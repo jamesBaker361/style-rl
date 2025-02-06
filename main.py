@@ -77,23 +77,6 @@ def main(args):
     def prompt_fn()->tuple[str,Any]:
         return args.prompt, {}
 
-
-    def image_outputs_logger(image_data, global_step, accelerate_logger):
-        # For the sake of this example, we will only log the last batch of images
-        # and associated data
-        result = {}
-        images, prompts, _, rewards, _ = image_data[-1]
-
-        for i, image in enumerate(images):
-            prompt = prompts[i]
-            reward = rewards[i].item()
-            result[f"{prompt:.25} | {reward:.2f}"] = image.unsqueeze(0).float()
-
-        accelerate_logger.log_images(
-            result,
-            step=global_step,
-        )
-
     content_image=Image.open("image.png")
 
     pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
@@ -152,7 +135,19 @@ def main(args):
                     _,sample_vit_style_embedding_list,=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list])
 
+                def image_outputs_logger(image_data, global_step, accelerate_logger):
+                    # For the sake of this example, we will only log the last batch of images
+                    # and associated data
+                    result = {}
+                    images, prompts, _, rewards, _ = image_data[-1]
 
+                    for i, image in enumerate(images):
+                        result[f"image_{i}"]=image
+
+                    accelerate_logger.log(
+                        result,
+                        step=global_step,
+                    )
                 style_lora_config=LoraConfig(
                     r=4,
                     lora_alpha=4,

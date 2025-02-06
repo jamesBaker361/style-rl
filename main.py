@@ -14,6 +14,7 @@ from PIL import Image
 from peft import LoraConfig
 from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline
 from typing import Any
+import torchvision.transforms as transforms
 
 parser=argparse.ArgumentParser()
 
@@ -52,7 +53,9 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_style_embedding_list=[]
     for image in image_list:
         #print("inputs :)")
-        vit_inputs={'pixel_values':image.to(vit_model.device)}
+        to_tensor = transforms.ToTensor()
+        image_tensor = to_tensor(image)
+        vit_inputs={'pixel_values':image_tensor.to(vit_model.device)}
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
         vit_embedding_list.append(vit_outputs.last_hidden_state.reshape(1,-1)[0])
         vit_style_embedding_list.append(vit_outputs.last_hidden_state[0][0]) #CLS token: https://github.com/google/dreambooth/issues/3
@@ -170,7 +173,7 @@ def main(args):
             if args.content_layer_train:
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_content_embedding_list])
+                    return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list])
             for e in range(args.epochs):
                 if args.style_layers_train:
                     style_trainer.train()

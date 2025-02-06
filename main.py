@@ -116,6 +116,7 @@ def main(args):
 
             
             config=DDPOConfig(log_with="wandb",
+                              sample_batch_size=args.batch_size,
                 num_epochs=1,
                 mixed_precision=args.mixed_precision,
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,

@@ -126,7 +126,7 @@ def main(args):
         images=[row[f"image_{k}"] for k in range(4)]
         _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
         vit_style_embedding_list=vit_style_embedding_list[:-1]
-        style_embedding=np.mean(vit_style_embedding_list,axis=0)
+        style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
         content_embedding=vit_content_embedding_list[-1]
         if args.method=="ddpo":
 

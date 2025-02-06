@@ -12,7 +12,7 @@ import torch
 import time
 from PIL import Image
 from peft import LoraConfig
-from pipelines import KeywordDDPOStableDiffusionPipeline
+from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline
 from typing import Any
 
 parser=argparse.ArgumentParser()
@@ -138,7 +138,7 @@ def main(args):
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
                 train_batch_size=args.batch_size,
                 train_gradient_accumulation_steps=args.gradient_accumulation_steps)
-            sd_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
             lora_config=LoraConfig(
                     r=4,
                     lora_alpha=4,

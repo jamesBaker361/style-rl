@@ -2,7 +2,7 @@ from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPO
 from diffusers import DiffusionPipeline
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:DiffusionPipeline,keyword:str="",use_lora:bool=True):
+    def __init__(self,sd_pipeline:DiffusionPipeline,keyword:str="",use_lora:bool=False):
         self.sd_pipeline=sd_pipeline
         self.keyword=keyword
         self.use_lora=use_lora

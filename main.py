@@ -167,6 +167,9 @@ def main(args):
                     style_reward_function,
                     prompt_fn
                 )
+            for e in range(args.epochs):
+                if args.style_layers_train:
+                    style_trainer.train()
                     
 
     

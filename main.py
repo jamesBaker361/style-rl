@@ -168,7 +168,7 @@ def main(args):
                     style_reward_function,
                     prompt_fn,
                     style_ddpo_pipeline,
-                    get_image_logger(STYLE_LORA)
+                    get_image_logger(STYLE_LORA+label)
                 )
             if args.content_layers_train:
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
@@ -189,7 +189,7 @@ def main(args):
                     style_reward_function,
                     prompt_fn,
                     content_ddpo_pipeline,
-                    get_image_logger(CONTENT_LORA)
+                    get_image_logger(CONTENT_LORA+label)
                 )
             for e in range(args.epochs):
                 if args.style_layers_train:

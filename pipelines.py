@@ -305,5 +305,5 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         return prompt_embeds
     
-    def safety_checker(self,image,*args,**kwargs):
+    def run_safety_checker(self,image,*args,**kwargs):
         return image,None

@@ -18,7 +18,7 @@ from typing import Any
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--mixed_precision",type=str,default="no")
-parser.add_argument("--project_name",type=str,default="style_creative")
+parser.add_argument("--project_name",type=str,default="style")
 parser.add_argument("--prompt",type=str,default="portrait, a beautiful cyborg with golden hair, 8k")
 parser.add_argument("--style_dataset",type=str,default="jlbaker361/stylization")
 parser.add_argument("--start",type=int,default=0)

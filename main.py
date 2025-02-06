@@ -31,6 +31,7 @@ parser.add_argument("--content_layers_train",action="store_true",help="separatel
 parser.add_argument("--sample_num_batches_per_epoch",type=int,default=64)
 parser.add_argument("--batch_size",type=int,default=2)
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
+parser.add_argument("--epochs",type=int,default=10)
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)

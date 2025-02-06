@@ -64,7 +64,22 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
+def get_image_logger(keyword:str):
+    def image_outputs_logger(image_data, global_step, accelerate_logger):
+        # For the sake of this example, we will only log the last batch of images
+        # and associated data
+        result = {}
+        images, prompts, _, rewards, _ = image_data[-1]
 
+        for i, image in enumerate(images):
+            result[f"{keyword}_{i}"]=image
+
+        accelerate_logger.log(
+            result,
+            step=global_step,
+        )
+    
+    return image_outputs_logger
 
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
@@ -137,19 +152,7 @@ def main(args):
                     _,sample_vit_style_embedding_list,=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list])
 
-                def image_outputs_logger(image_data, global_step, accelerate_logger):
-                    # For the sake of this example, we will only log the last batch of images
-                    # and associated data
-                    result = {}
-                    images, prompts, _, rewards, _ = image_data[-1]
-
-                    for i, image in enumerate(images):
-                        result[f"image_{i}"]=image
-
-                    accelerate_logger.log(
-                        result,
-                        step=global_step,
-                    )
+                
                 style_lora_config=LoraConfig(
                     r=4,
                     lora_alpha=4,
@@ -164,7 +167,7 @@ def main(args):
                     style_reward_function,
                     prompt_fn,
                     style_ddpo_pipeline,
-                    image_outputs_logger
+                    get_image_logger(STYLE_LORA)
                 )
             for e in range(args.epochs):
                 if args.style_layers_train:

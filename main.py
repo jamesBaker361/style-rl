@@ -90,7 +90,7 @@ def main(args):
     }[args.mixed_precision]
 
     def prompt_fn()->tuple[str,Any]:
-        print("args prompt")
+        print("args prompt",args.prompt)
         return args.prompt, {}
 
     content_image=Image.open("image.png")

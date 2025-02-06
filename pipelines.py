@@ -304,3 +304,6 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         prompt_embeds = torch.cat([prompt_embeds_tuple[1], prompt_embeds_tuple[0]])
 
         return prompt_embeds
+    
+    def safety_checker(self,image,*args,**kwargs):
+        return image,None

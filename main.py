@@ -10,6 +10,13 @@ parser=argparse.ArgumentParser()
 
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="style_creative")
+parser.add_argument("--prompt",type=str,default="wizard")
+parser.add_argument("--style_dataset",type=str,default="jlbaker361/stylization")
+parser.add_argument("--start",type=int,default=0)
+parser.add_argument("--end",type=int,default=5)
+parser.add_argument("--method",type=str,default="ddpo")
+parser.add_argument("--image_dim",type=int,default=256)
+parser.add_argument("--num_inference_steps",type=int,default=4)
 
 
 
@@ -29,8 +36,8 @@ def main(args):
     prompt = "Self-portrait oil painting, a beautiful cyborg with golden hair, 8k"
 
     # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
-    num_inference_steps = 4
-    images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0).images
+    num_inference_steps = args.num_inference_steps
+    images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
     images[0].save("image.png")
     return
 

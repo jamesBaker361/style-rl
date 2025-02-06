@@ -51,9 +51,8 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_content_embedding_list=[]
     vit_style_embedding_list=[]
     for image in image_list:
-        vit_inputs = vit_processor(images=[image], return_tensors="pt")
         #print("inputs :)")
-        vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)
+        vit_inputs={'pixel_values':image.to(vit_model.device)}
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
         vit_embedding_list.append(vit_outputs.last_hidden_state.reshape(1,-1)[0])
         vit_style_embedding_list.append(vit_outputs.last_hidden_state[0][0]) #CLS token: https://github.com/google/dreambooth/issues/3
@@ -103,11 +102,11 @@ def main(args):
 
     try:
         vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
-        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16')
+        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
     except:
     
         vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16',force_download=True)
-        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True)
+        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
     vit_model.eval()
     vit_model.requires_grad_(False)
 
@@ -138,7 +137,7 @@ def main(args):
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
                 train_batch_size=args.batch_size,
                 train_gradient_accumulation_steps=args.gradient_accumulation_steps)
-            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
             lora_config=LoraConfig(
                     r=4,
                     lora_alpha=4,
@@ -148,7 +147,6 @@ def main(args):
             if args.style_layers_train:
 
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
-                    images=(images * 255).round().clamp(0, 255).to(torch.uint8)
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list])
 
@@ -171,7 +169,6 @@ def main(args):
                 )
             if args.content_layer_train:
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
-                    images=(images * 255).round().clamp(0, 255).to(torch.uint8)
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_content_embedding_list])
             for e in range(args.epochs):

@@ -160,7 +160,9 @@ def main(args):
                 style_trainer=DDPOTrainer(
                     config,
                     style_reward_function,
-                    prompt_fn
+                    prompt_fn,
+                    style_ddpo_pipeline,
+                    image_outputs_logger
                 )
             for e in range(args.epochs):
                 if args.style_layers_train:

@@ -5,21 +5,42 @@ from experiment_helpers.better_vit_model import BetterViTModel
 from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CLIPTokenizer
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
+from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline
 from datasets import load_dataset
+import numpy as np
 import torch
 import time
+from PIL import Image
+from peft import LoraConfig
+from pipelines import KeywordDDPOStableDiffusionPipeline
+from typing import Any
 
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="style_creative")
-parser.add_argument("--prompt",type=str,default="wizard")
+parser.add_argument("--prompt",type=str,default="portrait, a beautiful cyborg with golden hair, 8k")
 parser.add_argument("--style_dataset",type=str,default="jlbaker361/stylization")
 parser.add_argument("--start",type=int,default=0)
 parser.add_argument("--limit",type=int,default=5)
 parser.add_argument("--method",type=str,default="ddpo")
 parser.add_argument("--image_dim",type=int,default=256)
 parser.add_argument("--num_inference_steps",type=int,default=4)
+parser.add_argument("--style_layers_train",action="store_true",help="only train the style layers")
+parser.add_argument("--content_layers_train",action="store_true",help="separately train the style layers")
+parser.add_argument("--sample_num_batches_per_epoch",type=int,default=64)
+parser.add_argument("--batch_size",type=int,default=2)
+parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
+
+def cos_sim_rescaled(vector_i,vector_j,return_np=False):
+    cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
+    try:
+        result= cos(vector_i,vector_j) *0.5 +0.5
+    except TypeError:
+        result= cos(torch.tensor(vector_i),torch.tensor(vector_j)) *0.5 +0.5
+    if return_np:
+        return result.detach().cpu().numpy()
+    return result
 
 def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTModel, image_list:list,return_numpy:bool=True):
     '''
@@ -45,13 +66,34 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
 
 
 def main(args):
-    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradiaent_accumulation_steps)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,
         "fp16":torch.float16
     }[args.mixed_precision]
 
+    def prompt_fn()->tuple[str,Any]:
+        return args.prompt, {}
+
+
+    def image_outputs_logger(image_data, global_step, accelerate_logger):
+        # For the sake of this example, we will only log the last batch of images
+        # and associated data
+        result = {}
+        images, prompts, _, rewards, _ = image_data[-1]
+
+        for i, image in enumerate(images):
+            prompt = prompts[i]
+            reward = rewards[i].item()
+            result[f"{prompt:.25} | {reward:.2f}"] = image.unsqueeze(0).float()
+
+        accelerate_logger.log_images(
+            result,
+            step=global_step,
+        )
+
+    content_image=Image.open("image.png")
 
     pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
     # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
@@ -74,25 +116,53 @@ def main(args):
     #images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
     #images[0].save("image.png")
     data=load_dataset(args.style_dataset,split="train")
+    STYLE_LORA="style_lora"
     for i, row in enumerate(data):
         if i<args.start or i>=args.limit:
             continue
         label=row["label"]
         images=[row[f"image_{k}"] for k in range(4)]
-        vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-        print(type(vit_style_embedding_list[0]))
-        try:
-            print("size",vit_style_embedding_list[0].size)
-        except:
-            try:
-                print("shape",vit_style_embedding_list[0].shape)
-            except:
-                try:
-                    print("len",len(vit_style_embedding_list[0]))
-                except:
-                    pass
+        _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
+        vit_style_embedding_list=vit_style_embedding_list[:-1]
+        style_embedding=np.mean(vit_style_embedding_list,axis=0)
+        content_embedding=vit_content_embedding_list[-1]
+        if args.method=="ddpo":
 
-    return
+
+
+            ddpo_pipeline = DefaultDDPOStableDiffusionPipeline(
+            "SimianLuo/LCM_Dreamshaper_v7",
+            use_lora=True,
+            )
+            config=DDPOConfig(log_with="wandb",
+                epochs=1,
+                mixed_precision=args.mixed_precision,
+                sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
+                train_batch_size=args.batch_size,
+                train_gradient_accumulation_steps=args.gradient_accumulation_steps)
+            sd_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+            ddpo_pipeline.sd_pipeline.scheduler=sd_pipeline.scheduler
+            if args.style_layers_train:
+
+                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
+                    images=(images * 255).round().clamp(0, 255).to(torch.uint8)
+                    _,sample_vit_style_embedding_list,=get_vit_embeddings(vit_processor,vit_model,images,False)
+                    return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list])
+
+
+                style_lora_config=LoraConfig(
+                    r=4,
+                    lora_alpha=4,
+                    init_lora_weights="gaussian",
+                    target_modules=["to_k", "to_q", "to_v", "to_out.0"],
+                    layers_to_transform=[0,1]
+                )
+                sd_pipeline.unet.add_adapter(style_lora_config,adapter_name=STYLE_LORA)
+                style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,STYLE_LORA)
+                style_trainer=DDPOTrainer()
+                    
+
+    
 
 if __name__=='__main__':
     print_details()

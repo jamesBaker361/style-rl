@@ -139,7 +139,8 @@ def main(args):
                 mixed_precision=args.mixed_precision,
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
                 train_batch_size=args.batch_size,
-                train_gradient_accumulation_steps=args.gradient_accumulation_steps)
+                train_gradient_accumulation_steps=args.gradient_accumulation_steps,
+                sample_num_steps=args.num_inference_steps)
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
             lora_config=LoraConfig(
                     r=4,

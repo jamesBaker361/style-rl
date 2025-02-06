@@ -52,10 +52,9 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_content_embedding_list=[]
     vit_style_embedding_list=[]
     for image in image_list:
+        vit_inputs = vit_processor(images=[image], return_tensors="pt")
         #print("inputs :)")
-        to_tensor = transforms.ToTensor()
-        image_tensor = to_tensor(image).unsqueeze(0)
-        vit_inputs={'pixel_values':image_tensor.to(vit_model.device)}
+        vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
         vit_embedding_list.append(vit_outputs.last_hidden_state.reshape(1,-1)[0])
         vit_style_embedding_list.append(vit_outputs.last_hidden_state[0][0]) #CLS token: https://github.com/google/dreambooth/issues/3

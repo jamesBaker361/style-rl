@@ -67,7 +67,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
 
 
 def main(args):
-    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradiaent_accumulation_steps)
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,

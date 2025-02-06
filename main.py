@@ -54,7 +54,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     for image in image_list:
         #print("inputs :)")
         to_tensor = transforms.ToTensor()
-        image_tensor = to_tensor(image)
+        image_tensor = to_tensor(image).unsqueeze(0)
         vit_inputs={'pixel_values':image_tensor.to(vit_model.device)}
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
         vit_embedding_list.append(vit_outputs.last_hidden_state.reshape(1,-1)[0])
@@ -119,6 +119,7 @@ def main(args):
     #images[0].save("image.png")
     data=load_dataset(args.style_dataset,split="train")
     STYLE_LORA="style_lora"
+    CONTENT_LORA="content_lora"
     for i, row in enumerate(data):
         if i<args.start or i>=args.limit:
             continue
@@ -174,6 +175,23 @@ def main(args):
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list])
+                
+                content_lora_config=LoraConfig(
+                    r=4,
+                    lora_alpha=4,
+                    init_lora_weights="gaussian",
+                    target_modules=["to_k", "to_q", "to_v", "to_out.0"],
+                    layers_to_transform=[4]
+                )
+                sd_pipeline.unet.add_adapter(content_lora_config,CONTENT_LORA)
+                content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,CONTENT_LORA)
+                content_trainer=DDPOTrainer(
+                    config,
+                    style_reward_function,
+                    prompt_fn,
+                    content_ddpo_pipeline,
+                    get_image_logger(CONTENT_LORA)
+                )
             for e in range(args.epochs):
                 if args.style_layers_train:
                     style_trainer.train()

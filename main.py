@@ -171,7 +171,7 @@ def main(args):
                     style_ddpo_pipeline,
                     get_image_logger(STYLE_LORA)
                 )
-            if args.content_layer_train:
+            if args.content_layers_train:
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list])
@@ -195,6 +195,8 @@ def main(args):
             for e in range(args.epochs):
                 if args.style_layers_train:
                     style_trainer.train()
+                if args.content_layers_train:
+                    content_trainer.train()
                     
 
     

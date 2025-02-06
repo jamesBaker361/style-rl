@@ -159,7 +159,11 @@ def main(args):
                 )
                 sd_pipeline.unet.add_adapter(style_lora_config,adapter_name=STYLE_LORA)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,STYLE_LORA)
-                style_trainer=DDPOTrainer()
+                style_trainer=DDPOTrainer(
+                    config,
+                    style_reward_function,
+                    prompt_fn
+                )
                     
 
     

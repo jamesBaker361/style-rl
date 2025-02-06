@@ -131,10 +131,7 @@ def main(args):
 
 
 
-            ddpo_pipeline = DefaultDDPOStableDiffusionPipeline(
-            "SimianLuo/LCM_Dreamshaper_v7",
-            use_lora=True,
-            )
+            
             config=DDPOConfig(log_with="wandb",
                 epochs=1,
                 mixed_precision=args.mixed_precision,
@@ -142,7 +139,12 @@ def main(args):
                 train_batch_size=args.batch_size,
                 train_gradient_accumulation_steps=args.gradient_accumulation_steps)
             sd_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
-            ddpo_pipeline.sd_pipeline.scheduler=sd_pipeline.scheduler
+            lora_config=LoraConfig(
+                    r=4,
+                    lora_alpha=4,
+                    init_lora_weights="gaussian",
+                    target_modules=["to_k", "to_q", "to_v", "to_out.0"]
+                )
             if args.style_layers_train:
 
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:

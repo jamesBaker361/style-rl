@@ -19,6 +19,7 @@ import torchvision.transforms as transforms
 from diffusers import StableDiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPOPipelineOutput,DDPOStableDiffusionPipeline
 import wandb
+from worse_peft import apply_lora
 
 parser=argparse.ArgumentParser()
 
@@ -155,7 +156,11 @@ def main(args):
                 #per_prompt_stat_tracking=True,
                 #per_prompt_stat_tracking_buffer_size=32
                 )
-            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+            sd_pipeline.unet.requires_grad_(False)
+            sd_pipeline.text_encoder.requires_grad_(False)
+            sd_pipeline.vae.requires_grad_(False)
+            sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
             #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
             lora_config=LoraConfig(
                     r=4,
@@ -168,14 +173,17 @@ def main(args):
                 @torch.no_grad()
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[torch.Tensor,Any]:
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    print("len sample",len(sample_vit_style_embedding_list))
-                    print("len images",len(images))
+                    #print("len sample",len(sample_vit_style_embedding_list))
+                    #print("len images",len(images))
                     return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
 
                 
-                style_keywords=["down_blocks.0","up_blocks.0"]
-                set_trainable(sd_pipeline,style_keywords)
+                style_keywords=[STYLE_LORA]
+                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[0],[0],False,keyword=STYLE_LORA)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
+                print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
+                for layer in style_ddpo_pipeline.get_trainable_layers():
+                    print(layer.device)
                 style_trainer=BetterDDPOTrainer(
                     config,
                     style_reward_function,

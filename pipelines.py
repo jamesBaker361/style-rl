@@ -309,3 +309,4 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     
     def run_safety_checker(self,image,*args,**kwargs):
         return image,None
+    

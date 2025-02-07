@@ -82,6 +82,12 @@ def get_image_logger(keyword:str):
     
     return image_outputs_logger
 
+def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
+    for key in keywords:
+        for name,p in sd_pipeline.unet.named_parameters():
+            if name.find(key)!=-1:
+                p.requires_grad_(True)
+
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
@@ -151,18 +157,14 @@ def main(args):
 
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list])
+                    print("len sample",len(sample_vit_style_embedding_list))
+                    print("len images",len(images))
+                    return [[cos_sim_rescaled(sample,style_embedding)] for sample in sample_vit_style_embedding_list]
 
                 
-                style_lora_config=LoraConfig(
-                    r=4,
-                    lora_alpha=4,
-                    init_lora_weights="gaussian",
-                    target_modules=["to_k", "to_q", "to_v", "to_out.0"],
-                    layers_to_transform=[0,1]
-                )
-                sd_pipeline.unet.add_adapter(style_lora_config,adapter_name=STYLE_LORA)
-                style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,STYLE_LORA)
+                style_keywords=["down_blocks.0","up_blocks.0"]
+                set_trainable(sd_pipeline,style_keywords)
+                style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 style_trainer=DDPOTrainer(
                     config,
                     style_reward_function,

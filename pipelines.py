@@ -7,16 +7,18 @@ from diffusers.image_processor import PipelineImageInput, VaeImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:DiffusionPipeline,keyword:str="",use_lora:bool=False):
+    def __init__(self,sd_pipeline:DiffusionPipeline,keywords:set,use_lora:bool=False):
         self.sd_pipeline=sd_pipeline
-        self.keyword=keyword
+        self.keywords=keywords
         self.use_lora=use_lora
 
     def get_trainable_layers(self):
-        return  [
-        p for name, p in self.sd_pipeline.unet.named_parameters()
-        if p.requires_grad and self.keyword in name
-            ]
+        ret=[]
+        for key in self.keywords:
+            for name,p in self.sd_pipeline.unet.named_parameters():
+                if name.find(key)!=-1:
+                    ret.append(p)
+        return ret
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):

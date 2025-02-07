@@ -2,6 +2,7 @@ import os
 import argparse
 from experiment_helpers.gpu_details import print_details
 from experiment_helpers.better_vit_model import BetterViTModel
+from experiment_helpers.better_ddpo_trainer import BetterDDPOTrainer
 from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CLIPTokenizer
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
@@ -15,6 +16,9 @@ from peft import LoraConfig
 from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline
 from typing import Any
 import torchvision.transforms as transforms
+from diffusers import StableDiffusionPipeline
+from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPOPipelineOutput,DDPOStableDiffusionPipeline
+import wandb
 
 parser=argparse.ArgumentParser()
 
@@ -33,6 +37,7 @@ parser.add_argument("--sample_num_batches_per_epoch",type=int,default=64)
 parser.add_argument("--batch_size",type=int,default=2)
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--epochs",type=int,default=10)
+parser.add_argument("--n_evaluation",type=int,default=10)
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -65,17 +70,17 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
-def get_image_logger(keyword:str):
-    def image_outputs_logger(image_data, global_step, accelerate_logger):
+def get_image_logger(keyword:str,accelerator:Accelerator):
+    def image_outputs_logger(image_data, global_step, _):
         # For the sake of this example, we will only log the last batch of images
         # and associated data
         result = {}
         images, prompts, _, rewards, _ = image_data[-1]
 
         for i, image in enumerate(images):
-            result[f"{keyword}_{i}"]=image
+            result[f"{keyword}_{i}"]=wandb.Image(image)
 
-        accelerate_logger.log(
+        accelerator.log(
             result,
             step=global_step,
         )
@@ -133,6 +138,7 @@ def main(args):
         vit_style_embedding_list=vit_style_embedding_list[:-1]
         style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
         content_embedding=vit_content_embedding_list[-1]
+        evaluation_images=[]
         if args.method=="ddpo":
 
 
@@ -145,8 +151,12 @@ def main(args):
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
                 train_batch_size=args.batch_size,
                 train_gradient_accumulation_steps=args.gradient_accumulation_steps,
-                sample_num_steps=args.num_inference_steps)
+                sample_num_steps=args.num_inference_steps,
+                #per_prompt_stat_tracking=True,
+                #per_prompt_stat_tracking_buffer_size=32
+                )
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
             lora_config=LoraConfig(
                     r=4,
                     lora_alpha=4,
@@ -155,22 +165,23 @@ def main(args):
                 )
             if args.style_layers_train:
 
-                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
+                @torch.no_grad()
+                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[torch.Tensor,Any]:
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     print("len sample",len(sample_vit_style_embedding_list))
                     print("len images",len(images))
-                    return [[cos_sim_rescaled(sample,style_embedding)] for sample in sample_vit_style_embedding_list]
+                    return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
 
                 
                 style_keywords=["down_blocks.0","up_blocks.0"]
                 set_trainable(sd_pipeline,style_keywords)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
-                style_trainer=DDPOTrainer(
+                style_trainer=BetterDDPOTrainer(
                     config,
                     style_reward_function,
                     prompt_fn,
                     style_ddpo_pipeline,
-                    get_image_logger(STYLE_LORA+label)
+                    get_image_logger(STYLE_LORA+label,accelerator)
                 )
             if args.content_layers_train:
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
@@ -195,9 +206,15 @@ def main(args):
                 )
             for e in range(args.epochs):
                 if args.style_layers_train:
-                    style_trainer.train()
+                    style_trainer.train(retain_graph=True)
                 if args.content_layers_train:
                     content_trainer.train()
+            for _ in range(args.n_evaluation):
+                image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+                evaluation_images.append(image)
+        elif args.method=="alignprop":
+            pass
+
                     
 
     

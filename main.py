@@ -179,7 +179,7 @@ def main(args):
             if args.style_layers_train:
 
                 @torch.no_grad()
-                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[list[torch.Tensor],Any]:
+                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     #print("len sample",len(sample_vit_style_embedding_list))
                     #print("len images",len(images))

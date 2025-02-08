@@ -41,7 +41,7 @@ parser.add_argument("--batch_size",type=int,default=2)
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--n_evaluation",type=int,default=10)
-parser.add_argument("--style_layers",nargs="*")
+parser.add_argument("--style_layers",nargs="*",type=int)
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -102,7 +102,10 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
                 p.requires_grad_(True)
 
 def main(args):
-    style_layers=[int(n) for n in args.style_layers]
+    if args.style_layers is not None:
+        style_layers=[int(n) for n in args.style_layers]
+    else:
+        style_layers=[0]
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={

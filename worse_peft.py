@@ -39,7 +39,7 @@ def apply_lora(unet:UNet2DConditionModel,down_block_indices:list,up_block_indice
         for name, module in block.named_modules():
             if isinstance(module, torch.nn.Linear) and any(x in name for x in ["to_q", "to_k", "to_v", "to_out.0"]):
                 lora_target_layers.append(name)
-                print(f"adding  {name} to dict")
+                #print(f"adding  {name} to dict")
         
         for layer_name in lora_target_layers:
             module = dict(block.named_modules())[layer_name]  # Get the module reference

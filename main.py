@@ -205,8 +205,10 @@ def main(args):
                 
                 style_keywords=[STYLE_LORA]
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
+                
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
+                sd_pipeline.unet.to(accelerator.device)
                 if args.method=="ddpo":
                     kwargs={"retain_graph":True}
                     style_trainer=BetterDDPOTrainer(

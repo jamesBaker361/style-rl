@@ -116,13 +116,13 @@ def main(args):
         def prompt_fn()->tuple[str,Any]:
             return args.prompt, {}
 
-        content_image=Image.open("image.png")
+        
 
         pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
 
-        prompt = "Self-portrait oil painting, a beautiful cyborg with golden hair, 8k"
+        content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
 
         try:
             vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')

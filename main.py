@@ -20,6 +20,7 @@ from diffusers import StableDiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPOPipelineOutput,DDPOStableDiffusionPipeline
 import wandb
 from worse_peft import apply_lora
+from ml_dtypes import bfloat16
 
 parser=argparse.ArgumentParser()
 
@@ -58,6 +59,8 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_content_embedding_list=[]
     vit_style_embedding_list=[]
     for image in image_list:
+        if type(image)==torch.Tensor and image.dtype==torch.bfloat16:
+            image=image.float()
         vit_inputs = vit_processor(images=[image], return_tensors="pt")
         #print("inputs :)")
         vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)

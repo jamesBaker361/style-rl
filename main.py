@@ -40,6 +40,7 @@ parser.add_argument("--batch_size",type=int,default=2)
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--n_evaluation",type=int,default=10)
+parser.add_argument("--style_layers",nargs="*")
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -100,6 +101,7 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
                 p.requires_grad_(True)
 
 def main(args):
+    style_layers=[int(n) for n in args.style_layers]
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
@@ -194,7 +196,7 @@ def main(args):
 
                 
                 style_keywords=[STYLE_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[0],[0],False,keyword=STYLE_LORA)
+                sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],False,keyword=STYLE_LORA)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
                 if args.method=="ddpo":

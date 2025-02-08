@@ -35,6 +35,7 @@ parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--num_inference_steps",type=int,default=4)
 parser.add_argument("--style_layers_train",action="store_true",help="only train the style layers")
 parser.add_argument("--content_layers_train",action="store_true",help="separately train the style layers")
+parser.add_argument("--style_mid_block",action="store_true")
 parser.add_argument("--sample_num_batches_per_epoch",type=int,default=64)
 parser.add_argument("--batch_size",type=int,default=2)
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
@@ -196,7 +197,7 @@ def main(args):
 
                 
                 style_keywords=[STYLE_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],False,keyword=STYLE_LORA)
+                sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
                 if args.method=="ddpo":

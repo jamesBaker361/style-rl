@@ -171,7 +171,7 @@ def main(args):
             if args.style_layers_train:
 
                 @torch.no_grad()
-                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[torch.Tensor,Any]:
+                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[list[torch.Tensor],Any]:
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     #print("len sample",len(sample_vit_style_embedding_list))
                     #print("len images",len(images))
@@ -193,7 +193,7 @@ def main(args):
             if args.content_layers_train:
 
                 @torch.no_grad()
-                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[torch.Tensor,Any]:
+                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
                 

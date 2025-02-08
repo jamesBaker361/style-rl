@@ -227,8 +227,8 @@ def main(args):
 
             accelerator.log({f"evaluation_{label}_{i}":wandb.Image(image) for i,image in enumerate(evaluation_images)  })
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
-            style_score=np.mean([cos_sim_rescaled(sample,style_embedding) for sample in evaluation_vit_style_embedding_list])
-            content_score=np.mean([cos_sim_rescaled(sample, content_embedding) for sample in evaluation_vit_content_embedding_list])
+            style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
+            content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
             accelerator.log({
                 f"{label}_content":content_score,
                 f"{label}_style":style_score

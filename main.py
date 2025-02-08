@@ -193,7 +193,7 @@ def main(args):
             if args.content_layers_train:
 
                 @torch.no_grad()
-                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
+                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> torch.Tensor:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
                 

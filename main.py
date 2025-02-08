@@ -99,7 +99,8 @@ def main(args):
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,
-        "fp16":torch.float16
+        "fp16":torch.float16,
+        "bf16":torch.bfloat16
     }[args.mixed_precision]
 
     with accelerator.autocast():

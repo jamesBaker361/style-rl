@@ -124,6 +124,10 @@ def main(args):
 
         content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
 
+        accelerator.log({
+            "src_content_image":wandb.Image(content_image)
+        })
+
         try:
             vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
             vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)

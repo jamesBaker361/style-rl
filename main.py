@@ -182,8 +182,7 @@ def main(args):
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,[0],[0],False,keyword=STYLE_LORA)
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
-                for layer in style_ddpo_pipeline.get_trainable_layers():
-                    print(layer.device)
+
                 style_trainer=BetterDDPOTrainer(
                     config,
                     style_reward_function,

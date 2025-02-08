@@ -12,11 +12,14 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         self.keywords=keywords
         self.use_lora=use_lora
 
+        for layer in self.get_trainable_layers():
+            layer.requires_grad_(True)
+
     def get_trainable_layers(self):
         ret=[]
         for key in self.keywords:
             for name,p in self.sd_pipeline.unet.named_parameters():
-                if name.find(key)!=-1:
+                if name.find(key)!=-1 and p.requires_grad:
                     ret.append(p)
         return ret
     
@@ -34,6 +37,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                       callback_on_step_end_tensor_inputs=None):
         return super().check_inputs(prompt, height, width, callback_steps, prompt_embeds, ip_adapter_image, ip_adapter_image_embeds, callback_on_step_end_tensor_inputs)
     
+    @torch.no_grad()
     def __call__(
         self,
         prompt: Union[str, List[str]] = None,

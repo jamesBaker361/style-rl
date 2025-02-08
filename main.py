@@ -252,16 +252,18 @@ def main(args):
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
             style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
             content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
-            accelerator.log({
+            metrics={
                 f"{label}_content":content_score,
                 f"{label}_style":style_score
-            })
+            }
+            accelerator.log(metrics)
             content_score_list.append(content_score)
             style_score_list.append(style_score)
-        accelerator.log({
+        metrics={
             f"content":np.mean(content_score_list),
             f"style":np.mean(style_score_list)
-            })
+            }
+        accelerator.log(metrics)
         
 
             

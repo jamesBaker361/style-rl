@@ -223,6 +223,9 @@ def main(args):
         elif args.method=="alignprop":
             pass
 
+        accelerator.log({f"evaluation_{label}_{i}":wandb.Image(image) for i,image in enumerate(evaluation_images)  })
+
+
                     
 
     

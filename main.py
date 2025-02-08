@@ -191,22 +191,18 @@ def main(args):
                     get_image_logger(STYLE_LORA+label,accelerator)
                 )
             if args.content_layers_train:
+
+                @torch.no_grad()
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any])-> torch.Tensor:
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list])
+                    return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
                 
-                content_lora_config=LoraConfig(
-                    r=4,
-                    lora_alpha=4,
-                    init_lora_weights="gaussian",
-                    target_modules=["to_k", "to_q", "to_v", "to_out.0"],
-                    layers_to_transform=[4]
-                )
-                sd_pipeline.unet.add_adapter(content_lora_config,CONTENT_LORA)
-                content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,CONTENT_LORA)
-                content_trainer=DDPOTrainer(
+                content_keywords=[CONTENT_LORA]
+                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
+                content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
+                content_trainer=BetterDDPOTrainer(
                     config,
-                    style_reward_function,
+                    content_reward_function,
                     prompt_fn,
                     content_ddpo_pipeline,
                     get_image_logger(CONTENT_LORA+label)
@@ -215,7 +211,7 @@ def main(args):
                 if args.style_layers_train:
                     style_trainer.train(retain_graph=True)
                 if args.content_layers_train:
-                    content_trainer.train()
+                    content_trainer.train(retain_graph=True)
             for _ in range(args.n_evaluation):
                 image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
                 evaluation_images.append(image)

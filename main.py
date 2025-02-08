@@ -59,9 +59,11 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_content_embedding_list=[]
     vit_style_embedding_list=[]
     for image in image_list:
+        do_rescale=True
         if type(image)==torch.Tensor and image.dtype==torch.bfloat16:
             image=image.float()
-        vit_inputs = vit_processor(images=[image], return_tensors="pt")
+            do_rescale=False
+        vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale)
         #print("inputs :)")
         vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
@@ -186,6 +188,8 @@ def main(args):
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     #print("len sample",len(sample_vit_style_embedding_list))
                     #print("len images",len(images))
+                    if args.method=="align":
+                        return torch.cat([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                     return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
 
                 

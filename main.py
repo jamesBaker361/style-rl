@@ -20,6 +20,7 @@ from diffusers import StableDiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPOPipelineOutput,DDPOStableDiffusionPipeline
 import wandb
 from worse_peft import apply_lora
+import torch.nn.functional as F
 from ml_dtypes import bfloat16
 
 parser=argparse.ArgumentParser()
@@ -62,10 +63,17 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     vit_style_embedding_list=[]
     for image in image_list:
         do_rescale=True
+        do_resize=True
         if type(image)==torch.Tensor and image.dtype==torch.bfloat16:
             image=image.float()
             do_rescale=False
-        vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale)
+            do_resize=False
+            image=F.interpolate(image, size=(224, 224), mode='bilinear', align_corners=False)
+            vit_inputs={
+                "pixel_values":image
+            }
+        else:
+            vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale,do_resize=do_resize)
         #print("inputs :)")
         vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
@@ -107,6 +115,7 @@ def main(args):
     else:
         style_layers=[0]
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
+    print("accelerator device",accelerator.device)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,
@@ -198,9 +207,11 @@ def main(args):
                     _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                     #print("len sample",len(sample_vit_style_embedding_list))
                     #print("len images",len(images))
-                    if args.method=="align":
-                        return torch.cat([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                     return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
+                
+                def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+                    _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                    return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
 
                 
                 style_keywords=[STYLE_LORA]
@@ -210,7 +221,7 @@ def main(args):
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
                 sd_pipeline.unet.to(accelerator.device)
                 if args.method=="ddpo":
-                    kwargs={"retain_graph":True}
+                    kwargs={"retain_graph":False}
                     style_trainer=BetterDDPOTrainer(
                         ddpo_config,
                         style_reward_function,
@@ -222,7 +233,7 @@ def main(args):
                     kwargs={}
                     style_trainer=AlignPropTrainer(
                         align_config,
-                        style_reward_function,
+                        style_reward_function_align,
                         prompt_fn,
                         style_ddpo_pipeline,
                         get_image_logger(STYLE_LORA+label,accelerator)

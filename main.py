@@ -102,123 +102,125 @@ def main(args):
         "fp16":torch.float16
     }[args.mixed_precision]
 
-    def prompt_fn()->tuple[str,Any]:
-        return args.prompt, {}
+    with accelerator.autocast():
 
-    content_image=Image.open("image.png")
+        def prompt_fn()->tuple[str,Any]:
+            return args.prompt, {}
 
-    pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
-    # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
-    pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
+        content_image=Image.open("image.png")
 
-    prompt = "Self-portrait oil painting, a beautiful cyborg with golden hair, 8k"
+        pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+        # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
+        pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
 
-    try:
-        vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
-        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
-    except:
-    
-        vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16',force_download=True)
-        vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
-    vit_model.eval()
-    vit_model.requires_grad_(False)
+        prompt = "Self-portrait oil painting, a beautiful cyborg with golden hair, 8k"
 
-    # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
-    num_inference_steps = args.num_inference_steps
-    #images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
-    #images[0].save("image.png")
-    data=load_dataset(args.style_dataset,split="train")
-    STYLE_LORA="style_lora"
-    CONTENT_LORA="content_lora"
-    for i, row in enumerate(data):
-        if i<args.start or i>=args.limit:
-            continue
-        label=row["label"]
-        images=[row[f"image_{k}"] for k in range(4)]
-        _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
-        vit_style_embedding_list=vit_style_embedding_list[:-1]
-        style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-        content_embedding=vit_content_embedding_list[-1]
-        evaluation_images=[]
-        if args.method=="ddpo":
+        try:
+            vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
+            vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
+        except:
+        
+            vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16',force_download=True)
+            vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
+        vit_model.eval()
+        vit_model.requires_grad_(False)
+
+        # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
+        num_inference_steps = args.num_inference_steps
+        #images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
+        #images[0].save("image.png")
+        data=load_dataset(args.style_dataset,split="train")
+        STYLE_LORA="style_lora"
+        CONTENT_LORA="content_lora"
+        for i, row in enumerate(data):
+            if i<args.start or i>=args.limit:
+                continue
+            label=row["label"]
+            images=[row[f"image_{k}"] for k in range(4)]
+            _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
+            vit_style_embedding_list=vit_style_embedding_list[:-1]
+            style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
+            content_embedding=vit_content_embedding_list[-1]
+            evaluation_images=[]
+            if args.method=="ddpo":
 
 
-
-            
-            config=DDPOConfig(log_with="wandb",
-                              sample_batch_size=args.batch_size,
-                num_epochs=1,
-                mixed_precision=args.mixed_precision,
-                sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
-                train_batch_size=args.batch_size,
-                train_gradient_accumulation_steps=args.gradient_accumulation_steps,
-                sample_num_steps=args.num_inference_steps,
-                #per_prompt_stat_tracking=True,
-                #per_prompt_stat_tracking_buffer_size=32
-                )
-            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-            sd_pipeline.unet.requires_grad_(False)
-            sd_pipeline.text_encoder.requires_grad_(False)
-            sd_pipeline.vae.requires_grad_(False)
-            sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-            #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
-            lora_config=LoraConfig(
-                    r=4,
-                    lora_alpha=4,
-                    init_lora_weights="gaussian",
-                    target_modules=["to_k", "to_q", "to_v", "to_out.0"]
-                )
-            if args.style_layers_train:
-
-                @torch.no_grad()
-                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[list[torch.Tensor],Any]:
-                    _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    #print("len sample",len(sample_vit_style_embedding_list))
-                    #print("len images",len(images))
-                    return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
 
                 
-                style_keywords=[STYLE_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[0],[0],False,keyword=STYLE_LORA)
-                style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
-                print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
-
-                style_trainer=BetterDDPOTrainer(
-                    config,
-                    style_reward_function,
-                    prompt_fn,
-                    style_ddpo_pipeline,
-                    get_image_logger(STYLE_LORA+label,accelerator)
-                )
-            if args.content_layers_train:
-
-                @torch.no_grad()
-                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
-                    _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
-                
-                content_keywords=[CONTENT_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
-                content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
-                content_trainer=BetterDDPOTrainer(
-                    config,
-                    content_reward_function,
-                    prompt_fn,
-                    content_ddpo_pipeline,
-                    get_image_logger(CONTENT_LORA+label,accelerator)
-                )
-            for e in range(args.epochs):
+                config=DDPOConfig(log_with="wandb",
+                                sample_batch_size=args.batch_size,
+                    num_epochs=1,
+                    mixed_precision=args.mixed_precision,
+                    sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
+                    train_batch_size=args.batch_size,
+                    train_gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    sample_num_steps=args.num_inference_steps,
+                    #per_prompt_stat_tracking=True,
+                    #per_prompt_stat_tracking_buffer_size=32
+                    )
+                sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+                sd_pipeline.unet.requires_grad_(False)
+                sd_pipeline.text_encoder.requires_grad_(False)
+                sd_pipeline.vae.requires_grad_(False)
+                sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
+                #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
+                lora_config=LoraConfig(
+                        r=4,
+                        lora_alpha=4,
+                        init_lora_weights="gaussian",
+                        target_modules=["to_k", "to_q", "to_v", "to_out.0"]
+                    )
                 if args.style_layers_train:
-                    style_trainer.train(retain_graph=True)
-                if args.content_layers_train:
-                    content_trainer.train(retain_graph=True)
-            for _ in range(args.n_evaluation):
-                image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
-                evaluation_images.append(image)
-        elif args.method=="alignprop":
-            pass
 
-        accelerator.log({f"evaluation_{label}_{i}":wandb.Image(image) for i,image in enumerate(evaluation_images)  })
+                    @torch.no_grad()
+                    def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)-> tuple[list[torch.Tensor],Any]:
+                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        #print("len sample",len(sample_vit_style_embedding_list))
+                        #print("len images",len(images))
+                        return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
+
+                    
+                    style_keywords=[STYLE_LORA]
+                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,[0],[0],False,keyword=STYLE_LORA)
+                    style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
+                    print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
+
+                    style_trainer=BetterDDPOTrainer(
+                        config,
+                        style_reward_function,
+                        prompt_fn,
+                        style_ddpo_pipeline,
+                        get_image_logger(STYLE_LORA+label,accelerator)
+                    )
+                if args.content_layers_train:
+
+                    @torch.no_grad()
+                    def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
+                        _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
+                    
+                    content_keywords=[CONTENT_LORA]
+                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
+                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
+                    content_trainer=BetterDDPOTrainer(
+                        config,
+                        content_reward_function,
+                        prompt_fn,
+                        content_ddpo_pipeline,
+                        get_image_logger(CONTENT_LORA+label,accelerator)
+                    )
+                for e in range(args.epochs):
+                    if args.style_layers_train:
+                        style_trainer.train(retain_graph=True)
+                    if args.content_layers_train:
+                        content_trainer.train(retain_graph=True)
+                for _ in range(args.n_evaluation):
+                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+                    evaluation_images.append(image)
+            elif args.method=="alignprop":
+                pass
+
+            accelerator.log({f"evaluation_{label}_{i}":wandb.Image(image) for i,image in enumerate(evaluation_images)  })
 
 
                     

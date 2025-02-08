@@ -159,9 +159,9 @@ def main(args):
                     #per_prompt_stat_tracking_buffer_size=32
                     )
                 sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-                sd_pipeline.unet.requires_grad_(False)
-                sd_pipeline.text_encoder.requires_grad_(False)
-                sd_pipeline.vae.requires_grad_(False)
+                sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
+                sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
+                sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
                 lora_config=LoraConfig(

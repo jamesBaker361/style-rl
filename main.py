@@ -214,9 +214,10 @@ def main(args):
                         style_trainer.train(retain_graph=True)
                     if args.content_layers_train:
                         content_trainer.train(retain_graph=True)
-                for _ in range(args.n_evaluation):
-                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
-                    evaluation_images.append(image)
+                with torch.no_grad():
+                    for _ in range(args.n_evaluation):
+                        image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+                        evaluation_images.append(image)
             elif args.method=="alignprop":
                 pass
 

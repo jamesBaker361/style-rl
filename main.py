@@ -205,7 +205,7 @@ def main(args):
                     content_reward_function,
                     prompt_fn,
                     content_ddpo_pipeline,
-                    get_image_logger(CONTENT_LORA+label)
+                    get_image_logger(CONTENT_LORA+label,accelerator)
                 )
             for e in range(args.epochs):
                 if args.style_layers_train:

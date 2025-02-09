@@ -270,7 +270,7 @@ def main(args):
                         args.epochs,
                         args.num_inference_steps,
                         args.gradient_accumulation_steps,
-                        args.batches,
+                        args.sample_num_batches_per_epoch,
                         style_ddpo_pipeline,
                         prompt_fn,
                         args.image_size,

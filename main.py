@@ -257,7 +257,7 @@ def main(args):
 
                 for image in images:
                     timesteps, num_inference_steps = retrieve_timesteps(
-                        sd_pipeline.scheduler, num_inference_steps, accelerator.device, timesteps, original_inference_steps=None)
+                        sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
                     timesteps=[timesteps[-1]]
                     pixels=image_transforms(image)
                     model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
@@ -335,7 +335,7 @@ def main(args):
                         style_ddpo_pipeline,
                         prompt_fn,
                         args.image_size,
-                        content_target_activations,
+                        style_target_activations,
                         args.label
                     )
             if args.content_layers_train:

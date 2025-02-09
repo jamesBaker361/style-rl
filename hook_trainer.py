@@ -25,7 +25,8 @@ class HookTrainer(PyTorchModelHubMixin):
                  train_adam_beta2:float=0.999,
                  train_adam_weight_decay:float=1e-4,
                  train_adam_epsilon:float=1e-8,
-                 random_layer:bool=True):
+                 random_layer:bool=True,
+                 train_use_8bit_adam:bool=False):
         self.accelerator=accelerator
         self.epochs=epochs
         self.num_inference_steps=num_inference_steps
@@ -42,9 +43,10 @@ class HookTrainer(PyTorchModelHubMixin):
         self.train_adam_weight_decay=train_adam_weight_decay
         self.train_adam_epsilon=train_adam_epsilon
         self.random_layer=random_layer
+        self.train_use_8bit_adam=train_use_8bit_adam
 
     def _setup_optimizer(self, trainable_layers_parameters):
-        if self.config.train_use_8bit_adam:
+        if self.train_use_8bit_adam:
             import bitsandbytes
 
             optimizer_cls = bitsandbytes.optim.AdamW8bit

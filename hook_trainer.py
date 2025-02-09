@@ -62,7 +62,7 @@ class HookTrainer(PyTorchModelHubMixin):
             f"{self.keyword}_training_image":wandb.Image(image)
         })
 
-    def train(self):
+    def train(self,*args,**kwargs):
         sd_pipeline=self.ddpo_pipeline.sd_pipeline
         unet=sd_pipeline.unet
         hooks=[]

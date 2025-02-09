@@ -259,7 +259,7 @@ def main(args):
                     timesteps, num_inference_steps = retrieve_timesteps(
                         sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
                     timesteps=[timesteps[-1]]
-                    pixels=image_transforms(image)
+                    pixels=image_transforms(image).unsqueeze(0)
                     model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
                     model_input = model_input * sd_pipeline.vae.config.scaling_factor
                     noise = torch.randn_like(model_input)

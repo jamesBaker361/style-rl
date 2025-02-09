@@ -92,7 +92,7 @@ class HookTrainer(PyTorchModelHubMixin):
             loss_list=[]
             with self.accelerator.accumulate():
                 for step in range(self.gradient_accumulation_steps):
-                    prompt=self.prompt_fn()
+                    prompt,_=self.prompt_fn()
                     image=sd_pipeline(prompt,num_inference_steps=self.num_inference_steps,height=self.image_size,width=self.image_size).images[0]
                     key = random.choice(list(activations.keys()))
                     value=activations[key]

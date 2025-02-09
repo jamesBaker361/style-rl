@@ -261,10 +261,13 @@ def main(args):
                     )
             for e in range(args.epochs):
                 torch.cuda.empty_cache()
+                start=time.time()
                 if args.style_layers_train:
                     style_trainer.train(**kwargs)
                 if args.content_layers_train:
                     content_trainer.train(**kwargs)
+                end=time.time()
+                print(f"\t {label} epoch {e} elapsed {end-start}")
             sd_pipeline.unet.requires_grad_(False)
             with torch.no_grad():
                 for _ in range(args.n_evaluation):

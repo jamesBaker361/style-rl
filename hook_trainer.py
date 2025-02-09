@@ -25,7 +25,7 @@ class HookTrainer(PyTorchModelHubMixin):
                  train_adam_beta2:float=0.999,
                  train_adam_weight_decay:float=1e-4,
                  train_adam_epsilon:float=1e-8,
-                 random_layer:bool=True,
+                 random_layer:bool=False,
                  train_use_8bit_adam:bool=False):
         self.accelerator=accelerator
         self.epochs=epochs
@@ -74,7 +74,7 @@ class HookTrainer(PyTorchModelHubMixin):
 
             # Hook function
         def hook_fn(module, input, output):
-            activations[module] = output # Store activation output
+            activations[module] = output[0].clone().detach() # Store activation output
 
         # Register hooks for all encoder and decoder blocks
         
@@ -90,13 +90,13 @@ class HookTrainer(PyTorchModelHubMixin):
             trainable_layers.parameters() if not isinstance(trainable_layers, list) else trainable_layers
         )
 
-        optimizer=self.accelerator.prepare(optimizer)
+        optimizer,trainable_layers=self.accelerator.prepare(optimizer,trainable_layers)
 
         target_activation_tensor=torch.stack([v for v in self.target_activations.values()])
 
         for e in range(self.epochs):
             loss_list=[]
-            with self.accelerator.accumulate():
+            with self.accelerator.accumulate(trainable_layers):
                 for step in range(self.gradient_accumulation_steps):
                     prompt,_=self.prompt_fn()
                     image=sd_pipeline(prompt,num_inference_steps=self.num_inference_steps,height=self.image_size,width=self.image_size).images[0]

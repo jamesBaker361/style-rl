@@ -220,6 +220,7 @@ def main(args):
                 
             ddpo_config=DDPOConfig(log_with="wandb",
                             sample_batch_size=args.batch_size,
+                            train_learning_rate=0.1,
                 num_epochs=1,
                 mixed_precision=args.mixed_precision,
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
@@ -244,7 +245,7 @@ def main(args):
                     print("hook fn called")
                     if module not in _style_target_activations:
                         _style_target_activations[module]=[]
-                    _style_target_activations[module].append(output)
+                    _style_target_activations[module].append(output[0].clone().detach())
 
                 style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
                 if args.style_mid_block:
@@ -309,7 +310,7 @@ def main(args):
                 sd_pipeline.unet.to(accelerator.device)
                 kwargs={}
                 if args.method=="ddpo":
-                    kwargs={"retain_graph":False}
+                    kwargs={"retain_graph":True}
                     style_trainer=BetterDDPOTrainer(
                         ddpo_config,
                         style_reward_function,

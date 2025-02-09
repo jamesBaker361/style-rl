@@ -163,7 +163,7 @@ def main(args):
 
             # Register hooks for all encoder and decoder blocks
             blocks=[block for i,block in enumerate(pipe.unet.down_blocks) if i in style_layers]
-            if args.use_mid_block:
+            if args.style_mid_block:
                 blocks.append(pipe.unet.mid_block)
             
             for layer in blocks:
@@ -246,7 +246,7 @@ def main(args):
                     _style_target_activations.append(output)
 
                 style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
-                if args.use_mid_block:
+                if args.style_mid_block:
                     style_blocks.append(sd_pipeline.unet.mid_block)
                 
                 for layer in blocks:

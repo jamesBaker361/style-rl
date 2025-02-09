@@ -82,7 +82,7 @@ class HookTrainer(PyTorchModelHubMixin):
 
         print(f"Registered {len(hooks)} hooks.")
 
-        trainable_layers = self.sd_pipeline.get_trainable_layers()
+        trainable_layers = self.ddpo_pipeline.get_trainable_layers()
 
         optimizer=self._setup_optimizer(
             trainable_layers.parameters() if not isinstance(trainable_layers, list) else trainable_layers

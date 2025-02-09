@@ -247,6 +247,7 @@ def main(args):
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
                 print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
                 sd_pipeline.unet.to(accelerator.device)
+                kwargs={}
                 if args.method=="ddpo":
                     kwargs={"retain_graph":False}
                     style_trainer=BetterDDPOTrainer(
@@ -256,8 +257,8 @@ def main(args):
                         style_ddpo_pipeline,
                         get_image_logger(STYLE_LORA+label,accelerator)
                     )
-                if args.method=="align":
-                    kwargs={}
+                elif args.method=="align":
+                    
                     style_trainer=AlignPropTrainer(
                         align_config,
                         style_reward_function_align,

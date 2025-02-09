@@ -104,6 +104,7 @@ class HookTrainer(PyTorchModelHubMixin):
                 self.save_image(image)
             avg_loss=np.mean(loss_list)
             self.accelerator.log({f"{self.keyword}_loss":avg_loss})
+            self.accelerator.log({f"all_loss":avg_loss})
 
         for hook in hooks:
             hook.remove()

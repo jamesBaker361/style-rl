@@ -43,6 +43,7 @@ parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
+parser.add_argument("--hook_based",action="store_true")
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -68,8 +69,8 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
             image=image.float()
             do_rescale=False
             do_resize=False
-            print("size",image.size())
-            image=F.interpolate(image, size=(224, 224), mode='bilinear', align_corners=False)
+            #print("size",image.size())
+            image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
             vit_inputs={
                 "pixel_values":image
             }
@@ -135,8 +136,31 @@ def main(args):
         pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
+        hooks = []
+        if args.hook_based:
+
+            activations = {}
+
+            # Hook function
+            def hook_fn(module, input, output):
+                if module not in activations:
+                    activations[module] = [output]  # Store activation output
+                else:
+                    activations[module].append(output)
+
+            # Register hooks for all encoder and decoder blocks
+            
+            for name, layer in pipe.unet.up_blocks+pipe.unet.down_blocks+[pipe.unet.mid_block]:
+                if "encoder" in name or "decoder" in name:  # Target encoder & decoder blocks
+                    hook = layer.register_forward_hook(hook_fn)
+                    hooks.append(hook)  # Keep track of hooks for later removal
+
+            print(f"Registered {len(hooks)} hooks.")
 
         content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+
+        for hook in hooks:
+            hook.remove()
 
         accelerator.log({
             "src_content_image":wandb.Image(content_image)

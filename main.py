@@ -250,7 +250,7 @@ def main(args):
                 if args.style_mid_block:
                     style_blocks.append(sd_pipeline.unet.mid_block)
                 
-                for layer in blocks:
+                for layer in style_blocks:
                     hook = layer.register_forward_hook(style_hook_fn)
                     hooks.append(hook)  # Keep track of hooks for later removal
 

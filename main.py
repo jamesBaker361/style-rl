@@ -241,9 +241,10 @@ def main(args):
                 _style_target_activations={}
 
                 def style_hook_fn(module, input, output):
+                    print("hook fn called")
                     if module not in _style_target_activations:
                         _style_target_activations[module]=[]
-                    _style_target_activations.append(output)
+                    _style_target_activations[module].append(output)
 
                 style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
                 if args.style_mid_block:
@@ -336,7 +337,7 @@ def main(args):
                         prompt_fn,
                         args.image_size,
                         style_target_activations,
-                        args.label
+                        label
                     )
             if args.content_layers_train:
 

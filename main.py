@@ -22,6 +22,7 @@ import wandb
 from worse_peft import apply_lora
 import torch.nn.functional as F
 from ml_dtypes import bfloat16
+from hook_trainer import HookTrainer
 
 parser=argparse.ArgumentParser()
 
@@ -137,16 +138,13 @@ def main(args):
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
         hooks = []
-        if args.hook_based:
+        if args.method=="hook":
 
-            activations = {}
+            target_activations = {}
 
             # Hook function
             def hook_fn(module, input, output):
-                if module not in activations:
-                    activations[module] = [output]  # Store activation output
-                else:
-                    activations[module].append(output)
+                target_activations[module] = output
 
             # Register hooks for all encoder and decoder blocks
             
@@ -266,7 +264,21 @@ def main(args):
                         style_ddpo_pipeline,
                         None
                         )
+                elif args.method=="hook":
+                    style_trainer=HookTrainer(
+                        accelerator,
+                        args.epochs,
+                        args.num_inference_steps,
+                        args.gradient_accumulation_steps,
+                        args.batches,
+                        style_ddpo_pipeline,
+                        prompt_fn,
+                        args.image_size,
+                        target_activations,
+                        args.label
+                    )
             if args.content_layers_train:
+
 
                 @torch.no_grad()
                 def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:

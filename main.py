@@ -68,6 +68,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
             image=image.float()
             do_rescale=False
             do_resize=False
+            print("size",image.size())
             image=F.interpolate(image, size=(224, 224), mode='bilinear', align_corners=False)
             vit_inputs={
                 "pixel_values":image
@@ -110,6 +111,7 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
                 p.requires_grad_(True)
 
 def main(args):
+    torch.cuda.empty_cache()
     if args.style_layers is not None:
         style_layers=[int(n) for n in args.style_layers]
     else:
@@ -258,6 +260,7 @@ def main(args):
                         get_image_logger(CONTENT_LORA+label,accelerator)
                     )
             for e in range(args.epochs):
+                torch.cuda.empty_cache()
                 if args.style_layers_train:
                     style_trainer.train(**kwargs)
                 if args.content_layers_train:

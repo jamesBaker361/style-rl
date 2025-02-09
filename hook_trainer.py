@@ -24,7 +24,8 @@ class HookTrainer(PyTorchModelHubMixin):
                  train_adam_beta1:float=0.9,
                  train_adam_beta2:float=0.999,
                  train_adam_weight_decay:float=1e-4,
-                 train_adam_epsilon:float=1e-8):
+                 train_adam_epsilon:float=1e-8,
+                 random_layer:bool=True):
         self.accelerator=accelerator
         self.epochs=epochs
         self.num_inference_steps=num_inference_steps
@@ -40,6 +41,7 @@ class HookTrainer(PyTorchModelHubMixin):
         self.train_adam_beta2=train_adam_beta2
         self.train_adam_weight_decay=train_adam_weight_decay
         self.train_adam_epsilon=train_adam_epsilon
+        self.random_layer=random_layer
 
     def _setup_optimizer(self, trainable_layers_parameters):
         if self.config.train_use_8bit_adam:
@@ -88,15 +90,21 @@ class HookTrainer(PyTorchModelHubMixin):
 
         optimizer=self.accelerator.prepare(optimizer)
 
+        target_activation_tensor=torch.stack([v for v in self.target_activations.values()])
+
         for e in range(self.epochs):
             loss_list=[]
             with self.accelerator.accumulate():
                 for step in range(self.gradient_accumulation_steps):
                     prompt,_=self.prompt_fn()
                     image=sd_pipeline(prompt,num_inference_steps=self.num_inference_steps,height=self.image_size,width=self.image_size).images[0]
-                    key = random.choice(list(activations.keys()))
-                    value=activations[key]
-                    loss=F.mse_loss(self.target_activations[key],value)
+                    if self.random_layer:
+                        key = random.choice(list(activations.keys()))
+                        value=activations[key]
+                        loss=F.mse_loss(self.target_activations[key],value)
+                    else:
+                        activation_tensor=torch.stack([v for v in activations.values()])
+                        loss=F.mse_loss(target_activation_tensor,activation_tensor)
                     self.accelerator.backward(loss)
                     optimizer.step()
                     optimizer.zero_grad()

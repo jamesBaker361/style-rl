@@ -262,7 +262,7 @@ def main(args):
                         style_reward_function_align,
                         prompt_fn,
                         style_ddpo_pipeline,
-                        get_image_logger(STYLE_LORA+label,accelerator)
+                        None
                         )
             if args.content_layers_train:
 
@@ -288,8 +288,10 @@ def main(args):
                 start=time.time()
                 if args.style_layers_train:
                     style_trainer.train(**kwargs)
+                    accelerator.free_memory()
                 if args.content_layers_train:
                     content_trainer.train(**kwargs)
+                    accelerator.free_memory()
                 end=time.time()
                 print(f"\t {label} epoch {e} elapsed {end-start}")
             sd_pipeline.unet.requires_grad_(False)

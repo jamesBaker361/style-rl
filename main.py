@@ -186,6 +186,7 @@ def main(args):
         style_score_list=[]
         content_score_list=[]
         for i, row in enumerate(data):
+            accelerator.free_memory()
             if i<args.start or i>=args.limit:
                 continue
             label=row["label"]

@@ -7,6 +7,7 @@ from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CL
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,AlignPropConfig,AlignPropTrainer
+from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img import retrieve_timesteps
 from datasets import load_dataset
 import numpy as np
 import torch
@@ -45,6 +46,10 @@ parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
+
+RARE_TOKEN="sksz"
+
+
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -114,6 +119,16 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
 
 def main(args):
     torch.cuda.empty_cache()
+
+    image_transforms = transforms.Compose(
+            [
+                transforms.Resize(args.image_size, interpolation=transforms.InterpolationMode.BILINEAR),
+                transforms.CenterCrop(args.image_size),
+                transforms.ToTensor(),
+                transforms.Normalize([0.5], [0.5]),
+            ]
+        )
+
     if args.style_layers is not None:
         style_layers=[int(n) for n in args.style_layers]
     else:
@@ -140,18 +155,20 @@ def main(args):
         hooks = []
         if args.method=="hook":
 
-            target_activations = {}
+            content_target_activations = {}
 
             # Hook function
             def hook_fn(module, input, output):
-                target_activations[module] = output
+                content_target_activations[module] = output
 
             # Register hooks for all encoder and decoder blocks
+            blocks=[block for i,block in enumerate(pipe.unet.down_blocks) if i in style_layers]
+            if args.use_mid_block:
+                blocks.append(pipe.unet.mid_block)
             
-            for name, layer in pipe.unet.up_blocks+pipe.unet.down_blocks+[pipe.unet.mid_block]:
-                if "encoder" in name or "decoder" in name:  # Target encoder & decoder blocks
-                    hook = layer.register_forward_hook(hook_fn)
-                    hooks.append(hook)  # Keep track of hooks for later removal
+            for layer in blocks:
+                hook = layer.register_forward_hook(hook_fn)
+                hooks.append(hook)  # Keep track of hooks for later removal
 
             print(f"Registered {len(hooks)} hooks.")
 
@@ -189,13 +206,15 @@ def main(args):
                 continue
             label=row["label"]
             images=[row[f"image_{k}"] for k in range(4)]
+
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]
             
-
+            
+                    
 
 
                 
@@ -217,6 +236,48 @@ def main(args):
             sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
             sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
+
+            if args.method=="hook":
+                _style_target_activations={}
+
+                def style_hook_fn(module, input, output):
+                    if module not in _style_target_activations:
+                        _style_target_activations[module]=[]
+                    _style_target_activations.append(output)
+
+                style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
+                if args.use_mid_block:
+                    style_blocks.append(sd_pipeline.unet.mid_block)
+                
+                for layer in blocks:
+                    hook = layer.register_forward_hook(style_hook_fn)
+                    hooks.append(hook)  # Keep track of hooks for later removal
+
+                print(f"\tRegistered {len(hooks)} hooks.")
+
+                for image in images:
+                    timesteps, num_inference_steps = retrieve_timesteps(
+                        sd_pipeline.scheduler, num_inference_steps, accelerator.device, timesteps, original_inference_steps=None)
+                    timesteps=[timesteps[-1]]
+                    pixels=image_transforms(image)
+                    model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
+                    model_input = model_input * sd_pipeline.vae.config.scaling_factor
+                    noise = torch.randn_like(model_input)
+                    noisy_model_input = sd_pipeline.scheduler.add_noise(model_input, noise, timesteps)
+
+                    sd_pipeline(" ",timesteps=timesteps,latents=noisy_model_input,height=args.image_size,width=args.image_size)
+
+                print("len  _style_target_activations",len(_style_target_activations))
+                for k,v in _style_target_activations.items():
+                    print("len values",len(v))
+                    break
+                style_target_activations={}
+                for k,v in _style_target_activations.items():
+                    style_target_activations[k]=torch.stack([v[i] for i in range(3, len(v), 4)]).mean(dim=0)
+
+
+                    
+
             sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
             #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
             lora_config=LoraConfig(
@@ -274,7 +335,7 @@ def main(args):
                         style_ddpo_pipeline,
                         prompt_fn,
                         args.image_size,
-                        target_activations,
+                        content_target_activations,
                         args.label
                     )
             if args.content_layers_train:

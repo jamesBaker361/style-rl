@@ -228,6 +228,7 @@ def main(args):
                 #per_prompt_stat_tracking_buffer_size=32
                 )
             align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
+                                         train_learning_rate=args.learning_rate,
                 sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
                 truncated_rand_backprop_minmax=[0,args.num_inference_steps])
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
@@ -335,7 +336,8 @@ def main(args):
                         prompt_fn,
                         args.image_size,
                         style_target_activations,
-                        label
+                        label,
+                        train_learning_rate=args.learning_rate
                     )
             if args.content_layers_train:
 

@@ -171,6 +171,7 @@ def main(args):
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
+    time.sleep(1) #wait a second maybe for accelerator stuff?
 
     with accelerator.autocast():
 
@@ -261,7 +262,7 @@ def main(args):
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]).mean(dim=0)
+            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image) for image in images]).mean(dim=0)
 
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]
@@ -351,7 +352,7 @@ def main(args):
                             reward_fn=cos_sim_rescaled
                         return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
                     elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
                         return [mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
                 
                 def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
@@ -363,7 +364,7 @@ def main(args):
                             reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                     elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
                         
                         return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
 

@@ -262,7 +262,7 @@ def main(args):
                     timesteps, num_inference_steps = retrieve_timesteps(
                         sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
                     timesteps=timesteps[-1].unsqueeze(0)
-                    pixels=image_transforms(image).unsqueeze(0)
+                    pixels=image_transforms(image).unsqueeze(0).to(device=accelerator.device,dtype=torch_dtype)
                     model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
                     model_input = model_input * sd_pipeline.vae.config.scaling_factor
                     noise = torch.randn_like(model_input)
@@ -307,7 +307,7 @@ def main(args):
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
                 
                 style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
-                print("n trainable layers",len(style_ddpo_pipeline.get_trainable_layers()))
+                print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
                 sd_pipeline.unet.to(accelerator.device)
                 kwargs={}
                 if args.method=="ddpo":
@@ -356,6 +356,7 @@ def main(args):
                 content_keywords=[CONTENT_LORA]
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
                 content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
+                print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
                 if args.method=="ddpo":
                     kwargs={"retain_graph":True}
                     content_trainer=BetterDDPOTrainer(

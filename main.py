@@ -75,8 +75,8 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     for image in image_list:
         do_rescale=True
         do_resize=True
-        if type(image)==torch.Tensor and image.dtype==torch.bfloat16:
-            image=image.float()
+        if type(image)==torch.Tensor:
+            image=image.to(dtype=vit_model.dtype)
             do_rescale=False
             do_resize=False
             #print("size",image.size())
@@ -341,7 +341,8 @@ def main(args):
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.reward_fn=="mse":
-                            reward_fn=F.mse_loss
+                            def reward_fn(*args,**kwargs):
+                                return -1*F.mse_loss(*args,**kwargs)
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
@@ -353,7 +354,8 @@ def main(args):
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.reward_fn=="mse":
-                            reward_fn=F.mse_loss
+                            def reward_fn(*args,**kwargs):
+                                return -1*F.mse_loss(*args,**kwargs)
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}

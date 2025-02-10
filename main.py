@@ -190,7 +190,8 @@ def main(args):
             if type(image)!=torch.Tensor:
                 image=transforms.ToTensor()(image)
             
-            image.to(dtype=torch_dtype, device=accelerator.device)
+            image=image.to(dtype=torch_dtype)
+            image=image.to(device=accelerator.device)
             image.requires_grad_(True)
             image=vgg_image_transforms(image)
             #image=image.float()
@@ -223,7 +224,7 @@ def main(args):
             print(f"Registered {len(hooks)} hooks.")
 
         content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
-
+        print("content_image type",type(content_image))
         for hook in hooks:
             hook.remove()
 

@@ -182,6 +182,10 @@ def main(args):
         def prompt_fn()->tuple[str,Any]:
             return args.prompt, {}
         
+        vgg_extractor=models.vgg16(pretrained=True).features[:args.vgg_layer].eval().to(device=accelerator.device,dtype=torch_dtype)
+        vgg_extractor.requires_grad_(False)
+        vgg_extractor=accelerator.prepare(vgg_extractor)
+        
         def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
             if type(image)!=torch.Tensor:
                 image=transforms.ToTensor()(image)
@@ -237,9 +241,7 @@ def main(args):
         vit_model.eval()
         vit_model.requires_grad_(False)
 
-        vgg_extractor=models.vgg16(pretrained=True).features[:args.vgg_layer].eval().to(device=accelerator.device,dtype=torch_dtype)
-        vgg_extractor.requires_grad_(False)
-        vgg_extractor=accelerator.prepare(vgg_extractor)
+        
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps

@@ -255,7 +255,7 @@ def main(args):
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-            vgg_style_embedding=torch.stack([[get_vgg_embedding(vgg_extractor,image) for image in images]]).mean(dim=0)
+            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image) for image in images]).mean(dim=0)
 
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]

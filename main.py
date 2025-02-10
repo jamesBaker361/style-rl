@@ -459,6 +459,7 @@ def main(args):
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
                 content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
                 print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
+                kwargs={}
                 if args.method=="ddpo":
                     kwargs={"retain_graph":True}
                     content_trainer=BetterDDPOTrainer(

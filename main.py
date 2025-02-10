@@ -455,6 +455,7 @@ def main(args):
 
                     image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
+                    print("evaluation image of type",type(image))
             
 
             for image in evaluation_images:

@@ -336,32 +336,34 @@ def main(args):
 
             if args.style_layers_train:
 
+                def mse_reward_fn(*args,**kwargs):
+                    return -1*F.mse_loss(*args,**kwargs)
+
                 @torch.no_grad()
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.reward_fn=="mse":
-                            def reward_fn(*args,**kwargs):
-                                return -1*F.mse_loss(*args,**kwargs)
+                            reward_fn=mse_reward_fn
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
                     elif args.reward_fn=="vgg":
                         sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
-                        return [F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
+                        return [mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
                 
                 def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.reward_fn=="mse":
-                            def reward_fn(*args,**kwargs):
-                                return -1*F.mse_loss(*args,**kwargs)
+                            reward_fn=mse_reward_fn
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                     elif args.reward_fn=="vgg":
                         sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
-                        return torch.stack([F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
+                        
+                        return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
 
                 
                 style_keywords=[STYLE_LORA]

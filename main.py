@@ -242,7 +242,7 @@ def main(args):
                 _style_target_activations={}
 
                 def style_hook_fn(module, input, output):
-                    print("hook fn called")
+                    output[0].requires_grad_(True)
                     if module not in _style_target_activations:
                         _style_target_activations[module]=[]
                     _style_target_activations[module].append(output[0].clone().detach())

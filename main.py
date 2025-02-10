@@ -85,7 +85,11 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
                 "pixel_values":image
             }
         else:
-            vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale,do_resize=do_resize)
+            try:
+                vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale,do_resize=do_resize)
+            except ValueError as e:
+                print("type image",type(image))
+                raise
         #print("inputs :)")
         vit_inputs['pixel_values']=vit_inputs['pixel_values'].to(vit_model.device)
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)

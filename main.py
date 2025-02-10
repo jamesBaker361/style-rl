@@ -272,6 +272,9 @@ def main(args):
 
                     sd_pipeline(" ",timesteps=timesteps,latents=noisy_model_input,height=args.image_size,width=args.image_size)
 
+                for hook in hooks:
+                    hook.remove()
+                hooks=[]
                 print("len  _style_target_activations",len(_style_target_activations))
                 for k,v in _style_target_activations.items():
                     print("len values",len(v))

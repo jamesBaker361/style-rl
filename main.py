@@ -422,6 +422,8 @@ def main(args):
                         label,
                         train_learning_rate=args.learning_rate
                     )
+                if args.reward_fn=="vgg":
+                    kwargs={"retain_graph":True}
             if args.content_layers_train:
 
 

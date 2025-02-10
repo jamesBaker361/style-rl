@@ -137,7 +137,7 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator):
         images, prompts, _ = [image_pair_data["images"], image_pair_data["prompts"], image_pair_data["rewards"]]
         for i, image in enumerate(images):
             result[f"{keyword}_{i}"]=wandb.Image(image)
-
+        print("n images =",len(images))
         accelerator.log(
             result,
             step=accelerator.get_tracker("wandb").run.step,

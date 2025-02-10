@@ -403,6 +403,8 @@ def main(args):
             accelerator.log(metrics)
             content_score_list.append(content_score)
             style_score_list.append(style_score)
+            del sd_pipeline
+            accelerator.free_memory()
         metrics={
             f"content":np.mean(content_score_list),
             f"style":np.mean(style_score_list)

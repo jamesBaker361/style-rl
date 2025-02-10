@@ -138,7 +138,7 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator):
 
         accelerator.log(
             result,
-            step=global_step,
+            step=accelerator.get_tracker("wandb").run.step,
         )
     return image_outputs_logger
 

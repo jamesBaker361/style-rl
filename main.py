@@ -127,7 +127,7 @@ def get_image_logger(keyword:str,accelerator:Accelerator):
     
     return image_outputs_logger
 
-def get_image_logger_align(keyword:str,accelerator:Accelerator):
+def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
 
     def image_outputs_logger(image_pair_data, global_step, accelerate_logger):
         print("called image logger align")
@@ -137,6 +137,7 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator):
         images, prompts, _ = [image_pair_data["images"], image_pair_data["prompts"], image_pair_data["rewards"]]
         for i, image in enumerate(images):
             result[f"{keyword}_{i}"]=wandb.Image(image)
+            cache.append(image)
         print("n images =",len(images))
         accelerator.log(
             result,
@@ -354,7 +355,8 @@ def main(args):
                     
 
             sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-
+            content_cache=[]
+            style_cache=[]
             if args.style_layers_train:
 
                 @torch.no_grad()
@@ -391,6 +393,7 @@ def main(args):
                 print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
                 sd_pipeline.unet.to(accelerator.device)
                 kwargs={}
+                
                 if args.method=="ddpo":
                     kwargs={"retain_graph":True}
                     style_trainer=BetterDDPOTrainer(
@@ -407,7 +410,7 @@ def main(args):
                         style_reward_function_align,
                         prompt_fn,
                         style_ddpo_pipeline,
-                        get_image_logger_align(STYLE_LORA+label,accelerator)
+                        get_image_logger_align(STYLE_LORA+label,accelerator,style_cache)
                         )
                 elif args.method=="hook":
                     style_trainer=HookTrainer(
@@ -461,6 +464,7 @@ def main(args):
                 print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
                 sd_pipeline.unet.to(accelerator.device)
                 kwargs={}
+                
                 if args.method=="ddpo":
                     kwargs={"retain_graph":True}
                     content_trainer=BetterDDPOTrainer(
@@ -476,7 +480,7 @@ def main(args):
                         content_reward_function_align,
                         prompt_fn,
                         content_ddpo_pipeline,
-                        get_image_logger_align(CONTENT_LORA+label,accelerator)
+                        get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
                     )
             for e in range(args.epochs):
                 torch.cuda.empty_cache()
@@ -501,7 +505,11 @@ def main(args):
             
 
             for image in evaluation_images:
-                accelerator.log({f"evaluation_{label}":wandb.Image(image)}) 
+                accelerator.log({f"evaluation_{label}":wandb.Image(image)})
+            for content_image in content_cache:
+                accelerator.log({f"cache_{label}_{CONTENT_LORA}":content_image})
+            for style_image in style_cache:
+                accelerator.log({f"cache_{label}_{STYLE_LORA}":style_image})
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
             style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
             content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])

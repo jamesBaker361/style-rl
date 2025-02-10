@@ -12,7 +12,7 @@ from datasets import load_dataset
 import numpy as np
 import torch
 import time
-from PIL import Image
+from PIL import Image,PngImagePlugin
 from peft import LoraConfig
 from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline
 from typing import Any
@@ -84,6 +84,13 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
             vit_inputs={
                 "pixel_values":image
             }
+        elif type(image)==PngImagePlugin.PngImageFile:
+            image=image.convert("RGB")
+            try:
+                vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale,do_resize=do_resize)
+            except ValueError as e:
+                print("type image",type(image))
+                raise
         else:
             try:
                 vit_inputs = vit_processor(images=[image], return_tensors="pt",do_rescale=do_rescale,do_resize=do_resize)

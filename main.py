@@ -245,7 +245,7 @@ def main(args):
                     output[0].requires_grad_(True)
                     if module not in _style_target_activations:
                         _style_target_activations[module]=[]
-                    _style_target_activations[module].append(output[0].clone().detach())
+                    _style_target_activations[module].append(output[0])
 
                 style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
                 if args.style_mid_block:
@@ -348,6 +348,10 @@ def main(args):
                     _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                     return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
                 
+                def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
+                    _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
+                    return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
+                
                 content_keywords=[CONTENT_LORA]
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
                 content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
@@ -359,6 +363,14 @@ def main(args):
                         prompt_fn,
                         content_ddpo_pipeline,
                         get_image_logger(CONTENT_LORA+label,accelerator)
+                    )
+                elif args.method=="align":
+                    content_trainer=AlignPropTrainer(
+                        align_config,
+                        content_reward_function_align,
+                        prompt_fn,
+                        content_ddpo_pipeline,
+                        None
                     )
             for e in range(args.epochs):
                 torch.cuda.empty_cache()

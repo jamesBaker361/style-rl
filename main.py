@@ -112,6 +112,22 @@ def get_image_logger(keyword:str,accelerator:Accelerator):
     
     return image_outputs_logger
 
+def get_image_logger_align(keyword:str,accelerator:Accelerator):
+
+    def image_outputs_logger(image_pair_data, global_step, accelerate_logger):
+        # For the sake of this example, we will only log the last batch of images
+        # and associated data
+        result = {}
+        images, prompts, _ = [image_pair_data["images"], image_pair_data["prompts"], image_pair_data["rewards"]]
+        for i, image in enumerate(images):
+            result[f"{keyword}_{i}"]=wandb.Image(image)
+
+        accelerator.log(
+            result,
+            step=global_step,
+        )
+    return image_outputs_logger
+
 def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
     for key in keywords:
         for name,p in sd_pipeline.unet.named_parameters():
@@ -150,7 +166,7 @@ def main(args):
 
         
 
-        pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
         hooks = []
@@ -331,7 +347,7 @@ def main(args):
                         style_reward_function_align,
                         prompt_fn,
                         style_ddpo_pipeline,
-                        None
+                        get_image_logger_align(STYLE_LORA+label,accelerator)
                         )
                 elif args.method=="hook":
                     style_trainer=HookTrainer(

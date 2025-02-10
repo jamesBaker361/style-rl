@@ -46,6 +46,7 @@ parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
+parser.add_argument("--learning_rate",type=float,default=1e-3)
 
 RARE_TOKEN="sksz"
 
@@ -216,7 +217,7 @@ def main(args):
                 
             ddpo_config=DDPOConfig(log_with="wandb",
                             sample_batch_size=args.batch_size,
-                            train_learning_rate=0.1,
+                            train_learning_rate=args.learning_rate,
                 num_epochs=1,
                 mixed_precision=args.mixed_precision,
                 sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
@@ -256,7 +257,7 @@ def main(args):
                 for image in images:
                     timesteps, num_inference_steps = retrieve_timesteps(
                         sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
-                    timesteps=timesteps[-1].unsqueeze(0)
+                    timesteps=timesteps[-1].unsqueeze(0).cpu()
                     pixels=image_transforms(image).unsqueeze(0).to(device=accelerator.device,dtype=torch_dtype)
                     model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
                     model_input = model_input * sd_pipeline.vae.config.scaling_factor

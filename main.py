@@ -30,7 +30,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="style")
 parser.add_argument("--prompt",type=str,default="portrait, a beautiful cyborg with golden hair, 8k")
-parser.add_argument("--style_dataset",type=str,default="jlbaker361/stylization")
+parser.add_argument("--style_dataset",type=str,default="jlbaker361/portraits")
 parser.add_argument("--start",type=int,default=0)
 parser.add_argument("--limit",type=int,default=5)
 parser.add_argument("--method",type=str,default="ddpo")
@@ -207,7 +207,12 @@ def main(args):
             if i<args.start or i>=args.limit:
                 continue
             label=row["label"]
-            images=[row[f"image_{k}"] for k in range(4)]
+            n_image=4
+            try:
+                images=[row[f"image_{k}"] for k in range(n_image)]
+            except:
+                n_image=1
+                images=[row[f"image_{k}"] for k in range(n_image)]
 
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
@@ -273,7 +278,7 @@ def main(args):
                     break
                 style_target_activations={}
                 for k,v in _style_target_activations.items():
-                    style_target_activations[k]=torch.stack([v[i] for i in range(3, len(v), 4)]).mean(dim=0)
+                    style_target_activations[k]=torch.stack([v[i] for i in range(n_image-1, len(v), n_image)]).mean(dim=0)
 
 
                     

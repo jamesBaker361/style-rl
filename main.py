@@ -50,6 +50,7 @@ parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
 parser.add_argument("--vgg_layer",type=int,default=27)
+parser.add_argument("--guidance_scale",type=float,default=5.0)
 
 RARE_TOKEN="sksz"
 
@@ -232,7 +233,7 @@ def main(args):
 
             print(f"Registered {len(hooks)} hooks.")
 
-        content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+        content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
         print("content_image type",type(content_image))
         for hook in hooks:
             hook.remove()
@@ -299,6 +300,7 @@ def main(args):
                 )
             align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
                                          train_learning_rate=args.learning_rate,
+                                         sample_guidance_scale=args.guidance_scale,
                 sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
                 truncated_rand_backprop_minmax=[0,args.num_inference_steps])
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
@@ -493,7 +495,7 @@ def main(args):
             with torch.no_grad():
                 for _ in range(args.n_evaluation):
 
-                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images[0]
+                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
                     print("evaluation image of type",type(image))
             

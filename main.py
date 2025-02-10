@@ -328,13 +328,7 @@ def main(args):
                     
 
             sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-            #sd_pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
-            lora_config=LoraConfig(
-                    r=4,
-                    lora_alpha=4,
-                    init_lora_weights="gaussian",
-                    target_modules=["to_k", "to_q", "to_v", "to_out.0"]
-                )
+
             if args.style_layers_train:
 
                 @torch.no_grad()

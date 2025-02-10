@@ -92,7 +92,7 @@ class HookTrainer(PyTorchModelHubMixin):
 
         optimizer,trainable_layers=self.accelerator.prepare(optimizer,trainable_layers)
 
-        target_activation_tensor=torch.stack([v for v in self.target_activations.values()])
+        #target_activation_tensor=torch.stack([v for v in self.target_activations.values()])
 
         for e in range(self.epochs):
             loss_list=[]
@@ -105,8 +105,8 @@ class HookTrainer(PyTorchModelHubMixin):
                         value=activations[key]
                         loss=F.mse_loss(self.target_activations[key],value)
                     else:
-                        activation_tensor=torch.stack([v for v in activations.values()])
-                        loss=F.mse_loss(target_activation_tensor,activation_tensor)
+                        for key,value in activations.items():
+                            loss=torch.sum([F.mse_loss(self.target_activations[key],value)])
                     self.accelerator.backward(loss)
                     optimizer.step()
                     optimizer.zero_grad()

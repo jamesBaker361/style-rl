@@ -140,12 +140,13 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
 
 vgg_image_transforms = transforms.Compose(
         [
-            transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
 
 def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+    if type(image)!=torch.Tensor:
+        image=transforms.ToTensor()(image)
     image=vgg_image_transforms(image)
     image=image.float()
     image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)

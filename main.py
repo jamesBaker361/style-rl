@@ -49,6 +49,7 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
+parser.add_argument("--vgg_layer",type=int,default=27)
 
 RARE_TOKEN="sksz"
 
@@ -340,7 +341,9 @@ def main(args):
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
-                        
+                    elif args.reward_fn=="vgg":
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                        return [F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
                 
                 def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
@@ -350,6 +353,9 @@ def main(args):
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                    elif args.reward_fn=="vgg":
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                        return torch.stack([F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
 
                 
                 style_keywords=[STYLE_LORA]

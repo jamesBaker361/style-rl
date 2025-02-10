@@ -129,6 +129,7 @@ def get_image_logger(keyword:str,accelerator:Accelerator):
 def get_image_logger_align(keyword:str,accelerator:Accelerator):
 
     def image_outputs_logger(image_pair_data, global_step, accelerate_logger):
+        print("called image logger align")
         # For the sake of this example, we will only log the last batch of images
         # and associated data
         result = {}

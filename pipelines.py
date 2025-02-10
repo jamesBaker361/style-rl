@@ -281,17 +281,14 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 
 
         denoised = denoised.to(prompt_embeds.dtype)
+        has_nsfw_concept = None
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
-            has_nsfw_concept = None
+            
         else:
             image = denoised
-            has_nsfw_concept = None
 
-        if has_nsfw_concept is None:
-            do_denormalize = [True] * image.shape[0]
-        else:
-            do_denormalize = [not has_nsfw for has_nsfw in has_nsfw_concept]
+        do_denormalize = [True] * image.shape[0]
         try:
             image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
         except RuntimeError:

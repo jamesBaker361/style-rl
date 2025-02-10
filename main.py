@@ -503,11 +503,16 @@ def main(args):
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
             style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
             content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
+            style_mse=np.mean([F.mse_loss(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
+            content_mse=content_score=np.mean([F.mse_loss(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
             metrics={
                 f"{label}_content":content_score,
-                f"{label}_style":style_score
+                f"{label}_style":style_score,
+                f"{label}_content_mse":content_mse,
+                f"{label}_style_mse":style_mse
             }
             accelerator.log(metrics)
+            print(metrics)
             content_score_list.append(content_score)
             style_score_list.append(style_score)
             sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)

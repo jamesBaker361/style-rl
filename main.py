@@ -213,11 +213,6 @@ def main(args):
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]
-            
-            
-                    
-
-
                 
             ddpo_config=DDPOConfig(log_with="wandb",
                             sample_batch_size=args.batch_size,

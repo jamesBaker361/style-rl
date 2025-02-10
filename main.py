@@ -201,6 +201,7 @@ def main(args):
         style_score_list=[]
         content_score_list=[]
         for i, row in enumerate(data):
+            hooks=[]
             accelerator.free_memory()
             if i<args.start or i>=args.limit:
                 continue
@@ -384,6 +385,8 @@ def main(args):
                 end=time.time()
                 print(f"\t {label} epoch {e} elapsed {end-start}")
             sd_pipeline.unet.requires_grad_(False)
+            for hook in hooks:
+                hook.remove() 
             with torch.no_grad():
                 for _ in range(args.n_evaluation):
 

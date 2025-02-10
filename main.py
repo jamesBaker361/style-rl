@@ -136,7 +136,16 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
             if name.find(key)!=-1:
                 p.requires_grad_(True)
 
+
+vgg_image_transforms = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    )
+
 def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+    image=vgg_image_transforms(image)
     image=image.float()
     image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
     return vgg_extractor(image)
@@ -153,7 +162,7 @@ def main(args):
                 transforms.Normalize([0.5], [0.5]),
             ]
         )
-
+    
     if args.style_layers is not None:
         style_layers=[int(n) for n in args.style_layers]
     else:
@@ -216,8 +225,9 @@ def main(args):
         vit_model.eval()
         vit_model.requires_grad_(False)
 
-        vgg=models.vgg16(pretrained=True).features[:26].eval()
-        vgg.requires_grad_(False)
+        vgg_extractor=models.vgg16(pretrained=True).features[:args.vgg_layer].eval().to(device=accelerator.device,dtype=torch_dtype)
+        vgg_extractor.requires_grad_(False)
+        vgg_extractor=accelerator.prepare(vgg_extractor)
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps
@@ -244,8 +254,12 @@ def main(args):
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
+            vgg_style_embedding=torch.stack([[get_vgg_embedding(vgg_extractor,image) for image in images]]).mean(dim=0)
+
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]
+
+
                 
             ddpo_config=DDPOConfig(log_with="wandb",
                             sample_batch_size=args.batch_size,

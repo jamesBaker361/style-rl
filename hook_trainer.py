@@ -106,7 +106,7 @@ class HookTrainer(PyTorchModelHubMixin):
                         loss=F.mse_loss(self.target_activations[key],value)
                     else:
                         for key,value in activations.items():
-                            loss=torch.sum([F.mse_loss(self.target_activations[key],value)])
+                            loss=sum([F.mse_loss(self.target_activations[key],value)])
                     self.accelerator.backward(loss)
                     optimizer.step()
                     optimizer.zero_grad()

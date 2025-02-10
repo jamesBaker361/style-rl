@@ -24,6 +24,7 @@ from worse_peft import apply_lora
 import torch.nn.functional as F
 from ml_dtypes import bfloat16
 from hook_trainer import HookTrainer
+from torchvision import models
 
 parser=argparse.ArgumentParser()
 
@@ -47,6 +48,7 @@ parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
+parser.add_argument("--reward_fn",type=str,default="cos")
 
 RARE_TOKEN="sksz"
 
@@ -134,6 +136,12 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
             if name.find(key)!=-1:
                 p.requires_grad_(True)
 
+def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+    image=image.float()
+    image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+    return vgg_extractor(image)
+
+
 def main(args):
     torch.cuda.empty_cache()
 
@@ -207,6 +215,9 @@ def main(args):
             vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
         vit_model.eval()
         vit_model.requires_grad_(False)
+
+        vgg=models.vgg16(pretrained=True).features[:26].eval()
+        vgg.requires_grad_(False)
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps
@@ -314,14 +325,23 @@ def main(args):
 
                 @torch.no_grad()
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
-                    _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    #print("len sample",len(sample_vit_style_embedding_list))
-                    #print("len images",len(images))
-                    return [cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
+                    if args.reward_fn=="cos" or args.reward_fn=="mse":
+                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        if args.reward_fn=="mse":
+                            reward_fn=F.mse_loss
+                        elif args.reward_fn=="cos":
+                            reward_fn=cos_sim_rescaled
+                        return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
+                        
                 
                 def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                    _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return torch.stack([cos_sim_rescaled(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                    if args.reward_fn=="cos" or args.reward_fn=="mse":
+                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        if args.reward_fn=="mse":
+                            reward_fn=F.mse_loss
+                        elif args.reward_fn=="cos":
+                            reward_fn=cos_sim_rescaled
+                        return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
 
                 
                 style_keywords=[STYLE_LORA]

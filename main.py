@@ -156,7 +156,8 @@ vgg_image_transforms = transforms.Compose(
         ]
     )
 
-
+def mse_reward_fn(*args,**kwargs):
+    return -1*F.mse_loss(*args,**kwargs)
 
 
 def main(args):
@@ -354,9 +355,6 @@ def main(args):
 
             if args.style_layers_train:
 
-                def mse_reward_fn(*args,**kwargs):
-                    return -1*F.mse_loss(*args,**kwargs)
-
                 @torch.no_grad()
                 def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
                     if args.reward_fn=="cos" or args.reward_fn=="mse":
@@ -453,7 +451,7 @@ def main(args):
                                 reward_fn=mse_reward_fn
                         elif args.reward_fn=="cos":
                             reward_fn=cos_sim_rescaled
-                    return torch.stack([cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
+                    return torch.stack([reward_fn(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
                 
                 content_keywords=[CONTENT_LORA]
                 sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)

@@ -147,9 +147,11 @@ vgg_image_transforms = transforms.Compose(
 def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor,torch_dtype:torch.dtype)->torch.Tensor:
     if type(image)!=torch.Tensor:
         image=transforms.ToTensor()(image)
+    
     image.to(dtype=torch_dtype, device=vgg_extractor.device)
+    image.requires_grad_(True)
     image=vgg_image_transforms(image)
-    image=image.float()
+    #image=image.float()
     image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
     return vgg_extractor(image)
 

@@ -144,9 +144,10 @@ vgg_image_transforms = transforms.Compose(
         ]
     )
 
-def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor,torch_dtype:torch.dtype)->torch.Tensor:
     if type(image)!=torch.Tensor:
         image=transforms.ToTensor()(image)
+    image.to(dtype=torch_dtype, device=vgg_extractor.device)
     image=vgg_image_transforms(image)
     image=image.float()
     image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
@@ -256,7 +257,7 @@ def main(args):
             _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
             vit_style_embedding_list=vit_style_embedding_list[:-1]
             style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image) for image in images]).mean(dim=0)
+            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]).mean(dim=0)
 
             content_embedding=vit_content_embedding_list[-1]
             evaluation_images=[]
@@ -343,7 +344,7 @@ def main(args):
                             reward_fn=cos_sim_rescaled
                         return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
                     elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
                         return [F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
                 
                 def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
@@ -355,7 +356,7 @@ def main(args):
                             reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                     elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image,torch_dtype) for image in images]
                         return torch.stack([F.mse_loss(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
 
                 

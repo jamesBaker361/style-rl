@@ -136,9 +136,11 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
         result = {}
         images, prompts, _ = [image_pair_data["images"], image_pair_data["prompts"], image_pair_data["rewards"]]
         for i, image in enumerate(images):
+            if type(image)==torch.Tensor:
+                image=image.float()
             result[f"{keyword}_{i}"]=wandb.Image(image)
             cache.append(image)
-        print("n images =",len(images))
+        print("n images =",len(images), "len cache",len(cache))
         accelerator.log(
             result,
             step=accelerator.get_tracker("wandb").run.step,
@@ -506,8 +508,10 @@ def main(args):
 
             for image in evaluation_images:
                 accelerator.log({f"evaluation_{label}":wandb.Image(image)})
+            print("len content cache",len(content_cache))
             for content_image in content_cache:
                 accelerator.log({f"cache_{label}_{CONTENT_LORA}":content_image})
+            print("len style cache",len(style_cache))
             for style_image in style_cache:
                 accelerator.log({f"cache_{label}_{STYLE_LORA}":style_image})
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)

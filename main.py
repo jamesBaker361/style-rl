@@ -51,6 +51,8 @@ parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
 parser.add_argument("--vgg_layer",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
+parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
+parser.add_argument("--model_src",type=str,default="SimianLuo/LCM_Dreamshaper_v7")
 
 RARE_TOKEN="sksz"
 
@@ -213,7 +215,7 @@ def main(args):
 
         
 
-        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained(args.model_src)
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
         hooks = []
@@ -306,7 +308,7 @@ def main(args):
                                          sample_guidance_scale=args.guidance_scale,
                 sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
                 truncated_rand_backprop_minmax=[0,args.num_inference_steps])
-            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained(args.model_src,device=accelerator.device,torch_dtype=torch_dtype)
             sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
             sd_pipeline.vae.to(accelerator.device).requires_grad_(False)

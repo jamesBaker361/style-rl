@@ -52,11 +52,13 @@ parser.add_argument("--reward_fn",type=str,default="cos")
 parser.add_argument("--vgg_layer",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
-parser.add_argument("--model_src",type=str,default="SimianLuo/LCM_Dreamshaper_v7")
+parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
+
 
 RARE_TOKEN="sksz"
 
-
+def run_safety_checker(self,image,*args,**kwargs):
+    return image,None
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):
     cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
@@ -215,10 +217,13 @@ def main(args):
             return vgg_extractor(image)
 
         
-
-        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained(args.model_src)
+        if args.pretrained_type=="consistency":
+            pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+        elif args.pretrained_type=="stable":
+            pipe=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
+        pipe.run_safety_checker=run_safety_checker
         hooks = []
         if args.method=="hook":
 
@@ -309,7 +314,11 @@ def main(args):
                                          sample_guidance_scale=args.guidance_scale,
                 sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
                 truncated_rand_backprop_minmax=[0,args.num_inference_steps])
-            sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained(args.model_src,device=accelerator.device,torch_dtype=torch_dtype)
+            if args.pretrained_type=="consistency":
+                sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+            elif args.pretrained_type=="stable":
+                sd_pipeline=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4",device=accelerator.device,torch_dtype=torch_dtype)
+            sd_pipeline.run_safety_checker=run_safety_checker
             sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
             sd_pipeline.vae.to(accelerator.device).requires_grad_(False)

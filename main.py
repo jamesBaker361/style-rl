@@ -499,6 +499,7 @@ def main(args):
                     )
             for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
                 model.to(accelerator.device)
+            total_start=time.time()
             for e in range(args.epochs):
                 torch.cuda.empty_cache()
                 start=time.time()
@@ -510,6 +511,7 @@ def main(args):
                     accelerator.free_memory()
                 end=time.time()
                 print(f"\t {label} epoch {e} elapsed {end-start}")
+            print(f"all epochs for {label} elapsed {end-total_start}")
             sd_pipeline.unet.requires_grad_(False)
             for hook in hooks:
                 hook.remove() 

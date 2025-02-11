@@ -17,6 +17,8 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
 
     def get_trainable_layers(self):
         ret=[]
+        if len(self.keywords)==0:
+            return [p for _,p in self.sd_pipeline.unet.named_parameters()]
         for key in self.keywords:
             for name,p in self.sd_pipeline.unet.named_parameters():
                 if name.find(key)!=-1 and p.requires_grad:

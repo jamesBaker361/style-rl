@@ -3,6 +3,7 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from experiment_helpers.better_vit_model import BetterViTModel
 from experiment_helpers.better_ddpo_trainer import BetterDDPOTrainer
+from experiment_helpers.unsafe_stable_diffusion_pipeline import UnsafeStableDiffusionPipeline
 from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CLIPTokenizer
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
@@ -220,7 +221,7 @@ def main(args):
         if args.pretrained_type=="consistency":
             pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
         elif args.pretrained_type=="stable":
-            pipe=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
+            pipe=UnsafeStableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
         pipe.run_safety_checker=run_safety_checker
@@ -317,7 +318,7 @@ def main(args):
             if args.pretrained_type=="consistency":
                 sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
             elif args.pretrained_type=="stable":
-                sd_pipeline=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4",device=accelerator.device,torch_dtype=torch_dtype)
+                sd_pipeline=UnsafeStableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4",device=accelerator.device,torch_dtype=torch_dtype)
             sd_pipeline.run_safety_checker=run_safety_checker
             sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)

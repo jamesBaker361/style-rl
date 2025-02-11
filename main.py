@@ -487,6 +487,8 @@ def main(args):
                         content_ddpo_pipeline,
                         get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
                     )
+            for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
+                model.to(accelerator.device)
             for e in range(args.epochs):
                 torch.cuda.empty_cache()
                 start=time.time()

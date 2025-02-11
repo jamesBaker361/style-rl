@@ -140,6 +140,7 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
         for i, image in enumerate(images):
             if type(image)==torch.Tensor:
                 image=image.float()
+                print("cache size",image.size())
             result[f"{keyword}_{i}"]=wandb.Image(image)
             cache.append(image)
         print("n images =",len(images), "len cache",len(cache))
@@ -512,10 +513,10 @@ def main(args):
                 accelerator.log({f"evaluation_{label}":wandb.Image(image)})
             print("len content cache",len(content_cache))
             for content_image in content_cache:
-                accelerator.log({f"cache_{label}_{CONTENT_LORA}":content_image})
+                accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(content_image)})
             print("len style cache",len(style_cache))
             for style_image in style_cache:
-                accelerator.log({f"cache_{label}_{STYLE_LORA}":style_image})
+                accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(style_image)})
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
             style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
             content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])

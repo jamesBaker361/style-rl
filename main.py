@@ -135,7 +135,6 @@ def get_image_logger(keyword:str,accelerator:Accelerator):
 def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
 
     def image_outputs_logger(image_pair_data, global_step, accelerate_logger):
-        print("called image logger align")
         # For the sake of this example, we will only log the last batch of images
         # and associated data
         result = {}
@@ -143,10 +142,8 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
         for i, image in enumerate(images):
             if type(image)==torch.Tensor:
                 image=image.float()
-                print("cache size",image.size())
             result[f"{keyword}_{i}"]=wandb.Image(image)
             cache.append(image)
-        print("n images =",len(images), "len cache",len(cache))
         accelerator.log(
             result,
             step=accelerator.get_tracker("wandb").run.step,
@@ -520,15 +517,12 @@ def main(args):
 
                     image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
-                    print("evaluation image of type",type(image))
             
 
             for image in evaluation_images:
                 accelerator.log({f"evaluation_{label}":wandb.Image(image)})
-            print("len content cache",len(content_cache))
             for content_image in content_cache:
                 accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(content_image)})
-            print("len style cache",len(style_cache))
             for style_image in style_cache:
                 accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(style_image)})
             _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)

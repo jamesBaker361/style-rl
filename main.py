@@ -57,7 +57,7 @@ parser.add_argument("--pretrained_type",type=str,default="consistency",help="con
 
 RARE_TOKEN="sksz"
 
-def run_safety_checker(self,image,*args,**kwargs):
+def run_safety_checker(image,*args,**kwargs):
     return image,None
 
 def cos_sim_rescaled(vector_i,vector_j,return_np=False):

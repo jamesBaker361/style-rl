@@ -26,6 +26,7 @@ import torch.nn.functional as F
 from ml_dtypes import bfloat16
 from hook_trainer import HookTrainer
 from torchvision import models
+from statics import unformatted_prompt_list
 
 parser=argparse.ArgumentParser()
 
@@ -54,6 +55,7 @@ parser.add_argument("--vgg_layer",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
+parser.add_argument("--use_prompts",action="store_true")
 
 
 RARE_TOKEN="sksz"
@@ -218,7 +220,10 @@ def main(args):
         if args.pretrained_type=="consistency":
             pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
         elif args.pretrained_type=="stable":
-            pipe=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
+            try:
+                pipe=StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
+            except:
+                pipe=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",force_download=True)
         # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
         pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
         pipe.run_safety_checker=run_safety_checker
@@ -315,7 +320,7 @@ def main(args):
             if args.pretrained_type=="consistency":
                 sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
             elif args.pretrained_type=="stable":
-                sd_pipeline=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4",device=accelerator.device,torch_dtype=torch_dtype)
+                sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
             sd_pipeline.run_safety_checker=run_safety_checker
             sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
@@ -513,10 +518,16 @@ def main(args):
             for hook in hooks:
                 hook.remove() 
             with torch.no_grad():
-                for _ in range(args.n_evaluation):
+                if args.use_prompts:
+                    for unformatted_prompt in unformatted_prompt_list:
+                        prompt=unformatted_prompt.format(args.prompt)
+                        image =sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                        evaluation_images.append(image)
+                else:
+                    for _ in range(args.n_evaluation):
 
-                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                    evaluation_images.append(image)
+                        image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                        evaluation_images.append(image)
             
 
             for image in evaluation_images:

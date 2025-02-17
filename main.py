@@ -55,7 +55,7 @@ parser.add_argument("--vgg_layer",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
-parser.add_argument("--use_prompts",action="store_true")
+parser.add_argument("--use_unformatted_prompts",action="store_true")
 
 
 RARE_TOKEN="sksz"

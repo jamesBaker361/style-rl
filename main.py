@@ -266,6 +266,9 @@ def main(args):
         vit_model.eval()
         vit_model.requires_grad_(False)
 
+        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
         
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
@@ -547,6 +550,12 @@ def main(args):
                 f"{label}_content_mse":content_mse,
                 f"{label}_style_mse":style_mse
             }
+            if args.use_prompts:
+                for unformatted_prompt,image in zip(unformatted_prompt_list,evaluation_images):
+                    inputs = clip_processor(text=[unformatted_prompt], images=image, return_tensors="pt", padding=True)
+                    outputs = model(**inputs)
+                    logits_per_image = outputs.logits_per_image
+                    clip_alignment=logits_per_image.item()
             accelerator.log(metrics)
             print(metrics)
             content_score_list.append(content_score)

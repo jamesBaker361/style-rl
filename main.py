@@ -556,7 +556,7 @@ def main(args):
             if args.use_unformatted_prompts:
                 for unformatted_prompt,image in zip(unformatted_prompt_list,evaluation_images):
                     inputs = clip_processor(text=[unformatted_prompt], images=image, return_tensors="pt", padding=True)
-                    outputs = model(**inputs)
+                    outputs = clip_model(**inputs)
                     logits_per_image = outputs.logits_per_image
                     clip_alignment=logits_per_image.item()
                     metrics["clip_alignment"]=clip_alignment

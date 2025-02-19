@@ -56,6 +56,11 @@ parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
 parser.add_argument("--use_unformatted_prompts",action="store_true")
+parser.add_argument("--content_dataset",type=str,default="jlbaker361/people")
+parser.add_argument("--content_start",type=int,default=0)
+parser.add_argument("--content_limit",type=int,default=5)
+parser.add_argument("--content_mid_block",action="store_true")
+parser.add_argument("--content_layers",nargs="*",type=int)
 
 
 RARE_TOKEN="sksz"

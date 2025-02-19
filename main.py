@@ -521,7 +521,7 @@ def main(args):
             for hook in hooks:
                 hook.remove() 
             with torch.no_grad():
-                if args.use_prompts:
+                if args.use_unformatted_prompts:
                     for unformatted_prompt in unformatted_prompt_list:
                         prompt=unformatted_prompt.format(args.prompt)
                         image =sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
@@ -550,7 +550,7 @@ def main(args):
                 f"{label}_content_mse":content_mse,
                 f"{label}_style_mse":style_mse
             }
-            if args.use_prompts:
+            if args.use_unformatted_prompts:
                 for unformatted_prompt,image in zip(unformatted_prompt_list,evaluation_images):
                     inputs = clip_processor(text=[unformatted_prompt], images=image, return_tensors="pt", padding=True)
                     outputs = model(**inputs)

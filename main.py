@@ -279,7 +279,10 @@ def main(args):
         STYLE_LORA="style_lora"
         CONTENT_LORA="content_lora"
         style_score_list=[]
+        style_mse_list=[]
         content_score_list=[]
+        content_mse_list=[]
+        clip_list=[]
         for i, row in enumerate(data):
             hooks=[]
             accelerator.free_memory()
@@ -543,7 +546,7 @@ def main(args):
             style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
             content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
             style_mse=np.mean([F.mse_loss(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
-            content_mse=content_score=np.mean([F.mse_loss(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
+            content_mse=np.mean([F.mse_loss(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
             metrics={
                 f"{label}_content":content_score,
                 f"{label}_style":style_score,
@@ -556,10 +559,14 @@ def main(args):
                     outputs = model(**inputs)
                     logits_per_image = outputs.logits_per_image
                     clip_alignment=logits_per_image.item()
+                    metrics["clip_alignment"]=clip_alignment
+                    clip_list.append(clip_alignment)
             accelerator.log(metrics)
             print(metrics)
             content_score_list.append(content_score)
+            content_mse_list.append(content_mse)
             style_score_list.append(style_score)
+            style_mse_list.append(style_mse)
             sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)
             if args.style_layers_train:
                 style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
@@ -567,8 +574,12 @@ def main(args):
                 content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
         metrics={
             f"content":np.mean(content_score_list),
-            f"style":np.mean(style_score_list)
+            f"style":np.mean(style_score_list),
+            f"content_mse":np.mean(content_mse_list),
+            f"style_mse":np.mean(style_mse_list)
             }
+        if args.use_unformatted_prompts:
+            metrics[f"clip_alignment"]=np.mean(clip_list)
         accelerator.log(metrics)
         
 

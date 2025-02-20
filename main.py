@@ -190,6 +190,10 @@ def main(args):
         style_layers=[int(n) for n in args.style_layers]
     else:
         style_layers=[0]
+    if args.content_layers is not None:
+        content_layers=[int(n) for n in args.content_layers]
+    else:
+        content_layers=[3]
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
@@ -252,14 +256,7 @@ def main(args):
 
             print(f"Registered {len(hooks)} hooks.")
 
-        content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-        print("content_image type",type(content_image))
-        for hook in hooks:
-            hook.remove()
-
-        accelerator.log({
-            "src_content_image":wandb.Image(content_image)
-        })
+        
 
         try:
             vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
@@ -281,6 +278,7 @@ def main(args):
         #images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
         #images[0].save("image.png")
         data=load_dataset(args.style_dataset,split="train")
+        content_data=load_dataset(args.content_dataset,split="train")
         STYLE_LORA="style_lora"
         CONTENT_LORA="content_lora"
         style_score_list=[]
@@ -288,295 +286,303 @@ def main(args):
         content_score_list=[]
         content_mse_list=[]
         clip_list=[]
-        for i, row in enumerate(data):
-            hooks=[]
-            accelerator.free_memory()
-            if i<args.start or i>=args.limit:
-                continue
-            label=row["label"]
-            n_image=4
-            try:
-                images=[row[f"image_{k}"] for k in range(n_image)]
-            except:
-                n_image=1
-                images=[row[f"image_{k}"] for k in range(n_image)]
-
-            _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
-            vit_style_embedding_list=vit_style_embedding_list[:-1]
-            style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-            vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image).clone().detach() for image in images]).mean(dim=0)
-
-            content_embedding=vit_content_embedding_list[-1]
-            evaluation_images=[]
-
-
-                
-            ddpo_config=DDPOConfig(log_with="wandb",
-                            sample_batch_size=args.batch_size,
-                            train_learning_rate=args.learning_rate,
-                num_epochs=1,
-                mixed_precision=args.mixed_precision,
-                sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
-                train_batch_size=args.batch_size,
-                train_gradient_accumulation_steps=args.gradient_accumulation_steps,
-                sample_num_steps=args.num_inference_steps,
-                #per_prompt_stat_tracking=True,
-                #per_prompt_stat_tracking_buffer_size=32
-                )
-            align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
-                                         train_learning_rate=args.learning_rate,
-                                         sample_guidance_scale=args.guidance_scale,
-                sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
-                truncated_rand_backprop_minmax=[0,args.num_inference_steps])
-            if args.pretrained_type=="consistency":
-                sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-            elif args.pretrained_type=="stable":
-                sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
-            sd_pipeline.run_safety_checker=run_safety_checker
-            sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
-            sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
-            sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
-
-            if args.method=="hook":
-                _style_target_activations={}
-
-                def style_hook_fn(module, input, output):
-                    output[0].requires_grad_(True)
-                    if module not in _style_target_activations:
-                        _style_target_activations[module]=[]
-                    _style_target_activations[module].append(output[0])
-
-                style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
-                if args.style_mid_block:
-                    style_blocks.append(sd_pipeline.unet.mid_block)
-                
-                for layer in style_blocks:
-                    hook = layer.register_forward_hook(style_hook_fn)
-                    hooks.append(hook)  # Keep track of hooks for later removal
-
-                print(f"\tRegistered {len(hooks)} hooks.")
-
-                for image in images:
-                    timesteps, num_inference_steps = retrieve_timesteps(
-                        sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
-                    timesteps=timesteps[-1].unsqueeze(0).cpu()
-                    pixels=image_transforms(image).unsqueeze(0).to(device=accelerator.device,dtype=torch_dtype)
-                    model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
-                    model_input = model_input * sd_pipeline.vae.config.scaling_factor
-                    noise = torch.randn_like(model_input)
-                    noisy_model_input = sd_pipeline.scheduler.add_noise(model_input, noise, timesteps)
-
-                    sd_pipeline(" ",timesteps=timesteps,latents=noisy_model_input,height=args.image_size,width=args.image_size)
-
-                for hook in hooks:
-                    hook.remove()
-                hooks=[]
-                print("len  _style_target_activations",len(_style_target_activations))
-                for k,v in _style_target_activations.items():
-                    print("len values",len(v))
-                    break
-                style_target_activations={}
-                for k,v in _style_target_activations.items():
-                    style_target_activations[k]=torch.stack([v[i] for i in range(n_image-1, len(v), n_image)]).mean(dim=0)
-
-
-                    
-
-            sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-            content_cache=[]
-            style_cache=[]
-            if args.style_layers_train:
-
-                @torch.no_grad()
-                def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
-                    if args.reward_fn=="cos" or args.reward_fn=="mse":
-                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                        if args.reward_fn=="mse":
-                            reward_fn=mse_reward_fn
-                        elif args.reward_fn=="cos":
-                            reward_fn=cos_sim_rescaled
-                        return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
-                    elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
-                        return [mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
-                
-                def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                    if args.reward_fn=="cos" or args.reward_fn=="mse":
-                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                        if args.reward_fn=="mse":
-                            reward_fn=mse_reward_fn
-                        elif args.reward_fn=="cos":
-                            reward_fn=cos_sim_rescaled
-                        return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
-                    elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
-                        
-                        return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
-
-                
-                style_keywords=[STYLE_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
-                
-                style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
-                print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
-                sd_pipeline.unet.to(accelerator.device)
-                kwargs={}
-                
-                if args.method=="ddpo":
-                    kwargs={"retain_graph":True}
-                    style_trainer=BetterDDPOTrainer(
-                        ddpo_config,
-                        style_reward_function,
-                        prompt_fn,
-                        style_ddpo_pipeline,
-                        get_image_logger(STYLE_LORA+label,accelerator)
-                    )
-                elif args.method=="align":
-                    
-                    style_trainer=AlignPropTrainer(
-                        align_config,
-                        style_reward_function_align,
-                        prompt_fn,
-                        style_ddpo_pipeline,
-                        get_image_logger_align(STYLE_LORA+label,accelerator,style_cache)
-                        )
-                elif args.method=="hook":
-                    style_trainer=HookTrainer(
-                        accelerator,
-                        args.epochs,
-                        args.num_inference_steps,
-                        args.gradient_accumulation_steps,
-                        args.sample_num_batches_per_epoch,
-                        style_ddpo_pipeline,
-                        prompt_fn,
-                        args.image_size,
-                        style_target_activations,
-                        label,
-                        train_learning_rate=args.learning_rate
-                    )
-                '''if args.reward_fn=="vgg":
-                    kwargs={"retain_graph":True}'''
-            if args.content_layers_train:
-
-
-                @torch.no_grad()
-                def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
-                    _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                    return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
-                
-                '''def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                    if args.reward_fn=="cos" or args.reward_fn=="mse":
-                        _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                        if args.reward_fn=="mse":
-                            reward_fn=mse_reward_fn
-                        elif args.reward_fn=="cos":
-                            reward_fn=cos_sim_rescaled
-                        return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
-                    elif args.reward_fn=="vgg":
-                        sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
-                        
-                        return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}'''
-
-                def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
-                    if args.reward_fn=="cos" or args.reward_fn=="mse":
-                        _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                        if args.reward_fn=="mse":
-                                reward_fn=mse_reward_fn
-                        elif args.reward_fn=="cos":
-                            reward_fn=cos_sim_rescaled
-                    return torch.stack([reward_fn(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
-                
-                content_keywords=[CONTENT_LORA]
-                sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
-                content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
-                print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
-                sd_pipeline.unet.to(accelerator.device)
-                kwargs={}
-                
-                if args.method=="ddpo":
-                    kwargs={"retain_graph":True}
-                    content_trainer=BetterDDPOTrainer(
-                        ddpo_config,
-                        content_reward_function,
-                        prompt_fn,
-                        content_ddpo_pipeline,
-                        get_image_logger(CONTENT_LORA+label,accelerator)
-                    )
-                elif args.method=="align":
-                    content_trainer=AlignPropTrainer(
-                        align_config,
-                        content_reward_function_align,
-                        prompt_fn,
-                        content_ddpo_pipeline,
-                        get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
-                    )
-            for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
-                model.to(accelerator.device)
-            total_start=time.time()
-            for e in range(args.epochs):
-                torch.cuda.empty_cache()
-                start=time.time()
-                if args.style_layers_train:
-                    style_trainer.train(**kwargs)
-                    accelerator.free_memory()
-                if args.content_layers_train:
-                    content_trainer.train(**kwargs)
-                    accelerator.free_memory()
-                end=time.time()
-                print(f"\t {label} epoch {e} elapsed {end-start}")
-            print(f"all epochs for {label} elapsed {end-total_start}")
-            sd_pipeline.unet.requires_grad_(False)
+        for k,content_row in enumerate(content_data):
+            content_label=content_row["label"]
+            content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+            print("content_image type",type(content_image))
             for hook in hooks:
-                hook.remove() 
-            with torch.no_grad():
-                if args.use_unformatted_prompts:
-                    for unformatted_prompt in unformatted_prompt_list:
-                        prompt=unformatted_prompt.format(args.prompt)
-                        image =sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                        evaluation_images.append(image)
-                else:
-                    for _ in range(args.n_evaluation):
+                hook.remove()
 
-                        image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                        evaluation_images.append(image)
             
+            for i, row in enumerate(data):
+                hooks=[]
+                accelerator.free_memory()
+                if i<args.start or i>=args.limit:
+                    continue
+                label=row["label"]+content_label
+                n_image=4
+                try:
+                    images=[row[f"image_{k}"] for k in range(n_image)]
+                except:
+                    n_image=1
+                    images=[row[f"image_{k}"] for k in range(n_image)]
 
-            for image in evaluation_images:
-                accelerator.log({f"evaluation_{label}":wandb.Image(image)})
-            for content_image in content_cache:
-                accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(content_image)})
-            for style_image in style_cache:
-                accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(style_image)})
-            _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
-            style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
-            content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
-            style_mse=np.mean([F.mse_loss(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
-            content_mse=np.mean([F.mse_loss(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
-            metrics={
-                f"{label}_content":content_score,
-                f"{label}_style":style_score,
-                f"{label}_content_mse":content_mse,
-                f"{label}_style_mse":style_mse
-            }
-            if args.use_unformatted_prompts:
-                for unformatted_prompt,image in zip(unformatted_prompt_list,evaluation_images):
-                    inputs = clip_processor(text=[unformatted_prompt], images=image, return_tensors="pt", padding=True)
-                    outputs = clip_model(**inputs)
-                    logits_per_image = outputs.logits_per_image
-                    clip_alignment=logits_per_image.item()
-                    metrics["clip_alignment"]=clip_alignment
-                    clip_list.append(clip_alignment)
-            accelerator.log(metrics)
-            print(metrics)
-            content_score_list.append(content_score)
-            content_mse_list.append(content_mse)
-            style_score_list.append(style_score)
-            style_mse_list.append(style_mse)
-            sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)
-            if args.style_layers_train:
-                style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
-            if args.content_layers_train:
-                content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
+                _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
+                vit_style_embedding_list=vit_style_embedding_list[:-1]
+                style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
+                vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image).clone().detach() for image in images]).mean(dim=0)
+
+                content_embedding=vit_content_embedding_list[-1]
+                evaluation_images=[]
+
+
+                    
+                ddpo_config=DDPOConfig(log_with="wandb",
+                                sample_batch_size=args.batch_size,
+                                train_learning_rate=args.learning_rate,
+                    num_epochs=1,
+                    mixed_precision=args.mixed_precision,
+                    sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
+                    train_batch_size=args.batch_size,
+                    train_gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    sample_num_steps=args.num_inference_steps,
+                    #per_prompt_stat_tracking=True,
+                    #per_prompt_stat_tracking_buffer_size=32
+                    )
+                align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
+                                            train_learning_rate=args.learning_rate,
+                                            sample_guidance_scale=args.guidance_scale,
+                    sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
+                    truncated_rand_backprop_minmax=[0,args.num_inference_steps])
+                if args.pretrained_type=="consistency":
+                    sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+                elif args.pretrained_type=="stable":
+                    sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
+                sd_pipeline.run_safety_checker=run_safety_checker
+                sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
+                sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
+                sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
+
+                if args.method=="hook":
+                    _style_target_activations={}
+
+                    def style_hook_fn(module, input, output):
+                        output[0].requires_grad_(True)
+                        if module not in _style_target_activations:
+                            _style_target_activations[module]=[]
+                        _style_target_activations[module].append(output[0])
+
+                    style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
+                    if args.style_mid_block:
+                        style_blocks.append(sd_pipeline.unet.mid_block)
+                    
+                    for layer in style_blocks:
+                        hook = layer.register_forward_hook(style_hook_fn)
+                        hooks.append(hook)  # Keep track of hooks for later removal
+
+                    print(f"\tRegistered {len(hooks)} hooks.")
+
+                    for image in images:
+                        timesteps, num_inference_steps = retrieve_timesteps(
+                            sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
+                        timesteps=timesteps[-1].unsqueeze(0).cpu()
+                        pixels=image_transforms(image).unsqueeze(0).to(device=accelerator.device,dtype=torch_dtype)
+                        model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
+                        model_input = model_input * sd_pipeline.vae.config.scaling_factor
+                        noise = torch.randn_like(model_input)
+                        noisy_model_input = sd_pipeline.scheduler.add_noise(model_input, noise, timesteps)
+
+                        sd_pipeline(" ",timesteps=timesteps,latents=noisy_model_input,height=args.image_size,width=args.image_size)
+
+                    for hook in hooks:
+                        hook.remove()
+                    hooks=[]
+                    print("len  _style_target_activations",len(_style_target_activations))
+                    for k,v in _style_target_activations.items():
+                        print("len values",len(v))
+                        break
+                    style_target_activations={}
+                    for k,v in _style_target_activations.items():
+                        style_target_activations[k]=torch.stack([v[i] for i in range(n_image-1, len(v), n_image)]).mean(dim=0)
+
+
+                        
+
+                sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
+                content_cache=[]
+                style_cache=[]
+                if args.style_layers_train:
+
+                    @torch.no_grad()
+                    def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
+                        if args.reward_fn=="cos" or args.reward_fn=="mse":
+                            _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                            if args.reward_fn=="mse":
+                                reward_fn=mse_reward_fn
+                            elif args.reward_fn=="cos":
+                                reward_fn=cos_sim_rescaled
+                            return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
+                        elif args.reward_fn=="vgg":
+                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                            return [mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
+                    
+                    def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+                        if args.reward_fn=="cos" or args.reward_fn=="mse":
+                            _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                            if args.reward_fn=="mse":
+                                reward_fn=mse_reward_fn
+                            elif args.reward_fn=="cos":
+                                reward_fn=cos_sim_rescaled
+                            return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                        elif args.reward_fn=="vgg":
+                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                            
+                            return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
+
+                    
+                    style_keywords=[STYLE_LORA]
+                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
+                    
+                    style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
+                    print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
+                    sd_pipeline.unet.to(accelerator.device)
+                    kwargs={}
+                    
+                    if args.method=="ddpo":
+                        kwargs={"retain_graph":True}
+                        style_trainer=BetterDDPOTrainer(
+                            ddpo_config,
+                            style_reward_function,
+                            prompt_fn,
+                            style_ddpo_pipeline,
+                            get_image_logger(STYLE_LORA+label,accelerator)
+                        )
+                    elif args.method=="align":
+                        
+                        style_trainer=AlignPropTrainer(
+                            align_config,
+                            style_reward_function_align,
+                            prompt_fn,
+                            style_ddpo_pipeline,
+                            get_image_logger_align(STYLE_LORA+label,accelerator,style_cache)
+                            )
+                    elif args.method=="hook":
+                        style_trainer=HookTrainer(
+                            accelerator,
+                            args.epochs,
+                            args.num_inference_steps,
+                            args.gradient_accumulation_steps,
+                            args.sample_num_batches_per_epoch,
+                            style_ddpo_pipeline,
+                            prompt_fn,
+                            args.image_size,
+                            style_target_activations,
+                            label,
+                            train_learning_rate=args.learning_rate
+                        )
+                    '''if args.reward_fn=="vgg":
+                        kwargs={"retain_graph":True}'''
+                if args.content_layers_train:
+
+
+                    @torch.no_grad()
+                    def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
+                        _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
+                    
+                    '''def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+                        if args.reward_fn=="cos" or args.reward_fn=="mse":
+                            _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
+                            if args.reward_fn=="mse":
+                                reward_fn=mse_reward_fn
+                            elif args.reward_fn=="cos":
+                                reward_fn=cos_sim_rescaled
+                            return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                        elif args.reward_fn=="vgg":
+                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                            
+                            return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}'''
+
+                    def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
+                        if args.reward_fn=="cos" or args.reward_fn=="mse":
+                            _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
+                            if args.reward_fn=="mse":
+                                    reward_fn=mse_reward_fn
+                            elif args.reward_fn=="cos":
+                                reward_fn=cos_sim_rescaled
+                        return torch.stack([reward_fn(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
+                    
+                    content_keywords=[CONTENT_LORA]
+                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
+                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
+                    print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
+                    sd_pipeline.unet.to(accelerator.device)
+                    kwargs={}
+                    
+                    if args.method=="ddpo":
+                        kwargs={"retain_graph":True}
+                        content_trainer=BetterDDPOTrainer(
+                            ddpo_config,
+                            content_reward_function,
+                            prompt_fn,
+                            content_ddpo_pipeline,
+                            get_image_logger(CONTENT_LORA+label,accelerator)
+                        )
+                    elif args.method=="align":
+                        content_trainer=AlignPropTrainer(
+                            align_config,
+                            content_reward_function_align,
+                            prompt_fn,
+                            content_ddpo_pipeline,
+                            get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
+                        )
+                for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
+                    model.to(accelerator.device)
+                total_start=time.time()
+                for e in range(args.epochs):
+                    torch.cuda.empty_cache()
+                    start=time.time()
+                    if args.style_layers_train:
+                        style_trainer.train(**kwargs)
+                        accelerator.free_memory()
+                    if args.content_layers_train:
+                        content_trainer.train(**kwargs)
+                        accelerator.free_memory()
+                    end=time.time()
+                    print(f"\t {label} epoch {e} elapsed {end-start}")
+                print(f"all epochs for {label} elapsed {end-total_start}")
+                sd_pipeline.unet.requires_grad_(False)
+                for hook in hooks:
+                    hook.remove() 
+                with torch.no_grad():
+                    if args.use_unformatted_prompts:
+                        for unformatted_prompt in unformatted_prompt_list:
+                            prompt=unformatted_prompt.format(args.prompt)
+                            image =sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                            evaluation_images.append(image)
+                    else:
+                        for _ in range(args.n_evaluation):
+
+                            image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                            evaluation_images.append(image)
+                
+
+                for image in evaluation_images:
+                    accelerator.log({f"evaluation_{label}":wandb.Image(image)})
+                for content_image in content_cache:
+                    accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(content_image)})
+                for style_image in style_cache:
+                    accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(style_image)})
+                _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
+                style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
+                content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
+                style_mse=np.mean([F.mse_loss(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
+                content_mse=np.mean([F.mse_loss(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])
+                metrics={
+                    f"{label}_content":content_score,
+                    f"{label}_style":style_score,
+                    f"{label}_content_mse":content_mse,
+                    f"{label}_style_mse":style_mse
+                }
+                if args.use_unformatted_prompts:
+                    for unformatted_prompt,image in zip(unformatted_prompt_list,evaluation_images):
+                        inputs = clip_processor(text=[unformatted_prompt], images=image, return_tensors="pt", padding=True)
+                        outputs = clip_model(**inputs)
+                        logits_per_image = outputs.logits_per_image
+                        clip_alignment=logits_per_image.item()
+                        metrics[f"{label}_clip_alignment"]=clip_alignment
+                        clip_list.append(clip_alignment)
+                accelerator.log(metrics)
+                print(metrics)
+                content_score_list.append(content_score)
+                content_mse_list.append(content_mse)
+                style_score_list.append(style_score)
+                style_mse_list.append(style_mse)
+                sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)
+                if args.style_layers_train:
+                    style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
+                if args.content_layers_train:
+                    content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
         metrics={
             f"content":np.mean(content_score_list),
             f"style":np.mean(style_score_list),

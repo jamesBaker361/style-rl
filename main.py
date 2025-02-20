@@ -292,7 +292,6 @@ def main(args):
             print("content_image type",type(content_image))
             for hook in hooks:
                 hook.remove()
-
             
             for i, row in enumerate(data):
                 hooks=[]

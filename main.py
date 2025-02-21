@@ -51,7 +51,8 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--vgg_layer",type=int,default=27)
+parser.add_argument("--content_reward_fn",type=str,default="mse")
+parser.add_argument("--vgg_layer_style",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
@@ -209,9 +210,9 @@ def main(args):
         def prompt_fn()->tuple[str,Any]:
             return args.prompt, {}
         
-        vgg_extractor=models.vgg16(pretrained=True).features[:args.vgg_layer].eval().to(device=accelerator.device,dtype=torch_dtype)
-        vgg_extractor.requires_grad_(False)
-        vgg_extractor=accelerator.prepare(vgg_extractor)
+        vgg_extractor_style=models.vgg16(pretrained=True).features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
+        vgg_extractor_style.requires_grad_(False)
+        vgg_extractor_style=accelerator.prepare(vgg_extractor_style)
         
         def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
             if type(image)!=torch.Tensor:
@@ -309,7 +310,7 @@ def main(args):
                 _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
                 vit_style_embedding_list=vit_style_embedding_list[:-1]
                 style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-                vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor,image).clone().detach() for image in images]).mean(dim=0)
+                vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
 
                 content_embedding=vit_content_embedding_list[-1]
                 evaluation_images=[]
@@ -402,7 +403,7 @@ def main(args):
                                 reward_fn=cos_sim_rescaled
                             return [reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list],{}
                         elif args.reward_fn=="vgg":
-                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                            sample_embedding_list=[get_vgg_embedding(vgg_extractor_style,image) for image in images]
                             return [mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list],{}
                     
                     def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
@@ -414,7 +415,7 @@ def main(args):
                                 reward_fn=cos_sim_rescaled
                             return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
                         elif args.reward_fn=="vgg":
-                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
+                            sample_embedding_list=[get_vgg_embedding(vgg_extractor_style,image) for image in images]
                             
                             return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
 
@@ -483,16 +484,16 @@ def main(args):
                             return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}'''
 
                     def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
-                        if args.reward_fn=="cos" or args.reward_fn=="mse":
-                            _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
-                            if args.reward_fn=="mse":
-                                    reward_fn=mse_reward_fn
-                            elif args.reward_fn=="cos":
-                                reward_fn=cos_sim_rescaled
+                        #if args.reward_fn=="cos" or args.reward_fn=="mse":
+                        _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
+                        if args.content_reward_fn=="mse":
+                            reward_fn=mse_reward_fn
+                        elif args.content_reward_fn=="cos":
+                            reward_fn=cos_sim_rescaled
                         return torch.stack([reward_fn(sample,content_embedding) for sample in sample_vit_content_embedding_list]),{}
                     
                     content_keywords=[CONTENT_LORA]
-                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,[],[],True,keyword=CONTENT_LORA)
+                    sd_pipeline.unet=apply_lora(sd_pipeline.unet,content_layers,[],args.content_mid_block,keyword=CONTENT_LORA)
                     content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
                     print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
                     sd_pipeline.unet.to(accelerator.device)

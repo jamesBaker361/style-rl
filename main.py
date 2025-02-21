@@ -227,35 +227,7 @@ def main(args):
             return vgg_extractor(image)
 
         
-        if args.pretrained_type=="consistency":
-            pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
-        elif args.pretrained_type=="stable":
-            try:
-                pipe=StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
-            except:
-                pipe=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",force_download=True)
-        # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
-        pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
-        pipe.run_safety_checker=run_safety_checker
-        hooks = []
-        if args.method=="hook":
-
-            content_target_activations = {}
-
-            # Hook function
-            def hook_fn(module, input, output):
-                content_target_activations[module] = output
-
-            # Register hooks for all encoder and decoder blocks
-            blocks=[block for i,block in enumerate(pipe.unet.down_blocks) if i in style_layers]
-            if args.style_mid_block:
-                blocks.append(pipe.unet.mid_block)
-            
-            for layer in blocks:
-                hook = layer.register_forward_hook(hook_fn)
-                hooks.append(hook)  # Keep track of hooks for later removal
-
-            print(f"Registered {len(hooks)} hooks.")
+        
 
         
 
@@ -289,12 +261,45 @@ def main(args):
         clip_list=[]
         for k,content_row in enumerate(content_data):
             content_label=content_row["label"]
-            content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-            print("content_image type",type(content_image))
-            for hook in hooks:
-                hook.remove()
+            
             
             for i, row in enumerate(data):
+
+                if args.pretrained_type=="consistency":
+                    pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+                elif args.pretrained_type=="stable":
+                    try:
+                        pipe=StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
+                    except:
+                        pipe=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",force_download=True)
+                # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
+                pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
+                pipe.run_safety_checker=run_safety_checker
+                hooks = []
+                if args.method=="hook":
+
+                    content_target_activations = {}
+
+                    # Hook function
+                    def hook_fn(module, input, output):
+                        content_target_activations[module] = output
+
+                    # Register hooks for all encoder and decoder blocks
+                    blocks=[block for i,block in enumerate(pipe.unet.down_blocks) if i in style_layers]
+                    if args.style_mid_block:
+                        blocks.append(pipe.unet.mid_block)
+                    
+                    for layer in blocks:
+                        hook = layer.register_forward_hook(hook_fn)
+                        hooks.append(hook)  # Keep track of hooks for later removal
+
+                    print(f"Registered {len(hooks)} hooks.")
+
+                content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                print("content_image type",type(content_image))
+                for hook in hooks:
+                    hook.remove()
+
                 hooks=[]
                 accelerator.free_memory()
                 if i<args.start or i>=args.limit:

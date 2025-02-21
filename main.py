@@ -460,8 +460,6 @@ def main(args):
                             label,
                             train_learning_rate=args.learning_rate
                         )
-                    '''if args.reward_fn=="vgg":
-                        kwargs={"retain_graph":True}'''
                 if args.content_layers_train:
 
 
@@ -469,19 +467,6 @@ def main(args):
                     def content_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any)->  tuple[list[torch.Tensor],Any]:
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
-                    
-                    '''def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                        if args.reward_fn=="cos" or args.reward_fn=="mse":
-                            _,sample_vit_style_embedding_list,__=get_vit_embeddings(vit_processor,vit_model,images,False)
-                            if args.reward_fn=="mse":
-                                reward_fn=mse_reward_fn
-                            elif args.reward_fn=="cos":
-                                reward_fn=cos_sim_rescaled
-                            return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
-                        elif args.reward_fn=="vgg":
-                            sample_embedding_list=[get_vgg_embedding(vgg_extractor,image) for image in images]
-                            
-                            return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}'''
 
                     def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":

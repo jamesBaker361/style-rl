@@ -8,24 +8,7 @@ from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
 import torch.utils.checkpoint as checkpoint
 import random
 
-class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:DiffusionPipeline,keywords:set,use_lora:bool=False):
-        self.sd_pipeline=sd_pipeline
-        self.keywords=keywords
-        self.use_lora=use_lora
 
-        for layer in self.get_trainable_layers():
-            layer.requires_grad_(True)
-
-    def get_trainable_layers(self):
-        ret=[]
-        if len(self.keywords)==0:
-            return [p for _,p in self.sd_pipeline.unet.named_parameters()]
-        for key in self.keywords:
-            for name,p in self.sd_pipeline.unet.named_parameters():
-                if name.find(key)!=-1 and p.requires_grad:
-                    ret.append(p)
-        return ret
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
@@ -633,3 +616,26 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     def run_safety_checker(self,image,*args,**kwargs):
         return image,None
     
+
+
+class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
+    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False):
+        self.sd_pipeline=sd_pipeline
+        self.keywords=keywords
+        self.use_lora=use_lora
+
+        for layer in self.get_trainable_layers():
+            layer.requires_grad_(True)
+
+    def get_trainable_layers(self):
+        ret=[]
+        if len(self.keywords)==0:
+            return [p for _,p in self.sd_pipeline.unet.named_parameters()]
+        for key in self.keywords:
+            for name,p in self.sd_pipeline.unet.named_parameters():
+                if name.find(key)!=-1 and p.requires_grad:
+                    ret.append(p)
+        return ret
+
+    def rgb_with_grad(self,*args,**kwargs):
+        return self.sd_pipeline.call_with_grad(*args,**kwargs)

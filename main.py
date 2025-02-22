@@ -190,11 +190,11 @@ def main(args):
     if args.style_layers is not None:
         style_layers=[int(n) for n in args.style_layers]
     else:
-        style_layers=[0]
+        style_layers=[]
     if args.content_layers is not None:
         content_layers=[int(n) for n in args.content_layers]
     else:
-        content_layers=[3]
+        content_layers=[]
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))

@@ -619,7 +619,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False):
+    def __init__(self,sd_pipeline:DiffusionPipeline,keywords:set,use_lora:bool=False):
         self.sd_pipeline=sd_pipeline
         self.keywords=keywords
         self.use_lora=use_lora
@@ -638,4 +638,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         return ret
 
     def rgb_with_grad(self,*args,**kwargs):
-        return self.sd_pipeline.call_with_grad(*args,**kwargs)
+        if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
+            return self.sd_pipeline.call_with_grad(*args,**kwargs)
+        else:
+            return super().rgb_with_grad(*args,**kwargs)

@@ -261,6 +261,7 @@ def main(args):
         clip_list=[]
         for k,content_row in enumerate(content_data):
             content_label=content_row["label"]
+            content_image=content_row["image_0"]
             
             
             for i, row in enumerate(data):
@@ -295,8 +296,8 @@ def main(args):
 
                     print(f"Registered {len(hooks)} hooks.")
 
-                content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                print("content_image type",type(content_image))
+                #content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                
                 for hook in hooks:
                     hook.remove()
 

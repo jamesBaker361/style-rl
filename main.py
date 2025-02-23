@@ -277,31 +277,7 @@ def main(args):
                 pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
                 pipe.run_safety_checker=run_safety_checker
                 hooks = []
-                if args.method=="hook":
-
-                    content_target_activations = {}
-
-                    # Hook function
-                    def hook_fn(module, input, output):
-                        content_target_activations[module] = output
-
-                    # Register hooks for all encoder and decoder blocks
-                    blocks=[block for i,block in enumerate(pipe.unet.down_blocks) if i in style_layers]
-                    if args.style_mid_block:
-                        blocks.append(pipe.unet.mid_block)
-                    
-                    for layer in blocks:
-                        hook = layer.register_forward_hook(hook_fn)
-                        hooks.append(hook)  # Keep track of hooks for later removal
-
-                    print(f"Registered {len(hooks)} hooks.")
-
-                #content_image=pipe(prompt=args.prompt, num_inference_steps=args.num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                 
-                for hook in hooks:
-                    hook.remove()
-
-                hooks=[]
                 accelerator.free_memory()
                 if i<args.start or i>=args.limit:
                     continue
@@ -349,49 +325,7 @@ def main(args):
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
-                if args.method=="hook":
-                    _style_target_activations={}
-
-                    def style_hook_fn(module, input, output):
-                        output[0].requires_grad_(True)
-                        if module not in _style_target_activations:
-                            _style_target_activations[module]=[]
-                        _style_target_activations[module].append(output[0])
-
-                    style_blocks=[block for i,block in enumerate(sd_pipeline.unet.down_blocks) if i in style_layers]
-                    if args.style_mid_block:
-                        style_blocks.append(sd_pipeline.unet.mid_block)
-                    
-                    for layer in style_blocks:
-                        hook = layer.register_forward_hook(style_hook_fn)
-                        hooks.append(hook)  # Keep track of hooks for later removal
-
-                    print(f"\tRegistered {len(hooks)} hooks.")
-
-                    for image in images:
-                        timesteps, num_inference_steps = retrieve_timesteps(
-                            sd_pipeline.scheduler, num_inference_steps, accelerator.device, None, original_inference_steps=None)
-                        timesteps=timesteps[-1].unsqueeze(0).cpu()
-                        pixels=image_transforms(image).unsqueeze(0).to(device=accelerator.device,dtype=torch_dtype)
-                        model_input = sd_pipeline.vae.encode(pixels).latent_dist.sample()
-                        model_input = model_input * sd_pipeline.vae.config.scaling_factor
-                        noise = torch.randn_like(model_input)
-                        noisy_model_input = sd_pipeline.scheduler.add_noise(model_input, noise, timesteps)
-
-                        sd_pipeline(" ",timesteps=timesteps,latents=noisy_model_input,height=args.image_size,width=args.image_size)
-
-                    for hook in hooks:
-                        hook.remove()
-                    hooks=[]
-                    print("len  _style_target_activations",len(_style_target_activations))
-                    for k,v in _style_target_activations.items():
-                        print("len values",len(v))
-                        break
-                    style_target_activations={}
-                    for k,v in _style_target_activations.items():
-                        style_target_activations[k]=torch.stack([v[i] for i in range(n_image-1, len(v), n_image)]).mean(dim=0)
-
-
+                
                         
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
@@ -452,20 +386,7 @@ def main(args):
                             style_ddpo_pipeline,
                             get_image_logger_align(STYLE_LORA+label,accelerator,style_cache)
                             )
-                    elif args.method=="hook":
-                        style_trainer=HookTrainer(
-                            accelerator,
-                            args.epochs,
-                            args.num_inference_steps,
-                            args.gradient_accumulation_steps,
-                            args.sample_num_batches_per_epoch,
-                            style_ddpo_pipeline,
-                            prompt_fn,
-                            args.image_size,
-                            style_target_activations,
-                            label,
-                            train_learning_rate=args.learning_rate
-                        )
+                    
                 if args.content_layers_train:
 
 
@@ -523,8 +444,6 @@ def main(args):
                     print(f"\t {label} epoch {e} elapsed {end-start}")
                 print(f"all epochs for {label} elapsed {end-total_start}")
                 sd_pipeline.unet.requires_grad_(False)
-                for hook in hooks:
-                    hook.remove() 
                 with torch.no_grad():
                     if args.use_unformatted_prompts:
                         for unformatted_prompt in unformatted_prompt_list:

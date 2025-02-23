@@ -314,7 +314,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         truncated_backprop: bool = True,
         truncated_backprop_rand: bool = True,
         gradient_checkpoint: bool = True,
-        truncated_backprop_timestep: int = 49,
+        truncated_backprop_timestep: int = 0,
         truncated_rand_backprop_minmax: tuple = (0, 50),
         **kwargs,
     ):
@@ -540,7 +540,6 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     """
                 else:
                     model_pred = self.unet(
-                        self.unet,
                         latents,
                         t,
                         timestep_cond=w_embedding,
@@ -553,10 +552,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 if truncated_backprop:
                     if truncated_backprop_rand:
                         rand_timestep = random.randint(
-                        truncated_rand_backprop_minmax[0], truncated_rand_backprop_minmax[1]
-                    )
-                    if i < rand_timestep:
-                        model_pred = model_pred.detach()
+                            truncated_rand_backprop_minmax[0], truncated_rand_backprop_minmax[1])
+                        if i < rand_timestep:
+                            model_pred = model_pred.detach()
                 else:
                     # fixed truncation process
                     if i < truncated_backprop_timestep:
@@ -639,6 +637,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
 
     def rgb_with_grad(self,*args,**kwargs):
         if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
+            kwargs["output_type"]="pt"
             return self.sd_pipeline.call_with_grad(*args,**kwargs)
         else:
             return super().rgb_with_grad(*args,**kwargs)

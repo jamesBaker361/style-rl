@@ -83,6 +83,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
     '''
     returns (vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list)
     '''
+    
     vit_embedding_list=[]
     vit_content_embedding_list=[]
     vit_style_embedding_list=[]
@@ -90,6 +91,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         do_rescale=True
         do_resize=True
         if type(image)==torch.Tensor:
+            image.requires_grad_(True)
             image=image.to(dtype=vit_model.dtype)
             do_rescale=False
             do_resize=False
@@ -241,6 +243,8 @@ def main(args):
         vit_model.eval()
         vit_model.requires_grad_(False)
 
+        vit_model=accelerator.prepare(vit_model)
+
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
@@ -315,6 +319,7 @@ def main(args):
                                             train_learning_rate=args.learning_rate,
                                             sample_guidance_scale=args.guidance_scale,
                     sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
+                    truncated_backprop_rand=False,
                     truncated_rand_backprop_minmax=[0,args.num_inference_steps])
                 if args.pretrained_type=="consistency":
                     sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)

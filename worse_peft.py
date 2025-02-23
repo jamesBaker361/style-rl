@@ -19,7 +19,10 @@ class LoRAAttention(nn.Module):
 
     def forward(self, x):
         delta_W = getattr(self, f"{self.keyword}_A") @ getattr(self, f"{self.keyword}_B")  # LoRA weight update
-        return nn.functional.linear(x, self.base_layer.weight + delta_W, self.base_layer.bias)
+        try:
+            return nn.functional.linear(x, self.base_layer.weight + delta_W, self.base_layer.bias)
+        except:
+            return nn.functional.linear(x, self.base_layer.base_layer.weight + delta_W, self.base_layer.base_layer.bias)
 
 
 def assign_value_to_attr(obj, attr_path, value):
@@ -43,6 +46,7 @@ def apply_lora(unet:UNet2DConditionModel,down_block_indices:list,up_block_indice
         
         for layer_name in lora_target_layers:
             module = dict(block.named_modules())[layer_name]  # Get the module reference
+            print("module type ",type(module))
             new_module=LoRAAttention(module, rank=rank,keyword=keyword)
             setattr(block, layer_name, new_module)
             assign_value_to_attr(block,layer_name,new_module)

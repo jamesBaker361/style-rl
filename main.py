@@ -228,28 +228,6 @@ def main(args):
             image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
             return vgg_extractor(image)
 
-        
-        
-
-        
-
-        try:
-            vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
-            vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
-        except:
-        
-            vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16',force_download=True)
-            vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
-        vit_model.eval()
-        vit_model.requires_grad_(False)
-
-        vit_model=accelerator.prepare(vit_model)
-
-        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-        clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-
-        
-
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps
         #images = pipe(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=8.0,height=args.image_size,width=args.image_size).images
@@ -269,6 +247,21 @@ def main(args):
             
             
             for i, row in enumerate(data):
+
+                try:
+                    vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
+                    vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
+                except:
+                
+                    vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16',force_download=True)
+                    vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16',force_download=True).to(accelerator.device)
+                vit_model.eval()
+                vit_model.requires_grad_(False)
+
+                vit_model=accelerator.prepare(vit_model)
+
+                clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+                clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
                 if args.pretrained_type=="consistency":
                     pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")

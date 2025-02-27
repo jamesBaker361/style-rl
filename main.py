@@ -287,6 +287,8 @@ def main(args):
                 mtcnn = BetterMTCNN()
                 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
+                mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
+
                 if args.pretrained_type=="consistency":
                     pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
                 elif args.pretrained_type=="stable":

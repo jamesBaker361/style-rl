@@ -136,7 +136,7 @@ def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionR
         # Calculate embedding (unsqueeze to add batch dimension)
         img_embedding = resnet(img_cropped.unsqueeze(0))
     elif type(image)==torch.Tensor:
-        assert len(image.size())==4
+        assert len(image.size())==3
         image=255*image.permute( 1, 2, 0)
         img_cropped=mtcnn(image)
         img_cropped.requires_grad_(True)

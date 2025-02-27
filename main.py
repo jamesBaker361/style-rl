@@ -128,22 +128,14 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
-def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN)-> torch.Tensor:
-    if type(image)==Image.Image:
-        img_cropped = mtcnn(image)
-        img_cropped.requires_grad_(True)
-
-        # Calculate embedding (unsqueeze to add batch dimension)
-        img_embedding = resnet(img_cropped.unsqueeze(0))
-    elif type(image)==torch.Tensor:
+def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN,dtype)-> torch.Tensor:
+        
+    if type(image)==torch.Tensor:
         assert len(image.size())==3
         image=255*image.permute( 1, 2, 0)
-        img_cropped=mtcnn(image)
-        img_cropped.requires_grad_(True)
-        img_embedding=resnet(img_cropped.unsqueeze(0))
-    else:
-        print("cant handle ",type(image))
-
+    img_cropped = mtcnn(image)
+    img_cropped.requires_grad_(True)
+    img_embedding=resnet(img_cropped.unsqueeze(0))
     return img_embedding
 
 def get_image_logger(keyword:str,accelerator:Accelerator):
@@ -284,8 +276,8 @@ def main(args):
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
-                mtcnn = BetterMTCNN()
-                resnet = InceptionResnetV1(pretrained='vggface2').eval()
+                mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
+                resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
 
                 mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
 

@@ -27,6 +27,9 @@ from ml_dtypes import bfloat16
 from hook_trainer import HookTrainer
 from torchvision import models
 from statics import unformatted_prompt_list
+from facenet_pytorch import MTCNN, InceptionResnetV1
+from better_mtcnn import BetterMTCNN
+from typing import Union
 
 parser=argparse.ArgumentParser()
 
@@ -51,7 +54,7 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--content_reward_fn",type=str,default="mse")
+parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face")
 parser.add_argument("--vgg_layer_style",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
@@ -124,6 +127,22 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_style_embedding_list=[v.cpu().numpy() for v in vit_style_embedding_list]
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
+
+def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN)-> torch.Tensor:
+    if type(image)==Image.Image:
+        img_cropped = mtcnn(image)
+        img_cropped.requires_grad_(True)
+
+        # Calculate embedding (unsqueeze to add batch dimension)
+        img_embedding = resnet(img_cropped.unsqueeze(0))
+    elif type(image)==torch.Tensor:
+        assert len(image.size())==4
+        image=255*image.permute( 1, 2, 0)
+        img_cropped=mtcnn(image)
+        img_cropped.requires_grad_(True)
+        img_embedding=resnet(img_cropped.unsqueeze(0))
+
+    return img_embedding
 
 def get_image_logger(keyword:str,accelerator:Accelerator):
     def image_outputs_logger(image_data, global_step, _):
@@ -263,6 +282,9 @@ def main(args):
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
+                mtcnn = BetterMTCNN()
+                resnet = InceptionResnetV1(pretrained='vggface2').eval()
+
                 if args.pretrained_type=="consistency":
                     pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
                 elif args.pretrained_type=="stable":
@@ -294,7 +316,7 @@ def main(args):
                 content_embedding=vit_content_embedding_list[-1]
                 evaluation_images=[]
 
-
+                content_face_embedding=get_face_embeddings(content_image,resnet,mtcnn)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
@@ -394,6 +416,9 @@ def main(args):
                         return [cos_sim_rescaled(sample,content_embedding) for sample in sample_vit_content_embedding_list],{}
 
                     def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
+                        if args.content_reward_fn=="face":
+                            face_embedding_list=[get_face_embeddings(image,resnet,mtcnn) for image in images]
+                            return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list])
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.content_reward_fn=="mse":

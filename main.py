@@ -141,6 +141,8 @@ def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionR
         img_cropped=mtcnn(image)
         img_cropped.requires_grad_(True)
         img_embedding=resnet(img_cropped.unsqueeze(0))
+    else:
+        print("cant handle ",type(image))
 
     return img_embedding
 
@@ -262,7 +264,7 @@ def main(args):
         clip_list=[]
         for k,content_row in enumerate(content_data):
             content_label=content_row["label"]
-            content_image=content_row["image_0"]
+            content_image=content_row["image_0"].convert("RGB")
             
             
             for i, row in enumerate(data):
@@ -307,6 +309,8 @@ def main(args):
                 except:
                     n_image=1
                     images=[row[f"image_{k}"] for k in range(n_image)]
+
+                images=[image.convert("RGB") for image in images]
 
                 _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
                 vit_style_embedding_list=vit_style_embedding_list[:-1]

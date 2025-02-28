@@ -474,28 +474,31 @@ def main(args):
                 for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
                     model.to(accelerator.device)
                 total_start=time.time()
-                for e in range(args.epochs):
-                    accelerator.free_memory()
-                    start=time.time()
-                    if args.style_layers_train:
-                        try:
-                            style_trainer.train(**kwargs)
-                        except torch.cuda.OutOfMemoryError:
-                            print("oom epoch ",e)
-                            accelerator.free_memory()
-                            style_trainer.train(**kwargs)
+                try:
+                    for e in range(args.epochs):
                         accelerator.free_memory()
-                    if args.content_layers_train:
-                        try:
-                            content_trainer.train(**kwargs)
-                        except torch.cuda.OutOfMemoryError:
-                            print("oom epoch ",{e})
+                        start=time.time()
+                        if args.style_layers_train:
+                            try:
+                                style_trainer.train(**kwargs)
+                            except torch.cuda.OutOfMemoryError:
+                                print("oom epoch ",e)
+                                accelerator.free_memory()
+                                style_trainer.train(**kwargs)
                             accelerator.free_memory()
-                            content_trainer.train(**kwargs)
+                        if args.content_layers_train:
+                            try:
+                                content_trainer.train(**kwargs)
+                            except torch.cuda.OutOfMemoryError:
+                                print("oom epoch ",{e})
+                                accelerator.free_memory()
+                                content_trainer.train(**kwargs)
 
-                        accelerator.free_memory()
-                    end=time.time()
-                    print(f"\t {label} epoch {e} elapsed {end-start}")
+                            accelerator.free_memory()
+                        end=time.time()
+                        print(f"\t {label} epoch {e} elapsed {end-start}")
+                except  torch.cuda.OutOfMemoryError:
+                    print(f"failed after {e} epochs")
                 print(f"all epochs for {label} elapsed {end-total_start}")
                 sd_pipeline.unet.requires_grad_(False)
                 with torch.no_grad():

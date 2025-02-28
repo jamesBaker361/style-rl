@@ -128,7 +128,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
-def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN)-> torch.Tensor:
+def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN,grad:bool=True)-> torch.Tensor:
         
     if type(image)==torch.Tensor:
         assert len(image.size())==3
@@ -137,7 +137,7 @@ def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionR
     img_cropped = mtcnn(image)
     if type(img_cropped)==torch.Tensor:
         print("line 138 type,device", image.dtype, image.device)
-    img_cropped.requires_grad_(True)
+    img_cropped.requires_grad_(grad)
     img_embedding=resnet(img_cropped.unsqueeze(0))
     return img_embedding
 
@@ -317,7 +317,7 @@ def main(args):
                 content_embedding=vit_content_embedding_list[-1]
                 evaluation_images=[]
 
-                content_face_embedding=get_face_embeddings(content_image,resnet,mtcnn)
+                content_face_embedding=get_face_embeddings(content_image,resnet,mtcnn,False)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,

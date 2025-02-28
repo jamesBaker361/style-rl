@@ -223,6 +223,7 @@ def main(args):
                 print("line 138 type,device", img_cropped.dtype, img_cropped.device)'''
             if img_cropped is None:  # Handle case where no face is detected
                 img_cropped = torch.zeros((3, 160, 160), dtype=torch_dtype, device=resnet.device)
+                img_cropped.requires_grad_(True)
             #img_cropped.requires_grad_(grad)
             img_embedding=resnet(img_cropped.unsqueeze(0))
             return img_embedding

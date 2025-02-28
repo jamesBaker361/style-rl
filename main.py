@@ -351,6 +351,7 @@ def main(args):
                 align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
                                             train_learning_rate=args.learning_rate,
                                             sample_guidance_scale=args.guidance_scale,
+                                            log_image_freq=-1,
                     sample_num_steps=args.num_inference_steps,train_batch_size=args.batch_size,truncated_backprop_timestep=args.num_inference_steps-1,
                     truncated_backprop_rand=False,
                     truncated_rand_backprop_minmax=[0,args.num_inference_steps])

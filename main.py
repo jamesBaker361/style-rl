@@ -136,8 +136,8 @@ def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionR
         print("line 136 type,device", image.dtype, image.device)
     img_cropped = mtcnn(image)
     if type(img_cropped)==torch.Tensor:
-        print("line 138 type,device", image.dtype, image.device)
-    img_cropped.requires_grad_(grad)
+        print("line 138 type,device", img_cropped.dtype, img_cropped.device)
+    #img_cropped.requires_grad_(grad)
     img_embedding=resnet(img_cropped.unsqueeze(0))
     return img_embedding
 
@@ -258,8 +258,7 @@ def main(args):
         content_mse_list=[]
         clip_list=[]
         for k,content_row in enumerate(content_data):
-            content_label=content_row["label"]
-            content_image=content_row["image_0"].convert("RGB")
+            
             
             
             for i, row in enumerate(data):
@@ -295,7 +294,8 @@ def main(args):
                 pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
                 pipe.run_safety_checker=run_safety_checker
                 hooks = []
-                
+                content_label=content_row["label"]
+            
                 accelerator.free_memory()
                 if i<args.start or i>=args.limit:
                     continue
@@ -317,7 +317,18 @@ def main(args):
                 content_embedding=vit_content_embedding_list[-1]
                 evaluation_images=[]
 
-                content_face_embedding=get_face_embeddings(content_image,resnet,mtcnn,False)
+                mtcnn_image_transforms = transforms.Compose(
+                        [
+                            transforms.Resize(160, interpolation=transforms.InterpolationMode.BILINEAR),
+                            transforms.CenterCrop(160),
+                            transforms.ToTensor(),
+                            transforms.Normalize([0.5], [0.5]),
+                        ]
+                    )
+                content_image=content_row["image_0"].convert("RGB")
+                content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
+
+                content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
@@ -483,10 +494,10 @@ def main(args):
 
                 for image in evaluation_images:
                     accelerator.log({f"evaluation_{label}":wandb.Image(image)})
-                for content_image in content_cache:
-                    accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(content_image)})
-                for style_image in style_cache:
-                    accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(style_image)})
+                for _content_image in content_cache:
+                    accelerator.log({f"cache_{label}_{CONTENT_LORA}":wandb.Image(_content_image)})
+                for _style_image in style_cache:
+                    accelerator.log({f"cache_{label}_{STYLE_LORA}":wandb.Image(_style_image)})
                 _,evaluation_vit_style_embedding_list,evaluation_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,evaluation_images,False)
                 style_score=np.mean([cos_sim_rescaled(sample,style_embedding).cpu() for sample in evaluation_vit_style_embedding_list])
                 content_score=np.mean([cos_sim_rescaled(sample, content_embedding).cpu() for sample in evaluation_vit_content_embedding_list])

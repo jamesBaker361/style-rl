@@ -125,18 +125,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
-def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN,grad:bool=True)-> torch.Tensor:
-        
-    if type(image)==torch.Tensor:
-        assert len(image.size())==3
-        image=255*image.permute( 1, 2, 0)
-        #print("line 136 type,device", image.dtype, image.device)
-    img_cropped = mtcnn(image)
-    '''if type(img_cropped)==torch.Tensor:
-        print("line 138 type,device", img_cropped.dtype, img_cropped.device)'''
-    #img_cropped.requires_grad_(grad)
-    img_embedding=resnet(img_cropped.unsqueeze(0))
-    return img_embedding
+
 
 def get_image_logger(keyword:str,accelerator:Accelerator):
     def image_outputs_logger(image_data, global_step, _):
@@ -221,6 +210,22 @@ def main(args):
     time.sleep(1) #wait a second maybe for accelerator stuff?
 
     with accelerator.autocast():
+
+
+        def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN,grad:bool=True)-> torch.Tensor:
+        
+            if type(image)==torch.Tensor:
+                assert len(image.size())==3
+                image=255*image.permute( 1, 2, 0)
+                #print("line 136 type,device", image.dtype, image.device)
+            img_cropped = mtcnn(image)
+            '''if type(img_cropped)==torch.Tensor:
+                print("line 138 type,device", img_cropped.dtype, img_cropped.device)'''
+            if img_cropped is None:  # Handle case where no face is detected
+                img_cropped = torch.zeros((3, 160, 160), dtype=torch_dtype, device=resnet.device)
+            #img_cropped.requires_grad_(grad)
+            img_embedding=resnet(img_cropped.unsqueeze(0))
+            return img_embedding
 
         def prompt_fn()->tuple[str,Any]:
             return args.prompt, {}

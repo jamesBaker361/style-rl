@@ -474,7 +474,7 @@ def main(args):
                     model.to(accelerator.device)
                 total_start=time.time()
                 for e in range(args.epochs):
-                    torch.cuda.empty_cache()
+                    accelerator.free_memory()
                     start=time.time()
                     if args.style_layers_train:
                         style_trainer.train(**kwargs)

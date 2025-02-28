@@ -477,10 +477,21 @@ def main(args):
                     accelerator.free_memory()
                     start=time.time()
                     if args.style_layers_train:
-                        style_trainer.train(**kwargs)
+                        try:
+                            style_trainer.train(**kwargs)
+                        except torch.cuda.OutOfMemoryError:
+                            print("oom epoch ",e)
+                            accelerator.free_memory()
+                            style_trainer.train(**kwargs)
                         accelerator.free_memory()
                     if args.content_layers_train:
-                        content_trainer.train(**kwargs)
+                        try:
+                            content_trainer.train(**kwargs)
+                        except torch.cuda.OutOfMemoryError:
+                            print("oom epoch ",{e})
+                            accelerator.free_memory()
+                            content_trainer.train(**kwargs)
+
                         accelerator.free_memory()
                     end=time.time()
                     print(f"\t {label} epoch {e} elapsed {end-start}")

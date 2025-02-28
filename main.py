@@ -262,7 +262,7 @@ def main(args):
             
             
             for i, row in enumerate(data):
-
+                content_image=content_row["image_0"].convert("RGB")
                 try:
                     vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
                     vit_model = BetterViTModel.from_pretrained('facebook/dino-vitb16').to(accelerator.device)
@@ -325,7 +325,7 @@ def main(args):
                             transforms.Normalize([0.5], [0.5]),
                         ]
                     )
-                content_image=content_row["image_0"].convert("RGB")
+                
                 content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
 
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False)

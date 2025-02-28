@@ -133,7 +133,10 @@ def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionR
     if type(image)==torch.Tensor:
         assert len(image.size())==3
         image=255*image.permute( 1, 2, 0)
+        print("line 136 type,device", image.dtype, image.device)
     img_cropped = mtcnn(image)
+    if type(img_cropped)==torch.Tensor:
+        print("line 138 type,device", image.dtype, image.device)
     img_cropped.requires_grad_(True)
     img_embedding=resnet(img_cropped.unsqueeze(0))
     return img_embedding

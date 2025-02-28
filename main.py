@@ -279,7 +279,9 @@ def main(args):
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
                 mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
+                mtcnn.eval()
                 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
+                resent.eval()
 
                 mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
 
@@ -329,6 +331,7 @@ def main(args):
                 content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
 
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False)
+                content_face_embedding.requires_grad_(False)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,

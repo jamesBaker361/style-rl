@@ -277,7 +277,7 @@ def main(args):
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
                 mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
-                resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
+                resnet = InceptionResnetV1(weights=VGG16_Weights.IMAGENET1K_V1).eval().to(dtype=torch_dtype,device=accelerator.device)
 
                 mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
 

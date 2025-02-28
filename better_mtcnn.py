@@ -50,7 +50,7 @@ def extract_face_pt(img, box, image_size=160, margin=0, save_path=None):
     Returns:
         torch.tensor -- tensor representing the extracted face.
     """
-    print("extract face_pt line 53", img.dtype, img.device)
+    #print("extract face_pt line 53", img.dtype, img.device)
     margin = [
         margin * (box[2] - box[0]) / (image_size - margin),
         margin * (box[3] - box[1]) / (image_size - margin),
@@ -64,14 +64,14 @@ def extract_face_pt(img, box, image_size=160, margin=0, save_path=None):
     ]
 
     face = crop_resize(img, box, image_size)
-    print("extract face_pt line 67", face.dtype, face.device)
+    #print("extract face_pt line 67", face.dtype, face.device)
     return face
 
 
 class BetterMTCNN(MTCNN):
     def extract(self, img, batch_boxes, save_path):
-        if type(img)==torch.Tensor:
-            print("extract line 72", img.dtype, img.device)
+        '''if type(img)==torch.Tensor:
+            print("extract line 72", img.dtype, img.device)'''
         # Determine if a batch or single image was passed
         batch_mode = True
         if (
@@ -121,8 +121,8 @@ class BetterMTCNN(MTCNN):
                 faces_im = faces_im[0]
             #("face im size",faces_im.size())
             faces.append(faces_im)
-            if type(faces_im)==torch.Tensor:
-                print("extract line 125", faces_im.dtype, faces_im.device)
+            '''if type(faces_im)==torch.Tensor:
+                print("extract line 125", faces_im.dtype, faces_im.device)'''
         
         if not batch_mode:
             faces = faces[0]

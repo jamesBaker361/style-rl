@@ -416,7 +416,7 @@ def main(args):
                     def content_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)->tuple[torch.Tensor,Any]:
                         if args.content_reward_fn=="face":
                             face_embedding_list=[get_face_embeddings(image,resnet,mtcnn) for image in images]
-                            return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list])
+                            return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.content_reward_fn=="mse":

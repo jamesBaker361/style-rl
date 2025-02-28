@@ -8,6 +8,7 @@ from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CL
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,AlignPropConfig,AlignPropTrainer
+from better_alignprop_trainer import BetterAlignPropTrainer
 from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img import retrieve_timesteps
 from datasets import load_dataset
 import numpy as np
@@ -418,7 +419,7 @@ def main(args):
                         )
                     elif args.method=="align":
                         
-                        style_trainer=AlignPropTrainer(
+                        style_trainer=BetterAlignPropTrainer(
                             align_config,
                             style_reward_function_align,
                             prompt_fn,

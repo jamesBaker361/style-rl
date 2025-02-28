@@ -128,7 +128,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_content_embedding_list=[v.cpu().numpy() for v in vit_content_embedding_list]
     return vit_embedding_list,vit_style_embedding_list, vit_content_embedding_list
 
-def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN,dtype)-> torch.Tensor:
+def get_face_embeddings(image:Union[Image.Image, torch.Tensor],resnet:InceptionResnetV1, mtcnn:BetterMTCNN)-> torch.Tensor:
         
     if type(image)==torch.Tensor:
         assert len(image.size())==3

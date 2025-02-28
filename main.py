@@ -330,8 +330,7 @@ def main(args):
                 
                 content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
 
-                content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False)
-                content_face_embedding.requires_grad_(False)
+                content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,

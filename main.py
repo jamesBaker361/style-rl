@@ -281,7 +281,7 @@ def main(args):
                 mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
                 mtcnn.eval()
                 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
-                resent.eval()
+                resnet.eval()
 
                 mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
 

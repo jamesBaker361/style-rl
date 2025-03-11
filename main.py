@@ -289,9 +289,6 @@ def main(args):
         content_mse_list=[]
         clip_list=[]
         for k,content_row in enumerate(content_data):
-            
-            
-            
             for i, row in enumerate(data):
                 content_image=content_row["image_0"].convert("RGB")
                 try:

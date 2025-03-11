@@ -5,10 +5,22 @@ import torch
 from typing import Union,Any,Optional,Callable,List,Dict
 from diffusers.image_processor import PipelineImageInput, VaeImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
+from transformers import CLIPImageProcessor, CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
 import torch.utils.checkpoint as checkpoint
+from diffusers.image_processor import PipelineImageInput, VaeImageProcessor
+from diffusers.schedulers import LCMScheduler
+from diffusers.models import AutoencoderKL, ImageProjection, UNet2DConditionModel
 import random
-
-
+from diffusers.loaders import FromSingleFileMixin, IPAdapterMixin, StableDiffusionLoraLoaderMixin, TextualInversionLoaderMixin
+from diffusers.utils import (
+    USE_PEFT_BACKEND,
+    deprecate,
+    logging,
+    replace_example_docstring,
+    scale_lora_layers,
+    unscale_lora_layers,
+)
+from diffusers.models.lora import adjust_lora_scale_text_encoder
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
@@ -614,7 +626,17 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     def run_safety_checker(self,image,*args,**kwargs):
         return image,None
     
+class PromptCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyModelPipeline):
+    def register_prompt_model(self,prompt_model:torch.nn.Module,src_entity:torch.Tensor):
+        self.prompt_model=prompt_model
+        self.src_entity=src_entity
 
+    # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.encode_prompt
+    def encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
+        positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+        src_embeds=self.prompt_model(self.src_entity)
+        postive=torch.cat([positive, src_embeds])
+        return positive,negative
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
     def __init__(self,sd_pipeline:DiffusionPipeline,keywords:set,use_lora:bool=False):
@@ -636,7 +658,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         return ret
 
     def rgb_with_grad(self,*args,**kwargs):
-        if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
+        if False: #type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
             kwargs["output_type"]="pt"
             return self.sd_pipeline.call_with_grad(*args,**kwargs)
         else:

@@ -638,7 +638,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         if hasattr(self, "prompt_model"):
             src_embeds=self.prompt_model(self.src_entity).unsqueeze(0)
             positive=positive[:, :-1, :]  #len 77 -> 76 this probably is just padding anyway
-            print("src embeds, positive shapes", src_embeds.size(),positive.size())
+            #print("src embeds, positive shapes", src_embeds.size(),positive.size())
             positive=torch.cat([src_embeds,positive],dim=1)
         return positive,negative
     

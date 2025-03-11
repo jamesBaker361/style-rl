@@ -28,6 +28,7 @@ from statics import unformatted_prompt_list
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from better_mtcnn import BetterMTCNN
 from typing import Union
+from diffusers.models.embeddings import ImageProjection
 
 parser=argparse.ArgumentParser()
 
@@ -65,6 +66,8 @@ parser.add_argument("--content_mid_block",action="store_true")
 parser.add_argument("--content_layers",nargs="*",type=int)
 parser.add_argument("--prompt_embedding_conditioning",action="store_true")
 parser.add_argument("--adapter_conditioning",action="store_true")
+parser.add_argument("--num_image_text_embeds",type=int,default=32,help="num_image_text_embeds for image projection")
+parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vgg, what model to use for the image embeds")
 
 
 RARE_TOKEN="sksz"
@@ -121,7 +124,12 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         vit_outputs=vit_model(**vit_inputs,output_hidden_states=True, output_past_key_values=True)
         vit_embedding_list.append(vit_outputs.last_hidden_state.reshape(1,-1)[0])
         vit_style_embedding_list.append(vit_outputs.last_hidden_state[0][0]) #CLS token: https://github.com/google/dreambooth/issues/3
-        vit_content_embedding_list.append(vit_outputs.past_key_values[11][0].reshape(1,-1)[0])
+        #print("vit_outputs.past_key_values",len(vit_outputs.past_key_values))
+        #print("vit_outputs.past_key_values[11]",len(vit_outputs.past_key_values[11]))
+        #print("vit_outputs.past_key_values[11][0]",vit_outputs.past_key_values[11][0].size())
+        #print("vit_outputs.past_key_values[11][0].reshape(1,-1)",vit_outputs.past_key_values[11][0].reshape(1,-1).size())
+        content=vit_outputs.past_key_values[11][0].mean(-2)[0]
+        vit_content_embedding_list.append(content)
     if return_numpy:
         vit_embedding_list=[v.cpu().numpy() for v in vit_embedding_list]
         vit_style_embedding_list=[v.cpu().numpy() for v in vit_style_embedding_list]
@@ -180,6 +188,21 @@ vgg_image_transforms = transforms.Compose(
 
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
+
+class PromptImageProjection(ImageProjection):
+    def forward(self,image_embeds: torch.Tensor,positive:torch.Tensor)->torch.Tensor:
+        batch_size = image_embeds.shape[0]
+
+        # image
+        image_embeds = self.image_embeds(image_embeds.to(self.image_embeds.weight.dtype))
+        image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
+        image_embeds = self.norm(image_embeds)
+        
+        positive=positive[:, : -self.num_image_text_embeds, :]  #len 77 -> 76 this probably is just padding anyway
+        #print("src embeds, positive shapes", src_embeds.size(),positive.size())
+        positive=torch.cat([image_embeds,positive],dim=1)
+
+        return positive
 
 
 def main(args):
@@ -325,6 +348,7 @@ def main(args):
                 vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
 
                 content_embedding=vit_content_embedding_list[-1]
+                print("content embedding shape ",content_embedding.size())
                 evaluation_images=[]
 
                 mtcnn_image_transforms = transforms.Compose(
@@ -370,9 +394,11 @@ def main(args):
 
 
                 if args.prompt_embedding_conditioning:
-                    prompt_model=torch.nn.Sequential(
-                        torch.nn.Linear(512,768)
-                    )
+                    if args.image_embeds_type=="face":
+                        image_embed_dim=512
+                    elif args.image_embeds_type=="vgg":
+                        image_embed_dim=768
+                    prompt_model=PromptImageProjection(image_embed_dim,768,args.num_image_text_embeds)
                     prompt_model.to(accelerator.device).requires_grad_(True)
                     prompt_model=accelerator.prepare(prompt_model)
                     sd_pipeline.register_prompt_model(prompt_model,content_face_embedding)

@@ -626,7 +626,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     def run_safety_checker(self,image,*args,**kwargs):
         return image,None
     
-class PromptCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyModelPipeline):
+#class PromptCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyModelPipeline):
     def register_prompt_model(self,prompt_model:torch.nn.Module,src_entity:torch.Tensor):
         self.prompt_model=prompt_model
         self.src_entity=src_entity
@@ -634,12 +634,20 @@ class PromptCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistency
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.encode_prompt
     def encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
         positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
-        src_embeds=self.prompt_model(self.src_entity)
-        postive=torch.cat([positive, src_embeds])
+        if hasattr(self, "prompt_model"):
+            src_embeds=self.prompt_model(self.src_entity)
+            postive=torch.cat([positive, src_embeds])
         return positive,negative
+    
+    def get_trainable_layers(self)->tuple:
+        unet_parameters=[p for p in self.unet.named_parameters()]
+        other_parameters=[]
+        if hasattr(self,"prompt_model"):
+            other_parameters=[p for p in self.prompt_model.parameters()]
+        return unet_parameters,other_parameters
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:DiffusionPipeline,keywords:set,use_lora:bool=False):
+    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False):
         self.sd_pipeline=sd_pipeline
         self.keywords=keywords
         self.use_lora=use_lora
@@ -649,13 +657,14 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
 
     def get_trainable_layers(self):
         ret=[]
+        unet_parameters,other_parameters=self.sd_pipeline.get_trainable_layers()
         if len(self.keywords)==0:
-            return [p for _,p in self.sd_pipeline.unet.named_parameters()]
+            return [p for _,p in unet_parameters]
         for key in self.keywords:
-            for name,p in self.sd_pipeline.unet.named_parameters():
+            for name,p in unet_parameters:
                 if name.find(key)!=-1 and p.requires_grad:
                     ret.append(p)
-        return ret
+        return ret+other_parameters
 
     def rgb_with_grad(self,*args,**kwargs):
         if False: #type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:

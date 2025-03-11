@@ -68,6 +68,7 @@ parser.add_argument("--prompt_embedding_conditioning",action="store_true")
 parser.add_argument("--adapter_conditioning",action="store_true")
 parser.add_argument("--num_image_text_embeds",type=int,default=32,help="num_image_text_embeds for image projection")
 parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vgg, what model to use for the image embeds")
+parser.add_argument("--use_encoder_hid_proj",action="store_true",help="whether to use encoder hidden proj thing")
 
 
 RARE_TOKEN="sksz"

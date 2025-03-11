@@ -627,7 +627,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         return image,None
     
 #class PromptCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyModelPipeline):
-    def register_prompt_model(self,prompt_model:torch.nn.Module,src_entity:torch.Tensor):
+    def register_prompt_model(self,prompt_model:torch.nn.Module,src_entity:torch.Tensor,num_image_text_embeds:int=16):
         self.prompt_model=prompt_model
         self.src_entity=src_entity
 
@@ -636,10 +636,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
         #print("positive shape", positive.size())
         if hasattr(self, "prompt_model"):
-            src_embeds=self.prompt_model(self.src_entity).unsqueeze(0)
-            positive=positive[:, :-1, :]  #len 77 -> 76 this probably is just padding anyway
-            #print("src embeds, positive shapes", src_embeds.size(),positive.size())
-            positive=torch.cat([src_embeds,positive],dim=1)
+            positive=self.prompt_model(self.src_entity,positive)
         return positive,negative
     
     def get_trainable_layers(self)->tuple:

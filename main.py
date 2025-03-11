@@ -391,14 +391,17 @@ def main(args):
 
 
                 if args.prompt_embedding_conditioning:
+                    
                     if args.image_embeds_type=="face":
                         image_embed_dim=512
+                        _src_embedding=content_face_embedding
                     elif args.image_embeds_type=="vgg":
                         image_embed_dim=768
+                        _src_embedding=content_embedding
                     prompt_model=PromptImageProjection(image_embed_dim,768,args.num_image_text_embeds)
                     prompt_model.to(accelerator.device).requires_grad_(True)
                     prompt_model=accelerator.prepare(prompt_model)
-                    sd_pipeline.register_prompt_model(prompt_model,content_face_embedding)
+                    sd_pipeline.register_prompt_model(prompt_model,_src_embedding)
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 content_cache=[]

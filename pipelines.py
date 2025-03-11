@@ -634,9 +634,12 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.encode_prompt
     def encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
         positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+        #print("positive shape", positive.size())
         if hasattr(self, "prompt_model"):
-            src_embeds=self.prompt_model(self.src_entity)
-            postive=torch.cat([positive, src_embeds])
+            src_embeds=self.prompt_model(self.src_entity).unsqueeze(0)
+            positive=positive[:, :-1, :]  #len 77 -> 76 this probably is just padding anyway
+            print("src embeds, positive shapes", src_embeds.size(),positive.size())
+            positive=torch.cat([src_embeds,positive],dim=1)
         return positive,negative
     
     def get_trainable_layers(self)->tuple:

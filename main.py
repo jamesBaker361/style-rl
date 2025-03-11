@@ -63,6 +63,8 @@ parser.add_argument("--content_start",type=int,default=0)
 parser.add_argument("--content_limit",type=int,default=5)
 parser.add_argument("--content_mid_block",action="store_true")
 parser.add_argument("--content_layers",nargs="*",type=int)
+parser.add_argument("--prompt_embedding_conditioning",action="store_true")
+parser.add_argument("--adapter_conditioning",action="store_true")
 
 
 RARE_TOKEN="sksz"
@@ -228,6 +230,7 @@ def main(args):
                 print("no face !!!")
             #img_cropped.requires_grad_(grad)
             img_embedding=resnet(img_cropped.unsqueeze(0))
+            print("img embedding shape",img_embedding.size())
             return img_embedding
 
         def prompt_fn()->tuple[str,Any]:
@@ -365,8 +368,14 @@ def main(args):
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
-                
-                        
+
+                if args.prompt_embedding_conditioning:
+                    prompt_model=torch.nn.Sequential(
+                        torch.nn.Linear(512,768)
+                    )
+                    prompt_model.to(accelerator.device).requires_grad_(True)
+                    prompt_model=accelerator.prepare(prompt_model)
+                    sd_pipeline.register_prompt_model(prompt_model,content_face_embedding)
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 content_cache=[]

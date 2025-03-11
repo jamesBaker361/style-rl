@@ -232,12 +232,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
-        # 7.1 Add image embeds for IP-Adapter
-        added_cond_kwargs = (
-            {"image_embeds": image_embeds}
-            if ip_adapter_image is not None or ip_adapter_image_embeds is not None
-            else None
-        )
+        # src_embeds if we have previously called register_encoder_hid_proj
+        if hasattr(self,"src_embeds"):
+            added_cond_kwargs={"image_embeds":self.src_embeds}
 
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
@@ -502,12 +499,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
-        # 7.1 Add image embeds for IP-Adapter
-        added_cond_kwargs = (
-            {"image_embeds": image_embeds}
-            if ip_adapter_image is not None or ip_adapter_image_embeds is not None
-            else None
-        )
+        # src_embeds if we have previously called register_encoder_hid_proj
+        if hasattr(self,"src_embeds"):
+            added_cond_kwargs={"image_embeds":self.src_embeds}
 
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
@@ -631,6 +625,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         self.prompt_model=prompt_model
         self.src_entity=src_entity
 
+    def register_encoder_hid_proj(self,src_embeds:torch.Tensor,encoder_hid_proj:torch.nn.Module):
+        self.src_embeds=src_embeds
+        self.unet.config.encoder_hid_dim_type = "image_proj"
+        self.unet.encoder_hid_proj=encoder_hid_proj
+
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.encode_prompt
     def encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
         positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
@@ -644,6 +643,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         other_parameters=[]
         if hasattr(self,"prompt_model"):
             other_parameters=[p for p in self.prompt_model.parameters()]
+        elif hasattr(self,"src_embeds"):
+            other_parameters=[p for p in self.unet.encoder_hid_proj.parameters()]
         return unet_parameters,other_parameters
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):

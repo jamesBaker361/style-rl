@@ -128,7 +128,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         #print("vit_outputs.past_key_values[11]",len(vit_outputs.past_key_values[11]))
         #print("vit_outputs.past_key_values[11][0]",vit_outputs.past_key_values[11][0].size())
         #print("vit_outputs.past_key_values[11][0].reshape(1,-1)",vit_outputs.past_key_values[11][0].reshape(1,-1).size())
-        content=vit_outputs.past_key_values[11][0].mean(-2)[0]
+        content=vit_outputs.past_key_values[11][0].mean(-2).reshape(1,-1)
         vit_content_embedding_list.append(content)
     if return_numpy:
         vit_embedding_list=[v.cpu().numpy() for v in vit_embedding_list]
@@ -192,6 +192,8 @@ def mse_reward_fn(*args,**kwargs):
 class PromptImageProjection(ImageProjection):
     def forward(self,image_embeds: torch.Tensor,positive:torch.Tensor)->torch.Tensor:
         batch_size = image_embeds.shape[0]
+
+        print("image embeds shape",image_embeds.size())
 
         # image
         image_embeds = self.image_embeds(image_embeds.to(self.image_embeds.weight.dtype))

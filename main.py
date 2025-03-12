@@ -400,7 +400,7 @@ def main(args):
                             transforms.Normalize([0.5], [0.5]),
                         ]
                     )
-                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0))
+                
 
 
                 if args.prompt_embedding_conditioning or args.use_encoder_hid_proj:
@@ -427,6 +427,9 @@ def main(args):
                     print(f"encoder model has {len([p for p in encoder_hid_proj.parameters()])} traanable parameters")
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
+                
+                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0).to(device=accelerator.device, dtype=torch_dtype))
+
                 content_cache=[]
                 style_cache=[]
                 if args.style_layers_train:

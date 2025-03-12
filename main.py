@@ -393,7 +393,7 @@ def main(args):
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
 
-                if args.prompt_embedding_conditioning:
+                if args.prompt_embedding_conditioning or args.use_encoder_hid_proj:
                     
                     if args.image_embeds_type=="face":
                         image_embed_dim=512
@@ -404,7 +404,11 @@ def main(args):
                     prompt_model=PromptImageProjection(image_embed_dim,768,args.num_image_text_embeds)
                     prompt_model.to(accelerator.device).requires_grad_(True)
                     prompt_model=accelerator.prepare(prompt_model)
+                if args.prompt_embedding_conditioning:
                     sd_pipeline.register_prompt_model(prompt_model,_src_embedding)
+
+                elif args.use_encoder_hid_proj:
+                    sd_pipeline.register_encoder_hid_proj(prompt_model,_src_embedding)
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 content_cache=[]

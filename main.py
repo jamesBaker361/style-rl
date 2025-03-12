@@ -400,7 +400,7 @@ def main(args):
                             transforms.Normalize([0.5], [0.5]),
                         ]
                     )
-                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image))
+                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image.unsqueeze(0)))
 
 
                 if args.prompt_embedding_conditioning or args.use_encoder_hid_proj:
@@ -498,7 +498,7 @@ def main(args):
                             face_embedding_list=[get_face_embeddings(image,resnet,mtcnn) for image in images]
                             return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list]),{}
                         elif args.content_reward_fn=="vae":
-                            return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image) for image in images]),{}
+                            return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image.unsqueeze(0)) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.content_reward_fn=="mse":

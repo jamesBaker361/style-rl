@@ -497,6 +497,8 @@ def main(args):
                         if args.content_reward_fn=="face":
                             face_embedding_list=[get_face_embeddings(image,resnet,mtcnn) for image in images]
                             return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list]),{}
+                        elif args.content_reward_fn=="vae":
+                            return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.content_reward_fn=="mse":
@@ -507,7 +509,11 @@ def main(args):
                     
                     content_keywords=[CONTENT_LORA]
                     sd_pipeline.unet=apply_lora(sd_pipeline.unet,content_layers,[],args.content_mid_block,keyword=CONTENT_LORA)
-                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA])
+                    if args.content_reward_fn=="vae":
+                        output_type="latents"
+                    else:
+                        output_type="pt"
+                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA],output_type=output_type)
                     print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
                     sd_pipeline.unet.to(accelerator.device)
                     kwargs={}

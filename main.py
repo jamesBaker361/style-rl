@@ -129,7 +129,7 @@ def get_vit_embeddings(vit_processor: ViTImageProcessor, vit_model: BetterViTMod
         #print("vit_outputs.past_key_values[11]",len(vit_outputs.past_key_values[11]))
         #print("vit_outputs.past_key_values[11][0]",vit_outputs.past_key_values[11][0].size())
         #print("vit_outputs.past_key_values[11][0].reshape(1,-1)",vit_outputs.past_key_values[11][0].reshape(1,-1).size())
-        content=vit_outputs.past_key_values[11][0].mean(-2).reshape(1,-1)
+        content=vit_outputs.past_key_values[11][0].reshape(1,-1)
         vit_content_embedding_list.append(content)
     if return_numpy:
         vit_embedding_list=[v.cpu().numpy() for v in vit_embedding_list]
@@ -194,7 +194,7 @@ class PromptImageProjection(ImageProjection):
     def forward(self,image_embeds: torch.Tensor,positive:torch.Tensor)->torch.Tensor:
         batch_size = image_embeds.shape[0]
 
-        print("image embeds shape",image_embeds.size())
+        #print("image embeds shape",image_embeds.size())
 
         # image
         image_embeds = self.image_embeds(image_embeds.to(self.image_embeds.weight.dtype))
@@ -256,7 +256,7 @@ def main(args):
                 print("no face !!!")
             #img_cropped.requires_grad_(grad)
             img_embedding=resnet(img_cropped.unsqueeze(0))
-            print("img embedding shape",img_embedding.size())
+            #print("img embedding shape",img_embedding.size())
             return img_embedding
 
         def prompt_fn()->tuple[str,Any]:
@@ -399,16 +399,20 @@ def main(args):
                         image_embed_dim=512
                         _src_embedding=content_face_embedding
                     elif args.image_embeds_type=="vgg":
-                        image_embed_dim=768
+                        image_embed_dim=151296
                         _src_embedding=content_embedding
+                    
+                if args.prompt_embedding_conditioning:
                     prompt_model=PromptImageProjection(image_embed_dim,768,args.num_image_text_embeds)
                     prompt_model.to(accelerator.device).requires_grad_(True)
                     prompt_model=accelerator.prepare(prompt_model)
-                if args.prompt_embedding_conditioning:
                     sd_pipeline.register_prompt_model(prompt_model,_src_embedding)
 
                 elif args.use_encoder_hid_proj:
-                    sd_pipeline.register_encoder_hid_proj(prompt_model,_src_embedding)
+                    encoder_hid_proj=ImageProjection(image_embed_dim,768,args.num_image_text_embeds)
+                    encoder_hid_proj.to(accelerator.device).requires_grad_(True)
+                    encoder_hid_proj=accelerator.prepare(encoder_hid_proj)
+                    sd_pipeline.register_encoder_hid_proj(encoder_hid_proj,_src_embedding)
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 content_cache=[]

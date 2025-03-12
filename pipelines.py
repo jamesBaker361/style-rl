@@ -625,7 +625,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         self.prompt_model=prompt_model
         self.src_entity=src_entity
 
-    def register_encoder_hid_proj(self,src_embeds:torch.Tensor,encoder_hid_proj:torch.nn.Module):
+    def register_encoder_hid_proj(self,encoder_hid_proj:torch.nn.Module,src_embeds:torch.Tensor):
         self.src_embeds=src_embeds
         self.unet.config.encoder_hid_dim_type = "image_proj"
         self.unet.encoder_hid_proj=encoder_hid_proj

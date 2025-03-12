@@ -235,6 +235,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # src_embeds if we have previously called register_encoder_hid_proj
         if hasattr(self,"src_embeds"):
             added_cond_kwargs={"image_embeds":self.src_embeds}
+        else:
+            added_cond_kwargs={}
 
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
@@ -404,105 +406,108 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 second element is a list of `bool`s indicating whether the corresponding generated image contains
                 "not-safe-for-work" (nsfw) content.
         """
-
+        ##print("407 added condkwagrs",added_cond_kwargs)
         callback = kwargs.pop("callback", None)
         callback_steps = kwargs.pop("callback_steps", None)
 
         # 0. Default height and width to unet
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
-
-        # 1. Check inputs. Raise error if not correct
-        self.check_inputs(
-            prompt,
-            height,
-            width,
-            callback_steps,
-            None,
-            prompt_embeds,
-            None,
-            ip_adapter_image,
-            ip_adapter_image_embeds,
-            callback_on_step_end_tensor_inputs,
-        )
-        self._guidance_scale = guidance_scale
-        self._clip_skip = clip_skip
-        self._cross_attention_kwargs = cross_attention_kwargs
-
-        # 2. Define call parameters
-        if prompt is not None and isinstance(prompt, str):
-            batch_size = 1
-        elif prompt is not None and isinstance(prompt, list):
-            batch_size = len(prompt)
-        else:
-            batch_size = prompt_embeds.shape[0]
-
-        device = self._execution_device
-
-        if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
-            image_embeds = self.prepare_ip_adapter_image_embeds(
+        with torch.no_grad():
+            # 1. Check inputs. Raise error if not correct
+            self.check_inputs(
+                prompt,
+                height,
+                width,
+                callback_steps,
+                None,
+                prompt_embeds,
+                None,
                 ip_adapter_image,
                 ip_adapter_image_embeds,
-                device,
-                batch_size * num_images_per_prompt,
-                self.do_classifier_free_guidance,
+                callback_on_step_end_tensor_inputs,
+            )
+            self._guidance_scale = guidance_scale
+            self._clip_skip = clip_skip
+            self._cross_attention_kwargs = cross_attention_kwargs
+
+            # 2. Define call parameters
+            if prompt is not None and isinstance(prompt, str):
+                batch_size = 1
+            elif prompt is not None and isinstance(prompt, list):
+                batch_size = len(prompt)
+            else:
+                batch_size = prompt_embeds.shape[0]
+
+            device = self._execution_device
+
+            if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
+                image_embeds = self.prepare_ip_adapter_image_embeds(
+                    ip_adapter_image,
+                    ip_adapter_image_embeds,
+                    device,
+                    batch_size * num_images_per_prompt,
+                    self.do_classifier_free_guidance,
+                )
+
+            # 3. Encode input prompt
+            lora_scale = (
+                self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
             )
 
-        # 3. Encode input prompt
-        lora_scale = (
-            self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
-        )
+            # NOTE: when a LCM is distilled from an LDM via latent consistency distillation (Algorithm 1) with guided
+            # distillation, the forward pass of the LCM learns to approximate sampling from the LDM using CFG with the
+            # unconditional prompt "" (the empty string). Due to this, LCMs currently do not support negative prompts.
+            prompt_embeds, _ = self.encode_prompt(
+                prompt,
+                device,
+                num_images_per_prompt,
+                self.do_classifier_free_guidance,
+                negative_prompt=None,
+                prompt_embeds=prompt_embeds,
+                negative_prompt_embeds=None,
+                lora_scale=lora_scale,
+                clip_skip=self.clip_skip,
+            )
 
-        # NOTE: when a LCM is distilled from an LDM via latent consistency distillation (Algorithm 1) with guided
-        # distillation, the forward pass of the LCM learns to approximate sampling from the LDM using CFG with the
-        # unconditional prompt "" (the empty string). Due to this, LCMs currently do not support negative prompts.
-        prompt_embeds, _ = self.encode_prompt(
-            prompt,
-            device,
-            num_images_per_prompt,
-            self.do_classifier_free_guidance,
-            negative_prompt=None,
-            prompt_embeds=prompt_embeds,
-            negative_prompt_embeds=None,
-            lora_scale=lora_scale,
-            clip_skip=self.clip_skip,
-        )
+            # 4. Prepare timesteps
+            timesteps, num_inference_steps = retrieve_timesteps(
+                self.scheduler, num_inference_steps, device, timesteps, original_inference_steps=original_inference_steps
+            )
 
-        # 4. Prepare timesteps
-        timesteps, num_inference_steps = retrieve_timesteps(
-            self.scheduler, num_inference_steps, device, timesteps, original_inference_steps=original_inference_steps
-        )
+            # 5. Prepare latent variable
+            num_channels_latents = self.unet.config.in_channels
+            latents = self.prepare_latents(
+                batch_size * num_images_per_prompt,
+                num_channels_latents,
+                height,
+                width,
+                prompt_embeds.dtype,
+                device,
+                generator,
+                latents,
+            )
+            bs = batch_size * num_images_per_prompt
 
-        # 5. Prepare latent variable
-        num_channels_latents = self.unet.config.in_channels
-        latents = self.prepare_latents(
-            batch_size * num_images_per_prompt,
-            num_channels_latents,
-            height,
-            width,
-            prompt_embeds.dtype,
-            device,
-            generator,
-            latents,
-        )
-        bs = batch_size * num_images_per_prompt
+            # 6. Get Guidance Scale Embedding
+            # NOTE: We use the Imagen CFG formulation that StableDiffusionPipeline uses rather than the original LCM paper
+            # CFG formulation, so we need to subtract 1 from the input guidance_scale.
+            # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
+            w = torch.tensor(self.guidance_scale - 1).repeat(bs)
+            w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=self.unet.config.time_cond_proj_dim).to(
+                device=device, dtype=latents.dtype
+            )
 
-        # 6. Get Guidance Scale Embedding
-        # NOTE: We use the Imagen CFG formulation that StableDiffusionPipeline uses rather than the original LCM paper
-        # CFG formulation, so we need to subtract 1 from the input guidance_scale.
-        # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
-        w = torch.tensor(self.guidance_scale - 1).repeat(bs)
-        w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=self.unet.config.time_cond_proj_dim).to(
-            device=device, dtype=latents.dtype
-        )
+            # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
+            extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
-        # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
-        extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
+            # src_embeds if we have previously called register_encoder_hid_proj
+            if hasattr(self,"src_embeds"):
+                added_cond_kwargs={"image_embeds":self.src_embeds}
+            else:
+                added_cond_kwargs={}
 
-        # src_embeds if we have previously called register_encoder_hid_proj
-        if hasattr(self,"src_embeds"):
-            added_cond_kwargs={"image_embeds":self.src_embeds}
-
+        #print("506 added condkwagrs",added_cond_kwargs)
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
@@ -512,6 +517,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                 # model prediction (v-prediction, eps, x)
                 if gradient_checkpoint:
+                    #print("516 added condkwagrs",added_cond_kwargs)
                     model_pred = checkpoint.checkpoint(
                         self.unet,
                         latents,
@@ -668,7 +674,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         return ret+other_parameters
 
     def rgb_with_grad(self,*args,**kwargs):
-        if False: #type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
+        if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
             kwargs["output_type"]="pt"
             return self.sd_pipeline.call_with_grad(*args,**kwargs)
         else:

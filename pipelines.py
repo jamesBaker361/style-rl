@@ -654,10 +654,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         return unet_parameters,other_parameters
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False):
+    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False,output_type:str="pt"):
         self.sd_pipeline=sd_pipeline
         self.keywords=keywords
         self.use_lora=use_lora
+        self.output_type=output_type
 
         for layer in self.get_trainable_layers():
             layer.requires_grad_(True)
@@ -674,8 +675,8 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         return ret+other_parameters
 
     def rgb_with_grad(self,*args,**kwargs):
+        kwargs["output_type"]=self.output_type
         if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
-            kwargs["output_type"]="pt"
             return self.sd_pipeline.call_with_grad(*args,**kwargs)
         else:
             return super().rgb_with_grad(*args,**kwargs)

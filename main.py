@@ -53,7 +53,7 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face")
+parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae")
 parser.add_argument("--vgg_layer_style",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
@@ -360,6 +360,8 @@ def main(args):
                         ]
                     )
                 
+                
+                
                 content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
 
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
@@ -392,6 +394,14 @@ def main(args):
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
+                vae_image_transforms=transforms.Compose(
+                        [
+                            transforms.ToTensor(),
+                            transforms.Normalize([0.5], [0.5]),
+                        ]
+                    )
+                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image))
+
 
                 if args.prompt_embedding_conditioning or args.use_encoder_hid_proj:
                     
@@ -407,12 +417,14 @@ def main(args):
                     prompt_model.to(accelerator.device).requires_grad_(True)
                     prompt_model=accelerator.prepare(prompt_model)
                     sd_pipeline.register_prompt_model(prompt_model,_src_embedding)
+                    print(f"prompt model has {len([p for p in prompt_model.parameters()])} traanable parameters")
 
                 elif args.use_encoder_hid_proj:
                     encoder_hid_proj=ImageProjection(image_embed_dim,768,args.num_image_text_embeds)
                     encoder_hid_proj.to(accelerator.device).requires_grad_(True)
                     encoder_hid_proj=accelerator.prepare(encoder_hid_proj)
                     sd_pipeline.register_encoder_hid_proj(encoder_hid_proj,_src_embedding)
+                    print(f"encoder model has {len([p for p in encoder_hid_proj.parameters()])} traanable parameters")
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 content_cache=[]

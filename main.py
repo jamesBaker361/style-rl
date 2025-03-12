@@ -400,7 +400,7 @@ def main(args):
                             transforms.Normalize([0.5], [0.5]),
                         ]
                     )
-                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image.unsqueeze(0)))
+                vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0))
 
 
                 if args.prompt_embedding_conditioning or args.use_encoder_hid_proj:

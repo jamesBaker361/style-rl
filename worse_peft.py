@@ -31,7 +31,7 @@ def assign_value_to_attr(obj, attr_path, value):
         obj = getattr(obj, attr)
     setattr(obj, attrs[-1], value)
 
-def apply_lora(unet:UNet2DConditionModel,down_block_indices:list,up_block_indices:list,use_mid_block:bool,rank=4,keyword:str="lora")-> UNet2DConditionModel:
+def apply_lora(unet:UNet2DConditionModel,down_block_indices:list,up_block_indices:list,use_mid_block:bool,rank=4,keyword:str="lora",substrings:list=["to_q", "to_k", "to_v", "to_out.0"])-> UNet2DConditionModel:
     blocks=[block for i,block in enumerate(unet.down_blocks) if i in down_block_indices]+[block for i,block in enumerate(unet.up_blocks) if i in up_block_indices]
     if use_mid_block:
         blocks.append(unet.mid_block)
@@ -40,13 +40,13 @@ def apply_lora(unet:UNet2DConditionModel,down_block_indices:list,up_block_indice
         print(type(block))
         lora_target_layers = []
         for name, module in block.named_modules():
-            if isinstance(module, torch.nn.Linear) and any(x in name for x in ["to_q", "to_k", "to_v", "to_out.0"]):
+            if isinstance(module, torch.nn.Linear) and any(x in name for x in substrings):
                 lora_target_layers.append(name)
                 #print(f"adding  {name} to dict")
         
         for layer_name in lora_target_layers:
             module = dict(block.named_modules())[layer_name]  # Get the module reference
-            print("module type ",type(module))
+            #print("module type ",type(module))
             new_module=LoRAAttention(module, rank=rank,keyword=keyword)
             setattr(block, layer_name, new_module)
             assign_value_to_attr(block,layer_name,new_module)

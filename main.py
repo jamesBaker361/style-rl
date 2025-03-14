@@ -30,6 +30,7 @@ from better_mtcnn import BetterMTCNN
 from typing import Union
 from diffusers.models.embeddings import ImageProjection
 from extractor import ViTExtractor
+from dift_sd import SDFeaturizer
 
 parser=argparse.ArgumentParser()
 
@@ -54,7 +55,7 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae or raw or dino")
+parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae or raw or dino or dift")
 parser.add_argument("--vgg_layer_style",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
@@ -70,6 +71,12 @@ parser.add_argument("--adapter_conditioning",action="store_true")
 parser.add_argument("--num_image_text_embeds",type=int,default=32,help="num_image_text_embeds for image projection")
 parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vgg, what model to use for the image embeds")
 parser.add_argument("--use_encoder_hid_proj",action="store_true",help="whether to use encoder hidden proj thing")
+parser.add_argument('--up_ft_index', default=1, type=int, choices=[0, 1, 2 ,3],
+                        help='which upsampling block of U-Net to extract the feature map for dift')
+parser.add_argument('--t', default=261, type=int, 
+                        help='time step for diffusion, choose from range [0, 1000] for dift')
+parser.add_argument('--ensemble_size', default=8, type=int, 
+                        help='number of repeated images in each batch used to get features for dift')
 
 
 RARE_TOKEN="sksz"
@@ -314,12 +321,19 @@ def main(args):
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
+                dift_featurizer=SDFeaturizer()
+                dift_featurizer.pipe.unet.to(device=accelerator.device,dtype=torch_dtype)
+                dift_featurizer.pipe.vae.to(device=accelerator.device,dtype=torch_dtype)
+                dift_featurizer.pipe.text_encoder.to(device=accelerator.device,dtype=torch_dtype)
+
                 mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
                 mtcnn.eval()
                 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
                 resnet.eval()
 
                 mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
+
+
 
                 if args.pretrained_type=="consistency":
                     pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
@@ -442,8 +456,15 @@ def main(args):
 
                 raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
 
+                sd_dift_content= dift_featurizer.forward(content_image.copy().to(device=accelerator.device, dtype=torch_dtype),
+                      prompt="portrait",
+                      t=args.t,
+                      up_ft_index=args.up_ft_index,
+                      ensemble_size=args.ensemble_size) 
+
                 content_cache=[]
                 style_cache=[]
+                accelerator.free_memory()
                 if args.style_layers_train:
 
                     @torch.no_grad()
@@ -518,7 +539,9 @@ def main(args):
                             #print(type(images[0].unsqueeze(0)))
                             return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image.unsqueeze(0)) for image in images]),{}
                         elif args.content_reward_fn=="dino":
-                            return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image)) for image in images]),{}
+                            return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image.unsqueeze(0))) for image in images]),{}
+                        elif args.content_reward_fn=="dift":
+                            return torch.stack([mse_reward_fn(sd_dift_content,image.unsqueeze(0)) for image in images]),{}
                         elif args.content_reward_fn=="raw":
                             return torch.stack([mse_reward_fn(raw_content,image) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":

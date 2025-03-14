@@ -456,7 +456,7 @@ def main(args):
 
                 raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
 
-                sd_dift_content= dift_featurizer.forward(content_image.copy().to(device=accelerator.device, dtype=torch_dtype),
+                sd_dift_content= dift_featurizer.forward(raw_content.copy().to(device=accelerator.device, dtype=torch_dtype),
                       prompt="portrait",
                       t=args.t,
                       up_ft_index=args.up_ft_index,

@@ -29,6 +29,7 @@ from facenet_pytorch import MTCNN, InceptionResnetV1
 from better_mtcnn import BetterMTCNN
 from typing import Union
 from diffusers.models.embeddings import ImageProjection
+from extractor import ViTExtractor
 
 parser=argparse.ArgumentParser()
 
@@ -53,7 +54,7 @@ parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae")
+parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae or raw or dino")
 parser.add_argument("--vgg_layer_style",type=int,default=27)
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
@@ -306,6 +307,10 @@ def main(args):
 
                 vit_model=accelerator.prepare(vit_model)
 
+                dino_vit_extractor=ViTExtractor("vit_base_patch16_224",devic=accelerator.device)
+                dino_vit_extractor.eval()
+                dino_vit_extractor.requires_grad_(False)
+
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
@@ -365,6 +370,9 @@ def main(args):
                 content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
 
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
+
+                dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image)
+                dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
@@ -394,12 +402,11 @@ def main(args):
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
-                vae_image_transforms=transforms.Compose(
-                        [
-                            transforms.ToTensor(),
-                            transforms.Normalize([0.5], [0.5]),
-                        ]
-                    )
+                vae_image_transforms = transforms.Compose([
+                    transforms.Resize((768, 768)),  # Resize to 768x768
+                    transforms.ToTensor(),
+                    transforms.Normalize([0.5], [0.5]),
+                    ])
                 
 
 
@@ -428,7 +435,12 @@ def main(args):
 
                 sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
                 
+                #print('sd_pipeline.unet.config.in_channels',sd_pipeline.unet.config.in_channels)
+                #print('sd_pipeline.unet.config.out_channels',sd_pipeline.unet.config.out_channels)
+
                 vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0).to(device=accelerator.device, dtype=torch_dtype))
+
+                raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
 
                 content_cache=[]
                 style_cache=[]
@@ -501,7 +513,14 @@ def main(args):
                             face_embedding_list=[get_face_embeddings(image,resnet,mtcnn) for image in images]
                             return torch.stack([mse_reward_fn(face_embedding,content_face_embedding) for face_embedding in face_embedding_list]),{}
                         elif args.content_reward_fn=="vae":
+                            #print("vae_content_embedding.latent_dist.sample()",vae_content_embedding.latent_dist.sample().size())
+                            #print("image.unsqueeze(0)",images[0].unsqueeze(0).size())
+                            #print(type(images[0].unsqueeze(0)))
                             return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image.unsqueeze(0)) for image in images]),{}
+                        #elif args.content_reward_fn=="dino":
+
+                        elif args.content_reward_fn=="raw":
+                            return torch.stack([mse_reward_fn(raw_content,image) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":
                         _,__,sample_vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images,False)
                         if args.content_reward_fn=="mse":
@@ -512,8 +531,9 @@ def main(args):
                     
                     content_keywords=[CONTENT_LORA]
                     sd_pipeline.unet=apply_lora(sd_pipeline.unet,content_layers,[],args.content_mid_block,keyword=CONTENT_LORA)
+
                     if args.content_reward_fn=="vae":
-                        output_type="latents"
+                        output_type="latent"
                     else:
                         output_type="pt"
                     content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA],output_type=output_type)

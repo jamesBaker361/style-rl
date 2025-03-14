@@ -412,12 +412,13 @@ def main(args):
                 elif args.pretrained_type=="stable":
                     sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
                 sd_pipeline.run_safety_checker=run_safety_checker
+                sd_pipeline.unet.config.sample_size=args.image_size
                 sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
 
                 vae_image_transforms = transforms.Compose([
-                    transforms.Resize((768, 768)),  # Resize to 768x768
+                    transforms.Resize((args.image_size, args.image_size)),  # Resize to 768x768
                     transforms.ToTensor(),
                     transforms.Normalize([0.5], [0.5]),
                     ])

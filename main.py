@@ -307,9 +307,9 @@ def main(args):
 
                 vit_model=accelerator.prepare(vit_model)
 
-                dino_vit_extractor=ViTExtractor("vit_base_patch16_224",devic=accelerator.device)
-                dino_vit_extractor.eval()
-                dino_vit_extractor.requires_grad_(False)
+                dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
+                dino_vit_extractor.model.eval()
+                dino_vit_extractor.model.requires_grad_(False)
 
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
@@ -517,8 +517,8 @@ def main(args):
                             #print("image.unsqueeze(0)",images[0].unsqueeze(0).size())
                             #print(type(images[0].unsqueeze(0)))
                             return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image.unsqueeze(0)) for image in images]),{}
-                        #elif args.content_reward_fn=="dino":
-
+                        elif args.content_reward_fn=="dino":
+                            return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image)) for image in images]),{}
                         elif args.content_reward_fn=="raw":
                             return torch.stack([mse_reward_fn(raw_content,image) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":

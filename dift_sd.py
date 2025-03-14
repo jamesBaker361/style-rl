@@ -232,11 +232,11 @@ class SDFeaturizer:
         if prompt == self.null_prompt:
             prompt_embeds = self.null_prompt_embeds
         else:
-            prompt_embeds = self.pipe._encode_prompt(
+            prompt_embeds = self.pipe.encode_prompt(
                 prompt=prompt,
                 device=device,
                 num_images_per_prompt=1,
-                do_classifier_free_guidance=False) # [1, 77, dim]
+                do_classifier_free_guidance=False)[0] # [1, 77, dim]
         prompt_embeds = prompt_embeds[0].repeat(ensemble_size, 1, 1)
         unet_ft_all = self.pipe(
             img_tensor=img_tensor,
@@ -255,11 +255,11 @@ class SDFeaturizer4Eval(SDFeaturizer):
             cat2prompt_embeds = {}
             for cat in cat_list:
                 prompt = f"a photo of a {cat}"
-                prompt_embeds = self.pipe._encode_prompt(
+                prompt_embeds = self.pipe.encode_prompt(
                     prompt=prompt,
                     device=device,
                     num_images_per_prompt=1,
-                    do_classifier_free_guidance=False) # [1, 77, dim]
+                    do_classifier_free_guidance=False)[0] # [1, 77, dim]
                 cat2prompt_embeds[cat] = prompt_embeds
             self.cat2prompt_embeds = cat2prompt_embeds
 

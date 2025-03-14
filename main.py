@@ -75,8 +75,9 @@ parser.add_argument('--up_ft_index', default=1, type=int, choices=[0, 1, 2 ,3],
                         help='which upsampling block of U-Net to extract the feature map for dift')
 parser.add_argument('--t', default=261, type=int, 
                         help='time step for diffusion, choose from range [0, 1000] for dift')
-parser.add_argument('--ensemble_size', default=8, type=int, 
+parser.add_argument('--ensemble_size', default=1, type=int, 
                         help='number of repeated images in each batch used to get features for dift')
+parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 
 
 RARE_TOKEN="sksz"
@@ -386,7 +387,7 @@ def main(args):
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
                 dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image)
-                dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed)
+                dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,face=args.facet)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
@@ -540,7 +541,7 @@ def main(args):
                             #print(type(images[0].unsqueeze(0)))
                             return torch.stack([mse_reward_fn(vae_content_embedding.latent_dist.sample(), image.unsqueeze(0)) for image in images]),{}
                         elif args.content_reward_fn=="dino":
-                            return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image.unsqueeze(0))) for image in images]),{}
+                            return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images]),{}
                         elif args.content_reward_fn=="dift":
                             return torch.stack([mse_reward_fn(sd_dift_content,image.unsqueeze(0)) for image in images]),{}
                         elif args.content_reward_fn=="raw":

@@ -531,7 +531,11 @@ def main(args):
                         elif args.content_reward_fn=="dino":
                             return torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images]),{}
                         elif args.content_reward_fn=="dift":
-                            return torch.stack([mse_reward_fn(sd_dift_content,image.unsqueeze(0)) for image in images]),{}
+                            return torch.stack([mse_reward_fn(sd_dift_content,  dift_featurizer.forward( 
+                                image.unsqueeze(0),prompt="portrait",
+                                t=args.t,
+                                up_ft_index=args.up_ft_index,
+                                ensemble_size=args.ensemble_size)) for image in images]),{}
                         elif args.content_reward_fn=="raw":
                             return torch.stack([mse_reward_fn(raw_content,image) for image in images]),{}
                         #if args.reward_fn=="cos" or args.reward_fn=="mse":

@@ -31,6 +31,7 @@ from typing import Union
 from diffusers.models.embeddings import ImageProjection
 from extractor import ViTExtractor
 from dift_sd import SDFeaturizer
+from image_projection import PromptImageProjection
 
 parser=argparse.ArgumentParser()
 
@@ -198,23 +199,6 @@ vgg_image_transforms = transforms.Compose(
 
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
-
-class PromptImageProjection(ImageProjection):
-    def forward(self,image_embeds: torch.Tensor,positive:torch.Tensor)->torch.Tensor:
-        batch_size = image_embeds.shape[0]
-
-        #print("image embeds shape",image_embeds.size())
-
-        # image
-        image_embeds = self.image_embeds(image_embeds.to(self.image_embeds.weight.dtype))
-        image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
-        image_embeds = self.norm(image_embeds)
-        
-        positive=positive[:, : -self.num_image_text_embeds, :]  #len 77 -> 76 this probably is just padding anyway
-        #print("src embeds, positive shapes", src_embeds.size(),positive.size())
-        positive=torch.cat([image_embeds,positive],dim=1)
-
-        return positive
 
 
 def main(args):
@@ -387,7 +371,7 @@ def main(args):
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
                 dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image)
-                dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,face=args.facet)
+                dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,facet=args.facet)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,

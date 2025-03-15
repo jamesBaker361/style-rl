@@ -42,8 +42,8 @@ parser.add_argument("--style_dataset",type=str,default="jlbaker361/portraits")
 parser.add_argument("--start",type=int,default=0)
 parser.add_argument("--limit",type=int,default=5)
 parser.add_argument("--method",type=str,default="ddpo")
-parser.add_argument("--image_size",type=int,default=256)
-parser.add_argument("--num_inference_steps",type=int,default=4)
+parser.add_argument("--image_size",type=int,default=768)
+parser.add_argument("--num_inference_steps",type=int,default=2)
 parser.add_argument("--style_layers_train",action="store_true",help="train the style layers")
 parser.add_argument("--content_layers_train",action="store_true",help="separately train the style layers")
 parser.add_argument("--style_mid_block",action="store_true")
@@ -363,7 +363,7 @@ def main(args):
 
                 content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
-                if args.content_reward_fn=="dift":
+                if args.content_reward_fn=="dino":
                     dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
                     dino_vit_extractor.model.eval()
                     dino_vit_extractor.model.requires_grad_(False)
@@ -394,7 +394,9 @@ def main(args):
                 elif args.pretrained_type=="stable":
                     sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
                 sd_pipeline.run_safety_checker=run_safety_checker
-                sd_pipeline.unet.config.sample_size=args.image_size
+                print("before ",sd_pipeline.unet.config.sample_size)
+                sd_pipeline.unet.config.sample_size=args.image_size // sd_pipeline.vae_scale_factor
+                print("after", sd_pipeline.unet.config.sample_size)
                 sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
                 sd_pipeline.vae.to(accelerator.device).requires_grad_(False)

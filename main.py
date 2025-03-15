@@ -255,21 +255,23 @@ def main(args):
         def prompt_fn()->tuple[str,Any]:
             return args.prompt, {}
         
-        vgg_extractor_style=models.vgg16(pretrained=True).features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
-        vgg_extractor_style.requires_grad_(False)
-        vgg_extractor_style=accelerator.prepare(vgg_extractor_style)
+        if args.reward_fn=="vgg":
         
-        def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
-            if type(image)!=torch.Tensor:
-                image=transforms.ToTensor()(image)
+            vgg_extractor_style=models.vgg16(pretrained=True).features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
+            vgg_extractor_style.requires_grad_(False)
+            vgg_extractor_style=accelerator.prepare(vgg_extractor_style)
             
-            image=image.to(dtype=torch_dtype)
-            image=image.to(device=accelerator.device)
-            image.requires_grad_(True)
-            image=vgg_image_transforms(image)
-            #image=image.float()
-            image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
-            return vgg_extractor(image)
+            def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+                if type(image)!=torch.Tensor:
+                    image=transforms.ToTensor()(image)
+                
+                image=image.to(dtype=torch_dtype)
+                image=image.to(device=accelerator.device)
+                image.requires_grad_(True)
+                image=vgg_image_transforms(image)
+                #image=image.float()
+                image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                return vgg_extractor(image)
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps
@@ -304,12 +306,7 @@ def main(args):
                 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
                 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
-                mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
-                mtcnn.eval()
-                resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
-                resnet.eval()
-
-                mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
+                
 
 
 
@@ -342,7 +339,8 @@ def main(args):
                 _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
                 vit_style_embedding_list=vit_style_embedding_list[:-1]
                 style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
-                vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
+                if args.reward_fn=="vgg":
+                    vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
 
                 content_embedding=vit_content_embedding_list[-1]
                 print("content embedding shape ",content_embedding.size())
@@ -359,9 +357,19 @@ def main(args):
                 
                 
                 
-                content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
+                
 
-                content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
+                if args.image_embeds_type=="face" or args.content_reward_fn=="face":
+                    content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
+                    mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
+                    mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
+                    mtcnn.eval()
+                    resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
+                    resnet.eval()
+
+                    
+
+                    content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
                 if args.content_reward_fn=="dino":
                     dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)

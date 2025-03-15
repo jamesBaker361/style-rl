@@ -446,13 +446,13 @@ def main(args):
                 #print('sd_pipeline.unet.config.out_channels',sd_pipeline.unet.config.out_channels)
 
                 vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0).to(device=accelerator.device, dtype=torch_dtype))
-
+                raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
                 if args.content_reward_fn=="dift":
                     dift_featurizer=SDFeaturizer()
                     dift_featurizer.pipe.unet.to(device=accelerator.device,dtype=torch_dtype)
                     dift_featurizer.pipe.vae.to(device=accelerator.device,dtype=torch_dtype)
                     dift_featurizer.pipe.text_encoder.to(device=accelerator.device,dtype=torch_dtype)
-                    raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
+                    
 
                     sd_dift_content= dift_featurizer.forward(raw_content.clone().to(device=accelerator.device, dtype=torch_dtype),
                         prompt="portrait",

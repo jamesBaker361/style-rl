@@ -19,6 +19,8 @@ class DeeperImageProjection(nn.Module):
             nn.Linear(self.mid_dim,self.out_dim),
             nn.SiLU()
         )
+        num_params = sum(p.numel() for p in self.image_embeds.parameters() if p.requires_grad)
+        print(f"ImageProjection Number of trainable parameters: {num_params}")
 
     def forward(self, image_embeds: torch.Tensor):
         batch_size = image_embeds.shape[0]

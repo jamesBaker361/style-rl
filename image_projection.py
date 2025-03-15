@@ -26,7 +26,6 @@ class DeeperImageProjection(nn.Module):
         # image
         image_embeds = self.image_embeds(image_embeds)
         image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
-        image_embeds = self.norm(image_embeds)
         return image_embeds
     
 
@@ -39,7 +38,6 @@ class PromptImageProjection(DeeperImageProjection):
         # image
         image_embeds = self.image_embeds(image_embeds.to(self.image_embeds[0].weight.dtype))
         image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
-        image_embeds = self.norm(image_embeds)
         
         positive=positive[:, : -self.num_image_text_embeds, :]  #len 77 -> 76 this probably is just padding anyway
         #print("src embeds, positive shapes", src_embeds.size(),positive.size())

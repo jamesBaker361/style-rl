@@ -413,6 +413,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 0. Default height and width to unet
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
+        #print("height,width,self.unet.config.sample_size,self.vae_scale_factor",height,width,self.unet.config.sample_size,self.vae_scale_factor)
         with torch.no_grad():
             # 1. Check inputs. Raise error if not correct
             self.check_inputs(
@@ -475,18 +476,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 self.scheduler, num_inference_steps, device, timesteps, original_inference_steps=original_inference_steps
             )
 
-            # 5. Prepare latent variable
-            num_channels_latents = self.unet.config.in_channels
-            latents = self.prepare_latents(
-                batch_size * num_images_per_prompt,
-                num_channels_latents,
-                height,
-                width,
-                prompt_embeds.dtype,
-                device,
-                generator,
-                latents,
-            )
+            
             bs = batch_size * num_images_per_prompt
 
             # 6. Get Guidance Scale Embedding
@@ -495,17 +485,33 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
             w = torch.tensor(self.guidance_scale - 1).repeat(bs)
             w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=self.unet.config.time_cond_proj_dim).to(
-                device=device, dtype=latents.dtype
+                device=device, dtype=self.unet.dtype
             )
 
             # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
             extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
-            # src_embeds if we have previously called register_encoder_hid_proj
-            if hasattr(self,"src_embeds"):
-                added_cond_kwargs={"image_embeds":self.src_embeds}
-            else:
-                added_cond_kwargs={}
+        
+        # 5. Prepare latent variable
+        num_channels_latents = self.unet.config.in_channels
+        latents = self.prepare_latents(
+            batch_size * num_images_per_prompt,
+            num_channels_latents,
+            height,
+            width,
+            prompt_embeds.dtype,
+            device,
+            generator,
+            latents,
+        )
+
+        latents.requires_grad_(True)
+        
+        # src_embeds if we have previously called register_encoder_hid_proj
+        if hasattr(self,"src_embeds"):
+            added_cond_kwargs={"image_embeds":self.src_embeds}
+        else:
+            added_cond_kwargs={}
 
         #print("506 added condkwagrs",added_cond_kwargs)
         # 8. LCM MultiStep Sampling Loop:
@@ -514,7 +520,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latents = latents.to(prompt_embeds.dtype)
-
+                #print("latents size",latents.size())
                 # model prediction (v-prediction, eps, x)
                 if gradient_checkpoint:
                     #print("516 added condkwagrs",added_cond_kwargs)

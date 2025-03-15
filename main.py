@@ -70,7 +70,7 @@ parser.add_argument("--content_layers",nargs="*",type=int)
 parser.add_argument("--prompt_embedding_conditioning",action="store_true")
 parser.add_argument("--adapter_conditioning",action="store_true")
 parser.add_argument("--num_image_text_embeds",type=int,default=32,help="num_image_text_embeds for image projection")
-parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vgg, what model to use for the image embeds")
+parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vit, what model to use for the image embeds")
 parser.add_argument("--use_encoder_hid_proj",action="store_true",help="whether to use encoder hidden proj thing")
 parser.add_argument('--up_ft_index', default=1, type=int, choices=[0, 1, 2 ,3],
                         help='which upsampling block of U-Net to extract the feature map for dift')
@@ -415,7 +415,7 @@ def main(args):
                     if args.image_embeds_type=="face":
                         image_embed_dim=512
                         _src_embedding=content_face_embedding
-                    elif args.image_embeds_type=="vgg":
+                    elif args.image_embeds_type=="vit":
                         image_embed_dim=151296
                         _src_embedding=content_embedding
                     

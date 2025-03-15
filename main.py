@@ -367,7 +367,7 @@ def main(args):
                     dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
                     dino_vit_extractor.model.eval()
                     dino_vit_extractor.model.requires_grad_(False)
-                    dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image)
+                    dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image).to(dtype=torch_dtype,device=accelerator.device)
                     dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,facet=args.facet)
                     
                 ddpo_config=DDPOConfig(log_with="wandb",

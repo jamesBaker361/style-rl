@@ -367,8 +367,9 @@ def main(args):
                     dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
                     dino_vit_extractor.model.eval()
                     dino_vit_extractor.model.requires_grad_(False)
-                    dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image).to(dtype=torch_dtype,device=accelerator.device)
+                    dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize(args.image_size,args.image_size)).to(dtype=torch_dtype,device=accelerator.device)
                     dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,facet=args.facet)
+                    print("dino vit features",dino_vit_features.size())
                     
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
@@ -451,6 +452,9 @@ def main(args):
                         t=args.t,
                         up_ft_index=args.up_ft_index,
                         ensemble_size=args.ensemble_size) 
+                    print("sd_dift_content",sd_dift_content.size())
+                    sd_dift_content.requires_grad_(True)
+
 
                 content_cache=[]
                 style_cache=[]

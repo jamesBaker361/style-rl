@@ -599,6 +599,7 @@ def main(args):
                         print(f"\t {label} epoch {e} elapsed {end-start}")
                 except  torch.cuda.OutOfMemoryError:
                     print(f"failed after {e} epochs")
+                    end=time.time()
                 print(f"all epochs for {label} elapsed {end-total_start}")
                 sd_pipeline.unet.requires_grad_(False)
                 with torch.no_grad():

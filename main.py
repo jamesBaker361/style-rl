@@ -362,14 +362,12 @@ def main(args):
 
                 if args.image_embeds_type=="face" or args.content_reward_fn=="face":
                     content_image_tensor=mtcnn_image_transforms(content_image).to(dtype=torch_dtype,device=accelerator.device)
-                    mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
+                    
                     mtcnn = BetterMTCNN(device=accelerator.device).to(dtype=torch_dtype)
                     mtcnn.eval()
                     resnet = InceptionResnetV1(pretrained='vggface2').eval().to(dtype=torch_dtype,device=accelerator.device)
                     resnet.eval()
-
-                    
-
+                    mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
                     content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
                 if args.content_reward_fn=="dino":

@@ -288,6 +288,7 @@ def main(args):
         clip_list=[]
         for k,content_row in enumerate(content_data):
             for i, row in enumerate(data):
+                accelerator.free_memory()
                 content_image=content_row["image_0"].convert("RGB")
                 try:
                     vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')

@@ -79,6 +79,7 @@ parser.add_argument('--t', default=261, type=int,
 parser.add_argument('--ensemble_size', default=1, type=int, 
                         help='number of repeated images in each batch used to get features for dift')
 parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
+parser.add_argument("--pipeline_no_checkpoint",action="store_false")
 
 
 RARE_TOKEN="sksz"
@@ -564,7 +565,8 @@ def main(args):
                         output_type="latent"
                     else:
                         output_type="pt"
-                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA],output_type=output_type)
+                    content_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,[CONTENT_LORA],
+                        output_type=output_type,gradient_checkpoint=args.pipeline_no_checkpoint)
                     print("n trainable layers content",len(content_ddpo_pipeline.get_trainable_layers()))
                     sd_pipeline.unet.to(accelerator.device)
                     kwargs={}

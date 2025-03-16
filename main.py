@@ -606,7 +606,15 @@ def main(args):
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:
                                 print("oom epoch ",{e})
+                                content_trainer=AlignPropTrainer(
+                                    align_config,
+                                    content_reward_function_align,
+                                    prompt_fn,
+                                    content_ddpo_pipeline,
+                                    get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
+                                )
                                 accelerator.free_memory()
+                                time.sleep(0.1)
                                 content_trainer.train(**kwargs)
 
                             accelerator.free_memory()

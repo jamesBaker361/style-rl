@@ -611,7 +611,7 @@ def main(args):
                                 style_trainer.train(**kwargs)
                             accelerator.free_memory()
                         if args.content_layers_train:
-                            
+                            before_objects=find_cuda_objects()
                             try:
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:
@@ -633,6 +633,10 @@ def main(args):
                             content_trainer.optimizer.zero_grad()
                             if args.content_reward_fn=="dift":
                                 sd_dift_content.grad.zero_()
+                            after_objects=find_cuda_objects()
+                            for obj in after_objects:
+                                if obj not in before_objects:
+                                    obj=accelerator.free_memory(obj)
                             print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             accelerator.free_memory()
                             torch.cuda.empty_cache()

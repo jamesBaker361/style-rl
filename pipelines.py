@@ -654,9 +654,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         unet_parameters=[p for p in self.unet.named_parameters()]
         other_parameters=[]
         if hasattr(self,"prompt_model"):
-            other_parameters=[p for p in self.prompt_model.parameters()]
+            other_parameters=[p for _,p in self.prompt_model.named_parameters()]
         elif hasattr(self,"src_embeds"):
-            other_parameters=[p for p in self.unet.encoder_hid_proj.parameters()]
+            other_parameters=[p for _,p in self.unet.encoder_hid_proj.named_parameters()]
         return unet_parameters,other_parameters
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):

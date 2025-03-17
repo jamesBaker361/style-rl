@@ -492,7 +492,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
             # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
             extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
-            print("rgb with grad no grad",len(find_cuda_objects()))
+            #print("rgb with grad no grad",len(find_cuda_objects()))
 
         
             # 5. Prepare latent variable

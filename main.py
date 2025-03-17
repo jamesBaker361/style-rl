@@ -633,13 +633,13 @@ def main(args):
                             content_trainer.optimizer.zero_grad()
                             after_objects=find_cuda_objects()
                             delete_unique_objects(before_objects,after_objects)
-                            print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
+                            #print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             accelerator.free_memory()
                             torch.cuda.empty_cache()
-                            memory=get_gpu_memory_usage()
+                            '''memory=get_gpu_memory_usage()
                             print("\tafter",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             if len(memory)>0:
-                                print("\t reserved allocated",memory["reserved_mb"],memory["allocated_mb"])
+                                print("\t reserved allocated",memory["reserved_mb"],memory["allocated_mb"])'''
                         end=time.time()
                         print(f"\t {label} epoch {e} elapsed {end-start}")
                 except  torch.cuda.OutOfMemoryError:

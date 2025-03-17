@@ -635,8 +635,7 @@ def main(args):
                                 style_trainer.train(**kwargs)
                             accelerator.free_memory()
                         if args.content_layers_train:
-                            if args.content_reward_fn=="dift":
-                                sd_dift_content.grad.zero_()
+                            
                             try:
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:
@@ -656,6 +655,8 @@ def main(args):
                                 time.sleep(0.1)
                                 content_trainer.train(**kwargs)
                             content_trainer.optimizer.zero_grad()
+                            if args.content_reward_fn=="dift":
+                                sd_dift_content.grad.zero_()
                             accelerator.free_memory()
                             torch.cuda.empty_cache()
                             memory=get_gpu_memory_usage()

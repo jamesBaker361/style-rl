@@ -676,10 +676,18 @@ def main(args):
                 style_score_list.append(style_score)
                 style_mse_list.append(style_mse)
                 sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)
+                clip_model,vit_model=accelerator.free_memory(clip_model,vit_model)
+                if args.image_embeds_type=="face" or args.content_reward_fn=="face":
+                    mtcnn,resnet=accelerator.free_memory(mtcnn,resnet)
+                if args.content_reward_fn=="dino":
+                    dino_vit_extractor=accelerator.free_memory(dino_vit_extractor)
+                if args.content_reward_fn=="dift":
+                    accelerator.free_memory(dift_featurizer.pipe.unet,dift_featurizer.pipe.vae,dift_featurizer.pipe.text_encoder)
                 if args.style_layers_train:
                     style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
                 if args.content_layers_train:
                     content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
+
                 torch.cuda.empty_cache()
         metrics={
             f"content":np.mean(content_score_list),

@@ -201,6 +201,31 @@ vgg_image_transforms = transforms.Compose(
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
 
+def get_gpu_memory_usage():
+    if torch.cuda.is_available():
+        # Get the current device
+        device = torch.cuda.current_device()
+        
+        # Get allocated memory in bytes
+        allocated = torch.cuda.memory_allocated(device)
+        
+        # Get cached memory in bytes (allocated + cached = total reserved)
+        reserved = torch.cuda.memory_reserved(device)
+        
+        # Convert to more readable format (MB)
+        allocated_mb = allocated / 1024 / 1024
+        reserved_mb = reserved / 1024 / 1024
+        
+        return {
+            "device": device,
+            "allocated_bytes": allocated,
+            "allocated_mb": allocated_mb,
+            "reserved_bytes": reserved,
+            "reserved_mb": reserved_mb
+        }
+    else:
+        return {}
+
 
 def main(args):
     torch.cuda.empty_cache()
@@ -623,6 +648,9 @@ def main(args):
 
                             accelerator.free_memory()
                             torch.cuda.empty_cache()
+                            memory=get_gpu_memory_usage()
+                            if len(memory)>0:
+                                print("\t reserved allocated",memory["reserved_mb"],memory["allocated_mb"])
                         end=time.time()
                         print(f"\t {label} epoch {e} elapsed {end-start}")
                 except  torch.cuda.OutOfMemoryError:

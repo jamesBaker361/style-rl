@@ -14,6 +14,7 @@ from PIL import Image
 from torchvision.transforms import PILToTensor
 import argparse
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+from gpu_helpers import *
 
 class MyUNet2DConditionModel(UNet2DConditionModel):
     def forward(
@@ -157,14 +158,14 @@ class MyUNet2DConditionModel(UNet2DConditionModel):
                 )
 
             if i in up_ft_indices:
-                up_ft[i] = sample.detach()
+                up_ft[i] = sample
 
         output = {}
         output['up_ft'] = up_ft
         return output
 
 class OneStepSDPipeline(StableDiffusionPipeline):
-    @torch.no_grad()
+    #@torch.no_grad()
     def __call__(
         self,
         img_tensor,
@@ -188,6 +189,12 @@ class OneStepSDPipeline(StableDiffusionPipeline):
                                up_ft_indices,
                                encoder_hidden_states=prompt_embeds,
                                cross_attention_kwargs=cross_attention_kwargs)
+        '''for u in unet_output['up_ft'].values():
+            print('unet_output',u.requires_grad)
+        print('latents',latents.requires_grad)
+        print('latents_noisy',latents_noisy.requires_grad)
+        print('noise',noise.requires_grad)
+        print('img_tensor',img_tensor.requires_grad)'''
         return unet_output
 
 
@@ -228,23 +235,27 @@ class SDFeaturizer:
         Return:
             unet_ft: a torch tensor in the shape of [1, c, h, w]
         '''
+        #print("sd forward before",len(find_cuda_objects()))
         img_tensor = img_tensor.repeat(ensemble_size, 1, 1, 1).to(device) # ensem, c, h, w
-        if prompt == self.null_prompt:
-            prompt_embeds = self.null_prompt_embeds
-        else:
-            prompt_embeds = self.pipe.encode_prompt(
-                prompt=prompt,
-                device=device,
-                num_images_per_prompt=1,
-                do_classifier_free_guidance=False)[0] # [1, 77, dim]
-        prompt_embeds = prompt_embeds[0].repeat(ensemble_size, 1, 1)
+        with torch.no_grad():
+            if prompt == self.null_prompt:
+                prompt_embeds = self.null_prompt_embeds
+            else:
+                prompt_embeds = self.pipe.encode_prompt(
+                    prompt=prompt,
+                    device=device,
+                    num_images_per_prompt=1,
+                    do_classifier_free_guidance=False)[0] # [1, 77, dim]
+            prompt_embeds = prompt_embeds[0].repeat(ensemble_size, 1, 1)
         unet_ft_all = self.pipe(
             img_tensor=img_tensor,
             t=t,
             up_ft_indices=[up_ft_index],
             prompt_embeds=prompt_embeds)
         unet_ft = unet_ft_all['up_ft'][up_ft_index] # ensem, c, h, w
+        del unet_ft_all
         unet_ft = unet_ft.mean(0, keepdim=True) # 1,c,h,w
+        #print("sd forward after",len(find_cuda_objects()))
         return unet_ft
 
 
@@ -304,13 +315,14 @@ def main(args):
     if args.img_size[0] > 0:
         img = img.resize(args.img_size)
     img_tensor = (PILToTensor()(img) / 255.0 - 0.5) * 2
-    ft = dift.forward(img_tensor,
-                      prompt=args.prompt,
-                      t=args.t,
-                      up_ft_index=args.up_ft_index,
-                      ensemble_size=args.ensemble_size)
-    print("outout size",ft.size() )
-    ft = torch.save(ft.squeeze(0).cpu(), args.output_path) # save feature in the shape of [c, h, w]
+    for index in [0,1,2,3]:
+        ft = dift.forward(img_tensor,
+                        prompt=args.prompt,
+                        t=args.t,
+                        up_ft_index=index,
+                        ensemble_size=args.ensemble_size)
+        print("outout size",ft.size() )
+    #ft = torch.save(ft.squeeze(0).cpu(), args.output_path) # save feature in the shape of [c, h, w]
 
 
 if __name__ == '__main__':

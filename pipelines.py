@@ -407,6 +407,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 second element is a list of `bool`s indicating whether the corresponding generated image contains
                 "not-safe-for-work" (nsfw) content.
         """
+        print("rgb with grad before",len(find_cuda_objects()))
         ##print("407 added condkwagrs",added_cond_kwargs)
         callback = kwargs.pop("callback", None)
         callback_steps = kwargs.pop("callback_steps", None)
@@ -491,20 +492,22 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
             # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
             extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
+            print("rgb with grad no grad",len(find_cuda_objects()))
 
         
-        # 5. Prepare latent variable
-        num_channels_latents = self.unet.config.in_channels
-        latents = self.prepare_latents(
-            batch_size * num_images_per_prompt,
-            num_channels_latents,
-            height,
-            width,
-            prompt_embeds.dtype,
-            device,
-            generator,
-            latents,
-        )
+            # 5. Prepare latent variable
+            num_channels_latents = self.unet.config.in_channels
+            latents = self.prepare_latents(
+                batch_size * num_images_per_prompt,
+                num_channels_latents,
+                height,
+                width,
+                prompt_embeds.dtype,
+                device,
+                generator,
+                latents,
+            )
+        print("rgb with grad latents",len(find_cuda_objects()))
 
         latents.requires_grad_(True)
         
@@ -537,6 +540,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         added_cond_kwargs,
                         None,None,None,None,
                         False,
+                        use_reentrant=False
                     )[0]
                     """
                     unet forward:
@@ -567,6 +571,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         added_cond_kwargs=added_cond_kwargs,
                         return_dict=False,
                     )[0]
+                print("loop model_pred",len(find_cuda_objects()))   
 
                 if truncated_backprop:
                     if truncated_backprop_rand:
@@ -580,6 +585,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         model_pred = model_pred.detach()
                 # compute the previous noisy sample x_t -> x_t-1
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
+                print("loop latents denoised",len(find_cuda_objects()))   
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
                     for k in callback_on_step_end_tensor_inputs:
@@ -598,7 +604,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         step_idx = i // getattr(self.scheduler, "order", 1)
                         callback(step_idx, t, latents)
 
-                
+        print("rgb with grad loop",len(find_cuda_objects()))         
 
         denoised = denoised.to(prompt_embeds.dtype)
         has_nsfw_concept = None
@@ -684,6 +690,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         return ret+other_parameters
 
     def rgb_with_grad(self,*args,**kwargs):
+        print("rgb with grad",len(find_cuda_objects()))
         kwargs["output_type"]=self.output_type
         kwargs["gradient_checkpoint"]=self.gradient_checkpoint
         if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:

@@ -467,7 +467,7 @@ def main(args):
                         up_ft_index=args.up_ft_index,
                         ensemble_size=args.ensemble_size) 
                     print("sd_dift_content",sd_dift_content.size())
-                    sd_dift_content.requires_grad_(True)
+                    sd_dift_content.requires_grad_(False)
                     
 
 
@@ -631,8 +631,6 @@ def main(args):
                                 time.sleep(0.1)
                                 content_trainer.train(**kwargs)
                             content_trainer.optimizer.zero_grad()
-                            if args.content_reward_fn=="dift":
-                                sd_dift_content.grad.zero_()
                             after_objects=find_cuda_objects()
                             delete_unique_objects(before_objects,after_objects)
                             print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))

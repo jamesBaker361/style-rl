@@ -12,6 +12,7 @@ import types
 from pathlib import Path
 from typing import Union, List, Tuple
 from PIL import Image
+from gpu_helpers import *
 
 
 
@@ -321,6 +322,7 @@ class ViTExtractor:
         """
         assert facet in ['key', 'query', 'value', 'token'], f"""{facet} is not a supported facet for descriptors. 
                                                              choose from ['key' | 'query' | 'value' | 'token'] """
+        #print("extract before",len(find_cuda_objects()))
         self._extract_features(batch, [layer], facet)
         x = self._feats[0]
         if facet == 'token':
@@ -333,6 +335,7 @@ class ViTExtractor:
             desc = x.permute(0, 2, 3, 1).flatten(start_dim=-2, end_dim=-1).unsqueeze(dim=1)  # Bx1xtx(dxh)
         else:
             desc = self._log_bin(x)
+        #print("extract after",len(find_cuda_objects()))
         return desc
 
     def extract_saliency_maps(self, batch: torch.Tensor) -> torch.Tensor:
@@ -387,5 +390,3 @@ if __name__ == "__main__":
         print(f"Image {args.image_path} is preprocessed to tensor of size {image_batch.shape}.")
         descriptors = extractor.extract_descriptors(image_batch.to(device), args.layer, args.facet, args.bin)
         print(f"Descriptors are of size: {descriptors.shape}")
-        torch.save(descriptors, args.output_path)
-        print(f"Descriptors saved to: {args.output_path}")

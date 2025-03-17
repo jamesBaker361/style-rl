@@ -634,10 +634,7 @@ def main(args):
                             if args.content_reward_fn=="dift":
                                 sd_dift_content.grad.zero_()
                             after_objects=find_cuda_objects()
-                            for obj in after_objects:
-                                if obj not in before_objects:
-                                    obj=accelerator.free_memory(obj)
-                                    obj=None
+                            delete_unique_objects(before_objects,after_objects)
                             print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             accelerator.free_memory()
                             torch.cuda.empty_cache()

@@ -47,3 +47,22 @@ def find_cuda_tensors_with_grads():
         except:
             pass  # Ignore inaccessible objects
     return tensors_with_grads
+
+def delete_unique_objects(list1, list2):
+    """Delete objects that are only in one of the two lists."""
+    set1 = {id(obj) for obj in list1}
+    set2 = {id(obj) for obj in list2}
+    
+    unique_in_list1 = [obj for obj in list1 if id(obj) not in set2]
+    unique_in_list2 = [obj for obj in list2 if id(obj) not in set1]
+
+    # Delete tensors and modules
+    for obj in unique_in_list1 + unique_in_list2:
+        obj.to("cpu")
+        if isinstance(obj, torch.Tensor):
+            obj.grad = None  # Clear gradients first
+        del obj  # Delete the object
+
+    # Force garbage collection and free CUDA memory
+    gc.collect()
+    torch.cuda.empty_cache()

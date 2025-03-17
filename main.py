@@ -290,6 +290,7 @@ def main(args):
         for k,content_row in enumerate(content_data):
             for i, row in enumerate(data):
                 accelerator.free_memory()
+                torch.cuda.empty_cache()
                 content_image=content_row["image_0"].convert("RGB")
                 try:
                     vit_processor = ViTImageProcessor.from_pretrained('facebook/dino-vitb16')
@@ -608,6 +609,7 @@ def main(args):
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:
                                 print("oom epoch ",{e})
+                                del content_trainer
                                 content_trainer=AlignPropTrainer(
                                     align_config,
                                     content_reward_function_align,
@@ -616,10 +618,12 @@ def main(args):
                                     get_image_logger_align(CONTENT_LORA+label,accelerator,content_cache)
                                 )
                                 accelerator.free_memory()
+                                torch.cuda.empty_cache()
                                 time.sleep(0.1)
                                 content_trainer.train(**kwargs)
 
                             accelerator.free_memory()
+                            torch.cuda.empty_cache()
                         end=time.time()
                         print(f"\t {label} epoch {e} elapsed {end-start}")
                 except  torch.cuda.OutOfMemoryError:
@@ -676,6 +680,7 @@ def main(args):
                     style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
                 if args.content_layers_train:
                     content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
+                torch.cuda.empty_cache()
         metrics={
             f"content":np.mean(content_score_list),
             f"style":np.mean(style_score_list),

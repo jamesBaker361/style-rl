@@ -479,6 +479,10 @@ def main(args):
                     dift_featurizer.pipe.unet.to(device=accelerator.device,dtype=torch_dtype)
                     dift_featurizer.pipe.vae.to(device=accelerator.device,dtype=torch_dtype)
                     dift_featurizer.pipe.text_encoder.to(device=accelerator.device,dtype=torch_dtype)
+                    for model in [dift_featurizer.pipe.unet,dift_featurizer.pipe.vae,dift_featurizer.pipe.text_encoder]:
+                        model.eval()
+                        model.requires_grad_(False)
+                        model=accelerator.prepare(model)
                     
 
                     sd_dift_content= dift_featurizer.forward(raw_content.clone().to(device=accelerator.device, dtype=torch_dtype),
@@ -488,6 +492,7 @@ def main(args):
                         ensemble_size=args.ensemble_size) 
                     print("sd_dift_content",sd_dift_content.size())
                     sd_dift_content.requires_grad_(True)
+                    
 
 
                 content_cache=[]
@@ -630,6 +635,8 @@ def main(args):
                                 style_trainer.train(**kwargs)
                             accelerator.free_memory()
                         if args.content_layers_train:
+                            if args.content_reward_fn=="dift":
+                                sd_dift_content.grad.zero_()
                             try:
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:

@@ -32,6 +32,7 @@ from diffusers.models.embeddings import ImageProjection
 from extractor import ViTExtractor
 from dift_sd import SDFeaturizer
 from image_projection import PromptImageProjection
+from gpu_helpers import *
 
 parser=argparse.ArgumentParser()
 
@@ -200,31 +201,6 @@ vgg_image_transforms = transforms.Compose(
 
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
-
-def get_gpu_memory_usage():
-    if torch.cuda.is_available():
-        # Get the current device
-        device = torch.cuda.current_device()
-        
-        # Get allocated memory in bytes
-        allocated = torch.cuda.memory_allocated(device)
-        
-        # Get cached memory in bytes (allocated + cached = total reserved)
-        reserved = torch.cuda.memory_reserved(device)
-        
-        # Convert to more readable format (MB)
-        allocated_mb = allocated / 1024 / 1024
-        reserved_mb = reserved / 1024 / 1024
-        
-        return {
-            "device": device,
-            "allocated_bytes": allocated,
-            "allocated_mb": allocated_mb,
-            "reserved_bytes": reserved,
-            "reserved_mb": reserved_mb
-        }
-    else:
-        return {}
 
 
 def main(args):
@@ -657,9 +633,11 @@ def main(args):
                             content_trainer.optimizer.zero_grad()
                             if args.content_reward_fn=="dift":
                                 sd_dift_content.grad.zero_()
+                            print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             accelerator.free_memory()
                             torch.cuda.empty_cache()
                             memory=get_gpu_memory_usage()
+                            print("\tafter",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             if len(memory)>0:
                                 print("\t reserved allocated",memory["reserved_mb"],memory["allocated_mb"])
                         end=time.time()

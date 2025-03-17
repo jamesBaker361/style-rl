@@ -637,6 +637,7 @@ def main(args):
                             for obj in after_objects:
                                 if obj not in before_objects:
                                     obj=accelerator.free_memory(obj)
+                                    obj=None
                             print("\tbefore",len(find_cuda_objects()),len(find_cuda_tensors_with_grads()))
                             accelerator.free_memory()
                             torch.cuda.empty_cache()

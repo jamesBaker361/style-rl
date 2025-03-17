@@ -634,6 +634,9 @@ def main(args):
                                 content_trainer.train(**kwargs)
                             except torch.cuda.OutOfMemoryError:
                                 print("oom epoch ",{e})
+                                content_trainer.optimizer.zero_grad()
+                                accelerator.free_memory(content_trainer.optimizer)
+                                torch.cuda.empty_cache()
                                 content_trainer=AlignPropTrainer(
                                     align_config,
                                     content_reward_function_align,
@@ -645,7 +648,7 @@ def main(args):
                                 torch.cuda.empty_cache()
                                 time.sleep(0.1)
                                 content_trainer.train(**kwargs)
-
+                            content_trainer.optimizer.zero_grad()
                             accelerator.free_memory()
                             torch.cuda.empty_cache()
                             memory=get_gpu_memory_usage()
@@ -702,19 +705,23 @@ def main(args):
                 content_mse_list.append(content_mse)
                 style_score_list.append(style_score)
                 style_mse_list.append(style_mse)
-                sd_pipeline.unet,sd_pipeline= accelerator.free_memory(sd_pipeline.unet,sd_pipeline)
-                clip_model,vit_model=accelerator.free_memory(clip_model,vit_model)
+                things_to_free=[sd_pipeline.unet,sd_pipeline.vae,sd_pipeline.text_encoder,clip_model,vit_model]
+                
                 if args.image_embeds_type=="face" or args.content_reward_fn=="face":
-                    mtcnn,resnet=accelerator.free_memory(mtcnn,resnet)
+                    things_to_free+=[mtcnn,resnet]
                 if args.content_reward_fn=="dino":
-                    dino_vit_extractor=accelerator.free_memory(dino_vit_extractor)
+                    things_to_free+=[dino_vit_extractor]
                 if args.content_reward_fn=="dift":
-                    accelerator.free_memory(dift_featurizer.pipe.unet,dift_featurizer.pipe.vae,dift_featurizer.pipe.text_encoder)
+                    things_to_free+=[dift_featurizer.pipe.unet,dift_featurizer.pipe.vae,dift_featurizer.pipe.text_encoder]
                 if args.style_layers_train:
-                    style_trainer,style_ddpo_pipeline=accelerator.free_memory(style_trainer,style_ddpo_pipeline)
+                    style_trainer.optimizer.zero_grad()
+                    things_to_free+=[style_trainer.optimizer,style_ddpo_pipeline.unet,style_ddpo_pipeline.vae,style_ddpo_pipeline.text_encoder]
                 if args.content_layers_train:
-                    content_trainer,content_ddpo_pipeline=accelerator.free_memory(content_trainer,content_ddpo_pipeline)
-
+                    content_trainer.optimizer.zero_grad()
+                    things_to_free+=[content_ddpo_pipeline.unet,content_ddpo_pipeline.vae,content_ddpo_pipeline.text_encoder,
+                        content_trainer.optimizer]
+                for thing in things_to_free:
+                    accelerator.free_memory(thing)
                 torch.cuda.empty_cache()
         metrics={
             f"content":np.mean(content_score_list),

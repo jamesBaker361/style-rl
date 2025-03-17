@@ -21,6 +21,7 @@ from diffusers.utils import (
     unscale_lora_layers,
 )
 from diffusers.models.lora import adjust_lora_scale_text_encoder
+from gpu_helpers import *
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
@@ -619,6 +620,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         if not return_dict:
             return (image, has_nsfw_concept)
 
+        print("called with grad",len(find_cuda_objects()))
         return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
     
 

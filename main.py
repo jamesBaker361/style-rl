@@ -42,7 +42,7 @@ parser.add_argument("--prompt",type=str,default="portrait, a beautiful cyborg wi
 parser.add_argument("--style_dataset",type=str,default="jlbaker361/portraits")
 parser.add_argument("--start",type=int,default=0)
 parser.add_argument("--limit",type=int,default=5)
-parser.add_argument("--method",type=str,default="ddpo")
+parser.add_argument("--method",type=str,default="align")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--num_inference_steps",type=int,default=4)
 parser.add_argument("--style_layers_train",action="store_true",help="train the style layers")

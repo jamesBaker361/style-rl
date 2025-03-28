@@ -497,6 +497,13 @@ def main(args):
                             elif args.reward_fn=="cos":
                                 reward_fn=cos_sim_rescaled
                             return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                        elif args.reward_fn=="dift":
+                            return torch.stack([mse_reward_fn(sd_dift_content,  dift_featurizer.forward( 
+                                image.unsqueeze(0),prompt="portrait",
+                                t=args.t,
+                                up_ft_index=args.up_ft_index,
+                                ensemble_size=args.ensemble_size)) for image in images]),{}
+                        
                         elif args.reward_fn=="vgg":
                             sample_embedding_list=[get_vgg_embedding(vgg_extractor_style,image) for image in images]
                             
@@ -718,6 +725,7 @@ def main(args):
         if args.use_unformatted_prompts:
             metrics[f"clip_alignment"]=np.mean(clip_list)
         accelerator.log(metrics)
+        print(metrics)
         
 
             

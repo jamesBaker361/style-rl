@@ -33,6 +33,7 @@ from extractor import ViTExtractor
 from dift_sd import SDFeaturizer
 from image_projection import PromptImageProjection
 from gpu_helpers import *
+import ImageReward as image_reward
 
 parser=argparse.ArgumentParser()
 
@@ -81,6 +82,8 @@ parser.add_argument('--ensemble_size', default=1, type=int,
                         help='number of repeated images in each batch used to get features for dift')
 parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--pipeline_no_checkpoint",action="store_false")
+parser.add_argument("--prompt_alignment",action="store_true")
+parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
 
 
 RARE_TOKEN="sksz"
@@ -274,6 +277,15 @@ def main(args):
                 #image=image.float()
                 image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                 return vgg_extractor(image)
+            
+        if args.prompt_alignment:
+            ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
+            text_input=ir_model.blip.tokenizer(prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+            prompt_ids=text_input.input_ids.to(accelerator.device)
+            prompt_attention_mask=text_input.attention_mask.to(accelerator.device)
+
+            ir_model=accelerator.prepare(ir_model)
+
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
         num_inference_steps = args.num_inference_steps

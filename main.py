@@ -524,7 +524,7 @@ def main(args):
                             ir_score=torch.stack([ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                       F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                                       ) for image in images])
-                            print(ir_score.size(),ret.size())
+                            ret=ret+ir_score.squeeze()
                         return ret,{}
                     
                     style_keywords=[STYLE_LORA]

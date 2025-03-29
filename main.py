@@ -280,7 +280,7 @@ def main(args):
             
         if args.prompt_alignment:
             ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
-            text_input=ir_model.blip.tokenizer(prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+            text_input=ir_model.blip.tokenizer(args.prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids=text_input.input_ids.to(accelerator.device)
             prompt_attention_mask=text_input.attention_mask.to(accelerator.device)
 
@@ -508,19 +508,24 @@ def main(args):
                                 reward_fn=mse_reward_fn
                             elif args.reward_fn=="cos":
                                 reward_fn=cos_sim_rescaled
-                            return torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list]),{}
+                            ret= torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list])
                         elif args.reward_fn=="dift":
-                            return torch.stack([mse_reward_fn(sd_dift_content,  dift_featurizer.forward( 
+                            ret= torch.stack([mse_reward_fn(sd_dift_content,  dift_featurizer.forward( 
                                 image.unsqueeze(0),prompt="portrait",
                                 t=args.t,
                                 up_ft_index=args.up_ft_index,
-                                ensemble_size=args.ensemble_size)) for image in images]),{}
+                                ensemble_size=args.ensemble_size)) for image in images])
                         
                         elif args.reward_fn=="vgg":
                             sample_embedding_list=[get_vgg_embedding(vgg_extractor_style,image) for image in images]
                             
-                            return torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list]),{}
-
+                            ret= torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list])
+                        if args.prompt_alignment:
+                            ir_score=torch.stack([ir_model.score_gard(prompt_ids,prompt_attention_mask,
+                                                                      F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                                      ) for image in images])
+                            print(ir_score.size(),ret.size())
+                        return ret,{}
                     
                     style_keywords=[STYLE_LORA]
                     sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)

@@ -521,7 +521,7 @@ def main(args):
                             
                             ret= torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list])
                         if args.prompt_alignment:
-                            ir_score=torch.stack([ir_model.score_gard(prompt_ids,prompt_attention_mask,
+                            ir_score=torch.stack([args.prompt_alignment_weight* ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                       F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                                       ) for image in images])
                             ret=ret+ir_score.squeeze()

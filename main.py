@@ -291,7 +291,7 @@ def main(args):
                 19:models.vgg19,
                 16:models.vgg16
             }[args.vgg_n]
-            vgg_model=vgg_function(pretrained=True)
+            vgg_model=vgg_function(pretrained=True).to(device=accelerator.device,dtype=torch_dtype)
             vgg_extractor_style=vgg_model.features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
             vgg_extractor_style.requires_grad_(False)
             vgg_extractor_style=accelerator.prepare(vgg_extractor_style)

@@ -202,6 +202,12 @@ vgg_image_transforms = transforms.Compose(
         ]
     )
 
+def gram_matrix(image_tensor:torch.Tensor)->torch.Tensor:
+    N, C, H, W = image_tensor.size()
+    features = image_tensor.view(N * C, H * W)
+    gram = torch.mm(features, features.t())
+    return torch.div(gram, N * C * H * W)
+
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
 
@@ -277,6 +283,10 @@ def main(args):
                 #image=image.float()
                 image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                 return vgg_extractor(image)
+            
+            def get_vgg_gram(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
+                vgg_embedding=get_vgg_embedding(vgg_extractor,image)
+                return gram_matrix(vgg_embedding)
             
         if args.prompt_alignment:
             ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
@@ -358,8 +368,9 @@ def main(args):
                 vit_style_embedding_list=vit_style_embedding_list[:-1]
                 style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
                 if args.reward_fn=="vgg":
+                    #print("vgg style embedding size",get_vgg_embedding(vgg_extractor_style,images[0]).clone().detach().size())
                     vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
-
+                    vgg_style_gram=get_vgg_gram(vgg_extractor_style,images[0]).clone().detach()
                 content_embedding=vit_content_embedding_list[-1]
                 print("content embedding shape ",content_embedding.size())
                 evaluation_images=[]
@@ -387,14 +398,16 @@ def main(args):
                     mtcnn,resnet=accelerator.prepare(mtcnn,resnet)
                     content_face_embedding=get_face_embeddings(content_image_tensor,resnet,mtcnn,False).detach()
 
-                if args.content_reward_fn=="dino":
+                if args.content_reward_fn=="dino" or args.reward_fn=="dino":
                     dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
                     dino_vit_extractor.model.eval()
                     dino_vit_extractor.model.requires_grad_(False)
                     dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
                     dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,facet=args.facet)
                     print("dino vit features",dino_vit_features.size())
-                    
+
+                    dino_vit_preporcessed_style=dino_vit_extractor.preprocess_pil(images[0].resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
+                    dino_vit_features_style=dino_vit_extractor.extract_descriptors(dino_vit_preporcessed_style,facet=args.facet)
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
                                 train_learning_rate=args.learning_rate,
@@ -526,11 +539,13 @@ def main(args):
                                 t=args.t,
                                 up_ft_index=args.up_ft_index,
                                 ensemble_size=args.ensemble_size)) for image in images])
+                        elif args.reward_fn=="dino":
+                            ret=torch.stack([mse_reward_fn(dino_vit_features_style,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images])
                         
                         elif args.reward_fn=="vgg":
-                            sample_embedding_list=[get_vgg_embedding(vgg_extractor_style,image) for image in images]
+                            sample_gram_list=[get_vgg_gram(vgg_extractor_style,image) for image in images]
                             
-                            ret= torch.stack([mse_reward_fn(sample,vgg_style_embedding,reduction="mean") for sample in sample_embedding_list])
+                            ret= torch.stack([mse_reward_fn(sample,vgg_style_gram,reduction="mean") for sample in sample_gram_list])
                         if args.prompt_alignment:
                             ir_score=torch.stack([args.prompt_alignment_weight* ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                       F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)

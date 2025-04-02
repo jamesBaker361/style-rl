@@ -59,7 +59,26 @@ parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
 parser.add_argument("--reward_fn",type=str,default="cos")
 parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae or raw or dino or dift")
+
+parser.add_argument("--vgg_n",type=int,default=16,help="16 or 19")
 parser.add_argument("--vgg_layer_style",type=int,default=27)
+parser.add_argument("--vgg_layer_indices",nargs="*",type=int)
+'''
+vgg16
+conv1-4
+conv2-9
+conv3-16
+conv4-23
+conv5-30
+
+vgg19
+conv1-4
+conv2-9
+conv3-18
+conv4-27
+conv5-30
+'''
+
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
@@ -84,6 +103,7 @@ parser.add_argument("--facet",type=str,default="token",help="dino vit facet to e
 parser.add_argument("--pipeline_no_checkpoint",action="store_false")
 parser.add_argument("--prompt_alignment",action="store_true")
 parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
+
 
 
 RARE_TOKEN="sksz"
@@ -202,9 +222,9 @@ vgg_image_transforms = transforms.Compose(
         ]
     )
 
-def gram_matrix(image_tensor:torch.Tensor)->torch.Tensor:
-    N, C, H, W = image_tensor.size()
-    features = image_tensor.view(N * C, H * W)
+def gram_matrix(vgg_embedding:torch.Tensor)->torch.Tensor:
+    N, C, H, W = vgg_embedding.size()
+    features = vgg_embedding.view(N * C, H * W)
     gram = torch.mm(features, features.t())
     return torch.div(gram, N * C * H * W)
 
@@ -267,10 +287,48 @@ def main(args):
             return args.prompt, {}
         
         if args.reward_fn=="vgg":
-        
-            vgg_extractor_style=models.vgg16(pretrained=True).features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
+            vgg_function={
+                19:models.vgg19,
+                16:models.vgg16
+            }[args.vgg_n]
+            vgg_model=vgg_function(pretrained=True)
+            vgg_extractor_style=vgg_model.features[:args.vgg_layer_style].eval().to(device=accelerator.device,dtype=torch_dtype)
             vgg_extractor_style.requires_grad_(False)
             vgg_extractor_style=accelerator.prepare(vgg_extractor_style)
+
+            def get_vgg_embedding_list(vgg_model_features:torch.nn.Sequential,layer_indices:list[int],image:torch.Tensor)->list[torch.Tensor]:
+                hooks=[]
+                activations=[]
+                def hook_fn(module, input, output):
+                    activations.append(output)
+                for idx in layer_indices:
+                    hooks.append(vgg_model_features[idx].register_forward_hook(hook_fn))
+
+                if type(image)!=torch.Tensor:
+                    image=transforms.ToTensor()(image)
+                
+                image=image.to(dtype=torch_dtype)
+                image=image.to(device=accelerator.device)
+                image.requires_grad_(True)
+                image=vgg_image_transforms(image)
+                #image=image.float()
+                image=F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+
+                vgg_model_features(image)
+
+                for h in hooks:
+                    h.remove()
+
+                return activations
+
+            def get_vgg_gram_list(vgg_model_features:torch.nn.Sequential,layer_indices:list[int],image:torch.Tensor)->list[torch.Tensor]:
+                vgg_embedding_list=get_vgg_embedding_list(vgg_model_features,layer_indices,image)
+                return[gram_matrix(vgg_embedding) for vgg_embedding in vgg_embedding_list]
+        
+
+            def mse_gram_list_reward_fn(list_1:list[torch.Tensor],list_2:list[torch.Tensor])->torch.Tensor:
+                return sum([mse_reward_fn(matrix_1,matrix_2) for matrix_1,matrix_2 in zip(list_1,list_2)])
+
             
             def get_vgg_embedding(vgg_extractor:torch.nn.modules.container.Sequential, image:torch.Tensor)->torch.Tensor:
                 if type(image)!=torch.Tensor:
@@ -372,6 +430,7 @@ def main(args):
                     vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
                     vgg_style_gram=get_vgg_gram(vgg_extractor_style,images[0]).clone().detach()
                     print('vgg_style_gram.size()',vgg_style_gram.size())
+                    style_vgg_gram_list=get_vgg_gram_list(vgg_model.features,args.vgg_layer_indices,images[0])
                 content_embedding=vit_content_embedding_list[-1]
                 print("content embedding shape ",content_embedding.size())
                 evaluation_images=[]
@@ -544,9 +603,9 @@ def main(args):
                             ret=torch.stack([mse_reward_fn(dino_vit_features_style,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images])
                         
                         elif args.reward_fn=="vgg":
-                            sample_gram_list=[get_vgg_gram(vgg_extractor_style,image) for image in images]
+                            sample_gram_list=[get_vgg_gram_list(vgg_extractor_style,image) for image in images]
                             
-                            ret= torch.stack([mse_reward_fn(sample,vgg_style_gram,reduction="mean") for sample in sample_gram_list])
+                            ret= torch.stack([mse_gram_list_reward_fn(sample,style_vgg_gram_list) for sample in sample_gram_list])
                         if args.prompt_alignment:
                             ir_score=torch.stack([args.prompt_alignment_weight* ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                       F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)

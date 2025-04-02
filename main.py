@@ -301,6 +301,8 @@ def main(args):
         content_mse_list=[]
         clip_list=[]
         for k,content_row in enumerate(content_data):
+            if k>=args.content_limit:
+                continue
             for i, row in enumerate(data):
                 accelerator.free_memory()
                 torch.cuda.empty_cache()

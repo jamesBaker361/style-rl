@@ -603,7 +603,7 @@ def main(args):
                             ret=torch.stack([mse_reward_fn(dino_vit_features_style,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images])
                         
                         elif args.reward_fn=="vgg":
-                            sample_gram_list=[get_vgg_gram_list(vgg_extractor_style,args.vgg_layer_indices,image) for image in images]
+                            sample_gram_list=[get_vgg_gram_list(vgg_model.features,args.vgg_layer_indices,image) for image in images]
                             
                             ret= torch.stack([mse_gram_list_reward_fn(sample,style_vgg_gram_list) for sample in sample_gram_list])
                         if args.prompt_alignment:

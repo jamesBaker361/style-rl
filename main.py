@@ -519,7 +519,7 @@ def main(args):
                                 reward_fn=cos_sim_rescaled
                             ret= torch.stack([reward_fn(sample,style_embedding) for sample in sample_vit_style_embedding_list])
                         elif args.reward_fn=="dift":
-                            ret= torch.stack([mse_reward_fn(sd_dift_content,  dift_featurizer.forward( 
+                            ret= torch.stack([mse_reward_fn(sd_dift_style,  dift_featurizer.forward( 
                                 image.unsqueeze(0),prompt="portrait",
                                 t=args.t,
                                 up_ft_index=args.up_ft_index,

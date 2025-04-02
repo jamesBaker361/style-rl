@@ -462,7 +462,8 @@ def main(args):
 
                 vae_content_embedding=sd_pipeline.vae.encode(vae_image_transforms(content_image).unsqueeze(0).to(device=accelerator.device, dtype=torch_dtype))
                 raw_content=vae_image_transforms(content_image).to(device=accelerator.device, dtype=torch_dtype)
-                if args.content_reward_fn=="dift":
+                raw_style=vae_image_transforms(images[0]).to(device=accelerator.device, dtype=torch_dtype)
+                if args.content_reward_fn=="dift" or args.reward_fn=="dift":
                     dift_featurizer=SDFeaturizer()
                     dift_featurizer.pipe.unet.to(device=accelerator.device,dtype=torch_dtype)
                     dift_featurizer.pipe.vae.to(device=accelerator.device,dtype=torch_dtype)
@@ -479,6 +480,14 @@ def main(args):
                         up_ft_index=args.up_ft_index,
                         ensemble_size=args.ensemble_size) 
                     print("sd_dift_content",sd_dift_content.size())
+                    sd_dift_content.requires_grad_(False)
+
+                    sd_dift_style= dift_featurizer.forward(raw_style.clone().to(device=accelerator.device, dtype=torch_dtype),
+                        prompt="portrait",
+                        t=args.t,
+                        up_ft_index=args.up_ft_index,
+                        ensemble_size=args.ensemble_size) 
+                    print("sd_dift_style",sd_dift_style.size())
                     sd_dift_content.requires_grad_(False)
                     
 

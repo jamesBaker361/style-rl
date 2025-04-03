@@ -425,12 +425,16 @@ def main(args):
                 _,vit_style_embedding_list, vit_content_embedding_list=get_vit_embeddings(vit_processor,vit_model,images+[content_image],False)
                 vit_style_embedding_list=vit_style_embedding_list[:-1]
                 style_embedding=torch.stack(vit_style_embedding_list).mean(dim=0)
+                
+                
                 if args.reward_fn=="vgg":
                     #print("vgg style embedding size",get_vgg_embedding(vgg_extractor_style,images[0]).clone().detach().size())
                     vgg_style_embedding=torch.stack([get_vgg_embedding(vgg_extractor_style,image).clone().detach() for image in images]).mean(dim=0)
                     vgg_style_gram=get_vgg_gram(vgg_extractor_style,images[0]).clone().detach()
                     print('vgg_style_gram.size()',vgg_style_gram.size())
                     style_vgg_gram_list=get_vgg_gram_list(vgg_model.features,args.vgg_layer_indices,images[0])
+                
+                
                 content_embedding=vit_content_embedding_list[-1]
                 print("content embedding shape ",content_embedding.size())
                 evaluation_images=[]

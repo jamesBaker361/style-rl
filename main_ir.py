@@ -111,17 +111,6 @@ RARE_TOKEN="sksz"
 def run_safety_checker(image,*args,**kwargs):
     return image,None
 
-def cos_sim_rescaled(vector_i,vector_j,return_np=False):
-    cos = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
-    try:
-        result= cos(vector_i,vector_j) *0.5 +0.5
-    except TypeError:
-        result= cos(torch.tensor(vector_i),torch.tensor(vector_j)) *0.5 +0.5
-    if return_np:
-        return result.detach().cpu().numpy()
-    return result
-
-
 def get_image_logger(keyword:str,accelerator:Accelerator):
     def image_outputs_logger(image_data, global_step, _):
         # For the sake of this example, we will only log the last batch of images
@@ -164,17 +153,6 @@ def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
                 p.requires_grad_(True)
 
 
-vgg_image_transforms = transforms.Compose(
-        [
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-        ]
-    )
-
-def gram_matrix(vgg_embedding:torch.Tensor)->torch.Tensor:
-    N, C, H, W = vgg_embedding.size()
-    features = vgg_embedding.view(N * C, H * W)
-    gram = torch.mm(features, features.t())
-    return torch.div(gram, N * C * H * W)
 
 def mse_reward_fn(*args,**kwargs):
     return -1*F.mse_loss(*args,**kwargs)
@@ -257,14 +235,7 @@ def main(args):
 
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-        
-        #print('sd_pipeline.unet.config.in_channels',sd_pipeline.unet.config.in_channels)
-        #print('sd_pipeline.unet.config.out_channels',sd_pipeline.unet.config.out_channels)
 
-          
-
-
-        content_cache=[]
         style_cache=[]
         accelerator.free_memory()
         if args.style_layers_train:

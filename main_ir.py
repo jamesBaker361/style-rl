@@ -34,6 +34,7 @@ from dift_sd import SDFeaturizer
 from image_projection import PromptImageProjection
 from gpu_helpers import *
 import ImageReward as image_reward
+import random
 
 parser=argparse.ArgumentParser()
 
@@ -103,6 +104,7 @@ parser.add_argument("--facet",type=str,default="token",help="dino vit facet to e
 parser.add_argument("--pipeline_no_checkpoint",action="store_false")
 parser.add_argument("--prompt_alignment",action="store_true")
 parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
+parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random prompts")
 
 
 
@@ -177,8 +179,15 @@ def main(args):
     time.sleep(1) #wait a second maybe for accelerator stuff?
 
     with accelerator.autocast():
-
+        prompt_list=[]
+        
+        if args.prompt_src_txt!="":
+            with open(args.prompt_src_txt, "r") as f:
+                prompt_list = [line.strip() for line in f]
         def prompt_fn()->tuple[str,Any]:
+            if len(prompt_list)>0:
+                return random.choice(prompt_list),{}
+
             return args.prompt, {}
         
         ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)

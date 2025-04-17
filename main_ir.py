@@ -255,7 +255,7 @@ def main(args):
                 prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
                 print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
                 if args.reward_fn=="ir":
-                    ret=torch.stack([ ir_model.score_gard(prompt_ids,prompt_attention_mask,
+                    ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
                                                                 F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                                 ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
                 return ret,{}

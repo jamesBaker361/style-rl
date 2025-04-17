@@ -33,7 +33,7 @@ class BetterAlignPropTrainer(AlignPropTrainer):
 
                 prompt_image_pairs["rewards"] = rewards
 
-                rewards_vis = self.accelerator.gather(rewards).detach().cpu().numpy()
+                rewards_vis = self.accelerator.gather(rewards).detach().to(torch.float32).cpu().numpy()
 
                 loss = self.calculate_loss(rewards)
 

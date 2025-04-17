@@ -253,6 +253,7 @@ def main(args):
                 text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                 prompt_ids=text_input.input_ids.to(accelerator.device)
                 prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
+                print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
                 if args.reward_fn=="ir":
                     ret=torch.stack([ ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                 F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)

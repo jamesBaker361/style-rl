@@ -22,7 +22,7 @@ day=$(date +'%m/%d/%Y %R')
 echo "main" ${day} $SLURM_JOBID "node_list" $SLURM_NODELIST $@  "\n" >> jobs.txt
 module purge
 eval "$(conda shell.bash hook)"
-conda activate clip2
+conda activate hands0
 export TRANSFORMERS_CACHE="/scratch/jlb638/trans_cache"
 export HF_HOME="/scratch/jlb638/trans_cache"
 export HF_HUB_CACHE="/scratch/jlb638/trans_cache"

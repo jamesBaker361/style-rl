@@ -305,7 +305,7 @@ def main(args):
         evaluation_images=[]
         with torch.no_grad():
             for _ in range(args.n_evaluation):
-                prompt,{}=prompt_fn()
+                prompt,_=prompt_fn()
                 image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                 evaluation_images.append(image)
         

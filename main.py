@@ -348,6 +348,7 @@ def main(args):
             
         if args.prompt_alignment or args.reward_fn=="ir":
             ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
+            ir_model.to(torch_dtype)
             text_input=ir_model.blip.tokenizer(args.prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids=text_input.input_ids.to(accelerator.device)
             prompt_attention_mask=text_input.attention_mask.to(accelerator.device)

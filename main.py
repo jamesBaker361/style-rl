@@ -346,7 +346,7 @@ def main(args):
                 vgg_embedding=get_vgg_embedding(vgg_extractor,image)
                 return gram_matrix(vgg_embedding)
             
-        if args.prompt_alignment:
+        if args.prompt_alignment or args.reward_fn=="ir":
             ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
             text_input=ir_model.blip.tokenizer(args.prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids=text_input.input_ids.to(accelerator.device)
@@ -472,6 +472,7 @@ def main(args):
 
                     dino_vit_preporcessed_style=dino_vit_extractor.preprocess_pil(images[0].resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
                     dino_vit_features_style=dino_vit_extractor.extract_descriptors(dino_vit_preporcessed_style,facet=args.facet)
+                
                 ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
                                 train_learning_rate=args.learning_rate,
@@ -610,10 +611,15 @@ def main(args):
                             sample_gram_list=[get_vgg_gram_list(vgg_model.features,args.vgg_layer_indices,image) for image in images]
                             
                             ret= torch.stack([mse_gram_list_reward_fn(sample,style_vgg_gram_list) for sample in sample_gram_list])
+                        elif args.reward_fn=="ir":
+                            ret=torch.stack([ ir_model.score_gard(prompt_ids,prompt_attention_mask,
+                                                                      F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                                      ) for image in images])
                         if args.prompt_alignment:
                             ir_score=torch.stack([args.prompt_alignment_weight* ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                       F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                                       ) for image in images])
+                            
                             ret=ret+ir_score.squeeze()
                         return ret,{}
                     

@@ -250,11 +250,13 @@ def main(args):
         if args.style_layers_train:
             
             def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                print(prompts)
+                text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+                prompt_ids=text_input.input_ids.to(accelerator.device)
+                prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
                 if args.reward_fn=="ir":
                     ret=torch.stack([ ir_model.score_gard(prompt_ids,prompt_attention_mask,
                                                                 F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
-                                                                ) for image in images])
+                                                                ) for image,prompt_attention_mask in zip(images,prompt_attention_mask_list)])
                 return ret,{}
             
             style_keywords=[STYLE_LORA]
@@ -301,16 +303,10 @@ def main(args):
         sd_pipeline.unet.requires_grad_(False)
         evaluation_images=[]
         with torch.no_grad():
-            if args.use_unformatted_prompts:
-                for unformatted_prompt in unformatted_prompt_list:
-                    prompt=unformatted_prompt.format(args.prompt)
-                    image =sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                    evaluation_images.append(image)
-            else:
-                for _ in range(args.n_evaluation):
-
-                    image=sd_pipeline(prompt=args.prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                    evaluation_images.append(image)
+            for _ in range(args.n_evaluation):
+                prompt,{}=prompt_fn()
+                image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                evaluation_images.append(image)
         
 
         

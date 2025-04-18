@@ -286,7 +286,7 @@ def main(args):
                 layer_agnostic_tokens.append(f"{args.placeholder_token}_{i}")
             placeholder_tokens += additional_tokens
 
-
+            print('placeholder_tokens',placeholder_tokens)
             num_added_tokens = tokenizer.add_tokens(placeholder_tokens)
             if num_added_tokens != args.num_vectors:
                 raise ValueError(

@@ -668,18 +668,20 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         return unet_parameters,other_parameters
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
-    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False,output_type:str="pt",gradient_checkpoint: bool = True):
+    def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False,output_type:str="pt",gradient_checkpoint: bool = True,textual_inversion:bool=False):
         self.sd_pipeline=sd_pipeline
         self.keywords=keywords
         self.use_lora=use_lora
         self.output_type=output_type
         self.gradient_checkpoint=gradient_checkpoint
-
+        self.textual_inversion=textual_inversion
         for layer in self.get_trainable_layers():
             layer.requires_grad_(True)
 
     def get_trainable_layers(self):
         ret=[]
+        if self.textual_inversion:
+            ret+=[p for _,p in self.sd_pipeline.text_encoder.named_parameters() if p.requires_grad]
         unet_parameters,other_parameters=self.sd_pipeline.get_trainable_layers()
         if len(self.keywords)==0:
             return [p for _,p in unet_parameters]

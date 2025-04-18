@@ -107,6 +107,7 @@ parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
 parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random prompts")
 parser.add_argument("--text_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")
+parser.add_argument("--num_vectors",type=int,default=1)
 
 
 
@@ -247,6 +248,53 @@ def main(args):
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
 
+        if args.textual_inversion:
+            sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(True)
+            tokenizer=sd_pipeline.tokenizer
+            text_encoder=sd_pipeline.text_encoder
+            placeholder_tokens = [args.placeholder_token]
+
+            if args.num_vectors < 1:
+                raise ValueError(f"--num_vectors has to be larger or equal to 1, but is {args.num_vectors}")
+
+            # add dummy tokens for multi-vector
+            additional_tokens = []
+            for i in range(1, args.num_vectors):
+                additional_tokens.append(f"{args.placeholder_token}_{i}")
+            placeholder_tokens += additional_tokens
+
+
+            num_added_tokens = tokenizer.add_tokens(placeholder_tokens)
+            if num_added_tokens != args.num_vectors:
+                raise ValueError(
+                    f"The tokenizer already contains the token {args.placeholder_token}. Please pass a different"
+                    " `placeholder_token` that is not already in the tokenizer."
+                )
+
+            # Convert the initializer_token, placeholder_token to ids
+            token_ids = tokenizer.encode(args.initializer_token, add_special_tokens=False)
+            # Check if initializer_token is a single token or a sequence of tokens
+            if len(token_ids) > 1:
+                raise ValueError("The initializer token must be a single token.")
+
+            initializer_token_id = token_ids[0]
+            placeholder_token_ids = tokenizer.convert_tokens_to_ids(placeholder_tokens)
+
+            # Resize the token embeddings as we are adding new special tokens to the tokenizer
+            text_encoder.resize_token_embeddings(len(tokenizer))
+
+            # Initialise the newly added placeholder token with the embeddings of the initializer token
+            token_embeds = text_encoder.get_input_embeddings().weight.data
+            with torch.no_grad():
+                for token_id in placeholder_token_ids:
+                    token_embeds[token_id] = token_embeds[initializer_token_id].clone()
+
+            # Freeze all parameters except for the token embeddings in text encoder
+            text_encoder.text_model.encoder.requires_grad_(False)
+            text_encoder.text_model.final_layer_norm.requires_grad_(False)
+            text_encoder.text_model.embeddings.position_embedding.requires_grad_(False)
+
+
         style_cache=[]
         accelerator.free_memory()
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
@@ -263,7 +311,7 @@ def main(args):
         style_keywords=[STYLE_LORA]
         sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
         
-        style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
+        style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords,textual_inversion=args.textual_inversion)
         print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
         sd_pipeline.unet.to(accelerator.device)
         kwargs={}

@@ -172,8 +172,8 @@ def main(args):
     else:
         style_layers=[]
 
-    if args.textual_inversion and args.mixed_precision=="bf16":
-        args.mixed_precision="fp16"
+    if args.textual_inversion:
+        args.mixed_precision="no"
     torch_dtype={
         "no":torch.float32,
         "fp16":torch.float16,

@@ -22,6 +22,7 @@ from diffusers.utils import (
 )
 from diffusers.models.lora import adjust_lora_scale_text_encoder
 from gpu_helpers import *
+from p_unet import PPlusUNet2DConditionModel
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
@@ -676,6 +677,9 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
     
     def register_new_tokens(self,new_tokens:list[str]):
         self.new_tokens=set(new_tokens)
+
+    def register_unet(self):
+        self.unet=PPlusUNet2DConditionModel(self.unet)
 
     def encode_prompt_list(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
         prompt_list=[prompt for _ in range(self.get_n_layers())]

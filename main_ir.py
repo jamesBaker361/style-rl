@@ -180,6 +180,8 @@ def main(args):
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
+    if args.textual_inversion and args.mixed_precision=="bf16":
+        torch_dtype=torch.float16
     time.sleep(1) #wait a second maybe for accelerator stuff?
 
     with accelerator.autocast():

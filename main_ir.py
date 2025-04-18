@@ -275,6 +275,11 @@ def main(args):
 
             # add dummy tokens for multi-vector
             additional_tokens = []
+
+            if args.num_vectors==1 and args.use_pplus:
+                n_layers=sd_pipeline.get_n_layers()
+                for j in range(n_layers):
+                    additional_tokens.append(f"{args.placeholder_token}_{j}")
             
             for i in range(1, args.num_vectors):
                 if args.use_pplus:

@@ -108,6 +108,7 @@ parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random p
 parser.add_argument("--text_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")
 parser.add_argument("--num_vectors",type=int,default=1)
+parser.add_argument("--initializer_token",type=str,default="4k")
 
 
 

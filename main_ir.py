@@ -357,25 +357,25 @@ def main(args):
         sd_pipeline.unet.requires_grad_(False)
         evaluation_images=[]
         score_list=[]
-        with torch.no_grad():
-            for _ in range(args.n_evaluation):
-                prompt,_=prompt_fn()
-                image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                evaluation_images.append(image)
-                score=ir_model.score(prompt,image)
-                score_list.append(score)
-        
+    with torch.no_grad():
+        for _ in range(args.n_evaluation):
+            prompt,_=prompt_fn()
+            image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+            evaluation_images.append(image)
+            score=ir_model.score(prompt,image)
+            score_list.append(score)
+    
 
-        
-        things_to_free=[sd_pipeline.unet,sd_pipeline.vae,sd_pipeline.text_encoder]
-        
-        
-        for thing in things_to_free:
-            accelerator.free_memory(thing)
-        torch.cuda.empty_cache()
-        metrics={"score":np.mean(score_list)}
-        accelerator.log(metrics)
-        print(metrics)
+    
+    things_to_free=[sd_pipeline.unet,sd_pipeline.vae,sd_pipeline.text_encoder]
+    
+    
+    for thing in things_to_free:
+        accelerator.free_memory(thing)
+    torch.cuda.empty_cache()
+    metrics={"score":np.mean(score_list)}
+    accelerator.log(metrics)
+    print(metrics)
         
 
             

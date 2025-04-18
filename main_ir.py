@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import time
 from PIL import Image,PngImagePlugin
-from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline
+from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline,PPlusCompatibleLatentConsistencyModelPipeline
 from typing import Any
 import torchvision.transforms as transforms
 from diffusers import StableDiffusionPipeline
@@ -109,6 +109,7 @@ parser.add_argument("--textual_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")
 parser.add_argument("--num_vectors",type=int,default=1)
 parser.add_argument("--initializer_token",type=str,default="pretty")
+parser.add_argument("--use_pplus",action="store_true")
 
 
 
@@ -250,6 +251,9 @@ def main(args):
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
         elif args.pretrained_type=="stable":
             sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
+        if args.use_pplus:
+            sd_pipeline=PPlusCompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+            sd_pipeline.to(device=accelerator.device,torch_dtype=torch_dtype)
         sd_pipeline.run_safety_checker=run_safety_checker
         print("before ",sd_pipeline.unet.config.sample_size)
         sd_pipeline.unet.config.sample_size=args.image_size // sd_pipeline.vae_scale_factor
@@ -262,19 +266,23 @@ def main(args):
 
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
-
+        layer_agnostic_tokens=[args.placeholder_token]
         if args.textual_inversion:
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(True)
-            
-            
-
             if args.num_vectors < 1:
                 raise ValueError(f"--num_vectors has to be larger or equal to 1, but is {args.num_vectors}")
 
             # add dummy tokens for multi-vector
             additional_tokens = []
+            
             for i in range(1, args.num_vectors):
-                additional_tokens.append(f"{args.placeholder_token}_{i}")
+                if args.use_pplus:
+                    n_layers=sd_pipeline.get_n_layers()
+                    for j in range(n_layers):
+                        additional_tokens.append(f"{args.placeholder_token}_{i}_{j}")
+                else:
+                    additional_tokens.append(f"{args.placeholder_token}_{i}")
+                layer_agnostic_tokens.append(f"{args.placeholder_token}_{i}")
             placeholder_tokens += additional_tokens
 
 
@@ -293,6 +301,7 @@ def main(args):
 
             initializer_token_id = token_ids[0]
             placeholder_token_ids = tokenizer.convert_tokens_to_ids(placeholder_tokens)
+            #layer_agnostic_token
 
             # Resize the token embeddings as we are adding new special tokens to the tokenizer
             text_encoder.resize_token_embeddings(len(tokenizer))
@@ -307,6 +316,8 @@ def main(args):
             text_encoder.text_model.encoder.requires_grad_(False)
             text_encoder.text_model.final_layer_norm.requires_grad_(False)
             text_encoder.text_model.embeddings.position_embedding.requires_grad_(False)
+            print("new tokens",placeholder_tokens)
+            print("layer_agnostic_tokens",layer_agnostic_tokens)
 
         def prompt_fn()->tuple[str,Any]:
             if len(prompt_list)>0:
@@ -314,7 +325,7 @@ def main(args):
 
             prompt= args.prompt
             if args.textual_inversion:
-                prompt+=" ".join(tokenizer.convert_ids_to_tokens(placeholder_token_ids))
+                prompt+=" ".join(layer_agnostic_tokens)
             return prompt,{}
 
         style_cache=[]
@@ -334,9 +345,11 @@ def main(args):
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
             new_prompts=[]
             for prompt in prompts:
+                print(f"prompt before: {prompt}")
                 for token in placeholder_tokens:
                     prompt=prompt.replace(token,"")
                 new_prompts.append(prompt)
+                print(f"prompt after {prompt}")
             prompts=new_prompts
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)

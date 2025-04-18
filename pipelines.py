@@ -666,6 +666,32 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         elif hasattr(self,"src_embeds"):
             other_parameters=[p for _,p in self.unet.encoder_hid_proj.named_parameters()]
         return unet_parameters,other_parameters
+    
+class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyModelPipeline):
+    def get_n_layers(self)->int:
+        n= len(self.unet.down_blocks)+len(self.unet.up_blocks)
+        if self.unet.mid_block is not None:
+            n+=1
+        return n
+    
+    def register_new_tokens(self,new_tokens:list[str]):
+        self.new_tokens=set(new_tokens)
+
+    def encode_prompt_list(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
+        prompt_list=[prompt for _ in range(self.get_n_layers())]
+        positive_list=[]
+        negative_list=[]
+        for i,new_prompt in enumerate(prompt_list):
+            for token in self.new_tokens:
+                prompt_list[i]=prompt_list[i].replace(token,f"token_{i}")
+
+            positive,negative= super().encode_prompt(prompt_list[i], device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+            #print("positive shape", positive.size())
+            if hasattr(self, "prompt_model"):
+                positive=self.prompt_model(self.src_entity,positive)
+            positive_list.append(positive)
+            negative_list.append(negative)
+        return positive_list,negative_list
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
     def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False,output_type:str="pt",gradient_checkpoint: bool = True,textual_inversion:bool=False):

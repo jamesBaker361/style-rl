@@ -1,9 +1,32 @@
 import torch
+from torch import nn
+import copy
 from typing import Optional,Tuple,Dict,Any,Union
 from diffusers.models.unets import UNet2DConditionModel,UNet2DConditionOutput
 from diffusers.utils import USE_PEFT_BACKEND, BaseOutput, deprecate, logging, scale_lora_layers, unscale_lora_layers
 
 class PPlusUNet2DConditionModel(UNet2DConditionModel):
+    def __init__(self, base_unet: nn.Module):
+        super().__init__()
+        self.load_from(base_unet)
+        self.clone_from(base_unet)
+
+    def clone_from(self, base_unet: nn.Module):
+        """
+        Clone all parameters and buffers from another UNet.
+        """
+        if not isinstance(base_unet, nn.Module):
+            raise ValueError("Expected an nn.Module instance")
+
+        self.load_state_dict(copy.deepcopy(base_unet.state_dict()))
+
+    def load_from(self, base_unet: nn.Module):
+        """
+        Initialize with structure and weights of another UNet.
+        """
+        for name, module in base_unet.named_children():
+            setattr(self, name, copy.deepcopy(module))
+
     def forward(
         self,
         sample: torch.Tensor,

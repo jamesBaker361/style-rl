@@ -105,6 +105,8 @@ parser.add_argument("--pipeline_no_checkpoint",action="store_false")
 parser.add_argument("--prompt_alignment",action="store_true")
 parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
 parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random prompts")
+parser.add_argument("--text_inversion",action="store_true")
+parser.add_argument("--placeholder_token",type=str,default="<SKS>")
 
 
 
@@ -247,37 +249,35 @@ def main(args):
 
         style_cache=[]
         accelerator.free_memory()
-        if args.style_layers_train:
+        def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+            text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+            prompt_ids_list=text_input.input_ids.to(accelerator.device)
+            prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
+            print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
+            if args.reward_fn=="ir":
+                ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
+                                                            F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                            ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
+            return ret,{}
+        
+        style_keywords=[STYLE_LORA]
+        sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
+        
+        style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
+        print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
+        sd_pipeline.unet.to(accelerator.device)
+        kwargs={}
+        
+        if args.method=="align":
             
-            def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
-                text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
-                prompt_ids_list=text_input.input_ids.to(accelerator.device)
-                prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
-                print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
-                if args.reward_fn=="ir":
-                    ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
-                                                                F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
-                                                                ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
-                return ret,{}
-            
-            style_keywords=[STYLE_LORA]
-            sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
-            
-            style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords)
-            print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
-            sd_pipeline.unet.to(accelerator.device)
-            kwargs={}
-            
-            if args.method=="align":
-                
-                style_trainer=BetterAlignPropTrainer(
-                    align_config,
-                    style_reward_function_align,
-                    prompt_fn,
-                    style_ddpo_pipeline,
-                    get_image_logger_align(STYLE_LORA,accelerator,style_cache)
-                    )
-            
+            style_trainer=BetterAlignPropTrainer(
+                align_config,
+                style_reward_function_align,
+                prompt_fn,
+                style_ddpo_pipeline,
+                get_image_logger_align(STYLE_LORA,accelerator,style_cache)
+                )
+        
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)

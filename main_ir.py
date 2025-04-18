@@ -332,6 +332,12 @@ def main(args):
             return ret,{}
 
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+            new_prompts=[]
+            for prompt in prompts:
+                for token in placeholder_tokens:
+                    prompt=prompt.replace(token,"")
+                new_prompts.append(prompt)
+            prompts=new_prompts
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)
             prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
@@ -398,6 +404,8 @@ def main(args):
     with torch.no_grad():
         for _ in range(args.n_evaluation):
             prompt,_=prompt_fn()
+            for token in placeholder_tokens:
+                prompt=prompt.replace(token,"")
             image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
             evaluation_images.append(image)
             score=ir_model.score(prompt,image)

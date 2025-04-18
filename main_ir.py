@@ -223,6 +223,18 @@ def main(args):
 
     
         accelerator.free_memory()
+        ddpo_config=DDPOConfig(log_with="wandb",
+                                sample_batch_size=args.batch_size,
+                                train_learning_rate=args.learning_rate,
+                    num_epochs=1,
+                    mixed_precision=args.mixed_precision,
+                    sample_num_batches_per_epoch=args.sample_num_batches_per_epoch,
+                    train_batch_size=args.batch_size,
+                    train_gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    sample_num_steps=args.num_inference_steps,
+                    #per_prompt_stat_tracking=True,
+                    #per_prompt_stat_tracking_buffer_size=32
+                    )
         align_config=AlignPropConfig(log_with="wandb",num_epochs=1,mixed_precision=args.mixed_precision,
                                     train_learning_rate=args.learning_rate,
                                     sample_guidance_scale=args.guidance_scale,
@@ -343,6 +355,15 @@ def main(args):
                 style_ddpo_pipeline,
                 get_image_logger_align(STYLE_LORA,accelerator,style_cache)
                 )
+        elif args.method=="ddpo":
+                        kwargs={"retain_graph":True}
+                        style_trainer=BetterDDPOTrainer(
+                            ddpo_config,
+                            style_reward_function,
+                            prompt_fn,
+                            style_ddpo_pipeline,
+                            get_image_logger(STYLE_LORA,accelerator)
+                        )
         
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:

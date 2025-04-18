@@ -303,6 +303,18 @@ def main(args):
 
         style_cache=[]
         accelerator.free_memory()
+
+        @torch.no_grad()
+        def style_reward_function(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[list[torch.Tensor],Any]:
+            if args.reward_fn=="ir":
+                text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+                prompt_ids_list=text_input.input_ids.to(accelerator.device)
+                prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
+                ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
+                                                            F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                            ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
+            return ret,{}
+
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)

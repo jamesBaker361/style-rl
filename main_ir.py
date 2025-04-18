@@ -254,6 +254,7 @@ def main(args):
         if args.use_pplus:
             sd_pipeline=PPlusCompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
             sd_pipeline.to(device=accelerator.device,torch_dtype=torch_dtype)
+            sd_pipeline.register_unet()
         sd_pipeline.run_safety_checker=run_safety_checker
         print("before ",sd_pipeline.unet.config.sample_size)
         sd_pipeline.unet.config.sample_size=args.image_size // sd_pipeline.vae_scale_factor
@@ -318,6 +319,8 @@ def main(args):
             text_encoder.text_model.embeddings.position_embedding.requires_grad_(False)
             print("new tokens",placeholder_tokens)
             print("layer_agnostic_tokens",layer_agnostic_tokens)
+            if args.use_pplus:
+                sd_pipeline.register_new_tokens(layer_agnostic_tokens)
 
         def prompt_fn()->tuple[str,Any]:
             if len(prompt_list)>0:

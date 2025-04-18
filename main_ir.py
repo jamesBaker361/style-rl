@@ -179,7 +179,7 @@ def main(args):
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
-    
+    placeholder_tokens = [args.placeholder_token]
 
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
@@ -266,7 +266,7 @@ def main(args):
         if args.textual_inversion:
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(True)
             
-            placeholder_tokens = [args.placeholder_token]
+            
 
             if args.num_vectors < 1:
                 raise ValueError(f"--num_vectors has to be larger or equal to 1, but is {args.num_vectors}")

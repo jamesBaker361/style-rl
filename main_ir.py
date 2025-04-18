@@ -357,6 +357,7 @@ def main(args):
         sd_pipeline.unet.requires_grad_(False)
         evaluation_images=[]
         score_list=[]
+    ir_model.to(torch.float32)
     with torch.no_grad():
         for _ in range(args.n_evaluation):
             prompt,_=prompt_fn()

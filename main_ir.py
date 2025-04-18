@@ -353,7 +353,7 @@ def main(args):
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
             end=time.time()
-        print(f"all epochs elapsed {end-total_start} total steps=")
+        print(f"all epochs elapsed {end-total_start} total steps= {args.epochs} * {args.num_inference_steps} *{args.batch_size}={args.epochs*args.num_inference_steps*args.batch_size}")
         sd_pipeline.unet.requires_grad_(False)
         evaluation_images=[]
         score_list=[]

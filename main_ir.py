@@ -403,7 +403,10 @@ def main(args):
             score=ir_model.score(prompt,image)
             score_list.append(score)
     
-
+    for image in evaluation_images:
+        accelerator.log({f"evaluation":wandb.Image(image)})
+    for _style_image in style_cache:
+        accelerator.log({f"cache_{STYLE_LORA}":wandb.Image(_style_image)})
     
     things_to_free=[sd_pipeline.unet,sd_pipeline.vae,sd_pipeline.text_encoder]
     

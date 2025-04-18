@@ -1319,5 +1319,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         kwargs["gradient_checkpoint"]=self.gradient_checkpoint
         if type(self.sd_pipeline)==CompatibleLatentConsistencyModelPipeline:
             return self.sd_pipeline.call_with_grad(*args,**kwargs)
+        elif type(self.sd_pipeline)==PPlusCompatibleLatentConsistencyModelPipeline:
+            return self.sd_pipeline.call_with_grad(*args,**kwargs)
         else:
             return super().rgb_with_grad(*args,**kwargs)

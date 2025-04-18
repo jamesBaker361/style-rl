@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import copy
 from typing import Optional,Tuple,Dict,Any,Union
-from diffusers.models.unets import UNet2DConditionModel,UNet2DConditionOutput
+from diffusers.models.unets.unet_2d_condition import UNet2DConditionModel,UNet2DConditionOutput
 from diffusers.utils import USE_PEFT_BACKEND, BaseOutput, deprecate, logging, scale_lora_layers, unscale_lora_layers
 
 class PPlusUNet2DConditionModel(UNet2DConditionModel):

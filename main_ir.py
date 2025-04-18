@@ -172,16 +172,18 @@ def main(args):
     else:
         style_layers=[]
 
-    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
-    print("accelerator device",accelerator.device)
-    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+    if args.textual_inversion and args.mixed_precision=="bf16":
+        args.mixed_precision="fp16"
     torch_dtype={
         "no":torch.float32,
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
-    if args.textual_inversion and args.mixed_precision=="bf16":
-        torch_dtype=torch.float16
+    
+
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
+    print("accelerator device",accelerator.device)
+    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     time.sleep(1) #wait a second maybe for accelerator stuff?
 
     with accelerator.autocast():

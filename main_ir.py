@@ -108,7 +108,7 @@ parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random p
 parser.add_argument("--textual_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")
 parser.add_argument("--num_vectors",type=int,default=1)
-parser.add_argument("--initializer_token",type=str,default="4k")
+parser.add_argument("--initializer_token",type=str,default="pretty")
 
 
 
@@ -273,7 +273,7 @@ def main(args):
             token_ids = tokenizer.encode(args.initializer_token, add_special_tokens=False)
             # Check if initializer_token is a single token or a sequence of tokens
             if len(token_ids) > 1:
-                raise ValueError("The initializer token must be a single token.")
+                raise ValueError(f"The initializer token must be a single token. {args.initializer_token} is {len(token_ids)}")
 
             initializer_token_id = token_ids[0]
             placeholder_token_ids = tokenizer.convert_tokens_to_ids(placeholder_tokens)

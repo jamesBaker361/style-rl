@@ -303,11 +303,14 @@ def main(args):
         print(f"all epochs elapsed {end-total_start}")
         sd_pipeline.unet.requires_grad_(False)
         evaluation_images=[]
+        score_list=[]
         with torch.no_grad():
             for _ in range(args.n_evaluation):
                 prompt,_=prompt_fn()
                 image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                 evaluation_images.append(image)
+                score=ir_model(prompt,image)
+                score_list.append(score)
         
 
         
@@ -317,7 +320,7 @@ def main(args):
         for thing in things_to_free:
             accelerator.free_memory(thing)
         torch.cuda.empty_cache()
-        metrics={}
+        metrics={"score":np.mean(score_list)}
         accelerator.log(metrics)
         print(metrics)
         

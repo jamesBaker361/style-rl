@@ -1117,7 +1117,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             # NOTE: when a LCM is distilled from an LDM via latent consistency distillation (Algorithm 1) with guided
             # distillation, the forward pass of the LCM learns to approximate sampling from the LDM using CFG with the
             # unconditional prompt "" (the empty string). Due to this, LCMs currently do not support negative prompts.
-            prompt_embeds_list, _ = self.encode_prompt(
+            prompt_embeds_list, _ = self.encode_prompt_list(
                 prompt,
                 device,
                 num_images_per_prompt,

@@ -188,11 +188,7 @@ def main(args):
         if args.prompt_src_txt!="":
             with open(args.prompt_src_txt, "r") as f:
                 prompt_list = [line.strip() for line in f]
-        def prompt_fn()->tuple[str,Any]:
-            if len(prompt_list)>0:
-                return random.choice(prompt_list),{}
-
-            return args.prompt, {}
+        
         
         ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
         ir_model.to(torch_dtype)
@@ -245,14 +241,15 @@ def main(args):
         sd_pipeline.unet.to(accelerator.device).requires_grad_(False)
         sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(False)
         sd_pipeline.vae.to(accelerator.device).requires_grad_(False)
+        tokenizer=sd_pipeline.tokenizer
+        text_encoder=sd_pipeline.text_encoder
 
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
 
         if args.textual_inversion:
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(True)
-            tokenizer=sd_pipeline.tokenizer
-            text_encoder=sd_pipeline.text_encoder
+            
             placeholder_tokens = [args.placeholder_token]
 
             if args.num_vectors < 1:
@@ -295,6 +292,14 @@ def main(args):
             text_encoder.text_model.final_layer_norm.requires_grad_(False)
             text_encoder.text_model.embeddings.position_embedding.requires_grad_(False)
 
+        def prompt_fn()->tuple[str,Any]:
+            if len(prompt_list)>0:
+                prompt= random.choice(prompt_list)
+
+            prompt= args.prompt
+            if args.textual_inversion:
+                prompt+=" ".join(tokenizer.convert_ids_to_tokens(placeholder_token_ids))
+            return prompt,{}
 
         style_cache=[]
         accelerator.free_memory()

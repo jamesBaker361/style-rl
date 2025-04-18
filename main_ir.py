@@ -288,11 +288,7 @@ def main(args):
 
             print('placeholder_tokens',placeholder_tokens)
             num_added_tokens = tokenizer.add_tokens(placeholder_tokens)
-            if num_added_tokens != args.num_vectors:
-                raise ValueError(
-                    f"The tokenizer already contains the token {args.placeholder_token}. Please pass a different"
-                    " `placeholder_token` that is not already in the tokenizer."
-                )
+            print(f"added {num_added_tokens} tokens")
 
             # Convert the initializer_token, placeholder_token to ids
             token_ids = tokenizer.encode(args.initializer_token, add_special_tokens=False)

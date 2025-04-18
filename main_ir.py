@@ -360,14 +360,14 @@ def main(args):
                 get_image_logger_align(STYLE_LORA,accelerator,style_cache)
                 )
         elif args.method=="ddpo":
-                        kwargs={"retain_graph":True}
-                        style_trainer=BetterDDPOTrainer(
-                            ddpo_config,
-                            style_reward_function,
-                            prompt_fn,
-                            style_ddpo_pipeline,
-                            get_image_logger(STYLE_LORA,accelerator)
-                        )
+            kwargs={"retain_graph":True}
+            style_trainer=BetterDDPOTrainer(
+                ddpo_config,
+                style_reward_function,
+                prompt_fn,
+                style_ddpo_pipeline,
+                get_image_logger(STYLE_LORA,accelerator)
+            )
         
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:

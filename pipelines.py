@@ -1173,7 +1173,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                 num_channels_latents,
                 height,
                 width,
-                prompt_embeds.dtype,
+                self.unet.dtype,
                 device,
                 generator,
                 latents,

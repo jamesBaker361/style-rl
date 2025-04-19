@@ -6,10 +6,6 @@ from diffusers.models.unets.unet_2d_condition import UNet2DConditionModel,UNet2D
 from diffusers.utils import USE_PEFT_BACKEND, BaseOutput, deprecate, logging, scale_lora_layers, unscale_lora_layers
 
 class PPlusUNet2DConditionModel(UNet2DConditionModel):
-    def __init__(self, base_unet: nn.Module):
-        super().__init__()
-        self.load_from(base_unet)
-        self.clone_from(base_unet)
 
     def clone_from(self, base_unet: nn.Module):
         """

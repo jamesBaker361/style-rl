@@ -60,52 +60,10 @@ parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
-parser.add_argument("--reward_fn",type=str,default="cos")
-parser.add_argument("--content_reward_fn",type=str,default="mse",help="mse or face or vae or raw or dino or dift")
 
-parser.add_argument("--vgg_n",type=int,default=16,help="16 or 19")
-parser.add_argument("--vgg_layer_style",type=int,default=27)
-parser.add_argument("--vgg_layer_indices",nargs="*",type=int)
-'''
-vgg16
-conv1-4
-conv2-9
-conv3-16
-conv4-23
-conv5-30
-
-vgg19
-conv1-4
-conv2-9
-conv3-18
-conv4-27
-conv5-30
-'''
-
-parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
-parser.add_argument("--use_unformatted_prompts",action="store_true")
-parser.add_argument("--content_dataset",type=str,default="jlbaker361/people")
-parser.add_argument("--content_start",type=int,default=0)
-parser.add_argument("--content_limit",type=int,default=5)
-parser.add_argument("--content_mid_block",action="store_true")
-parser.add_argument("--content_layers",nargs="*",type=int)
-parser.add_argument("--prompt_embedding_conditioning",action="store_true")
-parser.add_argument("--adapter_conditioning",action="store_true")
-parser.add_argument("--num_image_text_embeds",type=int,default=4,help="num_image_text_embeds for image projection")
-parser.add_argument("--image_embeds_type",type=str,default="face",help="face or vit, what model to use for the image embeds")
-parser.add_argument("--use_encoder_hid_proj",action="store_true",help="whether to use encoder hidden proj thing")
-parser.add_argument('--up_ft_index', default=1, type=int, choices=[0, 1, 2 ,3],
-                        help='which upsampling block of U-Net to extract the feature map for dift')
-parser.add_argument('--t', default=261, type=int, 
-                        help='time step for diffusion, choose from range [0, 1000] for dift')
-parser.add_argument('--ensemble_size', default=1, type=int, 
-                        help='number of repeated images in each batch used to get features for dift')
-parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
-parser.add_argument("--pipeline_no_checkpoint",action="store_false")
-parser.add_argument("--prompt_alignment",action="store_true")
-parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
+
 parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random prompts")
 parser.add_argument("--textual_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")

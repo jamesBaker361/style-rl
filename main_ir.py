@@ -114,6 +114,7 @@ parser.add_argument("--num_vectors",type=int,default=1)
 parser.add_argument("--initializer_token",type=str,default="pretty")
 parser.add_argument("--use_pplus",action="store_true")
 parser.add_argument("--validation_epochs",type=int,default=1)
+parser.add_argument("--train_unet",action="store_true")
 
 
 
@@ -352,7 +353,8 @@ def main(args):
             return ret,{}
         
         style_keywords=[STYLE_LORA]
-        sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
+        if args.train_unet:
+            sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
         
         style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords,textual_inversion=args.textual_inversion)
         print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))

@@ -689,7 +689,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
 
         big_positive_list=[]
         big_negative_list=[]
-        print("prompt",prompt)
+        #print("prompt",prompt)
         for p in prompt:
             prompt_list=[p for _ in range(self.get_n_layers())]
             positive_list=[]
@@ -697,7 +697,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             for i,new_prompt in enumerate(prompt_list):
                 for token in self.new_tokens:
                     prompt_list[i]=prompt_list[i].replace(token,f"{token}_{i}")
-                print('prompt_list[i]',prompt_list[i])
+                #print('prompt_list[i]',prompt_list[i])
                 positive,negative= super().encode_prompt(prompt_list[i], device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
                 #print("positive shape", positive.size())
                 if hasattr(self, "prompt_model"):

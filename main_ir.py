@@ -11,6 +11,7 @@ from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,Alig
 from better_alignprop_trainer import BetterAlignPropTrainer
 from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img import retrieve_timesteps
 from datasets import load_dataset
+import string
 import numpy as np
 import torch
 import time
@@ -107,6 +108,7 @@ parser.add_argument("--prompt_alignment_weight",type=float,default=0.1)
 parser.add_argument("--prompt_src_txt",type=str,default="",help="src of random prompts")
 parser.add_argument("--textual_inversion",action="store_true")
 parser.add_argument("--placeholder_token",type=str,default="<SKS>")
+parser.add_argument("--additional_token",type=str,default="<XYZ>")
 parser.add_argument("--num_vectors",type=int,default=1)
 parser.add_argument("--initializer_token",type=str,default="pretty")
 parser.add_argument("--use_pplus",action="store_true")
@@ -279,16 +281,18 @@ def main(args):
             if args.num_vectors==1 and args.use_pplus:
                 n_layers=sd_pipeline.get_n_layers()
                 for j in range(n_layers):
-                    additional_tokens.append(f"{args.placeholder_token}_{j}")
+                    additional_tokens.append(f"{args.additional_token}_{j}")
             
+            suffixes=[''.join(random.choices(string.ascii_letters + string.digits, k=4)) for _ in range(args.num_vectors)]
             for i in range(1, args.num_vectors):
+                suffix=suffixes[i]
                 if args.use_pplus:
                     n_layers=sd_pipeline.get_n_layers()
                     for j in range(n_layers):
-                        additional_tokens.append(f"{args.placeholder_token}_{i}_{j}")
+                        additional_tokens.append(f"{args.additional_token}_{suffix}_{j}")
                 else:
-                    additional_tokens.append(f"{args.placeholder_token}_{i}")
-                layer_agnostic_tokens.append(f"{args.placeholder_token}_{i}")
+                    additional_tokens.append(f"{args.additional_token}_{suffix}")
+                layer_agnostic_tokens.append(f"{args.additional_token}_{suffix}")
             placeholder_tokens += additional_tokens
 
             print('placeholder_tokens',placeholder_tokens)

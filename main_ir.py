@@ -332,6 +332,7 @@ def main(args):
                 prompt= random.choice(prompt_list)
 
             prompt= args.prompt
+            prompt+=" "
             if args.textual_inversion:
                 prompt+=" ".join(layer_agnostic_tokens)
             return prompt

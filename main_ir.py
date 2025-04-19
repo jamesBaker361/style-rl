@@ -377,12 +377,12 @@ def main(args):
                 
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
-            if e%args.validation_epochs==0:
-                evaluation_images,score_list=get_images_and_scores()
-                metrics={"score":np.mean(score_list)}
-                accelerator.log(metrics)
-                for i,image in enumerate(evaluation_images):
-                    accelerator.log({f"evaluation_{i}":wandb.Image(image)})
+                if e%args.validation_epochs==0:
+                    evaluation_images,score_list=get_images_and_scores()
+                    metrics={"score":np.mean(score_list)}
+                    accelerator.log(metrics)
+                    for i,image in enumerate(evaluation_images):
+                        accelerator.log({f"evaluation_{i}":wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
             end=time.time()

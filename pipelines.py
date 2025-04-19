@@ -1325,7 +1325,7 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
             ret+=text_params
         unet_parameters,other_parameters=self.sd_pipeline.get_trainable_layers()
         if len(self.keywords)==0:
-            return [p for _,p in unet_parameters if p.requires_grad]
+            ret+= [p for _,p in unet_parameters if p.requires_grad]
         for key in self.keywords:
             for name,p in unet_parameters:
                 if name.find(key)!=-1 and p.requires_grad:

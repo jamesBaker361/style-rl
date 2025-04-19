@@ -681,7 +681,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
     def register_unet(self):
         old_unet=self.unet
         self.unet=PPlusUNet2DConditionModel(old_unet)
-        self.unet.config=old_unet.config
+        self.unet.set_config(old_unet.config)
 
     def encode_prompt_list(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
 

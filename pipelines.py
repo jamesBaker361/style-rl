@@ -682,6 +682,8 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         self.unet=PPlusUNet2DConditionModel(self.unet)
 
     def encode_prompt_list(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
+        print(type(prompt),type(prompt))
+        print(prompt)
         prompt_list=[prompt for _ in range(self.get_n_layers())]
         positive_list=[]
         negative_list=[]

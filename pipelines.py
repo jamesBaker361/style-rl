@@ -215,7 +215,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             num_channels_latents,
             height,
             width,
-            prompt_embeds.dtype,
+            self.unet.dtype,
             device,
             generator,
             latents,
@@ -885,7 +885,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             num_channels_latents,
             height,
             width,
-            prompt_embeds.dtype,
+            self.unet.dtype,
             device,
             generator,
             latents,
@@ -915,7 +915,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         self._num_timesteps = len(timesteps)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
-                latents = latents.to(prompt_embeds.dtype)
+                latents = latents.to(self.unet.dtype)
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(
@@ -950,7 +950,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
 
                 
 
-        denoised = denoised.to(prompt_embeds.dtype)
+        denoised = denoised.to(self.unet.dtype)
         has_nsfw_concept = None
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
@@ -1194,7 +1194,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         self._num_timesteps = len(timesteps)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
-                latents = latents.to(prompt_embeds.dtype)
+                latents = latents.to(self.unet.dtype)
                 #print("latents size",latents.size())
                 # model prediction (v-prediction, eps, x)
                 if gradient_checkpoint:
@@ -1277,7 +1277,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
 
         #print("rgb with grad loop",len(find_cuda_objects()))         
 
-        denoised = denoised.to(prompt_embeds.dtype)
+        denoised = denoised.to(self.unet.dtype)
         has_nsfw_concept = None
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]

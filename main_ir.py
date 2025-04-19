@@ -281,7 +281,7 @@ def main(args):
             if args.num_vectors==1 and args.use_pplus:
                 n_layers=sd_pipeline.get_n_layers()
                 for j in range(n_layers):
-                    additional_tokens.append(f"{args.additional_token}_{j}")
+                    additional_tokens.append(f"{args.placeholder_token}_{j}")
             
             suffixes=[''.join(random.choices(string.ascii_letters + string.digits, k=4)) for _ in range(args.num_vectors)]
             for i in range(1, args.num_vectors):

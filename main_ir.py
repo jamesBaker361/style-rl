@@ -112,6 +112,7 @@ parser.add_argument("--additional_token",type=str,default="<XYZ>")
 parser.add_argument("--num_vectors",type=int,default=1)
 parser.add_argument("--initializer_token",type=str,default="pretty")
 parser.add_argument("--use_pplus",action="store_true")
+parser.add_argument("--validation_epochs",type=int,default=20)
 
 
 
@@ -396,7 +397,21 @@ def main(args):
                 style_ddpo_pipeline,
                 get_image_logger(STYLE_LORA,accelerator)
             )
-        
+        def get_images_and_scores():  
+            with torch.autocast(accelerator.device,False):  
+                evaluation_images=[]
+                score_list=[]
+                ir_model.to(torch.float32)
+                with torch.no_grad():
+                    for _ in range(args.n_evaluation):
+                        prompt=prompt_fn()
+                        for token in placeholder_tokens:
+                            prompt=prompt.replace(token,"")
+                        image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                        evaluation_images.append(image)
+                        score=ir_model.score(prompt,image)
+                        score_list.append(score) 
+                return evaluation_images,score_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)
@@ -415,26 +430,21 @@ def main(args):
                 
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
+            if e%args.validation_epochs:
+                evaluation_images,score_list=get_images_and_scores()
+                metrics={"score":np.mean(score_list)}
+                accelerator.log(metrics)
+                for i,image in enumerate(evaluation_images):
+                    accelerator.log({f"evaluation_{i}":wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
             end=time.time()
         print(f"all epochs elapsed {end-total_start} total steps= {args.epochs} * {args.num_inference_steps} *{args.batch_size}={args.epochs*args.num_inference_steps*args.batch_size}")
         sd_pipeline.unet.requires_grad_(False)
-        evaluation_images=[]
-        score_list=[]
-    ir_model.to(torch.float32)
-    with torch.no_grad():
-        for _ in range(args.n_evaluation):
-            prompt=prompt_fn()
-            for token in placeholder_tokens:
-                prompt=prompt.replace(token,"")
-            image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-            evaluation_images.append(image)
-            score=ir_model.score(prompt,image)
-            score_list.append(score)
     
+    evaluation_images,score_list=get_images_and_scores()
     for image in evaluation_images:
-        accelerator.log({f"evaluation":wandb.Image(image)})
+        accelerator.log({f"final_evaluation":wandb.Image(image)})
     for _style_image in style_cache:
         accelerator.log({f"cache_{STYLE_LORA}":wandb.Image(_style_image)})
     

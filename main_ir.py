@@ -214,23 +214,6 @@ def main(args):
  
         accelerator.free_memory()
         torch.cuda.empty_cache()
-        
-
-
-
-        if args.pretrained_type=="consistency":
-            pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
-        elif args.pretrained_type=="stable":
-            try:
-                pipe=StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
-            except:
-                pipe=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",force_download=True)
-        # To save GPU memory, torch.float16 can be used, but it may compromise image quality.
-        pipe.to(torch_device="cuda", torch_dtype=torch_dtype)
-        pipe.run_safety_checker=run_safety_checker
-
-    
-        accelerator.free_memory()
         ddpo_config=DDPOConfig(log_with="wandb",
                                 sample_batch_size=args.batch_size,
                                 train_learning_rate=args.learning_rate,

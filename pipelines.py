@@ -711,7 +711,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         big_positive_list=[list(row) for row in zip(*big_positive_list)]
         print("after len", len(big_negative_list))
         big_positive_list=[torch.cat(tensor_list,dim=0) for tensor_list in big_positive_list]
-        big_negative_list=[torch.cat(tensor_list,dim=0) for tensor_list in big_negative_list]
+        #big_negative_list=[torch.cat(tensor_list,dim=0) for tensor_list in big_negative_list]
         return big_positive_list,big_negative_list
     
     @torch.no_grad()

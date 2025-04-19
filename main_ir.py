@@ -428,7 +428,7 @@ def main(args):
             prompt=prompt_fn()
             for token in placeholder_tokens:
                 prompt=prompt.replace(token,"")
-            image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+            image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
             evaluation_images.append(image)
             score=ir_model.score(prompt,image)
             score_list.append(score)

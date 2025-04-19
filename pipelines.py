@@ -685,6 +685,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
 
         big_positive_list=[]
         big_negative_list=[]
+        print("prompt",prompt)
         for p in prompt:
             prompt_list=[p for _ in range(self.get_n_layers())]
             positive_list=[]

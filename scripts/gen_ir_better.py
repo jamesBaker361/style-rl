@@ -14,6 +14,6 @@ for lr in [0.001,0.0001]:
                 }[pplus]
                 command=f"sbatch -J ir-ti --err=slurm/ir/{name}.err --out=slurm/ir/{name}.out"
                 command+=f" {exclude} runpygpu.sh main_ir.py  --epochs 1000  {unet_flag} {pplus_flag} --num_vectors {num_vectors}"
-                command+=f"  --prompt_alignment --project_name ti-ir --textual_inversion --prompt_src_txt random_animals.txt"
+                command+=f"   --project_name ti-ir --textual_inversion --prompt_src_txt random_animals.txt"
                 command+=f" --validation_epochs 40 --learning_rate {lr}"
                 print(command)

@@ -36,6 +36,7 @@ from image_projection import PromptImageProjection
 from gpu_helpers import *
 import ImageReward as image_reward
 import random
+from worse_peft import apply_lora
 
 parser=argparse.ArgumentParser()
 
@@ -155,13 +156,6 @@ def get_image_logger_align(keyword:str,accelerator:Accelerator,cache:list):
             step=accelerator.get_tracker("wandb").run.step,
         )
     return image_outputs_logger
-
-def set_trainable(sd_pipeline:DiffusionPipeline,keywords:list):
-    for key in keywords:
-        for name,p in sd_pipeline.unet.named_parameters():
-            if name.find(key)!=-1:
-                p.requires_grad_(True)
-
 
 
 def mse_reward_fn(*args,**kwargs):

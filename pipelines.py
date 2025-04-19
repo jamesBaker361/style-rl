@@ -682,22 +682,26 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         self.unet=PPlusUNet2DConditionModel(self.unet)
 
     def encode_prompt_list(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
-        print(type(prompt),type(prompt))
-        print(prompt)
-        prompt_list=[prompt for _ in range(self.get_n_layers())]
-        positive_list=[]
-        negative_list=[]
-        for i,new_prompt in enumerate(prompt_list):
-            for token in self.new_tokens:
-                prompt_list[i]=prompt_list[i].replace(token,f"{token}_{i}")
-            print('prompt_list[i]',prompt_list[i])
-            positive,negative= super().encode_prompt(prompt_list[i], device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
-            #print("positive shape", positive.size())
-            if hasattr(self, "prompt_model"):
-                positive=self.prompt_model(self.src_entity,positive)
-            positive_list.append(positive)
-            negative_list.append(negative)
-        return positive_list,negative_list
+
+        big_positive_list=[]
+        big_negative_list=[]
+        for p in prompt:
+            prompt_list=[p for _ in range(self.get_n_layers())]
+            positive_list=[]
+            negative_list=[]
+            for i,new_prompt in enumerate(prompt_list):
+                for token in self.new_tokens:
+                    prompt_list[i]=prompt_list[i].replace(token,f"{token}_{i}")
+                print('prompt_list[i]',prompt_list[i])
+                positive,negative= super().encode_prompt(prompt_list[i], device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+                #print("positive shape", positive.size())
+                if hasattr(self, "prompt_model"):
+                    positive=self.prompt_model(self.src_entity,positive)
+                positive_list.append(positive)
+                negative_list.append(negative)
+            big_positive_list.append(positive_list)
+            big_negative_list.append(negative_list)
+        return big_positive_list,big_negative_list
     
     @torch.no_grad()
     def __call__(

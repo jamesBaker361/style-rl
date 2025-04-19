@@ -112,7 +112,7 @@ parser.add_argument("--additional_token",type=str,default="<XYZ>")
 parser.add_argument("--num_vectors",type=int,default=1)
 parser.add_argument("--initializer_token",type=str,default="pretty")
 parser.add_argument("--use_pplus",action="store_true")
-parser.add_argument("--validation_epochs",type=int,default=20)
+parser.add_argument("--validation_epochs",type=int,default=1)
 
 
 
@@ -436,7 +436,7 @@ def main(args):
                 
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
-            if e%args.validation_epochs:
+            if e%args.validation_epochs==0:
                 evaluation_images,score_list=get_images_and_scores()
                 metrics={"score":np.mean(score_list)}
                 accelerator.log(metrics)

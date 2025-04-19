@@ -200,9 +200,7 @@ def main(args):
         
         ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
         ir_model.to(torch_dtype)
-        text_input=ir_model.blip.tokenizer(args.prompt, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
-        prompt_ids=text_input.input_ids.to(accelerator.device)
-        prompt_attention_mask=text_input.attention_mask.to(accelerator.device)
+
 
         ir_model=accelerator.prepare(ir_model)
 
@@ -314,8 +312,8 @@ def main(args):
         def prompt_fn()->str:
             if len(prompt_list)>0:
                 prompt= random.choice(prompt_list)
-
-            prompt= args.prompt
+            else:
+                prompt= args.prompt
             prompt+=" "
             if args.textual_inversion:
                 prompt+=" ".join(layer_agnostic_tokens)

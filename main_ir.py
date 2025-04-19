@@ -364,7 +364,7 @@ def main(args):
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)
             prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
-            print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
+            #print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
             if args.reward_fn=="ir":
                 ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
                                                             F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
@@ -398,20 +398,26 @@ def main(args):
                 get_image_logger(STYLE_LORA,accelerator)
             )
         def get_images_and_scores():  
-            with torch.autocast(accelerator.device,False):  
-                evaluation_images=[]
-                score_list=[]
-                ir_model.to(torch.float32)
-                with torch.no_grad():
-                    for _ in range(args.n_evaluation):
-                        prompt=prompt_fn()
-                        for token in placeholder_tokens:
-                            prompt=prompt.replace(token,"")
-                        image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
-                        evaluation_images.append(image)
-                        score=ir_model.score(prompt,image)
-                        score_list.append(score) 
-                return evaluation_images,score_list
+            #with torch.autocast(accelerator.device,False):  
+            evaluation_images=[]
+            score_list=[]
+            #ir_model.to(torch.float32)
+            with torch.no_grad():
+                for _ in range(args.n_evaluation):
+                    prompt=prompt_fn()
+                    for token in placeholder_tokens:
+                        prompt=prompt.replace(token,"")
+                    images=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
+                    evaluation_images.append(image)
+                    score_list.append(ir_model.score(prompt,image))
+                    '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+                    prompt_ids_list=text_input.input_ids.to(accelerator.device)
+                    prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
+                    score_list=[ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
+                                                            F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                            ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)]
+                    score_list=[s.detach().cpu().numpy().item() for s in score_list]'''
+            return evaluation_images,score_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)

@@ -27,6 +27,14 @@ class PPlusUNet2DConditionModel(UNet2DConditionModel):
         for name, module in base_unet.named_children():
             setattr(self, name, copy.deepcopy(module))
 
+    @property
+    def config(self):
+        return self.config
+
+    @config.setter
+    def config(self, value):
+        self.config = value
+
     def forward(
         self,
         sample: torch.Tensor,

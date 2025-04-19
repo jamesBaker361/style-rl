@@ -239,6 +239,8 @@ def main(args):
         print("after", sd_pipeline.unet.config.sample_size)
         sd_pipeline.unet.to(accelerator.device)
         sd_pipeline.unet.requires_grad_(False)
+        for param in sd_pipeline.unet.parameters():
+            param.requires_grad_(False)
         sd_pipeline.text_encoder.to(accelerator.device)
         sd_pipeline.text_encoder.requires_grad_(False)
         sd_pipeline.vae.to(accelerator.device)

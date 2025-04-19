@@ -928,7 +928,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                     latents,
                     t,
                     timestep_cond=w_embedding,
-                    encoder_hidden_states=prompt_embeds_list,
+                    encoder_hidden_states_list=prompt_embeds_list,
                     cross_attention_kwargs=self.cross_attention_kwargs,
                     added_cond_kwargs=added_cond_kwargs,
                     return_dict=False,

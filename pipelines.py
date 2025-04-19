@@ -660,7 +660,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         return positive,negative
     
     def get_trainable_layers(self)->tuple:
-        unet_parameters=[p for p in self.unet.named_parameters()]
+        unet_parameters=[p for p in self.unet.named_parameters() if p.requires_grad]
         other_parameters=[]
         if hasattr(self,"prompt_model"):
             other_parameters=[p for _,p in self.prompt_model.named_parameters()]
@@ -1320,10 +1320,12 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
     def get_trainable_layers(self):
         ret=[]
         if self.textual_inversion:
-            ret+=[p for _,p in self.sd_pipeline.text_encoder.named_parameters() if p.requires_grad]
+            text_params=[p for _,p in self.sd_pipeline.text_encoder.named_parameters() if p.requires_grad]
+            print("len text parpams",len(text_params))
+            ret+=text_params
         unet_parameters,other_parameters=self.sd_pipeline.get_trainable_layers()
         if len(self.keywords)==0:
-            return [p for _,p in unet_parameters]
+            return [p for _,p in unet_parameters if p.requires_grad]
         for key in self.keywords:
             for name,p in unet_parameters:
                 if name.find(key)!=-1 and p.requires_grad:

@@ -660,7 +660,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         return positive,negative
     
     def get_trainable_layers(self)->tuple:
-        unet_parameters=[p for p in self.unet.named_parameters() if p.requires_grad]
+        unet_parameters=[p for p in self.unet.named_parameters() if p[0].requires_grad]
         other_parameters=[]
         if hasattr(self,"prompt_model"):
             other_parameters=[p for _,p in self.prompt_model.named_parameters()]

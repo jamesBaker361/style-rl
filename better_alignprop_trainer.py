@@ -99,7 +99,7 @@ class BetterAlignPropTrainer(AlignPropTrainer):
         sample_neg_prompt_embeds = self.neg_prompt_embed.repeat(batch_size, 1, 1)
 
         if prompts is None:
-            prompts, prompt_metadata = zip(*[self.prompt_fn() for _ in range(batch_size)])
+            prompts = [self.prompt_fn() for _ in range(batch_size)]
         else:
             prompt_metadata = [{} for _ in range(batch_size)]
 
@@ -141,6 +141,6 @@ class BetterAlignPropTrainer(AlignPropTrainer):
 
         prompt_image_pairs["images"] = images
         prompt_image_pairs["prompts"] = prompts
-        prompt_image_pairs["prompt_metadata"] = prompt_metadata
+        prompt_image_pairs["prompt_metadata"] = {}
 
         return prompt_image_pairs

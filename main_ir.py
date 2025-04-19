@@ -323,14 +323,14 @@ def main(args):
             if args.use_pplus:
                 sd_pipeline.register_new_tokens(layer_agnostic_tokens)
 
-        def prompt_fn()->tuple[str,Any]:
+        def prompt_fn()->str:
             if len(prompt_list)>0:
                 prompt= random.choice(prompt_list)
 
             prompt= args.prompt
             if args.textual_inversion:
                 prompt+=" ".join(layer_agnostic_tokens)
-            return prompt,{}
+            return prompt
 
         style_cache=[]
         accelerator.free_memory()
@@ -420,7 +420,7 @@ def main(args):
     ir_model.to(torch.float32)
     with torch.no_grad():
         for _ in range(args.n_evaluation):
-            prompt,_=prompt_fn()
+            prompt=prompt_fn()
             for token in placeholder_tokens:
                 prompt=prompt.replace(token,"")
             image=sd_pipeline(prompt=prompt, num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]

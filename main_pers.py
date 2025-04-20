@@ -23,6 +23,8 @@ parser.add_argument("--epochs",type=int,default=1)
 parser.add_argument("--embedding",type=str,default="dino")
 parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--data_dir",type=str,default="data_dir")
+parser.add_argument("--save_data_npz",action="store_true")
+parser.add_argument("--load_data_npz",action="store_true")
 
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
@@ -33,7 +35,7 @@ def main(args):
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
-    data=load_dataset(args.dataset,split="train")
+    raw_data=load_dataset(args.dataset,split="train")
 
     os.makedirs(args.data_dir,exist_ok=True)
 
@@ -53,12 +55,21 @@ def main(args):
             embedding=dino_vit_features.view(batch_size,-1)
         return embedding
     
-    def trans(pil_image:Image.Image):
+    def transform_image(pil_image:Image.Image):
         if args.embedding=="dino":
             t=transforms.Compose(
                 [transforms.ToTensor(),transforms.Normalize(dino_vit_extractor.mean,dino_vit_extractor.std)]
             )
         return t(pil_image)
+    
+    embedding_list=[]
+    text_list=[]
+    for row in raw_data:
+        image=row["image"]
+        text=row["text"]
+        embedding_list.append(embed_img_tensor(transform_image(image)))
+        text_list.append(text)
+
 
 
 

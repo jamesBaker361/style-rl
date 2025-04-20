@@ -295,11 +295,11 @@ def main(args):
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
             new_prompts=[]
             for prompt in prompts:
-                print(f"prompt before: {prompt}")
+                #print(f"prompt before: {prompt}")
                 for token in placeholder_tokens:
                     prompt=prompt.replace(token,"")
                 new_prompts.append(prompt)
-                print(f"prompt after {prompt}")
+                #print(f"prompt after {prompt}")
             prompts=new_prompts
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)
@@ -343,14 +343,17 @@ def main(args):
             evaluation_images=[]
             score_list=[]
             #ir_model.to(torch.float32)
+            prompt_list=[]
             with torch.no_grad():
-                for _ in range(args.n_evaluation):
+                for k in range(args.n_evaluation):
                     prompt=prompt_fn()
-                    for token in placeholder_tokens:
-                        prompt=prompt.replace(token,"")
                     image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
+                    
+                    for token in placeholder_tokens:
+                        prompt=prompt.replace(token,"")
                     score_list.append(ir_model.score(prompt,image))
+                    prompt_list.append(prompt)
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)
                     prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
@@ -358,7 +361,7 @@ def main(args):
                                                             F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)]
                     score_list=[s.detach().cpu().numpy().item() for s in score_list]'''
-            return evaluation_images,score_list
+            return evaluation_images,score_list,prompt_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)
@@ -378,18 +381,20 @@ def main(args):
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
                 if e%args.validation_epochs==0:
-                    evaluation_images,score_list=get_images_and_scores()
+                    evaluation_images,score_list,prompt_list=get_images_and_scores()
                     metrics={"score":np.mean(score_list)}
                     accelerator.log(metrics)
-                    for i,image in enumerate(evaluation_images):
-                        accelerator.log({f"evaluation_{i}":wandb.Image(image)})
+                    for image,prompt in zip(evaluation_images, prompt_list):
+                        accelerator.log({prompt: wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
             end=time.time()
         print(f"all epochs elapsed {end-total_start} total steps= {args.epochs} * {args.num_inference_steps} *{args.batch_size}={args.epochs*args.num_inference_steps*args.batch_size}")
         sd_pipeline.unet.requires_grad_(False)
     
-    evaluation_images,score_list=get_images_and_scores()
+    evaluation_images,score_list,prompt_list=get_images_and_scores()
+    for image,prompt in zip(evaluation_images, prompt_list):
+        accelerator.log({prompt: wandb.Image(image)})
     for image in evaluation_images:
         accelerator.log({f"final_evaluation":wandb.Image(image)})
     for _style_image in style_cache:

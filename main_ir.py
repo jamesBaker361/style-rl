@@ -385,7 +385,7 @@ def main(args):
                     metrics={"score":np.mean(score_list)}
                     accelerator.log(metrics)
                     for image,prompt in zip(evaluation_images, prompt_list):
-                        accelerator.log({prompt: wandb.Image(image)})
+                        accelerator.log({prompt.strip(): wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
             end=time.time()
@@ -394,7 +394,7 @@ def main(args):
     
     evaluation_images,score_list,prompt_list=get_images_and_scores()
     for image,prompt in zip(evaluation_images, prompt_list):
-        accelerator.log({prompt: wandb.Image(image)})
+        accelerator.log({prompt.strip(): wandb.Image(image)})
     for image in evaluation_images:
         accelerator.log({f"final_evaluation":wandb.Image(image)})
     for _style_image in style_cache:

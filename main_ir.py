@@ -159,8 +159,8 @@ def main(args):
             clipfiqa_normalize=transforms.Normalize([0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711])
             clip_model = "/scratch/jlb638/weights/RN50.pt"
             clip_weights = "/scratch/jlb638/weights/CLIB-FIQA_R50.pth"
-            '''net, _ = clip.load(clip_model, device=accelerator.device, jit=False)
-            clipfiqa_model = load_net_param(net, clip_weights)'''
+            net, _ = load(clip_model, device=accelerator.device, jit=False)
+            clipfiqa_model = load_net_param(net, clip_weights)
 
 
 

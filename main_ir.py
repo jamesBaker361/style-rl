@@ -339,14 +339,14 @@ def main(args):
                 style_ddpo_pipeline,
                 get_image_logger(STYLE_LORA,accelerator)
             )
-        def get_images_and_scores():  
+        def get_images_and_scores(n_evaluation:int):  
             #with torch.autocast(accelerator.device,False):  
             evaluation_images=[]
             score_list=[]
             #ir_model.to(torch.float32)
             prompt_list=[]
             with torch.no_grad():
-                for k in range(args.n_evaluation):
+                for k in range(n_evaluation):
                     prompt=prompt_fn()
                     image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
@@ -383,7 +383,7 @@ def main(args):
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
                 if e%args.validation_epochs==0:
-                    evaluation_images,score_list,prompt_list=get_images_and_scores()
+                    evaluation_images,score_list,prompt_list=get_images_and_scores(args.n_evaluation)
                     metrics={"score":np.mean(score_list)}
                     accelerator.log(metrics)
                     #print("promtpt list",prompt_list)
@@ -395,7 +395,7 @@ def main(args):
         print(f"all epochs elapsed {end-total_start} total steps= {args.epochs} * {args.num_inference_steps} *{args.batch_size}={args.epochs*args.num_inference_steps*args.batch_size}")
         sd_pipeline.unet.requires_grad_(False)
     
-    evaluation_images,score_list,prompt_list=get_images_and_scores()
+    evaluation_images,score_list,prompt_list=get_images_and_scores(50)
     for image,prompt in zip(evaluation_images, prompt_list):
         accelerator.log({prompt.strip(): wandb.Image(image)})
     for image in evaluation_images:

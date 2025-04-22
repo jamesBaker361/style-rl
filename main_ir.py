@@ -28,9 +28,8 @@ from gpu_helpers import *
 import ImageReward as image_reward
 import random
 from worse_peft import apply_lora
-#from clipfiqa.model import clip
-#from clipfiqa.model.models import convert_weights
-#from clipfiqa.utilities import load_net_param
+from clipfiqa_utils import load,load_net_param
+from clipfiqa_models import convert_weights
 import pyiqa
 
 parser=argparse.ArgumentParser()

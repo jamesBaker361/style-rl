@@ -361,7 +361,7 @@ def main(args):
                         image=transforms.ToTensor()(image)
                         image=qualiclip_normalize(image).unsqueeze(0)
                         image=image.to(accelerator.device,torch_dtype)
-                        print("image",image.dtype,image.device)
+                        #print("image",image.dtype,image.device)
                         score_list.append(qualiclip_model(image))
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)
@@ -391,7 +391,10 @@ def main(args):
                 print(f"\t epoch {e} elapsed {end-start}")
                 if e%args.validation_epochs==0:
                     evaluation_images,score_list,prompt_list=get_images_and_scores(args.n_evaluation)
-                    metrics={"score":np.mean(score_list)}
+                    try:
+                        metrics={"score":np.mean(score_list)}
+                    except TypeError:
+                        metrics={"score":np.mean([s.cpu() for s in score_list])}
                     accelerator.log(metrics)
                     #print("promtpt list",prompt_list)
                     for image,prompt in zip(evaluation_images, prompt_list):
@@ -416,7 +419,11 @@ def main(args):
     for thing in things_to_free:
         accelerator.free_memory(thing)
     torch.cuda.empty_cache()
-    metrics={"score":np.mean(score_list),"final_score":np.mean(score_list)}
+    try:
+        metrics={"score":np.mean(score_list),"final_score":np.mean(score_list)}
+    except TypeError:
+        score_list=[s.cpu() for s in score_list]
+        metrics={"score":np.mean(score_list),"final_score":np.mean(score_list)}
     accelerator.log(metrics)
     print(metrics)
         

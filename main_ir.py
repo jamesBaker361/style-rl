@@ -52,7 +52,7 @@ parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
-parser.add_argument("--reward_fn",type=str,default="ir")
+parser.add_argument("--reward_fn",type=str,default="ir",help="ir or qualiclip")
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
@@ -143,12 +143,14 @@ def main(args):
             with open(args.prompt_src_txt, "r") as f:
                 prompt_list = [line.strip() for line in f]
         
-        
-        ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
-        ir_model.to(torch_dtype)
-
-
-        ir_model=accelerator.prepare(ir_model)
+        if args.reward_fn=="ir":
+            ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
+            ir_model.to(torch_dtype)
+            ir_model=accelerator.prepare(ir_model)
+        elif args.reward_fn=="qualiclip":
+            qualiclip_model=pyiqa.create_metric("qualiclip",device=accelerator.device)
+            qualiclip_model.to(torch_dtype)
+            qualiclip_model=accelerator.prepare(qualiclip_model)
 
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
@@ -294,14 +296,17 @@ def main(args):
                 new_prompts.append(prompt)
                 #print(f"reward fn prompt after {prompt}")
             prompts=new_prompts
-            text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
-            prompt_ids_list=text_input.input_ids.to(accelerator.device)
-            prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
+            
             #print('prompt_attention_mask_list.size()',prompt_attention_mask_list.size())
             if args.reward_fn=="ir":
+                text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
+                prompt_ids_list=text_input.input_ids.to(accelerator.device)
+                prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
                 ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
                                                             F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
+            elif args.reward_fn=="qualiclip":
+                ret=torch.stack([qualiclip_model(images.unsqueeze(0)) for images in images])
             return ret,{}
         
         style_keywords=[STYLE_LORA]
@@ -349,6 +354,8 @@ def main(args):
                     if args.reward_fn=="ir":
                         score_list.append(ir_model.score(prompt,image))
                         prompt_list.append(prompt)
+                    elif args.reward_fn=="qualiclip":
+                        score_list.append(qualiclip_model(image))
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)
                     prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)

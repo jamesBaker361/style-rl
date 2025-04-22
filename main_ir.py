@@ -361,6 +361,7 @@ def main(args):
                         image=transforms.ToTensor()(image)
                         image=qualiclip_normalize(image).unsqueeze(0)
                         image=image.to(accelerator.device,torch_dtype)
+                        print("image",image.dtype,image.device)
                         score_list.append(qualiclip_model(image))
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)

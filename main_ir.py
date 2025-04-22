@@ -359,7 +359,7 @@ def main(args):
                     elif args.reward_fn=="qualiclip":
                         image=image.resize((224,224))
                         image=transforms.ToTensor()(image)
-                        image=qualiclip_normalize(image)
+                        image=qualiclip_normalize(image).unsqueeze(0)
                         score_list.append(qualiclip_model(image))
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)

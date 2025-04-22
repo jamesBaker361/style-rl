@@ -148,6 +148,7 @@ def main(args):
             ir_model.to(torch_dtype)
             ir_model=accelerator.prepare(ir_model)
         elif args.reward_fn=="qualiclip":
+            qualiclip_normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711])
             qualiclip_model=torch.hub.load(repo_or_dir="miccunifi/QualiCLIP", source="github", model="QualiCLIP")
             qualiclip_model.to(torch_dtype)
             qualiclip_model=accelerator.prepare(qualiclip_model)
@@ -306,7 +307,7 @@ def main(args):
                                                             F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             elif args.reward_fn=="qualiclip":
-                ret=torch.stack([qualiclip_model(F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])
+                ret=torch.stack([qualiclip_model(F.interpolate(qualiclip_normalize(image).unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])
             return ret,{}
         
         style_keywords=[STYLE_LORA]

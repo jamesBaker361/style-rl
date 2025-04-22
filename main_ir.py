@@ -148,7 +148,7 @@ def main(args):
             ir_model.to(torch_dtype)
             ir_model=accelerator.prepare(ir_model)
         elif args.reward_fn=="qualiclip":
-            qualiclip_model=pyiqa.create_metric("qualiclip",device=accelerator.device)
+            qualiclip_model=torch.hub.load(repo_or_dir="miccunifi/QualiCLIP", source="github", model="QualiCLIP")
             qualiclip_model.to(torch_dtype)
             qualiclip_model=accelerator.prepare(qualiclip_model)
 
@@ -306,7 +306,7 @@ def main(args):
                                                             F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             elif args.reward_fn=="qualiclip":
-                ret=torch.stack([qualiclip_model(images.unsqueeze(0)) for images in images])
+                ret=torch.stack([qualiclip_model(F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])
             return ret,{}
         
         style_keywords=[STYLE_LORA]

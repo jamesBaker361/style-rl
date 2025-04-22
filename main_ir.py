@@ -276,7 +276,7 @@ def main(args):
             prompt+=" "
             if args.textual_inversion:
                 prompt+=" ".join(layer_agnostic_tokens)
-            print("prompt fn returns ",prompt)
+            #print("prompt fn returns ",prompt)
             return prompt
 
         style_cache=[]

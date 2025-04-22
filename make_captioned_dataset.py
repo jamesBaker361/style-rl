@@ -42,6 +42,12 @@ def main(args):
         img_list.append(img)
         text_list.append(text)
 
+        if i%100==1:
+            Dataset.from_dict({
+                "image":img_list,
+                "text":text_list
+            }).push_to_hub(args.dest_dataset)
+
 
 
     Dataset.from_dict({

@@ -28,6 +28,9 @@ from gpu_helpers import *
 import ImageReward as image_reward
 import random
 from worse_peft import apply_lora
+from clipfiqa.model import clip
+from clipfiqa.model.models import convert_weights
+from clipfiqa.utilities import load_net_param
 import pyiqa
 
 parser=argparse.ArgumentParser()
@@ -52,7 +55,7 @@ parser.add_argument("--n_evaluation",type=int,default=10)
 parser.add_argument("--style_layers",nargs="*",type=int)
 parser.add_argument("--hook_based",action="store_true")
 parser.add_argument("--learning_rate",type=float,default=1e-3)
-parser.add_argument("--reward_fn",type=str,default="ir",help="ir or qualiclip")
+parser.add_argument("--reward_fn",type=str,default="ir",help="ir or qualiclip or clipfiqa")
 parser.add_argument("--guidance_scale",type=float,default=5.0)
 parser.add_argument("--train_whole_model",action="store_true",help="dont use lora")
 parser.add_argument("--pretrained_type",type=str,default="consistency",help="consistency or stable")
@@ -153,6 +156,13 @@ def main(args):
             qualiclip_model=torch.hub.load(repo_or_dir="miccunifi/QualiCLIP", source="github", model="QualiCLIP")
             qualiclip_model.to(torch_dtype)
             qualiclip_model=accelerator.prepare(qualiclip_model)
+        elif args.reward_fn=="clipfiqa":
+            clipfiqa_normalize=transforms.Normalize([0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711])
+            clip_model = "/scratch/jlb638/weights/RN50.pt"
+            clip_weights = "/scratch/jlb638/weights/CLIB-FIQA_R50.pth"
+            net, _ = clip.load(clip_model, device=accelerator.device, jit=False)
+            clipfiqa_model = load_net_param(net, clip_weights)
+
 
 
         # Can be set to 1~50 steps. LCM support fast inference even <= 4 steps. Recommend: 1~8 steps.
@@ -343,7 +353,7 @@ def main(args):
             evaluation_images=[]
             score_list=[]
             #ir_model.to(torch.float32)
-            prompt_list=[]
+            gen_prompt_list=[]
             with torch.no_grad():
                 for k in range(n_evaluation):
                     prompt=prompt_fn()
@@ -355,7 +365,7 @@ def main(args):
                     #print("evaluation after",prompt)
                     if args.reward_fn=="ir":
                         score_list.append(ir_model.score(prompt,image))
-                        prompt_list.append(prompt)
+                        gen_prompt_list.append(prompt)
                     elif args.reward_fn=="qualiclip":
                         image=image.resize((224,224))
                         image=transforms.ToTensor()(image)
@@ -363,7 +373,8 @@ def main(args):
                         image=image.to(accelerator.device,torch_dtype)
                         #print("image",image.dtype,image.device)
                         score_list.append(qualiclip_model(image))
-            return evaluation_images,score_list,prompt_list
+                        gen_prompt_list.append(prompt)
+            return evaluation_images,score_list,gen_prompt_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)
@@ -383,14 +394,14 @@ def main(args):
                 end=time.time()
                 print(f"\t epoch {e} elapsed {end-start}")
                 if e%args.validation_epochs==0:
-                    evaluation_images,score_list,prompt_list=get_images_and_scores(args.n_evaluation)
+                    evaluation_images,score_list,gen_prompt_list=get_images_and_scores(args.n_evaluation)
                     try:
                         metrics={"score":np.mean(score_list)}
                     except TypeError:
                         metrics={"score":np.mean([s.cpu() for s in score_list])}
                     accelerator.log(metrics)
                     #print("promtpt list",prompt_list)
-                    for image,prompt in zip(evaluation_images, prompt_list):
+                    for image,prompt in zip(evaluation_images, gen_prompt_list):
                         accelerator.log({prompt.strip(): wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:
             print(f"FAILED after {e} epochs")
@@ -398,8 +409,8 @@ def main(args):
         print(f"all epochs elapsed {end-total_start} total steps= {args.epochs} * {args.num_inference_steps} *{args.batch_size}={args.epochs*args.num_inference_steps*args.batch_size}")
         sd_pipeline.unet.requires_grad_(False)
     
-    evaluation_images,score_list,prompt_list=get_images_and_scores(50)
-    for image,prompt in zip(evaluation_images, prompt_list):
+    evaluation_images,score_list,gen_prompt_list=get_images_and_scores(50)
+    for image,prompt in zip(evaluation_images, gen_prompt_list):
         accelerator.log({prompt.strip(): wandb.Image(image)})
     for image in evaluation_images:
         accelerator.log({f"final_evaluation":wandb.Image(image)})

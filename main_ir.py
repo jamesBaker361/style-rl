@@ -363,13 +363,6 @@ def main(args):
                         image=image.to(accelerator.device,torch_dtype)
                         #print("image",image.dtype,image.device)
                         score_list.append(qualiclip_model(image))
-                    '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
-                    prompt_ids_list=text_input.input_ids.to(accelerator.device)
-                    prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
-                    score_list=[ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
-                                                            F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
-                                                            ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)]
-                    score_list=[s.detach().cpu().numpy().item() for s in score_list]'''
             return evaluation_images,score_list,prompt_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:

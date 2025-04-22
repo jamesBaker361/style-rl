@@ -3,7 +3,7 @@ for lr in [0.001,0.0001]:
     for unet in ["no-unet","unet"]:
         for pplus in ["no-pplus","pplus"]:
             for num_vectors in [1]:
-                for reward_fn in ["ir","qualiclip"]:
+                for reward_fn in ["qualiclip"]:
                     name=f"ti_{reward_fn}_{lr}_{unet}_{pplus}_{num_vectors}"
                     unet_flag={
                         "no-unet":"",

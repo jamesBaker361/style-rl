@@ -354,8 +354,9 @@ def main(args):
                     for token in placeholder_tokens+layer_agnostic_tokens:
                         prompt=prompt.replace(token,"")
                     #print("evaluation after",prompt)
-                    score_list.append(ir_model.score(prompt,image))
-                    prompt_list.append(prompt)
+                    if args.reward_fn=="ir":
+                        score_list.append(ir_model.score(prompt,image))
+                        prompt_list.append(prompt)
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
                     prompt_ids_list=text_input.input_ids.to(accelerator.device)
                     prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)

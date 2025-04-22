@@ -24,19 +24,11 @@ from trl import DDPOConfig
 import wandb
 from worse_peft import apply_lora
 import torch.nn.functional as F
-from torchvision import models
-from statics import unformatted_prompt_list
-from facenet_pytorch import MTCNN, InceptionResnetV1
-from better_mtcnn import BetterMTCNN
-from typing import Union
-from diffusers.models.embeddings import ImageProjection
-from extractor import ViTExtractor
-from dift_sd import SDFeaturizer
-from image_projection import PromptImageProjection
 from gpu_helpers import *
 import ImageReward as image_reward
 import random
 from worse_peft import apply_lora
+import pyiqa
 
 parser=argparse.ArgumentParser()
 

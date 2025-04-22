@@ -30,45 +30,27 @@ parser.add_argument("--save_data_npz",action="store_true")
 parser.add_argument("--load_data_npz",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--pipeline",type=str,default="lcm")
+parser.add_argument("--batch_size",type=int,default=8)
 
 import torch
 import torch.nn.functional as F
 
-def make_batches(tensor_list, batch_size, pad_value=0):
+def make_batches_same_size(tensor_list, batch_size):
     """
-    Splits a list of tensors into batches, padding them to the same shape within each batch.
+    Splits a list of equally‑sized tensors into batches.
 
     Args:
-        tensor_list (List[torch.Tensor]): List of tensors to batch. Each tensor can have different shapes.
+        tensor_list (List[torch.Tensor]): List of tensors, all with identical shape.
         batch_size (int): Desired batch size.
-        pad_value (int, float): Value to use for padding shorter tensors.
 
     Returns:
-        List[torch.Tensor]: List of batched tensors, each of shape (batch_size, *max_shape).
+        List[torch.Tensor]: List of batched tensors, each of shape (batch_size, *tensor_shape).
     """
     batches = []
     for i in range(0, len(tensor_list), batch_size):
-        batch = tensor_list[i:i+batch_size]
-        # Determine max shape in this batch
-        max_shape = list(batch[0].shape)
-        for tensor in batch[1:]:
-            for dim, size in enumerate(tensor.shape):
-                max_shape[dim] = max(max_shape[dim], size)
-
-        # Create padded batch
-        padded = []
-        for tensor in batch:
-            # Compute pad widths for F.pad, in reverse order: (pad_last_dim_left, pad_last_dim_right, pad_second_last_left, ...)
-            pad_sizes = []
-            for size, max_size in zip(tensor.shape[::-1], max_shape[::-1]):
-                pad_sizes.extend([0, max_size - size])
-            padded_tensor = F.pad(tensor, pad_sizes, value=pad_value)
-            padded.append(padded_tensor)
-
-        # Stack into a single tensor
-        batched = torch.stack(padded, dim=0)
+        batch = tensor_list[i:i + batch_size]
+        batched = torch.stack(batch, dim=0)
         batches.append(batched)
-
     return batches
 
 
@@ -129,6 +111,8 @@ def main(args):
     print("embedding dim",embedding_dim)
 
     projection_layer=IPAdapterFullImageProjection(embedding_dim)
+
+    batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
 
     #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
     #multiple projection layers for different layers..?

@@ -296,11 +296,11 @@ def main(args):
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
             new_prompts=[]
             for prompt in prompts:
-                print(f"reward fn prompt before: {prompt}")
+                #print(f"reward fn prompt before: {prompt}")
                 for token in placeholder_tokens+layer_agnostic_tokens:
                     prompt=prompt.replace(token,"")
                 new_prompts.append(prompt)
-                print(f"reward fn prompt after {prompt}")
+                #print(f"reward fn prompt after {prompt}")
             prompts=new_prompts
             text_input=ir_model.blip.tokenizer(prompts, padding='max_length', truncation=True, max_length=35, return_tensors="pt")
             prompt_ids_list=text_input.input_ids.to(accelerator.device)
@@ -350,10 +350,10 @@ def main(args):
                     prompt=prompt_fn()
                     image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
-                    print("evaluation before",prompt)
+                    #print("evaluation before",prompt)
                     for token in placeholder_tokens+layer_agnostic_tokens:
                         prompt=prompt.replace(token,"")
-                    print("evaluation after",prompt)
+                    #print("evaluation after",prompt)
                     score_list.append(ir_model.score(prompt,image))
                     prompt_list.append(prompt)
                     '''text_input=ir_model.blip.tokenizer([prompt], padding='max_length', truncation=True, max_length=35, return_tensors="pt")
@@ -386,7 +386,7 @@ def main(args):
                     evaluation_images,score_list,prompt_list=get_images_and_scores()
                     metrics={"score":np.mean(score_list)}
                     accelerator.log(metrics)
-                    print("promtpt list",prompt_list)
+                    #print("promtpt list",prompt_list)
                     for image,prompt in zip(evaluation_images, prompt_list):
                         accelerator.log({prompt.strip(): wandb.Image(image)})
         except  torch.cuda.OutOfMemoryError:

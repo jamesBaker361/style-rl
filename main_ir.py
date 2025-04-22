@@ -297,7 +297,7 @@ def main(args):
             new_prompts=[]
             for prompt in prompts:
                 print(f"reward fn prompt before: {prompt}")
-                for token in placeholder_tokens:
+                for token in placeholder_tokens+layer_agnostic_tokens:
                     prompt=prompt.replace(token,"")
                 new_prompts.append(prompt)
                 print(f"reward fn prompt after {prompt}")
@@ -351,7 +351,7 @@ def main(args):
                     image=sd_pipeline(prompt=[prompt], num_inference_steps=num_inference_steps, guidance_scale=args.guidance_scale,height=args.image_size,width=args.image_size).images[0]
                     evaluation_images.append(image)
                     print("evaluation before",prompt)
-                    for token in placeholder_tokens:
+                    for token in placeholder_tokens+layer_agnostic_tokens:
                         prompt=prompt.replace(token,"")
                     print("evaluation after",prompt)
                     score_list.append(ir_model.score(prompt,image))

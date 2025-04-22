@@ -409,7 +409,7 @@ def main(args):
     for thing in things_to_free:
         accelerator.free_memory(thing)
     torch.cuda.empty_cache()
-    metrics={"score":np.mean(score_list)}
+    metrics={"score":np.mean(score_list),"final_score":np.mean(score_list)}
     accelerator.log(metrics)
     print(metrics)
         

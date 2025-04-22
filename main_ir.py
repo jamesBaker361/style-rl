@@ -144,6 +144,7 @@ def main(args):
                 prompt_list = [line.strip() for line in f]
         
         if args.reward_fn=="ir":
+            ir_normalize=transforms.Normalize(0.16717362830052426,1.0333394966054072)
             ir_model=image_reward.load("ImageReward-v1.0",device=accelerator.device)
             ir_model.to(torch_dtype)
             ir_model=accelerator.prepare(ir_model)
@@ -304,7 +305,7 @@ def main(args):
                 prompt_ids_list=text_input.input_ids.to(accelerator.device)
                 prompt_attention_mask_list=text_input.attention_mask.to(accelerator.device)
                 ret=torch.stack([ ir_model.score_gard(prompt_ids.unsqueeze(0),prompt_attention_mask.unsqueeze(0),
-                                                            F.interpolate(image.unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
+                                                            F.interpolate(ir_normalize(image).unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             elif args.reward_fn=="qualiclip":
                 ret=torch.stack([qualiclip_model(F.interpolate(qualiclip_normalize(image).unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])

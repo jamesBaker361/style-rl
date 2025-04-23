@@ -121,6 +121,21 @@ def main(args):
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
         #todo: compatible SanaSprint
 
+    text_embedding_list=[]
+    for t in text_list:
+        text_embeds, _ = pipeline.encode_prompt(
+                text,
+                accelerator.device,
+                1,
+                pipeline.do_classifier_free_guidance,
+                negative_prompt=None,
+                prompt_embeds=None,
+                negative_prompt_embeds=None,
+            )
+        print('textembeds.size',text_embeds.size())
+
+    loss_buffer=[]
+
     
 
 

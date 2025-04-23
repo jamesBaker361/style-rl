@@ -13,7 +13,7 @@ from experiment_helpers.unsafe_stable_diffusion_pipeline import UnsafeStableDiff
 import time
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--src_dataset",type=str,default="timm/imagenet-22k-wds")
+parser.add_argument("--src_dataset",type=str,default="timm/imagenet-12k-wds")
 parser.add_argument("--dest_dataset",type=str,default="jlbaker361/imagenet-captioned")
 parser.add_argument("--image_key",type=str,default="jpg")
 parser.add_argument("--limit",type=int,default=-1)

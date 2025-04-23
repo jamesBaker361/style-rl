@@ -904,6 +904,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                 generator,
                 latents,
             )
+            print('latents size',latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 
         latents.requires_grad_(True)

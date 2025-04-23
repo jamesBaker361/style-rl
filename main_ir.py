@@ -8,7 +8,7 @@ from transformers import CLIPProcessor, CLIPModel,ViTImageProcessor, ViTModel,CL
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,AlignPropConfig,AlignPropTrainer
-from better_alignprop_trainer import BetterAlignPropTrainer
+from better_alignprop_trainer import BetterAlignPropTrainer,register_mono_stat_tracker
 from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img import retrieve_timesteps
 from datasets import load_dataset
 import string
@@ -396,6 +396,7 @@ def main(args):
             sd_pipeline.unet=apply_lora(sd_pipeline.unet,style_layers,[0],args.style_mid_block,keyword=STYLE_LORA)
         
         style_ddpo_pipeline=KeywordDDPOStableDiffusionPipeline(sd_pipeline,style_keywords,textual_inversion=args.textual_inversion)
+        
         print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
         sd_pipeline.unet.to(accelerator.device)
         kwargs={}
@@ -409,6 +410,7 @@ def main(args):
                 style_ddpo_pipeline,
                 get_image_logger_align(STYLE_LORA,accelerator,style_cache)
                 )
+            register_mono_stat_tracker(style_trainer)
         elif args.method=="ddpo":
             kwargs={"retain_graph":True}
             style_trainer=BetterDDPOTrainer(

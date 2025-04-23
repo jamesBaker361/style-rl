@@ -225,6 +225,10 @@ def main(args):
             sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
         if args.nemesis:
             nemesis_pipeline=deepcopy(sd_pipeline)
+            nemesis_pipeline.to(accelerator.device,torch_dtype)
+            nemesis_pipeline.vae.to(accelerator.device,torch_dtype)
+            nemesis_pipeline.unet.to(accelerator.device,torch_dtype)
+            nemesis_pipeline.text_encoder.to(accelerator.device,torch_dtype)
         if args.use_pplus:
             sd_pipeline=PPlusCompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
             sd_pipeline.to(device=accelerator.device,torch_dtype=torch_dtype)

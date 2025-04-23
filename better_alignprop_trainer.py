@@ -1,7 +1,30 @@
 from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,AlignPropConfig,AlignPropTrainer
+from trl.trainer.utils import PerPromptStatTracker
 import torch
 from collections import defaultdict
 from pipelines import PPlusCompatibleLatentConsistencyModelPipeline
+import numpy as np
+
+class MonoPerPromptStatTracker(PerPromptStatTracker):
+    def __init__(self, buffer_size, min_count):
+        super().__init__(buffer_size, min_count)
+        self.past_rewards=[]
+    def update(self, prompts, rewards):
+        std=np.std(self.past_rewards)
+        mean=np.mean(self.past_rewards)
+        for r in rewards:
+            self.past_rewards.append(r.cpu().detach().item())
+        if len(self.past_rewards)==self.buffer_size:
+            self.past_rewards=self.past_rewards[1:]
+        return([(r-mean)/std for r in rewards])
+
+        
+
+
+def register_mono_stat_tracker(trainer:AlignPropTrainer,per_prompt_stat_tracking_buffer_size,per_prompt_stat_tracking_min_count):
+    trainer.stat_tracker = MonoPerPromptStatTracker(
+                per_prompt_stat_tracking_buffer_size,
+                per_prompt_stat_tracking_min_count)
 
 class BetterAlignPropTrainer(AlignPropTrainer):
     def step(self, epoch: int, global_step: int):
@@ -31,6 +54,9 @@ class BetterAlignPropTrainer(AlignPropTrainer):
                 )
 
                 rewards = self.compute_rewards(prompt_image_pairs)
+
+                if hasattr(self,"stat_tracker"):
+                    rewards=self.stat_tracker.update(prompt_image_pairs["prompts"],rewards)
 
                 prompt_image_pairs["rewards"] = rewards
 

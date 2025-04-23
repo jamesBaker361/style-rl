@@ -360,7 +360,7 @@ def main(args):
                         truncated_backprop_rand=align_config.truncated_backprop_rand,
                         truncated_backprop_timestep=align_config.truncated_backprop_timestep,
                         truncated_rand_backprop_minmax=align_config.truncated_rand_backprop_minmax,
-                        output_type="pt",)
+                        output_type="pt",).images[0]
                 similarities=torch.stack([-F.mse_loss(nem,im) for nem,im in zip(nemesis_images,images)])
                 return ret +similarities,{}
                 

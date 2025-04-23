@@ -27,6 +27,13 @@ from diffusers.utils.outputs import BaseOutput
 from dataclasses import dataclass
 import PIL
 import numpy as np
+from copy import deepcopy
+
+def register_evil_twin(pipeline:DiffusionPipeline):
+    unet=pipeline.unet
+    pipeline.evil_twin_unet=deepcopy(unet)
+    pipeline.evil_twin_unet.to(unet.device,unet.dtype)
+    return pipeline.evil_twin_unet
 
 @dataclass
 class CustomStableDiffusionPipelineOutput(BaseOutput):

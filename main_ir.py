@@ -180,7 +180,7 @@ def main(args):
                             for b, o, p, e, l, q in product(blur_list, occ_list, pose_list, exp_list, ill_list, quality_list)])
         elif args.reward_fn=="dino":
             content_image=Image.open("lebrun.jpg")
-            dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
+            dino_vit_extractor=ViTExtractor("dino_vits8",device=accelerator.device)
             dino_vit_extractor.model.eval()
             dino_vit_extractor.model.requires_grad_(False)
             dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)

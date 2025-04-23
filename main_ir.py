@@ -327,7 +327,7 @@ def main(args):
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             return ret,{}
 
-        def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+        def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
             latents=prompt_metadata["latents"]
             new_prompts=[]
             for prompt in prompts:

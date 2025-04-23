@@ -1,6 +1,6 @@
 exclude=" --exclude=gpu[005,006,008,010-014,017,018],cuda[001-008],pascal[001-010] " 
 for lr in [0.001,0.01]:
-    for unet in ["no-unet"]:
+    for unet in ["unet"]:
         for pplus in ["no-pplus"]:
             for num_vectors in [1]:
                 for reward_fn in ["qualiclip","ir"]:
@@ -9,7 +9,7 @@ for lr in [0.001,0.01]:
                         name=f"ti_evil_twin_{prompt_src}_{reward_fn}_{lr}_{unet}_{pplus}_{num_vectors}"
                         unet_flag={
                             "no-unet":"",
-                            "unet":"--train_unet"
+                            "unet":"--train_unet --style_layers 0 1 2 3 "
                         }[unet]
                         pplus_flag={
                             "no-pplus":"",

@@ -214,7 +214,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     return_dict=False,
                 )[0]
                 if hasattr(self,"evil_twin_unet"):
-                    print("evil twin >:)")
+                    #print("evil twin >:)")
                     evil_twin_model_pred=self.evil_twin_unet(
                         latents,
                         t,
@@ -756,7 +756,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                     return_dict=False,
                 )[0]
                 if hasattr(self,"evil_twin_unet"):
-                    print("evil twin >:)")
+                    #print("evil twin >:)")
                     evil_twin_model_pred=self.evil_twin_unet(
                         latents,
                         t,

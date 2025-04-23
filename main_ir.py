@@ -32,6 +32,7 @@ from clipfiqa_utils import load,load_net_param,tokenize
 from clipfiqa_models import convert_weights
 from itertools import product
 import pyiqa
+from copy import deepcopy
 
 parser=argparse.ArgumentParser()
 
@@ -69,6 +70,7 @@ parser.add_argument("--initializer_token",type=str,default="pretty")
 parser.add_argument("--use_pplus",action="store_true")
 parser.add_argument("--validation_epochs",type=int,default=1)
 parser.add_argument("--train_unet",action="store_true")
+parser.add_argument("--nemesis",action="store_true")
 
 
 
@@ -204,6 +206,8 @@ def main(args):
             sd_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
         elif args.pretrained_type=="stable":
             sd_pipeline=StableDiffusionPipeline.from_pretrained("sd-legacy/stable-diffusion-v1-5",device=accelerator.device,torch_dtype=torch_dtype)
+        if args.nemesis:
+            nemesis_pipeline=deepcopy(sd_pipeline)
         if args.use_pplus:
             sd_pipeline=PPlusCompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
             sd_pipeline.to(device=accelerator.device,torch_dtype=torch_dtype)
@@ -225,6 +229,21 @@ def main(args):
 
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
+
+        if args.nemesis:
+            nemesis_pipeline.unet.requires_grad_(False)
+            nemesis_pipeline.vae.requires_grad_(False)
+            nemesis_pipeline.text_encoder.requires_grad_(False)
+            nemesis_pipeline.unet,nemesis_pipeline.vae,nemesis_pipeline.text_encoder=accelerator.prepare(nemesis_pipeline.unet,nemesis_pipeline.vae,nemesis_pipeline.text_encoder)
+            neg_prompt_embed = sd_pipeline.text_encoder(
+                sd_pipeline.tokenizer(
+                    [""] if align_config.negative_prompts is None else align_config.negative_prompts,
+                    return_tensors="pt",
+                    padding="max_length",
+                    truncation=True,
+                    max_length=sd_pipeline.tokenizer.model_max_length,
+                ).input_ids.to(accelerator.device)
+            )[0]
         layer_agnostic_tokens=[args.placeholder_token]
         if args.textual_inversion:
             sd_pipeline.text_encoder.to(accelerator.device).requires_grad_(True)
@@ -329,6 +348,19 @@ def main(args):
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             elif args.reward_fn=="qualiclip":
                 ret=torch.stack([qualiclip_model(F.interpolate(qualiclip_normalize(image).unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])
+            if args.nemesis:
+                batch_size=images.size()[0]
+                sample_neg_prompt_embeds = neg_prompt_embed.repeat(batch_size, 1, 1).to(accelerator.device,torch_dtype)
+                nemesis_image=nemesis_pipeline(prompt,latents=latents,
+                                               negative_prompt_embeds=sample_neg_prompt_embeds,
+                    num_inference_steps=align_config.sample_num_steps,
+                    guidance_scale=align_config.sample_guidance_scale,
+                    eta=align_config.sample_eta,
+                    truncated_backprop_rand=align_config.truncated_backprop_rand,
+                    truncated_backprop_timestep=align_config.truncated_backprop_timestep,
+                    truncated_rand_backprop_minmax=align_config.truncated_rand_backprop_minmax,
+                    output_type="pt",)
+                
             return ret,{}
         
         style_keywords=[STYLE_LORA]

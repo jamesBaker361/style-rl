@@ -165,6 +165,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             generator,
             latents,
         )
+        print("compatiable latenst size",latents.size())
         bs = batch_size * num_images_per_prompt
 
         # 6. Get Guidance Scale Embedding
@@ -378,6 +379,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 generator,
                 latents,
             )
+            print("compatiable latenst size call with grad",latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 
         latents.requires_grad_(True)
@@ -691,6 +693,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             generator,
             latents,
         )
+        print("pplus call latensts size",latents.size())
         bs = batch_size * num_images_per_prompt
 
         # 6. Get Guidance Scale Embedding
@@ -904,7 +907,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                 generator,
                 latents,
             )
-            print('latents size',latents.size())
+            print('pplus call_with_grad latents size',latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 
         latents.requires_grad_(True)

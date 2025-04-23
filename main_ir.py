@@ -232,6 +232,7 @@ def main(args):
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
 
         if args.nemesis:
+            nemesis_pipeline.unet.config.sample_size=args.image_size // sd_pipeline.vae_scale_factor
             nemesis_pipeline.unet.requires_grad_(False)
             nemesis_pipeline.vae.requires_grad_(False)
             nemesis_pipeline.text_encoder.requires_grad_(False)

@@ -77,6 +77,9 @@ parser.add_argument("--nemesis_weight",type=float,default=1.0)
 parser.add_argument("--evil_twin",action="store_true")
 parser.add_argument("--evil_twin_guidance_scale",type=float,default=5.0)
 parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
+#per_prompt_stat_tracking_buffer_size' and 'per_prompt_stat_tracking_min_count'
+parser.add_argument("--per_prompt_stat_tracking_buffer_size",type=int,default=30)
+parser.add_argument("--per_prompt_stat_tracking_min_count",type=int,default=1)
 
 
 
@@ -400,26 +403,7 @@ def main(args):
         print("n trainable layers style",len(style_ddpo_pipeline.get_trainable_layers()))
         sd_pipeline.unet.to(accelerator.device)
         kwargs={}
-        
-        if args.method=="align":
-            
-            style_trainer=BetterAlignPropTrainer(
-                align_config,
-                style_reward_function_align,
-                prompt_fn,
-                style_ddpo_pipeline,
-                get_image_logger_align(STYLE_LORA,accelerator,style_cache)
-                )
-            register_mono_stat_tracker(style_trainer)
-        elif args.method=="ddpo":
-            kwargs={"retain_graph":True}
-            style_trainer=BetterDDPOTrainer(
-                ddpo_config,
-                style_reward_function,
-                prompt_fn,
-                style_ddpo_pipeline,
-                get_image_logger(STYLE_LORA,accelerator)
-            )
+
         def get_images_and_scores(n_evaluation:int):  
             #with torch.autocast(accelerator.device,False):  
             evaluation_images=[]
@@ -452,6 +436,28 @@ def main(args):
                         score_list.append(mse_reward_fn(features,dino_vit_features))
 
             return evaluation_images,score_list,gen_prompt_list
+        
+        if args.method=="align":
+            
+            style_trainer=BetterAlignPropTrainer(
+                align_config,
+                style_reward_function_align,
+                prompt_fn,
+                style_ddpo_pipeline,
+                get_image_logger_align(STYLE_LORA,accelerator,style_cache)
+                )
+            evaluation_images,score_list,gen_prompt_list=get_images_and_scores(args.per_prompt_stat_tracking_buffer_size)
+            register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,score_list)
+        elif args.method=="ddpo":
+            kwargs={"retain_graph":True}
+            style_trainer=BetterDDPOTrainer(
+                ddpo_config,
+                style_reward_function,
+                prompt_fn,
+                style_ddpo_pipeline,
+                get_image_logger(STYLE_LORA,accelerator)
+            )
+        
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:
             model.to(accelerator.device)

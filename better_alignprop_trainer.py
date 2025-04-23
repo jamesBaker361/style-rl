@@ -6,9 +6,9 @@ from pipelines import PPlusCompatibleLatentConsistencyModelPipeline
 import numpy as np
 
 class MonoPerPromptStatTracker(PerPromptStatTracker):
-    def __init__(self, buffer_size, min_count):
-        super().__init__(buffer_size, min_count)
-        self.past_rewards=[]
+    def __init__(self, buffer_size, past_rewards):
+        super().__init__(buffer_size, 1)
+        self.past_rewards=past_rewards
     def update(self, prompts, rewards):
         std=np.std(self.past_rewards)
         mean=np.mean(self.past_rewards)
@@ -17,14 +17,17 @@ class MonoPerPromptStatTracker(PerPromptStatTracker):
         if len(self.past_rewards)==self.buffer_size:
             self.past_rewards=self.past_rewards[1:]
         return([(r-mean)/std for r in rewards])
+    
+    def pre_fill(self,scores):
+        self.past_rewards=scores
 
         
 
 
-def register_mono_stat_tracker(trainer:AlignPropTrainer,per_prompt_stat_tracking_buffer_size,per_prompt_stat_tracking_min_count):
+def register_mono_stat_tracker(trainer:AlignPropTrainer,per_prompt_stat_tracking_buffer_size,score_list=[]):
     trainer.stat_tracker = MonoPerPromptStatTracker(
                 per_prompt_stat_tracking_buffer_size,
-                per_prompt_stat_tracking_min_count)
+                score_list)
 
 class BetterAlignPropTrainer(AlignPropTrainer):
     def step(self, epoch: int, global_step: int):

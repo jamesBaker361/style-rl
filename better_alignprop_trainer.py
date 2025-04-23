@@ -67,7 +67,7 @@ class BetterAlignPropTrainer(AlignPropTrainer):
             info = {k: torch.mean(torch.tensor(v)) for k, v in info.items()}
             info = self.accelerator.reduce(info, reduction="mean")
             info.update({"epoch": epoch})
-            self.accelerator.log(info, step=global_step)
+            self.accelerator.log(info)
             global_step += 1
             info = defaultdict(list)
         else:

@@ -432,6 +432,7 @@ def main(args):
                         score_list.append(qualiclip_model(image))
                     elif args.reward_fn=="dino":
                         image=dino_vit_extractor.preprocess_pil(image)
+                        image=image.to(accelerator.device,torch_dtype)
                         features=dino_vit_extractor.extract_descriptors(image,facet=args.facet)
                         score_list.append(mse_reward_fn(features,dino_vit_features))
 

@@ -33,6 +33,8 @@ from clipfiqa_models import convert_weights
 from itertools import product
 import pyiqa
 from copy import deepcopy
+from PIL import Image
+from extractor import ViTExtractor
 
 parser=argparse.ArgumentParser()
 
@@ -74,6 +76,7 @@ parser.add_argument("--nemesis",action="store_true")
 parser.add_argument("--nemesis_weight",type=float,default=1.0)
 parser.add_argument("--evil_twin",action="store_true")
 parser.add_argument("--evil_twin_guidance_scale",type=float,default=5.0)
+parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 
 
 
@@ -175,6 +178,14 @@ def main(args):
             ill_list = ['extreme lighting', 'normal lighting']
             joint_texts = torch.cat([tokenize(f"a photo of a {b}, {o}, and {p} face with {e} under {l}, which is of {q} quality") 
                             for b, o, p, e, l, q in product(blur_list, occ_list, pose_list, exp_list, ill_list, quality_list)])
+        elif args.reward_fn=="dino":
+            content_image=Image.open("lebrun.jpg")
+            dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
+            dino_vit_extractor.model.eval()
+            dino_vit_extractor.model.requires_grad_(False)
+            dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
+            dino_vit_features=dino_vit_extractor.extract_descriptors(dino_vit_prepocessed,facet=args.facet)
+            print("dino vit features",dino_vit_features.size())
 
 
 
@@ -229,7 +240,6 @@ def main(args):
         sd_pipeline.vae.requires_grad_(False)
         tokenizer=sd_pipeline.tokenizer
         text_encoder=sd_pipeline.text_encoder
-
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
 
@@ -358,6 +368,8 @@ def main(args):
                                                             ) for image,prompt_ids,prompt_attention_mask in zip(images,prompt_ids_list,prompt_attention_mask_list)])
             elif args.reward_fn=="qualiclip":
                 ret=torch.stack([qualiclip_model(F.interpolate(qualiclip_normalize(image).unsqueeze(0), size=(224, 224), mode='bilinear', align_corners=False)) for image in images])
+            elif args.reward_fn=="dino":
+                ret=torch.stack([mse_reward_fn(dino_vit_features,dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)) for image in images])
             if args.nemesis:
                 with torch.no_grad():
                     batch_size=images.size()[0]
@@ -421,9 +433,10 @@ def main(args):
                     for token in placeholder_tokens+layer_agnostic_tokens:
                         prompt=prompt.replace(token,"")
                     #print("evaluation after",prompt)
+                    gen_prompt_list.append(prompt)
                     if args.reward_fn=="ir":
                         score_list.append(ir_model.score(prompt,image))
-                        gen_prompt_list.append(prompt)
+                        
                     elif args.reward_fn=="qualiclip":
                         image=image.resize((224,224))
                         image=transforms.ToTensor()(image)
@@ -431,7 +444,11 @@ def main(args):
                         image=image.to(accelerator.device,torch_dtype)
                         #print("image",image.dtype,image.device)
                         score_list.append(qualiclip_model(image))
-                        gen_prompt_list.append(prompt)
+                    elif args.reward_fn=="dino":
+                        image=dino_vit_extractor.preprocess_pil(image)
+                        features=dino_vit_extractor.extract_descriptors(image.unsqueeze(0),facet=args.facet)
+                        score_list.append(mse_reward_fn(features,dino_vit_features))
+
             return evaluation_images,score_list,gen_prompt_list
         
         for model in [sd_pipeline,sd_pipeline.unet, sd_pipeline.vae,sd_pipeline.text_encoder]:

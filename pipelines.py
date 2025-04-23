@@ -29,10 +29,11 @@ import PIL
 import numpy as np
 from copy import deepcopy
 
-def register_evil_twin(pipeline:DiffusionPipeline):
+def register_evil_twin(pipeline:DiffusionPipeline,scale:float):
     unet=pipeline.unet
     pipeline.evil_twin_unet=deepcopy(unet)
     pipeline.evil_twin_unet.to(unet.device,unet.dtype)
+    pipeline.evile_twin_guidance_scale=scale
     return pipeline.evil_twin_unet
 
 @dataclass
@@ -212,7 +213,19 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     added_cond_kwargs=added_cond_kwargs,
                     return_dict=False,
                 )[0]
+                if hasattr(self,"evil_twin_unet"):
+                    print("evil twin >:)")
+                    evil_twin_model_pred=self.evil_twin_unet(
+                        latents,
+                        t,
+                        timestep_cond=w_embedding,
+                        encoder_hidden_states=prompt_embeds,
+                        cross_attention_kwargs=self.cross_attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        return_dict=False,
+                    )[0]
 
+                    model_pred=evil_twin_model_pred + self.evil_twin_guidance_scale* (model_pred-evil_twin_model_pred)
                 # compute the previous noisy sample x_t -> x_t-1
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
                 if callback_on_step_end is not None:
@@ -742,6 +755,19 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
                     added_cond_kwargs=added_cond_kwargs,
                     return_dict=False,
                 )[0]
+                if hasattr(self,"evil_twin_unet"):
+                    print("evil twin >:)")
+                    evil_twin_model_pred=self.evil_twin_unet(
+                        latents,
+                        t,
+                        timestep_cond=w_embedding,
+                        encoder_hidden_states=prompt_embeds,
+                        cross_attention_kwargs=self.cross_attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        return_dict=False,
+                    )[0]
+
+                    model_pred=evil_twin_model_pred + self.evil_twin_guidance_scale* (model_pred-evil_twin_model_pred)
 
                 # compute the previous noisy sample x_t -> x_t-1
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)

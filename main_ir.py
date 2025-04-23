@@ -16,7 +16,7 @@ import numpy as np
 import torch
 import time
 from PIL import Image,PngImagePlugin
-from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline,PPlusCompatibleLatentConsistencyModelPipeline
+from pipelines import KeywordDDPOStableDiffusionPipeline,CompatibleLatentConsistencyModelPipeline,PPlusCompatibleLatentConsistencyModelPipeline,register_evil_twin
 from typing import Any
 import torchvision.transforms as transforms
 from diffusers import StableDiffusionPipeline
@@ -72,6 +72,8 @@ parser.add_argument("--validation_epochs",type=int,default=1)
 parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--nemesis",action="store_true")
 parser.add_argument("--nemesis_weight",type=float,default=1.0)
+parser.add_argument("--evil_twin",action="store_true")
+parser.add_argument("--evil_twin_guidance_scale",type=float,default=5.0)
 
 
 
@@ -230,6 +232,12 @@ def main(args):
 
 
         sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae=accelerator.prepare(sd_pipeline.unet,sd_pipeline.text_encoder,sd_pipeline.vae)
+
+        if args.evil_twin:
+            evil_twin_unet=register_evil_twin(sd_pipeline,args.evil_twin_guidance_scale)
+            evil_twin_unet.requires_grad_(False)
+            evil_twin_unet=accelerator.prepare(evil_twin_unet)
+
 
         if args.nemesis:
             nemesis_pipeline.unet.config.sample_size=args.image_size // sd_pipeline.vae_scale_factor

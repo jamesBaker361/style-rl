@@ -16,7 +16,7 @@ class MonoPerPromptStatTracker(PerPromptStatTracker):
             self.past_rewards.append(r.cpu().detach().item())
         if len(self.past_rewards)==self.buffer_size:
             self.past_rewards=self.past_rewards[1:]
-        return([(r-mean)/std for r in rewards])
+        return (rewards-mean)/std
     
     def pre_fill(self,scores):
         self.past_rewards=scores

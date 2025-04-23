@@ -188,6 +188,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
+        latents_clone=latents.clone()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latents = latents.to(prompt_embeds.dtype)
@@ -245,7 +246,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         if not return_dict:
             return (image, has_nsfw_concept)
 
-        return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_clone)
     
 
     def call_with_grad(
@@ -391,6 +392,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
+        latents_copy=latents.clone()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latents = latents.to(prompt_embeds.dtype)
@@ -497,7 +499,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             return (image, has_nsfw_concept)
 
         #print("called with grad",len(find_cuda_objects()))
-        return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)
     
 
     def _encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
@@ -712,6 +714,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
+        latents_clone=latents.clone()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latents = latents.to(self.unet.dtype)
@@ -769,7 +772,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         if not return_dict:
             return (image, has_nsfw_concept)
 
-        return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_clone)
     
 
     def call_with_grad(
@@ -915,6 +918,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
+        latents_clone=latents.clone()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latents = latents.to(self.unet.dtype)
@@ -1021,7 +1025,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             return (image, has_nsfw_concept)
 
         #print("called with grad",len(find_cuda_objects()))
-        return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_clone)
 
 class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
     def __init__(self,sd_pipeline:CompatibleLatentConsistencyModelPipeline,keywords:set,use_lora:bool=False,output_type:str="pt",gradient_checkpoint: bool = True,textual_inversion:bool=False):

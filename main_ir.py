@@ -71,6 +71,7 @@ parser.add_argument("--use_pplus",action="store_true")
 parser.add_argument("--validation_epochs",type=int,default=1)
 parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--nemesis",action="store_true")
+parser.add_argument("--nemesis_weight",type=float,default=1.0)
 
 
 
@@ -361,7 +362,7 @@ def main(args):
                         truncated_backprop_timestep=align_config.truncated_backprop_timestep,
                         truncated_rand_backprop_minmax=align_config.truncated_rand_backprop_minmax,
                         output_type="pt",).images[0]
-                similarities=torch.stack([-F.mse_loss(nem,im) for nem,im in zip(nemesis_images,images)])
+                similarities=torch.stack([args.nemesis_weight* -F.mse_loss(nem,im) for nem,im in zip(nemesis_images,images)])
                 return ret +similarities,{}
                 
             return ret,{}

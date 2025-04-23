@@ -309,6 +309,7 @@ def main(args):
             return ret,{}
 
         def style_reward_function_align(images:torch.Tensor, prompts:tuple[str], metadata:tuple[Any],prompt_metadata:Any=None)-> tuple[torch.Tensor,Any]:
+            latents=prompt_metadata["latents"]
             new_prompts=[]
             for prompt in prompts:
                 #print(f"reward fn prompt before: {prompt}")

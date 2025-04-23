@@ -138,9 +138,10 @@ class BetterAlignPropTrainer(AlignPropTrainer):
             )
 
         images = sd_output.images
+        latents=sd_output.latents
 
         prompt_image_pairs["images"] = images
         prompt_image_pairs["prompts"] = prompts
-        prompt_image_pairs["prompt_metadata"] = {}
+        prompt_image_pairs["prompt_metadata"] = {"latents":latents}
 
         return prompt_image_pairs

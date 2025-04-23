@@ -21,6 +21,6 @@ for lr in [0.001,0.01]:
                         }[prompt_src]
                         command=f"sbatch -J {reward_fn}-{prompt_src}-ti --err=slurm/ti/{name}.err --out=slurm/ti/{name}.out"
                         command+=f" {exclude} runpygpu.sh main_ir.py  --epochs 10000  {unet_flag} {pplus_flag} --num_vectors {num_vectors}"
-                        command+=f"   --project_name {reward_fn} --textual_inversion --prompt_src_txt {src_text} "
+                        command+=f"   --project_name {reward_fn}_{prompt_src} --textual_inversion --prompt_src_txt {src_text} "
                         command+=f" --validation_epochs 40 --learning_rate {lr} --reward_fn {reward_fn} "
                         print(command)

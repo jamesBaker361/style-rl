@@ -173,7 +173,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             generator,
             latents,
         )
-        print("compatiable latenst size",latents.size())
+        #print("compatiable latenst size",latents.size())
         bs = batch_size * num_images_per_prompt
 
         # 6. Get Guidance Scale Embedding

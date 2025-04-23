@@ -1,6 +1,6 @@
 exclude=" --exclude=gpu[005,006,008,010-014,017,018],cuda[001-008],pascal[001-010] " 
 for lr in [0.001,0.01]:
-    for unet in ["no-unet","unet"]:
+    for unet in ["no-unet"]:
         for pplus in ["no-pplus"]:
             for num_vectors in [1]:
                 for reward_fn in ["qualiclip","ir"]:

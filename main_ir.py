@@ -351,7 +351,7 @@ def main(args):
             if args.nemesis:
                 batch_size=images.size()[0]
                 sample_neg_prompt_embeds = neg_prompt_embed.repeat(batch_size, 1, 1).to(accelerator.device,torch_dtype)
-                nemesis_image=nemesis_pipeline(prompt,latents=latents,
+                nemesis_images=nemesis_pipeline(prompt,latents=latents,
                                                negative_prompt_embeds=sample_neg_prompt_embeds,
                     num_inference_steps=align_config.sample_num_steps,
                     guidance_scale=align_config.sample_guidance_scale,
@@ -360,6 +360,8 @@ def main(args):
                     truncated_backprop_timestep=align_config.truncated_backprop_timestep,
                     truncated_rand_backprop_minmax=align_config.truncated_rand_backprop_minmax,
                     output_type="pt",)
+                similarities=torch.stack([-F.mse_loss(nem,im) for nem,im in zip(nemesis_images,images)])
+                return ret +similarities,{}
                 
             return ret,{}
         

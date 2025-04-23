@@ -39,9 +39,16 @@ _MODELS = {
     "ViT-L/14@336px": "https://openaipublic.azureedge.net/clip/models/3035c92b350959924f9f00213499208652fc7ea050643e8b385c2dac08641f02/ViT-L-14-336px.pt",
 }
 
-def load_net_param(net, weight_path):
+def dist_to_score(x,device:str):
+    anchor_bins = torch.tensor([0.1, 0.3, 0.5, 0.7, 0.9]).to(device)
+    anchor_bins = anchor_bins.repeat(x.size(0), 1).to(device)
+    norm_scores = x * anchor_bins
+    one_scores = torch.sum(norm_scores, dim=1).to(device)
+    return one_scores
+
+def load_net_param(net, weight_path,device):
     net_dict = net.state_dict()
-    pretrained_dict = torch.load(weight_path, map_location='cuda')
+    pretrained_dict = torch.load(weight_path, map_location=device)
     pretrained_dict = {k.replace('module.', ''): v for k, v in pretrained_dict.items()}
     same_dict = {k: v for k, v in pretrained_dict.items() if k in net_dict}
     net_dict.update(same_dict)

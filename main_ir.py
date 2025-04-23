@@ -355,7 +355,7 @@ def main(args):
                     batch_size=images.size()[0]
                     sample_neg_prompt_embeds = neg_prompt_embed.repeat(batch_size, 1, 1).to(accelerator.device,torch_dtype)
                     nemesis_images=nemesis_pipeline(prompts,
-                                                    #,latents=latents,
+                                                    latents=latents,
                                                 negative_prompt_embeds=sample_neg_prompt_embeds,
                         num_inference_steps=align_config.sample_num_steps,
                         guidance_scale=align_config.sample_guidance_scale,

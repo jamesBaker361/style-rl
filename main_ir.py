@@ -28,8 +28,9 @@ from gpu_helpers import *
 import ImageReward as image_reward
 import random
 from worse_peft import apply_lora
-from clipfiqa_utils import load,load_net_param
+from clipfiqa_utils import load,load_net_param,tokenize
 from clipfiqa_models import convert_weights
+from itertools import product
 import pyiqa
 
 parser=argparse.ArgumentParser()
@@ -160,7 +161,16 @@ def main(args):
             clip_model = "/scratch/jlb638/weights/RN50.pt"
             clip_weights = "/scratch/jlb638/weights/CLIB-FIQA_R50.pth"
             net, _ = load(clip_model, device=accelerator.device, jit=False)
-            clipfiqa_model = load_net_param(net, clip_weights)
+            clipfiqa_model = load_net_param(net, clip_weights,device=accelerator.device)
+            quality_list = ['bad', 'poor', 'fair', 'good', 'perfect']
+            blur_list = ['hazy', 'blurry', 'clear']
+            occ_list = ['obstructed', 'unobstructed']
+            pose_list = ['profile', 'slight angle', 'frontal']
+            exp_list = ['exaggerated expression', 'typical expression']
+            ill_list = ['extreme lighting', 'normal lighting']
+            joint_texts = torch.cat([tokenize(f"a photo of a {b}, {o}, and {p} face with {e} under {l}, which is of {q} quality") 
+                            for b, o, p, e, l, q in product(blur_list, occ_list, pose_list, exp_list, ill_list, quality_list)])
+
 
 
 

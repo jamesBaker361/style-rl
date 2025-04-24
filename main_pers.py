@@ -289,6 +289,7 @@ def main(args):
                         images=pipeline.call_with_grad(prompt=text, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                         predicted=embed_img_tensor(images)
                         loss=loss_fn(images,predicted)
+                        loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                         accelerator.backward(loss)
 
                         optimizer.step()

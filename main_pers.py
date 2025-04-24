@@ -167,7 +167,7 @@ def main(args):
 
 
     cross_attention_dim=unet.config.cross_attention_dim
-    projection_layer=IPAdapterFullImageProjection(embedding_dim)
+    projection_layer=IPAdapterFullImageProjection(embedding_dim,cross_attention_dim)
 
     params=[p for p in projection_layer.parameters()]
 

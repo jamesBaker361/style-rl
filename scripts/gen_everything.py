@@ -22,7 +22,7 @@ for lr in [0.001,0.01]:
                     command+=f" {exclude} runpygpu.sh main_ir.py    {method_flags} {submethod_flags} --num_vectors 1 "
                     command+=f"  --textual_inversion --prompt_src_txt {src_text} "
                     command+=f" --validation_epochs 40 --learning_rate {lr} --reward_fn {reward_fn} "
-                    command+=f" --project_name testing --per_prompt_stat_tracking_buffer_size 3 --epochs 10"
-                    #command+=f"  --project_name {reward_fn}_{prompt_src} --epochs 250 "
+                    #command+=f" --project_name testing --per_prompt_stat_tracking_buffer_size 3 --epochs 10"
+                    command+=f"  --project_name {reward_fn}_{prompt_src} --epochs 250 "
                     print(command)
                     

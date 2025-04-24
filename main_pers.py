@@ -16,6 +16,7 @@ import torch.nn.functional as F
 from PIL import Image
 import random
 from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast
+from worse_peft import apply_lora
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -163,6 +164,16 @@ def main(args):
         #todo: compatible SanaSprint
 
     projection_layer=IPAdapterFullImageProjection(embedding_dim)
+
+    params=[p for p in projection_layer.parameters()]
+
+    if args.train_unet:
+        apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)
+        params+=[p for p in pipeline.unet.params()]
+
+    print("trainable params: ",len(params))
+
+    optimizer=torch.optim.AdamW(params)
 
 
 

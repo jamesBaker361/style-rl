@@ -69,6 +69,7 @@ def main(args):
         "bf16":torch.bfloat16
     }[args.mixed_precision]
     with accelerator.autocast():
+        
         raw_data=load_dataset(args.dataset,split="train")
 
         os.makedirs(args.data_dir,exist_ok=True)
@@ -186,6 +187,7 @@ def main(args):
         loss_buffer=[]
 
         for e in range(1, args.epochs+1):
+            start=time.time()
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
                 image_embeds=projection_layer(embeds_batch)
@@ -249,7 +251,10 @@ def main(args):
 
                         optimizer.step()
                         optimizer.zero_grad()
-
+            end=time.time()
+            elapsed=end-start
+            print(f"\t epoch {e} elapsed {end-start}")
+            accelerator.free_memory()
 
     
 

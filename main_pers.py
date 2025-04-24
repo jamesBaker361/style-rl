@@ -232,6 +232,7 @@ def main(args):
             start=time.time()
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
+                embeds_batch.to(device)
                 image_embeds=projection_layer(embeds_batch)
                 image_embeds=image_embeds.unsqueeze(1)
                 print(image_embeds.size())

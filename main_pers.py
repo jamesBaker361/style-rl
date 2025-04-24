@@ -209,7 +209,7 @@ def main(args):
 
                     if scheduler.config.prediction_type == "epsilon":
                         target = noise
-                    elif scheduler.config.prediction_type == "v_prediction":
+                    elif scheduler.config.prediction_type == "v_prediction" or scheduler.config.prediction_type =="velocity":
                         target = scheduler.get_velocity(latents, noise, timesteps)
                     else:
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")

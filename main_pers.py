@@ -31,7 +31,7 @@ parser.add_argument("--save_data_npz",action="store_true")
 parser.add_argument("--load_data_npz",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--pipeline",type=str,default="lcm")
-parser.add_argument("--batch_size",type=int,default=8)
+parser.add_argument("--batch_size",type=int,default=1)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--training_type",help="denoise or reward",default="denoise")
 parser.add_argument("--train_unet",action="store_true")
@@ -187,7 +187,7 @@ def main(args):
         for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
             print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=projection_layer(embeds_batch)
-            image_embeds=image_embeds.unsqueeze(1).unsqueeze(1).repeat(1,2,1,1)
+            image_embeds=image_embeds.unsqueeze(1)
             print(image_embeds.size())
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):

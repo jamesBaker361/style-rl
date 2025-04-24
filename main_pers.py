@@ -229,7 +229,7 @@ def main(args):
                     optimizer.zero_grad()
             elif args.training_type=="reward":
                 with accelerator.accumulate():
-                    images=pipeline.call_with_grad(prompt_embeds=text_embeds_batch, ip_adapter_image_embeds=[image_embeds],output_type="pt")
+                    images=pipeline.call_with_grad(prompt_embeds=text_embeds_batch, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     predicted=embed_img_tensor(images)
                     loss=loss_fn(images,predicted)
                     accelerator.backward(loss)

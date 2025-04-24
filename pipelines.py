@@ -197,8 +197,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     self.do_classifier_free_guidance,
                 )
                 added_cond_kwargs={"image_embeds":image_embeds}
-            else:
-                added_cond_kwargs={}
+        else:
+            added_cond_kwargs={}
 
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order

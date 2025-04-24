@@ -1,6 +1,7 @@
 import torch
 from diffusers import StableDiffusionPipeline,AutoPipelineForText2Image
 from diffusers.models import AutoencoderKL, ImageProjection, UNet2DConditionModel
+from pipelines import CompatibleLatentConsistencyModelPipeline
 
 def prepare_ip_adapter_image_embeds(
     self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance
@@ -58,9 +59,9 @@ from diffusers import AutoPipelineForText2Image
 import torch
 from diffusers.utils import load_image
 
-StableDiffusionPipeline.prepare_ip_adapter_image_embeds=prepare_ip_adapter_image_embeds
+CompatibleLatentConsistencyModelPipeline.prepare_ip_adapter_image_embeds=prepare_ip_adapter_image_embeds
 
-pipeline = StableDiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+pipeline = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 
 pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 

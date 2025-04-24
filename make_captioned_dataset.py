@@ -11,6 +11,19 @@ from experiment_helpers.better_vit_model import BetterViTModel
 from experiment_helpers.better_ddpo_trainer import BetterDDPOTrainer
 from experiment_helpers.unsafe_stable_diffusion_pipeline import UnsafeStableDiffusionPipeline
 import time
+from PIL import Image
+
+def center_crop_min_dim(img: Image.Image) -> Image.Image:
+    width, height = img.size
+    min_dim = min(width, height)
+
+    left = (width - min_dim) // 2
+    top = (height - min_dim) // 2
+    right = left + min_dim
+    bottom = top + min_dim
+
+    return img.crop((left, top, right, bottom))
+
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--src_dataset",type=str,default="timm/imagenet-12k-wds")
@@ -34,6 +47,7 @@ def main(args):
         if i==args.limit:
             break
         img=row[args.image_key]
+        img=center_crop_min_dim(img)
         inputs = processor(img, return_tensors="pt").to(device,torch_dtype)
 
         out = model.generate(**inputs)

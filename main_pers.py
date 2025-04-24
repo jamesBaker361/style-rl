@@ -207,7 +207,7 @@ def main(args):
                             1,
                             pipeline.do_classifier_free_guidance,
                             negative_prompt=None,
-                            prompt_embeds=prompt_embeds,
+                            prompt_embeds=None,
                             negative_prompt_embeds=None,
                             #lora_scale=lora_scale,
                             clip_skip=pipeline.clip_skip,

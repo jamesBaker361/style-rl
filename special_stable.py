@@ -6,6 +6,7 @@ class SpecialPipe(AutoPipelineForText2Image):
     def prepare_ip_adapter_image_embeds(
         self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance
     ):
+        print("called prepare_ip_adapter_image_embeds ")
         image_embeds = []
         if do_classifier_free_guidance:
             negative_image_embeds = []

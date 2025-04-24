@@ -35,6 +35,7 @@ parser.add_argument("--batch_size",type=int,default=8)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--training_type",help="denoise or reward",default="denoise")
 parser.add_argument("--train_unet",action="store_true")
+parser.add_argument("--prediction_type",type=str,default="epsilon")
 
 import torch
 import torch.nn.functional as F

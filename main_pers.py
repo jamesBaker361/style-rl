@@ -104,7 +104,7 @@ def main(args):
                 p_inputs=processor(img_tensor,return_tensors="pt")
                 outputs = model(**p_inputs)
                 cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
-                print("cls featurs size",cls_features.size())
+                #print("cls featurs size",cls_features.size())
                 embedding=cls_features
                 
 

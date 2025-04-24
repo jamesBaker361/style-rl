@@ -18,7 +18,7 @@ for lr in [0.001,0.01]:
                             "animals":"random_animals.txt",
                             "nature":"nature_prompts.txt"
                     }[prompt_src]
-                    command=f"sbatch -J {reward_fn}-{prompt_src}-ti-3000 --err=slurm/{prompt_src}/{name}.err --out=slurm/{prompt_src}/{name}.out"
+                    command=f"sbatch -J {reward_fn}-{prompt_src}-ti-3000 --err=slurm/{prompt_src}3000/{name}.err --out=slurm/{prompt_src}3000/{name}.out"
                     command+=f" {exclude} runpygpu.sh main_ir.py    {method_flags} {submethod_flags} --num_vectors 1 "
                     command+=f"   --prompt_src_txt {src_text} "
                     command+=f" --validation_epochs 40 --learning_rate {lr} --reward_fn {reward_fn} "

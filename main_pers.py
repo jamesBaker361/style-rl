@@ -223,7 +223,10 @@ def main(args):
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 if b==args.buffer_size:
                     break
-                image=pipeline()
+                text=text_batch[0]
+                image=pipeline(text,output_type="pt").images[0]
+                loss=loss_fn(image,embeds_batch[0])
+                loss_buffer.append(loss.cpu().detach().item())
 
         training_start=time.time()
         for e in range(1, args.epochs+1):
@@ -291,6 +294,9 @@ def main(args):
 
                         optimizer.step()
                         optimizer.zero_grad()
+
+                        loss_buffer.append(loss.cpu().detach().item())
+                        loss_buffer=loss_buffer[1:]
             end=time.time()
             elapsed=end-start
             print(f"\t epoch {e} elapsed {end-start}")

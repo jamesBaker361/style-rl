@@ -32,6 +32,7 @@ parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=8)
 parser.add_argument("--epochs",type=int,default=10)
+parser.add_argument("--training_type",help="denoise or reward",default="denoise")
 
 import torch
 import torch.nn.functional as F
@@ -144,6 +145,14 @@ def main(args):
 
 
     loss_buffer=[]
+
+    for e in range(1, args.epochs+1):
+        for b,(text_embeds_batch, embeds_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list)):
+            if args.training_type=="denoise":
+                pass
+            elif args.training_type=="reward":
+                pass
+
 
     
 

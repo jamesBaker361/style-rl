@@ -94,7 +94,7 @@ def main(args):
             outputs = model(**p_inputs)
             cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
             print("cls featurs size",cls_features.size())
-            embedding=cls_features
+            embedding=cls_features[0]
             
 
         return embedding
@@ -156,7 +156,7 @@ def main(args):
             )
         print('textembeds.size',text_embeds.size())
 
-        text_embedding_list.append(text_embeds)
+        text_embedding_list.append(text_embeds[0])
 
     batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
     batched_image_list=make_batches_same_size(image_list,args.batch_size)
@@ -185,7 +185,41 @@ def main(args):
         for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
             print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
             if args.training_type=="denoise":
-                pass
+                with accelerator.accumulate(params):
+                    # Convert images to latent space
+                    latents = vae.encode(image_batch).latent_dist.sample()
+                    latents = latents * vae.config.scaling_factor
+
+                    # Sample noise that we'll add to the latents
+                    noise = torch.randn_like(latents)
+
+                        # Get the text embedding for conditioning
+                    encoder_hidden_states = text_embeds_batch
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size), device=latents.device)
+                    #timesteps = timesteps.long()
+
+                    noisy_latents = scheduler.add_noise(latents, noise, timesteps)
+
+                    # Get the target for loss depending on the prediction type
+                    if args.prediction_type is not None:
+                        # set prediction_type of scheduler if defined
+                        scheduler.register_to_config(prediction_type=args.prediction_type)
+
+                    if scheduler.config.prediction_type == "epsilon":
+                        target = noise
+                    elif scheduler.config.prediction_type == "v_prediction":
+                        target = scheduler.get_velocity(latents, noise, timesteps)
+                    else:
+                        raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
+
+                    # Predict the noise residual and compute loss
+                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, return_dict=False)[0]
+
+                    loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    accelerator.backward(loss)
+
+                    optimizer.step()
+                    optimizer.zero_grad()
             elif args.training_type=="reward":
                 pass
 

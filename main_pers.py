@@ -70,7 +70,7 @@ def main(args):
     os.makedirs(args.data_dir,exist_ok=True)
 
     if args.embedding=="dino":
-        dino_vit_extractor=ViTExtractor("vit_base_patch16_224",device=accelerator.device)
+        dino_vit_extractor=ViTExtractor("dino_vits8",device=accelerator.device)
         dino_vit_extractor.model.eval()
         dino_vit_extractor.model.requires_grad_(False)
 

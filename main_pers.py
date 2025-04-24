@@ -82,6 +82,7 @@ def main(args):
             #dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
             dino_vit_features=dino_vit_extractor.extract_descriptors(img_tensor,facet=args.facet)
             batch_size=img_tensor.size()[0]
+            print('dino_vit_features.size()',dino_vit_features.size())
             embedding=dino_vit_features.view(batch_size,-1)
         return embedding
     

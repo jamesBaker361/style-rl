@@ -161,6 +161,7 @@ def main(args):
 
     batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
     batched_image_list=make_batches_same_size(image_list,args.batch_size)
+    batched_text_list= [text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
 
     #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
     #multiple projection layers for different layers..?
@@ -184,8 +185,8 @@ def main(args):
     loss_buffer=[]
 
     for e in range(1, args.epochs+1):
-        for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
-            print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
+        for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
+            print(b, 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=projection_layer(embeds_batch)
             image_embeds=image_embeds.unsqueeze(1)
             print(image_embeds.size())
@@ -199,7 +200,19 @@ def main(args):
                     noise = torch.randn_like(latents)
 
                         # Get the text embedding for conditioning
-                    encoder_hidden_states = text_embeds_batch
+
+                    prompt_embeds, _ = pipeline.encode_prompt(
+                            text,
+                            accelerator.device,
+                            1,
+                            pipeline.do_classifier_free_guidance,
+                            negative_prompt=None,
+                            prompt_embeds=prompt_embeds,
+                            negative_prompt_embeds=None,
+                            #lora_scale=lora_scale,
+                            clip_skip=pipeline.clip_skip,
+                    )
+                    encoder_hidden_states = prompt_embeds
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()
 

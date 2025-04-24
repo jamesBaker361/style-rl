@@ -195,7 +195,7 @@ def main(args):
 
                         # Get the text embedding for conditioning
                     encoder_hidden_states = text_embeds_batch
-                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size), device=latents.device)
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()
 
                     noisy_latents = scheduler.add_noise(latents, noise, timesteps)

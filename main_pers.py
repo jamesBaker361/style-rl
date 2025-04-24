@@ -37,6 +37,7 @@ parser.add_argument("--training_type",help="denoise or reward",default="denoise"
 parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--prediction_type",type=str,default="epsilon")
 parser.add_argument("--train_split",type=float,default=0.96)
+parser.add_argument("--validation_interval",type=int,default=20)
 
 import torch
 import torch.nn.functional as F
@@ -152,7 +153,7 @@ def main(args):
             text_encoder=pipeline.text_encoder
             scheduler=pipeline.scheduler
         
-
+        ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
         batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
         batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
 
@@ -175,7 +176,7 @@ def main(args):
         batched_image_list=make_batches_same_size(image_list,args.batch_size)
         batched_text_list= [text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
 
-        ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
+        
         batched_image_list,test_batched_image_list,val_batched_image_list=split_list_by_ratio(batched_image_list,ratios)
         batched_text_list,test_batched_text_list,val_batched_text_list=split_list_by_ratio(batched_text_list,ratios)
 
@@ -217,7 +218,7 @@ def main(args):
                         noise = torch.randn_like(latents)
 
                             # Get the text embedding for conditioning
-
+                        text=text_batch
                         prompt_embeds, _ = pipeline.encode_prompt(
                                 text,
                                 accelerator.device,
@@ -269,6 +270,20 @@ def main(args):
             elapsed=end-start
             print(f"\t epoch {e} elapsed {end-start}")
             accelerator.free_memory()
+            if e%args.validation_interval==0:
+                metrics={}
+                difference_list=[]
+                start=time.time()
+                for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
+                    image_embeds=projection_layer(embeds_batch)
+                    image_embeds=image_embeds.unsqueeze(1)
+                    text=text_batch[0]
+                    image=pipeline(text[0],ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                    difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())
+                    pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
+                    metrics[text]
+                accelerator.log({})
+                
 
     
 

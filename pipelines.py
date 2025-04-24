@@ -345,6 +345,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     batch_size * num_images_per_prompt,
                     self.do_classifier_free_guidance,
                 )
+                added_cond_kwargs={"image_embeds":image_embeds}
+            else:
+                added_cond_kwargs={}
 
             # 3. Encode input prompt
             lora_scale = (
@@ -405,11 +408,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         latents.requires_grad_(True)
         
-        # src_embeds if we have previously called register_encoder_hid_proj
-        if hasattr(self,"src_embeds"):
-            added_cond_kwargs={"image_embeds":self.src_embeds}
-        else:
-            added_cond_kwargs={}
+       
 
         #print("506 added condkwagrs",added_cond_kwargs)
         # 8. LCM MultiStep Sampling Loop:

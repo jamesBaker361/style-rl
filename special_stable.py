@@ -1,8 +1,8 @@
 import torch
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline,AutoPipelineForText2Image
 from diffusers.models import AutoencoderKL, ImageProjection, UNet2DConditionModel
 
-class SpecialPipe(StableDiffusionPipeline):
+class SpecialPipe(AutoPipelineForText2Image):
     def prepare_ip_adapter_image_embeds(
         self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance
     ):

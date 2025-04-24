@@ -161,7 +161,7 @@ def main(args):
             text_encoder.to(device,torch_dtype)
             scheduler.to(device,torch_dtype)'''
             pipeline.requires_grad_(False)
-            for model in [pipeline,vae,unet,text_encoder,scheduler]:
+            for model in [vae,unet,text_encoder,scheduler]:
                 model.to(device,torch_dtype)
                 model.requires_grad_(False)
         

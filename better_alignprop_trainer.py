@@ -11,6 +11,7 @@ class MonoPerPromptStatTracker(PerPromptStatTracker):
         self.past_rewards=past_rewards
     def update(self, prompts, rewards):
         std=np.std(self.past_rewards)
+        print("past rewards", self.past_rewards)
         mean=np.mean(self.past_rewards)
         flat_rewards=rewards.flatten()
         for r in flat_rewards:

@@ -215,8 +215,6 @@ def main(args):
                     else:
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
                     
-                    
-
                     added_cond_kwargs={"image_embeds":image_embeds}
 
                     # Predict the noise residual and compute loss

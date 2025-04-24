@@ -211,9 +211,13 @@ def main(args):
                         target = scheduler.get_velocity(latents, noise, timesteps)
                     else:
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
+                    
+                    image_embeds=projection_layer(embeds_batch)
+
+                    added_cond_kwargs={"image_embeds":image_embeds}
 
                     # Predict the noise residual and compute loss
-                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, return_dict=False)[0]
+                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)

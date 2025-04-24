@@ -133,6 +133,8 @@ def main(args):
 
     print("embedding dim",embedding_dim)
 
+    if args.pipeline=="lcm":
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
     
 
     batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
@@ -157,8 +159,7 @@ def main(args):
     #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
     #multiple projection layers for different layers..?
 
-    if args.pipeline=="lcm":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+    
         #todo: compatible SanaSprint
 
     projection_layer=IPAdapterFullImageProjection(embedding_dim)

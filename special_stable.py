@@ -60,7 +60,7 @@ from diffusers.utils import load_image
 
 StableDiffusionPipeline.prepare_ip_adapter_image_embeds=prepare_ip_adapter_image_embeds
 
-pipeline = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
+pipeline = StableDiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 
 pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 

@@ -452,7 +452,10 @@ def main(args):
                 get_image_logger_align(STYLE_LORA,accelerator,style_cache)
                 )
             evaluation_images,score_list,gen_prompt_list=get_images_and_scores(args.per_prompt_stat_tracking_buffer_size)
-            register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,[s.cpu() for s in score_list])
+            try:
+                register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,[s.cpu() for s in score_list])
+            except AttributeError:
+                register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,score_list)
         elif args.method=="ddpo":
             kwargs={"retain_graph":True}
             style_trainer=BetterDDPOTrainer(

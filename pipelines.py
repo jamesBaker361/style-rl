@@ -125,7 +125,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
 
-        device = self._execution_device
+        device = self.unet.device
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             image_embeds = self.prepare_ip_adapter_image_embeds(
@@ -335,7 +335,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             else:
                 batch_size = prompt_embeds.shape[0]
 
-            device = self._execution_device
+            device = self.unet.device
 
             if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
                 image_embeds = self.prepare_ip_adapter_image_embeds(
@@ -667,7 +667,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
         else:
             batch_size = prompt_embeds.shape[0]
 
-        device = self._execution_device
+        device = self.unet.device
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             image_embeds = self.prepare_ip_adapter_image_embeds(
@@ -878,7 +878,7 @@ class PPlusCompatibleLatentConsistencyModelPipeline(CompatibleLatentConsistencyM
             else:
                 batch_size = prompt_embeds.shape[0]
 
-            device = self._execution_device
+            device = self.unet.device
 
             if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
                 image_embeds = self.prepare_ip_adapter_image_embeds(

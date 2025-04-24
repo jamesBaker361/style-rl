@@ -17,6 +17,8 @@ from PIL import Image
 import random
 from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast
 from worse_peft import apply_lora
+import wandb
+import numpy as np
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -271,6 +273,7 @@ def main(args):
             print(f"\t epoch {e} elapsed {end-start}")
             accelerator.free_memory()
             if e%args.validation_interval==0:
+                start=time.time()
                 metrics={}
                 difference_list=[]
                 start=time.time()
@@ -281,8 +284,11 @@ def main(args):
                     image=pipeline(text[0],ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())
                     pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
-                    metrics[text]
-                accelerator.log({})
+                    metrics[text]=wandb.Image(pil_image)
+                metrics["difference"]=np.mean(difference_list)
+                accelerator.log(metrics)
+                end=time.time()
+                print(f"\t validation epoch {e} elapsed {end-start}")
                 
 
     

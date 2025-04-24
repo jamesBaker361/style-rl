@@ -32,7 +32,6 @@ parser.add_argument("--facet",type=str,default="query",help="dino vit facet to e
 parser.add_argument("--data_dir",type=str,default="data_dir")
 parser.add_argument("--save_data_npz",action="store_true")
 parser.add_argument("--load_data_npz",action="store_true")
-parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=1)
 parser.add_argument("--epochs",type=int,default=10)

@@ -186,7 +186,7 @@ def main(args):
 
     for e in range(1, args.epochs+1):
         for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
-            print(b, 'embeds',embeds_batch.size(), "img", image_batch.size())
+            print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=projection_layer(embeds_batch)
             image_embeds=image_embeds.unsqueeze(1)
             print(image_embeds.size())
@@ -242,7 +242,7 @@ def main(args):
                     optimizer.zero_grad()
             elif args.training_type=="reward":
                 with accelerator.accumulate():
-                    images=pipeline.call_with_grad(prompt_embeds=text_embeds_batch, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                    images=pipeline.call_with_grad(prompt=text, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     predicted=embed_img_tensor(images)
                     loss=loss_fn(images,predicted)
                     accelerator.backward(loss)

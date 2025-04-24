@@ -74,3 +74,17 @@ images = pipeline(
     num_inference_steps=1,
     generator=generator,
 ).images[0]
+
+print("TAKE TWO")
+
+pipeline = CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+
+embeds=[torch.randn((1,1,1024))]
+
+images = pipeline(
+    prompt='best quality, high quality, wearing sunglasses',
+    ip_adapter_image_embeds=embeds,
+    negative_prompt="monochrome, lowres, bad anatomy, worst quality, low quality",
+    num_inference_steps=1,
+    generator=generator,
+).images[0]

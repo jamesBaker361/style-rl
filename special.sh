@@ -1,0 +1,1 @@
+sbatch --out=slurm/main/special.out --err=slurm/main/special.err runpymain.sh special_stable.py

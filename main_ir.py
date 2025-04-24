@@ -453,7 +453,7 @@ def main(args):
                 )
             evaluation_images,score_list,gen_prompt_list=get_images_and_scores(args.per_prompt_stat_tracking_buffer_size)
             try:
-                register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,[s.cpu() for s in score_list])
+                register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,[s.cpu().item() for s in score_list])
             except AttributeError:
                 register_mono_stat_tracker(style_trainer,args.per_prompt_stat_tracking_buffer_size,score_list)
         elif args.method=="ddpo":

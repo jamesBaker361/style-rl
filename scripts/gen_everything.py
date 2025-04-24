@@ -6,7 +6,7 @@ for lr in [0.001,0.01]:
                 for submethod in ["vanilla","nemesis"]:
                     name=f"{reward_fn}_{lr}_{reward_fn}_{prompt_src}_{method}_{submethod}"
                     method_flags={
-                        "unet":" --train_unet style_layers 0 1 2 3 ",
+                        "unet":" --train_unet --style_layers 0 1 2 3 ",
                         "pp":" --textual_inversion --use_pplus ",
                         "ti": " --textual_inversion "
                     }[method]

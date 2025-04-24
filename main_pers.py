@@ -15,6 +15,7 @@ from extractor import ViTExtractor
 import torch.nn.functional as F
 from PIL import Image
 import random
+from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -73,6 +74,9 @@ def main(args):
         dino_vit_extractor=ViTExtractor("dino_vits8",device=accelerator.device)
         dino_vit_extractor.model.eval()
         dino_vit_extractor.model.requires_grad_(False)
+    elif args.embedding=="ssl":
+        processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
+        model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
 
     def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
         if args.embedding=="dino":
@@ -84,12 +88,24 @@ def main(args):
             batch_size=img_tensor.size()[0]
             print('dino_vit_features.size()',dino_vit_features.size())
             embedding=dino_vit_features.view(batch_size,-1)
+        elif args.embedding=="ssl":
+            p_inputs=processor(img_tensor,return_tensors="pt")
+            outputs = model(**p_inputs)
+            cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
+            print("cls featurs size",cls_features.size())
+            embedding=cls_features
+            
+
         return embedding
     
     def transform_image(pil_image:Image.Image):
         if args.embedding=="dino":
             t=transforms.Compose(
                 [transforms.ToTensor(),transforms.Normalize(dino_vit_extractor.mean,dino_vit_extractor.std)]
+            )
+        elif args.embedding=="ssl":
+            t=transforms.Compose(
+                [transforms.ToTensor()]
             )
         return t(pil_image)
     
@@ -153,6 +169,7 @@ def main(args):
 
     for e in range(1, args.epochs+1):
         for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
+            print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
             if args.training_type=="denoise":
                 pass
             elif args.training_type=="reward":

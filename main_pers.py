@@ -167,7 +167,7 @@ def main(args):
 
 
     cross_attention_dim=unet.config.cross_attention_dim
-    projection_layer=IPAdapterFullImageProjection(embedding_dim,cross_attention_dim)
+    projection_layer=IPAdapterFullImageProjection(embedding_dim)
 
     params=[p for p in projection_layer.parameters()]
 
@@ -187,6 +187,8 @@ def main(args):
         for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
             print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=projection_layer(embeds_batch)
+            image_embeds=image_embeds.unsqueeze(1).unsqueeze(1).repeat(1,2,1,1)
+            print(image_embeds.size())
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
                     # Convert images to latent space

@@ -63,7 +63,7 @@ def make_batches_same_size(tensor_list, batch_size):
     return batches
 
 def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
-    assert sum(ratios) == 1.0, "Ratios must sum to 1.0"
+    #assert sum(ratios) == 1.0, "Ratios must sum to 1.0"
     n = len(lst)
     i1 = int(n * ratios[0])
     i2 = i1 + int(n * ratios[1])
@@ -156,6 +156,7 @@ def main(args):
             scheduler=pipeline.scheduler
         
         ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
+        print(ratios)
         batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
         batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
 

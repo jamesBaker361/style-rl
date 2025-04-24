@@ -32,6 +32,7 @@ parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=8)
 parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--training_type",help="denoise or reward",default="denoise")
+parser.add_argument("--train_unet",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -115,17 +116,9 @@ def main(args):
 
     print("embedding dim",embedding_dim)
 
-    projection_layer=IPAdapterFullImageProjection(embedding_dim)
+    
 
     batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
-
-    #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
-    #multiple projection layers for different layers..?
-
-    if args.pipeline=="lcm":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-        #todo: compatible SanaSprint
-
     text_embedding_list=[]
     for t in text_list:
         text_embeds, _ = pipeline.encode_prompt(
@@ -143,6 +136,15 @@ def main(args):
 
     batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
     batched_image_list=make_batches_same_size(image_list,args.batch_size)
+
+    #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
+    #multiple projection layers for different layers..?
+
+    if args.pipeline=="lcm":
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+        #todo: compatible SanaSprint
+
+    projection_layer=IPAdapterFullImageProjection(embedding_dim)
 
 
 

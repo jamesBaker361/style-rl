@@ -36,6 +36,7 @@ parser.add_argument("--epochs",type=int,default=10)
 parser.add_argument("--training_type",help="denoise or reward",default="denoise")
 parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--prediction_type",type=str,default="epsilon")
+parser.add_argument("--train_split",type=float,default=0.96)
 
 import torch
 import torch.nn.functional as F
@@ -57,6 +58,13 @@ def make_batches_same_size(tensor_list, batch_size):
         batched = torch.stack(batch, dim=0)
         batches.append(batched)
     return batches
+
+def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
+    assert sum(ratios) == 1.0, "Ratios must sum to 1.0"
+    n = len(lst)
+    i1 = int(n * ratios[0])
+    i2 = i1 + int(n * ratios[1])
+    return lst[:i1], lst[i1:i2], lst[i2:]
 
 
 def main(args):
@@ -146,6 +154,8 @@ def main(args):
         
 
         batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
+        batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
+
         text_embedding_list=[]
         for t in text_list:
             text_embeds, _ = pipeline.encode_prompt(
@@ -164,6 +174,10 @@ def main(args):
         batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
         batched_image_list=make_batches_same_size(image_list,args.batch_size)
         batched_text_list= [text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
+
+        ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
+        batched_image_list,test_batched_image_list,val_batched_image_list=split_list_by_ratio(batched_image_list,ratios)
+        batched_text_list,test_batched_text_list,val_batched_text_list=split_list_by_ratio(batched_text_list,ratios)
 
         #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
         #multiple projection layers for different layers..?

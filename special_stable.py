@@ -58,7 +58,7 @@ from diffusers import AutoPipelineForText2Image
 import torch
 from diffusers.utils import load_image
 
-pipeline = SpecialPipe.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5")
+pipeline = SpecialPipe.from_pretrained("CompVis/stable-diffusion-v1-4")
 
 pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 

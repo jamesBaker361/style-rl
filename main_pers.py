@@ -40,6 +40,7 @@ parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--prediction_type",type=str,default="epsilon")
 parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
+parser.add_argument("--buffer_size",type=int,default=10)
 
 import torch
 import torch.nn.functional as F
@@ -73,6 +74,7 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
+    device=accelerator.device
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,
@@ -154,6 +156,14 @@ def main(args):
             unet=pipeline.unet
             text_encoder=pipeline.text_encoder
             scheduler=pipeline.scheduler
+            '''vae.to(device,torch_dtype)
+            unet.to(device,torch_dtype)
+            text_encoder.to(device,torch_dtype)
+            scheduler.to(device,torch_dtype)'''
+            pipeline.requires_grad_(False)
+            for model in [pipeline,vae,unet,text_encoder,scheduler]:
+                model.to(device,torch_dtype)
+                model.requires_grad_(False)
         
         ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
         print(ratios)
@@ -189,21 +199,23 @@ def main(args):
 
         cross_attention_dim=unet.config.cross_attention_dim
         projection_layer=IPAdapterFullImageProjection(embedding_dim,cross_attention_dim)
+        projection_layer.to(device,torch_dtype)
+        projection_layer.requires_grad_(True)
 
         params=[p for p in projection_layer.parameters()]
 
         if args.train_unet:
             apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)
-            params+=[p for p in pipeline.unet.params()]
+            params+=[p for p in pipeline.unet.params() if p.requires_grad]
 
         print("trainable params: ",len(params))
 
         optimizer=torch.optim.AdamW(params)
 
-
+        vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer)
 
         loss_buffer=[]
-
+        training_start=time.time()
         for e in range(1, args.epochs+1):
             start=time.time()
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
@@ -290,6 +302,9 @@ def main(args):
                 accelerator.log(metrics)
                 end=time.time()
                 print(f"\t validation epoch {e} elapsed {end-start}")
+        training_end=time.time()
+        print(f"total trainign time = {training_end-training_start}")
+
                 
 
     

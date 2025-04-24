@@ -24,7 +24,7 @@ parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--epochs",type=int,default=1)
 parser.add_argument("--embedding",type=str,default="dino")
 parser.add_argument("--reward_embedding",type=str,default="dino")
-parser.add_argument("--facet",type=str,default="token",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
+parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--data_dir",type=str,default="data_dir")
 parser.add_argument("--save_data_npz",action="store_true")
 parser.add_argument("--load_data_npz",action="store_true")
@@ -94,10 +94,12 @@ def main(args):
     
     embedding_list=[]
     text_list=[]
+    image_list=[]
     shuffled_row_list=[row for row in raw_data]
     random.shuffle(shuffled_row_list)
     for row in raw_data:
         image=row["image"]
+        image_list.append(transform_image(image))
         text=row["text"]
         if type(text)==list:
             text=text[0]
@@ -141,13 +143,14 @@ def main(args):
         text_embedding_list.append(text_embeds)
 
     batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
+    batched_image_list=make_batches_same_size(image_list,args.batch_size)
 
 
 
     loss_buffer=[]
 
     for e in range(1, args.epochs+1):
-        for b,(text_embeds_batch, embeds_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list)):
+        for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
             if args.training_type=="denoise":
                 pass
             elif args.training_type=="reward":

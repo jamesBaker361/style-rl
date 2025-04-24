@@ -25,6 +25,7 @@ parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="person")
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
+parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--embedding",type=str,default="dino")
 parser.add_argument("--reward_embedding",type=str,default="dino")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
@@ -164,6 +165,10 @@ def main(args):
             for model in [vae,unet,text_encoder,scheduler]:
                 model.to(device,torch_dtype)
                 model.requires_grad_(False)
+
+        print("before ",pipeline.unet.config.sample_size)
+        pipeline.unet.config.sample_size=args.image_size // pipeline.vae_scale_factor
+        print("after", pipeline.unet.config.sample_size)
         
         ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
         print(ratios)
@@ -213,8 +218,13 @@ def main(args):
         optimizer=torch.optim.AdamW(params)
 
         vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer)
+        if args.training_type=="reward":
+            loss_buffer=[]
+            for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
+                if b==args.buffer_size:
+                    break
+                image=pipeline()
 
-        loss_buffer=[]
         training_start=time.time()
         for e in range(1, args.epochs+1):
             start=time.time()

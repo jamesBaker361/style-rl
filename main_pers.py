@@ -31,6 +31,7 @@ parser.add_argument("--load_data_npz",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=8)
+parser.add_argument("--epochs",type=int,default=10)
 
 import torch
 import torch.nn.functional as F
@@ -97,6 +98,8 @@ def main(args):
     for row in raw_data:
         image=row["image"]
         text=row["text"]
+        if type(text)==list:
+            text=text[0]
         embedding_list.append(embed_img_tensor(transform_image(image)))
         text_list.append(text)
 
@@ -133,6 +136,12 @@ def main(args):
                 negative_prompt_embeds=None,
             )
         print('textembeds.size',text_embeds.size())
+
+        text_embedding_list.append(text_embeds)
+
+    batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
+
+
 
     loss_buffer=[]
 

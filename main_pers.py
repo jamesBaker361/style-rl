@@ -94,7 +94,7 @@ def main(args):
             outputs = model(**p_inputs)
             cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
             print("cls featurs size",cls_features.size())
-            embedding=cls_features[0]
+            embedding=cls_features
             
 
         return embedding
@@ -121,7 +121,7 @@ def main(args):
         text=row["text"]
         if type(text)==list:
             text=text[0]
-        embedding_list.append(embed_img_tensor(transform_image(image)))
+        embedding_list.append(embed_img_tensor(transform_image(image))[0])
         text_list.append(text)
 
     def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
@@ -184,6 +184,7 @@ def main(args):
     for e in range(1, args.epochs+1):
         for b,(text_embeds_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_embedding_list, batched_embedding_list, batched_image_list)):
             print(b,'text', text_embeds_batch.size(), 'embeds',embeds_batch.size(), "img", image_batch.size())
+            image_embeds=projection_layer(embeds_batch)
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
                     # Convert images to latent space
@@ -212,7 +213,7 @@ def main(args):
                     else:
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
                     
-                    image_embeds=projection_layer(embeds_batch)
+                    
 
                     added_cond_kwargs={"image_embeds":image_embeds}
 
@@ -225,7 +226,14 @@ def main(args):
                     optimizer.step()
                     optimizer.zero_grad()
             elif args.training_type=="reward":
-                pass
+                with accelerator.accumulate():
+                    images=pipeline.call_with_grad(prompt_embeds=text_embeds_batch, ip_adapter_image_embeds=image_embeds,output_type="pt")
+                    predicted=embed_img_tensor(images)
+                    loss=loss_fn(images,predicted)
+                    accelerator.backward(loss)
+
+                    optimizer.step()
+                    optimizer.zero_grad()
 
 
     

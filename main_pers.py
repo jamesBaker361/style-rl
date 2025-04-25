@@ -99,6 +99,7 @@ def main(args):
             model.to(device,torch_dtype)
 
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
+            img_tensor=img_tensor.to(device,torch_dtype)
             if args.embedding=="dino":
                 if len(img_tensor.size())==3:
                     img_tensor=img_tensor.unsqueeze(0)

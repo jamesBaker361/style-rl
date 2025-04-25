@@ -21,6 +21,8 @@ import wandb
 import numpy as np
 import random
 from gpu_helpers import *
+from adapter_helpers import replace_ip_attn,get_modules_of_types
+from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 
 
 parser=argparse.ArgumentParser()
@@ -45,6 +47,7 @@ parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
 parser.add_argument("--buffer_size",type=int,default=0)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
+parser.add_argument("--cross_embedding_dim",type=int,default=1024)
 
 import torch
 import torch.nn.functional as F
@@ -175,19 +178,26 @@ def main(args):
 
         if args.pipeline=="lcm":
             pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-            vae=pipeline.vae
-            unet=pipeline.unet
-            text_encoder=pipeline.text_encoder
-            scheduler=pipeline.scheduler
-            pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-            '''vae.to(device,torch_dtype)
-            unet.to(device,torch_dtype)
-            text_encoder.to(device,torch_dtype)
-            scheduler.to(device,torch_dtype)'''
-            #pipeline.requires_grad_(False)
-            for component in [vae,unet,text_encoder]:
-                component.to(device,torch_dtype)
-                component.requires_grad_(False)
+        vae=pipeline.vae
+        unet=pipeline.unet
+        text_encoder=pipeline.text_encoder
+        scheduler=pipeline.scheduler
+        pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+        '''vae.to(device,torch_dtype)
+        unet.to(device,torch_dtype)
+        text_encoder.to(device,torch_dtype)
+        scheduler.to(device,torch_dtype)'''
+        #pipeline.requires_grad_(False)
+        for component in [vae,unet,text_encoder]:
+            component.to(device,torch_dtype)
+            component.requires_grad_(False)
+        
+        replace_ip_attn(unet,args.cross_embedding_dim)
+        attn_layer_list=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
+        print("len attn_layers",len(attn_layer_list))
+        for layer in attn_layer_list:
+            layer.requires_grad_(True)
+
 
         print("before ",pipeline.unet.config.sample_size)
         pipeline.unet.config.sample_size=args.image_size // pipeline.vae_scale_factor
@@ -225,13 +235,13 @@ def main(args):
         #multiple projection layers for different layers..?
 
 
-        cross_attention_dim=unet.config.cross_attention_dim
-        projection_layer=IPAdapterFullImageProjection(embedding_dim,cross_attention_dim)
+        #cross_attention_dim=unet.config.cross_attention_dim
+        projection_layer=IPAdapterFullImageProjection(embedding_dim,args.cross_attention_dim)
         projection_layer.to(device,torch_dtype)
         projection_layer.ff.to(device,torch_dtype)
         projection_layer.requires_grad_(True)
 
-        params=[p for p in projection_layer.parameters()]
+        params=[p for p in projection_layer.parameters()]+[attn_layer_list]
 
         if args.train_unet:
             apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)

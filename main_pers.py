@@ -378,12 +378,19 @@ def main(args):
                         image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                         image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
                         print("img vs real img",image.size(),image_batch.size())
+                        #image_embeds.to("cpu")
+                        image_batch.to(image.device)
+
                         difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
-                        pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
-                        metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+
+
                         embedding_real=embed_img_tensor(image_batch)
                         embedding_fake=embed_img_tensor(image)
                         embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
+                        
+                        
+                        pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
+                        metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
                     metrics["difference"]=np.mean(difference_list)
                     accelerator.log(metrics)
                     end=time.time()
@@ -400,7 +407,17 @@ def main(args):
             image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",image.size(),image_batch.size())
+            #image_embeds.to("cpu")
+            image_batch.to(image.device)
+
             difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
+
+
+            embedding_real=embed_img_tensor(image_batch)
+            embedding_fake=embed_img_tensor(image)
+            embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
+            
+            
             pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
             metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
         metrics["difference"]=np.mean(difference_list)

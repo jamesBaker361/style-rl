@@ -143,6 +143,7 @@ def main(args):
                 #print("cls featurs size",cls_features.size())
                 embedding=cls_features
             elif args.embedding=="siglip2":
+                print("img",img_tensor.device)
                 inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
                 for key in ['input_ids','pixel_values']:
                     print(key,inputs[key].device)

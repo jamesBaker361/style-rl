@@ -428,14 +428,10 @@ def main(args):
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
         metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,pipeline)
-        accelerator.log({
-            "final_difference":metrics["difference"],
-            "final_embedding_difference":metrics["embedding_difference"]
-        })
-        print({
-            "final_difference":metrics["difference"],
-            "final_embedding_difference":metrics["embedding_difference"]
-        })
+        new_metrics={}
+        for k,v in metrics.items():
+            new_metrics["test_"+k]=v
+        accelerator.log(new_metrics)
 
         if args.pipeline=="lcm":
             baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)

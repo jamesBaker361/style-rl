@@ -148,6 +148,8 @@ def main(args):
             #print(embedding.size())
             embedding.to("cpu")
             embedding_list.append(embedding)
+            accelerator.free_memory()
+            torch.cuda.empty_cache()
             
             text_list.append(text)
             get_gpu_memory_usage()

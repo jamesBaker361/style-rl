@@ -331,8 +331,8 @@ def main(args):
         for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(test_batched_text_list, test_batched_embedding_list, test_batched_image_list)):
             image_embeds=projection_layer(embeds_batch)
             image_embeds=image_embeds.unsqueeze(1)
-            text=text_batch[0]
-            image=pipeline(text[0],ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+            prompt=" "
+            image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
             difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())
             pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
             metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)

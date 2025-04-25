@@ -165,9 +165,9 @@ def main(args):
             text_encoder.to(device,torch_dtype)
             scheduler.to(device,torch_dtype)'''
             #pipeline.requires_grad_(False)
-            for model in [vae,unet,text_encoder]:
-                model.to(device,torch_dtype)
-                model.requires_grad_(False)
+            for component in [vae,unet,text_encoder]:
+                component.to(device,torch_dtype)
+                component.requires_grad_(False)
 
         print("before ",pipeline.unet.config.sample_size)
         pipeline.unet.config.sample_size=args.image_size // pipeline.vae_scale_factor

@@ -245,11 +245,7 @@ def main(args):
         projection_layer.ff.to(device,torch_dtype)
         projection_layer.requires_grad_(True)'''
 
-        params=[p.parameters() for p in attn_layer_list]
-
-        if args.train_unet:
-            apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)
-            params+=[p for p in pipeline.unet.params() if p.requires_grad]
+        params=[p for p in pipeline.unet.params() if p.requires_grad]
 
         print("trainable params: ",len(params))
 

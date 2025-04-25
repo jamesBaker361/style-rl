@@ -264,6 +264,7 @@ def main(args):
 
         training_start=time.time()
         for e in range(1, args.epochs+1):
+            before_objects=find_cuda_objects()
             start=time.time()
             loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
@@ -342,6 +343,17 @@ def main(args):
                         optimizer.zero_grad()
 
                 loss_buffer.append(loss.cpu().detach().item())
+                if torch.cuda.is_available():
+                    before_memory=get_gpu_memory_usage()["allocated_mb"]
+                after_objects=find_cuda_objects()
+                len_after=len(after_objects)
+                delete_unique_objects(before_objects,after_objects)
+                after_after_objects=find_cuda_objects()
+                print("deleted ",len_after-len(after_after_objects))
+                if torch.cuda.is_available():
+                    after_memory=get_gpu_memory_usage()["allocated_mb"]
+                    print(f"freed {before_memory-after_memory} mb")
+
             end=time.time()
             elapsed=end-start
             print(f"\t epoch {e} elapsed {end-start}")

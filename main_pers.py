@@ -143,7 +143,7 @@ def main(args):
             for row in raw_data:
                 before_objects=find_cuda_objects()
                 image=row["image"]
-                image_list.append(transform_image(image))
+                image_list.append(transform_image(image).to("cpu"))
                 text=row["text"]
                 if type(text)==list:
                     text=text[0]

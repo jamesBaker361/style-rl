@@ -316,7 +316,7 @@ def main(args):
 
                         if scheduler.config.prediction_type == "epsilon":
                             target = noise
-                        elif scheduler.config.prediction_type == "v_prediction" or scheduler.config.prediction_type =="velocity":
+                        elif scheduler.config.prediction_type == "v_prediction":
                             target = scheduler.get_velocity(latents, noise, timesteps)
                         else:
                             raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
@@ -380,7 +380,7 @@ def main(args):
                         image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
                         print("img vs real img",image.size(),image_batch.size())
                         #image_embeds.to("cpu")
-                        image_batch.to(image.device)
+                        image_batch=image_batch.to(image.device)
 
                         difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
 
@@ -411,7 +411,7 @@ def main(args):
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",image.size(),image_batch.size())
             #image_embeds.to("cpu")
-            image_batch.to(image.device)
+            image_batch=image_batch.to(image.device)
 
             difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
 

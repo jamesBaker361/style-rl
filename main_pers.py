@@ -96,6 +96,7 @@ def main(args):
         elif args.embedding=="ssl":
             processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
             model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
+            model.to(device,torch_dtype)
 
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
             if args.embedding=="dino":

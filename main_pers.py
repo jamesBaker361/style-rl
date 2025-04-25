@@ -361,7 +361,8 @@ def main(args):
             print(f"\t epoch {e} elapsed {end-start}")
             accelerator.log({
                 "loss_mean":np.mean(loss_buffer),
-                "loss_std":np.std(loss_buffer)
+                "loss_std":np.std(loss_buffer),
+                "elapsed":elapsed
             })
             accelerator.free_memory()
             if e%args.validation_interval==0:
@@ -387,6 +388,7 @@ def main(args):
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
         difference_list=[]
+        embedding_difference_list=[]
         metrics={}
         for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(test_batched_text_list, test_batched_embedding_list, test_batched_image_list)):
             image_embeds=embeds_batch #.unsqueeze(0)

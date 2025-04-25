@@ -104,8 +104,10 @@ def main(args):
         "bf16":torch.bfloat16
     }[args.mixed_precision]
     with accelerator.autocast():
-        
-        raw_data=load_dataset(args.dataset,split="train")
+        try:
+            raw_data=load_dataset(args.dataset,split="train")
+        except OSError:
+            raw_data=load_dataset(args.dataset,split="train",force_download=True)
 
         os.makedirs(args.data_dir,exist_ok=True)
 

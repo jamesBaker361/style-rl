@@ -144,6 +144,7 @@ def main(args):
             text=row["text"]
             if type(text)==list:
                 text=text[0]
+            before_objects=find_cuda_objects()
             embedding=embed_img_tensor(transform_image(image))[0]
             #print(embedding.size())
             embedding.to("cpu")
@@ -152,8 +153,11 @@ def main(args):
             torch.cuda.empty_cache()
             
             text_list.append(text)
-            get_gpu_memory_usage()
+            print(get_gpu_memory_usage())
             print("gpu objects:",len(find_cuda_objects()))
+            after_objects=find_cuda_objects
+            delete_unique_objects(after_objects,before_objects)
+
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
             pred_embedding_batch=embed_img_tensor(img_tensor_batch)

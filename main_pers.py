@@ -41,7 +41,7 @@ parser.add_argument("--train_unet",action="store_true")
 parser.add_argument("--prediction_type",type=str,default="epsilon")
 parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
-parser.add_argument("--buffer_size",type=int,default=10)
+parser.add_argument("--buffer_size",type=int,default=0)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 
 import torch
@@ -224,7 +224,7 @@ def main(args):
         optimizer=torch.optim.AdamW(params)
 
         vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer)
-        if args.training_type=="reward":
+        '''if args.training_type=="reward":
             loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 if b==args.buffer_size:
@@ -232,11 +232,12 @@ def main(args):
                 text=text_batch[0]
                 image=pipeline(text,output_type="pt").images[0]
                 loss=loss_fn(image,embeds_batch[0])
-                loss_buffer.append(loss.cpu().detach().item())
+                loss_buffer.append(loss.cpu().detach().item())'''
 
         training_start=time.time()
         for e in range(1, args.epochs+1):
             start=time.time()
+            loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
                 embeds_batch.to(device)
@@ -299,22 +300,26 @@ def main(args):
                         images=pipeline.call_with_grad(prompt=prompt, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                         predicted=embed_img_tensor(images)
                         loss=loss_fn(images,predicted)
-                        loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
+                        #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                         accelerator.backward(loss)
 
                         optimizer.step()
                         optimizer.zero_grad()
 
-                        loss_buffer.append(loss.cpu().detach().item())
-                        loss_buffer=loss_buffer[1:]
+                loss_buffer.append(loss.cpu().detach().item())
             end=time.time()
             elapsed=end-start
             print(f"\t epoch {e} elapsed {end-start}")
+            accelerator.log({
+                "loss_mean":np.mean(loss_buffer),
+                "loss_std":np.std(loss_buffer)
+            })
             accelerator.free_memory()
             if e%args.validation_interval==0:
                 start=time.time()
                 metrics={}
                 difference_list=[]
+                embedding_difference_list=[]
                 start=time.time()
                 for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
                     image_embeds=projection_layer(embeds_batch)

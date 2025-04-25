@@ -296,6 +296,7 @@ def main(args):
                 pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
             metrics["difference"]=np.mean(difference_list)
+            metrics["embedding_difference"]=np.mean(embedding_difference_list)
             accelerator.log(metrics)
             return metrics
 
@@ -414,7 +415,15 @@ def main(args):
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
         metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list)
-        
+        accelerator.log({
+            "final_difference":metrics["difference"],
+            "final_embedding_difference":metrics["embedding_difference"]
+        })
+        print({
+            "final_difference":metrics["difference"],
+            "final_embedding_difference":metrics["embedding_difference"]
+        })
+
         
 
                 

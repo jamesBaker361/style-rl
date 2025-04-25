@@ -110,9 +110,9 @@ def main(args):
                 print('dino_vit_features.size()',dino_vit_features.size())
                 embedding=dino_vit_features.view(batch_size,-1)
             elif args.embedding=="ssl":
-                print("before ",type(img_tensor),img_tensor.size())
+                #print("before ",type(img_tensor),img_tensor.size())
                 p_inputs=processor(img_tensor,return_tensors="pt")
-                print(p_inputs)
+                #print(p_inputs)
                 outputs = model(**p_inputs)
                 cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
                 #print("cls featurs size",cls_features.size())
@@ -143,7 +143,7 @@ def main(args):
             text=row["text"]
             if type(text)==list:
                 text=text[0]
-            embedding_list.append(embed_img_tensor(transform_image(image))[0])
+            embedding_list.append(embed_img_tensor(transform_image(image))[0]).to("cpu")
             text_list.append(text)
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
@@ -240,7 +240,7 @@ def main(args):
             loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
-                embeds_batch.to(device)
+                embeds_batch.to(device,torch_dtype)
                 image_embeds=projection_layer(embeds_batch)
                 image_embeds=image_embeds.unsqueeze(1)
                 #print(image_embeds.size())

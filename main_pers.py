@@ -245,7 +245,7 @@ def main(args):
         projection_layer.ff.to(device,torch_dtype)
         projection_layer.requires_grad_(True)'''
 
-        params=[p for p in pipeline.unet.params() if p.requires_grad]
+        params=[p for p in pipeline.unet.parameters() if p.requires_grad]
 
         print("trainable params: ",len(params))
 

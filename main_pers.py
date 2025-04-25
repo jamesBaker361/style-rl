@@ -110,6 +110,7 @@ def main(args):
             0.5,
             0.5
         ],
+        device:device,
         "image_processor_type": "SiglipImageProcessorFast",
         "image_std": [
             0.5,
@@ -149,8 +150,8 @@ def main(args):
             model.requires_grad_(False)
         elif args.embedding=="siglip2":
             model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=device)
-            SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
+            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224")
+            SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=device)
             model.to(device,torch_dtype)
             model.requires_grad_(False)
 

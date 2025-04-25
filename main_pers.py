@@ -138,25 +138,27 @@ def main(args):
         image_list=[]
         shuffled_row_list=[row for row in raw_data]
         random.shuffle(shuffled_row_list)
-        for row in raw_data:
-            image=row["image"]
-            image_list.append(transform_image(image))
-            text=row["text"]
-            if type(text)==list:
-                text=text[0]
-            before_objects=find_cuda_objects()
-            embedding=embed_img_tensor(transform_image(image))[0]
-            #print(embedding.size())
-            embedding.to("cpu")
-            embedding_list.append(embedding)
-            accelerator.free_memory()
-            torch.cuda.empty_cache()
-            
-            text_list.append(text)
-            print(get_gpu_memory_usage())
-            print("gpu objects:",len(find_cuda_objects()))
-            after_objects=find_cuda_objects()
-            delete_unique_objects(after_objects,before_objects)
+        with torch.no_grad():
+            for row in raw_data:
+                image=row["image"]
+                image_list.append(transform_image(image))
+                text=row["text"]
+                if type(text)==list:
+                    text=text[0]
+                before_objects=find_cuda_objects()
+                embedding=embed_img_tensor(transform_image(image))[0]
+                #print(embedding.size())
+                embedding.to("cpu")
+                embedding_list.append(embedding)
+                accelerator.free_memory()
+                torch.cuda.empty_cache()
+                
+                text_list.append(text)
+                print(get_gpu_memory_usage())
+                print("gpu objects:",len(find_cuda_objects()))
+                after_objects=find_cuda_objects()
+                delete_unique_objects(after_objects,before_objects)
+                print("grads",len(find_cuda_tensors_with_grads()))
 
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:

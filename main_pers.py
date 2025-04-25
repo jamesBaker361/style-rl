@@ -254,7 +254,7 @@ def main(args):
                 if args.training_type=="denoise":
                     with accelerator.accumulate(params):
                         # Convert images to latent space
-                        image_batch.to(device,torch_dtype)
+                        image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)
                         latents = vae.encode(image_batch).latent_dist.sample()
                         latents = latents * vae.config.scaling_factor
 

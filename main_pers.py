@@ -372,6 +372,7 @@ def main(args):
                     image_embeds=embeds_batch #.unsqueeze(0)
                     prompt=" "
                     image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                    image_batch=F.resize(image_batch, (args.image_size,args.image_size))
                     print("img vs real img",image.size(),image_batch.size())
                     difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
                     pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
@@ -389,6 +390,8 @@ def main(args):
             image_embeds=embeds_batch #.unsqueeze(0)
             prompt=" "
             image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+            image_batch=F.resize(image_batch, (args.image_size,args.image_size))
+            print("img vs real img",image.size(),image_batch.size())
             difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
             pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
             metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)

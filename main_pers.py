@@ -399,7 +399,7 @@ def main(args):
                         
                         
                         do_denormalize= [True] * image.shape[0]
-                        pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)
+                        pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
                         metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
                     metrics["difference"]=np.mean(difference_list)
                     accelerator.log(metrics)
@@ -431,7 +431,7 @@ def main(args):
             
             do_denormalize= [True] * image.shape[0]
             pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)
-            metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+            metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)[0]
         metrics["difference"]=np.mean(difference_list)
         accelerator.log(metrics)
         

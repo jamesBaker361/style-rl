@@ -48,6 +48,7 @@ parser.add_argument("--validation_interval",type=int,default=20)
 parser.add_argument("--buffer_size",type=int,default=0)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 parser.add_argument("--cross_attention_dim",type=int,default=1024)
+parser.add_argument("--limit",type=int,default=-1)
 
 import torch
 import torch.nn.functional as F
@@ -143,7 +144,9 @@ def main(args):
         shuffled_row_list=[row for row in raw_data]
         random.shuffle(shuffled_row_list)
         with torch.no_grad():
-            for row in raw_data:
+            for i,row in enumerate(raw_data):
+                if i==args.limit:
+                    break
                 before_objects=find_cuda_objects()
                 image=row["image"]
                 image_list.append(transform_image(image).to("cpu"))

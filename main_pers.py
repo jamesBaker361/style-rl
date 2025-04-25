@@ -108,7 +108,9 @@ def main(args):
                 print('dino_vit_features.size()',dino_vit_features.size())
                 embedding=dino_vit_features.view(batch_size,-1)
             elif args.embedding=="ssl":
+                print("before ",type(img_tensor),img_tensor.size())
                 p_inputs=processor(img_tensor,return_tensors="pt")
+                print(p_inputs)
                 outputs = model(**p_inputs)
                 cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
                 #print("cls featurs size",cls_features.size())

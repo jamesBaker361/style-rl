@@ -144,6 +144,8 @@ def main(args):
                 embedding=cls_features
             elif args.embedding=="siglip2":
                 inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
+                for key in ['input_ids','pixel_values']:
+                    print(key,inputs[key].device)
                 outputs = model(**inputs)
                 embedding=outputs.image_embeds
                 

@@ -280,7 +280,7 @@ def main(args):
                 image=pipeline(text,output_type="pt").images[0]
                 loss=loss_fn(image,embeds_batch[0])
                 loss_buffer.append(loss.cpu().detach().item())'''
-        def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:False):
+        def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False):
             metrics={}
             difference_list=[]
             embedding_difference_list=[]

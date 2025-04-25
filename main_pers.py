@@ -250,7 +250,8 @@ def main(args):
                 embeds_batch.to(device,torch_dtype)
                 image_embeds=projection_layer(embeds_batch)
                 image_embeds=image_embeds.unsqueeze(1)
-                #print(image_embeds.size())
+                print('image_embeds')
+                print(image_embeds)
                 prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                     prompt=" "
@@ -260,6 +261,9 @@ def main(args):
                         image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)
                         latents = vae.encode(image_batch).latent_dist.sample()
                         latents = latents * vae.config.scaling_factor
+
+                        print('latents')
+                        print(latents)
 
                         # Sample noise that we'll add to the latents
                         noise = torch.randn_like(latents)
@@ -275,6 +279,8 @@ def main(args):
                                 negative_prompt_embeds=None,
                                 #lora_scale=lora_scale,
                         )
+
+                        print(encoder_hidden_states)
                         encoder_hidden_states = prompt_embeds
                         timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                         #timesteps = timesteps.long()
@@ -297,6 +303,9 @@ def main(args):
 
                         # Predict the noise residual and compute loss
                         model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+
+                        print('model_pred')
+                        print(model_pred)
 
                         loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                         accelerator.backward(loss)

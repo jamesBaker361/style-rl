@@ -193,9 +193,9 @@ def main(args):
             component.requires_grad_(False)
         
         replace_ip_attn(unet,args.cross_embedding_dim)
-        attn_layer_list=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
+        attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
         print("len attn_layers",len(attn_layer_list))
-        for layer in attn_layer_list:
+        for (layer) in attn_layer_list:
             layer.requires_grad_(True)
 
 

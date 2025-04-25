@@ -7,6 +7,7 @@ from experiment_helpers.unsafe_stable_diffusion_pipeline import UnsafeStableDiff
 from pipelines import CompatibleLatentConsistencyModelPipeline
 from datasets import load_dataset
 import torchvision.transforms as transforms
+
 import torch
 from accelerate import Accelerator
 import time
@@ -15,7 +16,7 @@ from extractor import ViTExtractor
 import torch.nn.functional as F
 from PIL import Image
 import random
-from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast
+from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast, SiglipModel
 from worse_peft import apply_lora
 import wandb
 import numpy as np
@@ -105,6 +106,10 @@ def main(args):
             processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
             model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
             model.to(device,torch_dtype)
+        elif args.embedding=="siglip2":
+            model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
+            processor = BaseImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
+            model.to(device,torch_dtype)
 
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
             img_tensor=img_tensor.to(device,torch_dtype)
@@ -125,8 +130,11 @@ def main(args):
                 cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
                 #print("cls featurs size",cls_features.size())
                 embedding=cls_features
+            elif args.embedding=="siglip2":
+                inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
+                outputs = model(**inputs)
+                embedding=outputs.image_embeds
                 
-
             return embedding
         
         def transform_image(pil_image:Image.Image):

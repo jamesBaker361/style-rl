@@ -26,6 +26,7 @@ from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from transformers.models.siglip.image_processing_siglip_fast import SiglipImageProcessorFast
+from transformers.models.siglip.processing_siglip import SiglipProcessor
 
 seed=1234
 random.seed(seed)                      # Python
@@ -118,7 +119,8 @@ def main(args):
             model.to(device,torch_dtype)
         elif args.embedding=="siglip2":
             model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
+            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224")
+            SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
             model.to(device,torch_dtype)
 
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:

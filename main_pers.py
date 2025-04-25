@@ -391,7 +391,7 @@ def main(args):
                         
                         
                         do_denormalize= [True] * image.shape[0]
-                        pil_image=pipeline.image_processor.postprocess(image,"pil",do_denormalize)
+                        pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)
                         metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
                     metrics["difference"]=np.mean(difference_list)
                     accelerator.log(metrics)
@@ -422,7 +422,7 @@ def main(args):
             embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
             
             do_denormalize= [True] * image.shape[0]
-            pil_image=pipeline.image_processor.postprocess(image,"pil",do_denormalize)
+            pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)
             metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
         metrics["difference"]=np.mean(difference_list)
         accelerator.log(metrics)

@@ -282,7 +282,7 @@ def main(args):
                         latents = vae.encode(image_batch).latent_dist.sample()
                         latents = latents * vae.config.scaling_factor
 
-                        print('latents',latents.requires_grad)
+                        print('latents',latents.requires_grad,latents.size())
 
                         # Sample noise that we'll add to the latents
                         noise = torch.randn_like(latents)

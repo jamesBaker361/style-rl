@@ -22,6 +22,7 @@ import numpy as np
 import random
 from gpu_helpers import *
 
+
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
 parser.add_argument("--mixed_precision",type=str,default="no")
@@ -140,12 +141,13 @@ def main(args):
         random.shuffle(shuffled_row_list)
         with torch.no_grad():
             for row in raw_data:
+                before_objects=find_cuda_objects()
                 image=row["image"]
                 image_list.append(transform_image(image))
                 text=row["text"]
                 if type(text)==list:
                     text=text[0]
-                before_objects=find_cuda_objects()
+                
                 embedding=embed_img_tensor(transform_image(image))[0]
                 #print(embedding.size())
                 embedding.to("cpu")
@@ -155,10 +157,10 @@ def main(args):
                 
                 text_list.append(text)
                 print(get_gpu_memory_usage())
-                print("gpu objects:",len(find_cuda_objects()))
+                #print("gpu objects:",len(find_cuda_objects()))
                 after_objects=find_cuda_objects()
                 delete_unique_objects(after_objects,before_objects)
-                print("grads",len(find_cuda_tensors_with_grads()))
+                #print("grads",len(find_cuda_tensors_with_grads()))
 
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:

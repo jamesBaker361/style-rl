@@ -271,14 +271,17 @@ def main(args):
                 image=pipeline(text,output_type="pt").images[0]
                 loss=loss_fn(image,embeds_batch[0])
                 loss_buffer.append(loss.cpu().detach().item())'''
-        def logging(batched_text_list, batched_embedding_list, batched_image_list):
+        def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:False):
             metrics={}
             difference_list=[]
             embedding_difference_list=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 image_embeds=embeds_batch #.unsqueeze(0)
                 prompt=" "
-                image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                if baseline:
+                    image=pipeline(prompt,ip_adapter_image=image_batch,output_type="pt").images[0]
+                else:
+                    image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                 image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
                 print("img vs real img",image.size(),image_batch.size())
                 #image_embeds.to("cpu")
@@ -297,7 +300,8 @@ def main(args):
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
             metrics["difference"]=np.mean(difference_list)
             metrics["embedding_difference"]=np.mean(embedding_difference_list)
-            accelerator.log(metrics)
+            if not baseline:
+                accelerator.log(metrics)
             return metrics
 
         training_start=time.time()
@@ -406,7 +410,7 @@ def main(args):
                 with torch.no_grad():
 
                     start=time.time()
-                    logging(val_batched_text_list,val_batched_embedding_list,val_batched_image_list)
+                    logging(val_batched_text_list,val_batched_embedding_list,val_batched_image_list,pipeline)
                     end=time.time()
                     print(f"\t validation epoch {e} elapsed {end-start}")
                 after_objects=find_cuda_objects()
@@ -414,7 +418,7 @@ def main(args):
         training_end=time.time()
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
-        metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list)
+        metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,pipeline)
         accelerator.log({
             "final_difference":metrics["difference"],
             "final_embedding_difference":metrics["embedding_difference"]
@@ -423,6 +427,15 @@ def main(args):
             "final_difference":metrics["difference"],
             "final_embedding_difference":metrics["embedding_difference"]
         })
+
+        if args.pipeline=="lcm":
+            baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+        baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+        baseline_metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,baseline_pipeline,True)
+        new_metrics={}
+        for k,v in baseline_metrics.items():
+            new_metrics["baseline_"+k]=v
+        accelerator.log(new_metrics)
 
         
 

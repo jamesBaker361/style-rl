@@ -117,11 +117,13 @@ def main(args):
             processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
             model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
             model.to(device,torch_dtype)
+            model.requires_grad_(False)
         elif args.embedding=="siglip2":
             model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
             processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224")
             SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
             model.to(device,torch_dtype)
+            model.requires_grad_(False)
 
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
             img_tensor=img_tensor.to(device,torch_dtype)

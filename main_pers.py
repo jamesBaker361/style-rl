@@ -150,8 +150,8 @@ def main(args):
             model.requires_grad_(False)
         elif args.embedding=="siglip2":
             model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224")
-            SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
+            processor = SiglipProcessor.from_args_and_dict({},siglip_config)
+            #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             model.to(device,torch_dtype)
             model.requires_grad_(False)
 

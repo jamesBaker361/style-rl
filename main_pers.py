@@ -23,6 +23,8 @@ import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
+from torchvision.transforms.v2 import functional as F_v2
+
 
 
 parser=argparse.ArgumentParser()
@@ -372,7 +374,7 @@ def main(args):
                     image_embeds=embeds_batch #.unsqueeze(0)
                     prompt=" "
                     image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-                    image_batch=F.resize(image_batch, (args.image_size,args.image_size))
+                    image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
                     print("img vs real img",image.size(),image_batch.size())
                     difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
                     pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
@@ -390,7 +392,7 @@ def main(args):
             image_embeds=embeds_batch #.unsqueeze(0)
             prompt=" "
             image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-            image_batch=F.resize(image_batch, (args.image_size,args.image_size))
+            image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",image.size(),image_batch.size())
             difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
             pil_image=pipeline.image_processor.postprocess(image,"pil",[True])

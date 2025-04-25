@@ -47,7 +47,7 @@ parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
 parser.add_argument("--buffer_size",type=int,default=0)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
-parser.add_argument("--cross_embedding_dim",type=int,default=1024)
+parser.add_argument("--cross_attention_dim",type=int,default=1024)
 
 import torch
 import torch.nn.functional as F
@@ -192,7 +192,7 @@ def main(args):
             component.to(device,torch_dtype)
             component.requires_grad_(False)
         
-        replace_ip_attn(unet,args.cross_embedding_dim)
+        replace_ip_attn(unet,args.cross_attention_dim)
         attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
         print("len attn_layers",len(attn_layer_list))
         for (layer) in attn_layer_list:

@@ -93,11 +93,38 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
     return lst[:i1], lst[i1:i2], lst[i2:]
 
 
+
+
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     device=accelerator.device
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+
+    siglip_config={
+        "do_normalize": True,
+        "do_rescale":True,
+        "do_resize": True,
+        "image_mean": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "image_processor_type": "SiglipImageProcessorFast",
+        "image_std": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "processor_class": "SiglipProcessor",
+        "resample": 2,
+        "rescale_factor": 0.00392156862745098,
+        "size": {
+            "height": 224,
+            "width": 224
+        }
+        }
+
     torch_dtype={
         "no":torch.float32,
         "fp16":torch.float16,
@@ -122,7 +149,7 @@ def main(args):
             model.requires_grad_(False)
         elif args.embedding=="siglip2":
             model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224")
+            processor = SiglipProcessor.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=device)
             SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224")
             model.to(device,torch_dtype)
             model.requires_grad_(False)
@@ -148,7 +175,7 @@ def main(args):
                 embedding=cls_features
             elif args.embedding=="siglip2":
                 print("img",img_tensor.device)
-                inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt",convert_to_rgb=False)
+                inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
                 for key in ['input_ids','pixel_values']:
                     print(key,inputs[key].device)
                 outputs = model(**inputs)

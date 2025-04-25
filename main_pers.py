@@ -366,24 +366,28 @@ def main(args):
             })
             accelerator.free_memory()
             if e%args.validation_interval==0:
-                start=time.time()
-                metrics={}
-                difference_list=[]
-                embedding_difference_list=[]
-                start=time.time()
-                for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
-                    image_embeds=embeds_batch #.unsqueeze(0)
-                    prompt=" "
-                    image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-                    image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
-                    print("img vs real img",image.size(),image_batch.size())
-                    difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
-                    pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
-                    metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
-                metrics["difference"]=np.mean(difference_list)
-                accelerator.log(metrics)
-                end=time.time()
-                print(f"\t validation epoch {e} elapsed {end-start}")
+                with torch.no_grad():
+                    start=time.time()
+                    metrics={}
+                    difference_list=[]
+                    embedding_difference_list=[]
+                    start=time.time()
+                    for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
+                        image_embeds=embeds_batch #.unsqueeze(0)
+                        prompt=" "
+                        image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                        image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
+                        print("img vs real img",image.size(),image_batch.size())
+                        difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
+                        pil_image=pipeline.image_processor.postprocess(image,"pil",[True])
+                        metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+                        embedding_real=embed_img_tensor(image_batch)
+                        embedding_fake=embed_img_tensor(image)
+                        embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
+                    metrics["difference"]=np.mean(difference_list)
+                    accelerator.log(metrics)
+                    end=time.time()
+                    print(f"\t validation epoch {e} elapsed {end-start}")
         training_end=time.time()
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()

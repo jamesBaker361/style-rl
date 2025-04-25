@@ -245,7 +245,7 @@ def main(args):
         projection_layer.ff.to(device,torch_dtype)
         projection_layer.requires_grad_(True)'''
 
-        params=[p for p in attn_layer_list.parameters()]
+        params=[p.parameters() for p in attn_layer_list]
 
         if args.train_unet:
             apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)

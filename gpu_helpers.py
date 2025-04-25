@@ -60,8 +60,11 @@ def delete_unique_objects(list1, list2):
     for obj in unique_in_list1 + unique_in_list2:
         
         if isinstance(obj, torch.Tensor):
+            if obj.grad is not None:
+                if obj.grad.grad_fn is not None:
+                    obj.grad.detach_()
             obj.grad = None  # Clear gradients first
-        obj.detach_()
+        #obj.detach_()
         obj.to("cpu")
         del obj  # Delete the object
 

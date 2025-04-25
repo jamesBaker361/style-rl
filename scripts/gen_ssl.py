@@ -14,8 +14,8 @@ for pipeline in ["lcm"]:
                     "lcm":"bf16"
                 }[pipeline]
                 command=f" sbatch -J pers {exclude} --out=slurm/pers/{name}.out --err=slurm/pers/{name}.err "
-                command+=f" runpygpu.sh main_pers.py  --mixed_precision {precision} --gradient_accumulation_steps 32 --embedding {embedding} --epochs 100 "
-                command+=f"  {training_flags}  --validation_interval 100 --dataset jlbaker361/{data} --project_name pers_{data} "
+                command+=f" runpygpu.sh main_pers.py  --mixed_precision {precision} --gradient_accumulation_steps 32 --embedding {embedding} --epochs 250 "
+                command+=f"  {training_flags}  --validation_interval 25 --dataset jlbaker361/{data} --project_name pers_{data} "
                 command+=f" --pipeline {pipeline} "
                 print(command)
 

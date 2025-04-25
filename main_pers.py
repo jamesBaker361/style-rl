@@ -271,6 +271,33 @@ def main(args):
                 image=pipeline(text,output_type="pt").images[0]
                 loss=loss_fn(image,embeds_batch[0])
                 loss_buffer.append(loss.cpu().detach().item())'''
+        def logging(batched_text_list, batched_embedding_list, batched_image_list):
+            metrics={}
+            difference_list=[]
+            embedding_difference_list=[]
+            for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
+                image_embeds=embeds_batch #.unsqueeze(0)
+                prompt=" "
+                image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
+                print("img vs real img",image.size(),image_batch.size())
+                #image_embeds.to("cpu")
+                image_batch=image_batch.to(image.device)
+
+                difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
+
+
+                embedding_real=embed_img_tensor(image_batch)
+                embedding_fake=embed_img_tensor(image)
+                embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
+                
+                
+                do_denormalize= [True] * image.shape[0]
+                pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
+                metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+            metrics["difference"]=np.mean(difference_list)
+            accelerator.log(metrics)
+            return metrics
 
         training_start=time.time()
         for e in range(1, args.epochs+1):
@@ -376,33 +403,9 @@ def main(args):
             if e%args.validation_interval==0:
                 before_objects=find_cuda_objects()
                 with torch.no_grad():
+
                     start=time.time()
-                    metrics={}
-                    difference_list=[]
-                    embedding_difference_list=[]
-                    start=time.time()
-                    for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
-                        image_embeds=embeds_batch #.unsqueeze(0)
-                        prompt=" "
-                        image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-                        image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
-                        print("img vs real img",image.size(),image_batch.size())
-                        #image_embeds.to("cpu")
-                        image_batch=image_batch.to(image.device)
-
-                        difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
-
-
-                        embedding_real=embed_img_tensor(image_batch)
-                        embedding_fake=embed_img_tensor(image)
-                        embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
-                        
-                        
-                        do_denormalize= [True] * image.shape[0]
-                        pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
-                        metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
-                    metrics["difference"]=np.mean(difference_list)
-                    accelerator.log(metrics)
+                    logging(val_batched_text_list,val_batched_embedding_list,val_batched_image_list)
                     end=time.time()
                     print(f"\t validation epoch {e} elapsed {end-start}")
                 after_objects=find_cuda_objects()
@@ -410,30 +413,8 @@ def main(args):
         training_end=time.time()
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
-        difference_list=[]
-        embedding_difference_list=[]
-        metrics={}
-        for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(test_batched_text_list, test_batched_embedding_list, test_batched_image_list)):
-            image_embeds=embeds_batch #.unsqueeze(0)
-            prompt=" "
-            image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-            image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
-            print("img vs real img",image.size(),image_batch.size())
-            #image_embeds.to("cpu")
-            image_batch=image_batch.to(image.device)
-
-            difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
-
-
-            embedding_real=embed_img_tensor(image_batch)
-            embedding_fake=embed_img_tensor(image)
-            embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
-            
-            do_denormalize= [True] * image.shape[0]
-            pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
-            metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
-        metrics["difference"]=np.mean(difference_list)
-        accelerator.log(metrics)
+        metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list)
+        
         
 
                 

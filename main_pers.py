@@ -26,6 +26,15 @@ from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 
+seed=1234
+random.seed(seed)                      # Python
+np.random.seed(seed)                   # NumPy
+torch.manual_seed(seed)                # PyTorch (CPU)
+try:
+    torch.cuda.manual_seed(seed)           # PyTorch (GPU)
+except:
+    pass
+
 
 
 parser=argparse.ArgumentParser()

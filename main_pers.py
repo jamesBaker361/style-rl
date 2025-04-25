@@ -154,7 +154,7 @@ def main(args):
                 if type(text)==list:
                     text=text[0]
                 
-                embedding=embed_img_tensor(transform_image(image))[0]
+                embedding=embed_img_tensor(transform_image(image)).unsqueeze(0)
                 #print(embedding.size())
                 embedding.to("cpu")
                 embedding_list.append(embedding)
@@ -270,7 +270,7 @@ def main(args):
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
                 embeds_batch.to(device,torch_dtype)
-                image_embeds=embeds_batch.unsqueeze(1)
+                image_embeds=embeds_batch #.unsqueeze(1)
                 print('image_embeds',image_embeds.requires_grad,image_embeds.size())
                 prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:
@@ -369,7 +369,7 @@ def main(args):
                 embedding_difference_list=[]
                 start=time.time()
                 for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
-                    image_embeds=embeds_batch.unsqueeze(0)
+                    image_embeds=embeds_batch #.unsqueeze(0)
                     prompt=" "
                     image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())
@@ -385,7 +385,7 @@ def main(args):
         difference_list=[]
         metrics={}
         for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(test_batched_text_list, test_batched_embedding_list, test_batched_image_list)):
-            image_embeds=embeds_batch.unsqueeze(0)
+            image_embeds=embeds_batch #.unsqueeze(0)
             prompt=" "
             image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
             difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())

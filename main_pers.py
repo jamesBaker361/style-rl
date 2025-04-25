@@ -219,7 +219,7 @@ def main(args):
                 torch.cuda.empty_cache()
                 
                 text_list.append(text)
-                print(get_gpu_memory_usage())
+                #print(get_gpu_memory_usage())
                 #print("gpu objects:",len(find_cuda_objects()))
                 after_objects=find_cuda_objects()
                 delete_unique_objects(after_objects,before_objects)

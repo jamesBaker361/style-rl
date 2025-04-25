@@ -251,7 +251,7 @@ def main(args):
 
         optimizer=torch.optim.AdamW(params)
 
-        vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline,projection_layer)
+        vae,unet,text_encoder,scheduler,optimizer,pipeline=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline)
         '''if args.training_type=="reward":
             loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
@@ -369,8 +369,7 @@ def main(args):
                 embedding_difference_list=[]
                 start=time.time()
                 for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(val_batched_text_list, val_batched_embedding_list, val_batched_image_list)):
-                    image_embeds=projection_layer(embeds_batch)
-                    image_embeds=image_embeds.unsqueeze(1)
+                    image_embeds=embeds_batch.unsqueeze(0)
                     prompt=" "
                     image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())
@@ -386,8 +385,7 @@ def main(args):
         difference_list=[]
         metrics={}
         for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(test_batched_text_list, test_batched_embedding_list, test_batched_image_list)):
-            image_embeds=projection_layer(embeds_batch)
-            image_embeds=image_embeds.unsqueeze(1)
+            image_embeds=embeds_batch.unsqueeze(0)
             prompt=" "
             image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
             difference_list.append(F.mse_loss(image,image_batch[0]).cpu().detach().item())

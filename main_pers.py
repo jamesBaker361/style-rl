@@ -151,7 +151,7 @@ def main(args):
                 t=transforms.Compose(
                     [transforms.ToTensor(),transforms.Normalize(dino_vit_extractor.mean,dino_vit_extractor.std)]
                 )
-            elif args.embedding=="ssl":
+            elif args.embedding=="ssl" or args.embedding=="siglip2":
                 t=transforms.Compose(
                     [transforms.ToTensor()]
                 )

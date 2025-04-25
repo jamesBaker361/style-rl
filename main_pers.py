@@ -288,7 +288,7 @@ def main(args):
                 image_embeds=embeds_batch #.unsqueeze(0)
                 prompt=" "
                 if baseline:
-                    image=pipeline(prompt,ip_adapter_image=image_batch,output_type="pt").images[0]
+                    image=pipeline(prompt,ip_adapter_image=image_batch.unsqueeze(0),output_type="pt").images[0]
                 else:
                     image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                 image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))

@@ -20,6 +20,7 @@ from worse_peft import apply_lora
 import wandb
 import numpy as np
 import random
+from gpu_helpers import *
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -144,11 +145,13 @@ def main(args):
             if type(text)==list:
                 text=text[0]
             embedding=embed_img_tensor(transform_image(image))[0]
-            print(embedding.size())
+            #print(embedding.size())
             embedding.to("cpu")
             embedding_list.append(embedding)
             
             text_list.append(text)
+            get_gpu_memory_usage()
+            print("gpu objects:",len(find_cuda_objects()))
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
             pred_embedding_batch=embed_img_tensor(img_tensor_batch)

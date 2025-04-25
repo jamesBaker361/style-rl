@@ -13,7 +13,7 @@ for pipeline in ["lcm"]:
                 precision={
                     "lcm":"bf16"
                 }[pipeline]
-                command+=f" sbatch -J pers {exclude} --out=slurm/pers/{name}.out --err=slurm/pers/{name}.err "
+                command=f" sbatch -J pers {exclude} --out=slurm/pers/{name}.out --err=slurm/pers/{name}.err "
                 command+=f" runpygpu.sh main_pers.py  --mixed_precision {precision} --gradient_accumulation_steps 32 --embedding {embedding} --epochs 100 "
                 command+=f"  {training_flags}  --validation_interval 100 --dataset jlbaker361/{data} --project_name pers_{data} "
                 command+=f" --pipeline {pipeline} "

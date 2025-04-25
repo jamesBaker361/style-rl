@@ -366,6 +366,7 @@ def main(args):
             })
             accelerator.free_memory()
             if e%args.validation_interval==0:
+                before_objects=find_cuda_objects()
                 with torch.no_grad():
                     start=time.time()
                     metrics={}
@@ -395,6 +396,8 @@ def main(args):
                     accelerator.log(metrics)
                     end=time.time()
                     print(f"\t validation epoch {e} elapsed {end-start}")
+                after_objects=find_cuda_objects()
+                delete_unique_objects(after_objects,before_objects)
         training_end=time.time()
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()

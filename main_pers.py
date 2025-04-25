@@ -192,10 +192,11 @@ def main(args):
             component.to(device,torch_dtype)
             component.requires_grad_(False)
         
-        replace_ip_attn(unet,args.cross_attention_dim)
+        replace_ip_attn(unet,args.cross_attention_dim,embedding_dim)
         attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
+        attn_layer_list.append( unet.encoder_hid_proj)
         print("len attn_layers",len(attn_layer_list))
-        for (layer) in attn_layer_list:
+        for layer in attn_layer_list:
             layer.requires_grad_(True)
 
 
@@ -236,12 +237,12 @@ def main(args):
 
 
         #cross_attention_dim=unet.config.cross_attention_dim
-        projection_layer=IPAdapterFullImageProjection(embedding_dim,args.cross_attention_dim)
+        '''projection_layer=IPAdapterFullImageProjection(embedding_dim,args.cross_attention_dim)
         projection_layer.to(device,torch_dtype)
         projection_layer.ff.to(device,torch_dtype)
-        projection_layer.requires_grad_(True)
+        projection_layer.requires_grad_(True)'''
 
-        params=[p for p in projection_layer.parameters()]+attn_layer_list
+        params=[p for p in attn_layer_list.parameters()]
 
         if args.train_unet:
             apply_lora(pipeline.unet,[0,1,2,3],[0,1,2,3],True)
@@ -269,9 +270,8 @@ def main(args):
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
                 embeds_batch.to(device,torch_dtype)
-                image_embeds=projection_layer(embeds_batch)
-                image_embeds=image_embeds.unsqueeze(1)
-                print('image_embeds',image_embeds.requires_grad)
+                image_embeds=embeds_batch.unsqueeze(1)
+                print('image_embeds',image_embeds.requires_grad,image_embeds.size())
                 prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                     prompt=" "

@@ -19,6 +19,7 @@ from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast
 from worse_peft import apply_lora
 import wandb
 import numpy as np
+import random
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -41,6 +42,7 @@ parser.add_argument("--prediction_type",type=str,default="epsilon")
 parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
 parser.add_argument("--buffer_size",type=int,default=10)
+parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 
 import torch
 import torch.nn.functional as F
@@ -235,7 +237,10 @@ def main(args):
                 embeds_batch.to(device)
                 image_embeds=projection_layer(embeds_batch)
                 image_embeds=image_embeds.unsqueeze(1)
-                print(image_embeds.size())
+                #print(image_embeds.size())
+                prompt=text_batch[0]
+                if args.epochs >1 and  random.random() <args.uncaptioned_frac:
+                    prompt=" "
                 if args.training_type=="denoise":
                     with accelerator.accumulate(params):
                         # Convert images to latent space
@@ -246,9 +251,8 @@ def main(args):
                         noise = torch.randn_like(latents)
 
                             # Get the text embedding for conditioning
-                        text=text_batch
                         prompt_embeds, _ = pipeline.encode_prompt(
-                                text,
+                                prompt,
                                 accelerator.device,
                                 1,
                                 pipeline.do_classifier_free_guidance,
@@ -287,7 +291,7 @@ def main(args):
                         optimizer.zero_grad()
                 elif args.training_type=="reward":
                     with accelerator.accumulate():
-                        images=pipeline.call_with_grad(prompt=text, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                        images=pipeline.call_with_grad(prompt=prompt, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                         predicted=embed_img_tensor(images)
                         loss=loss_fn(images,predicted)
                         loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)

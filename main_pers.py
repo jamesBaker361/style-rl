@@ -143,7 +143,11 @@ def main(args):
             text=row["text"]
             if type(text)==list:
                 text=text[0]
-            embedding_list.append(embed_img_tensor(transform_image(image))[0]).to("cpu")
+            embedding=embed_img_tensor(transform_image(image))[0]
+            print(embedding.size())
+            embedding.to("cpu")
+            embedding_list.append(embedding)
+            
             text_list.append(text)
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
@@ -177,10 +181,10 @@ def main(args):
         
         ratios=(args.train_split,(1-args.train_split)//2,(1-args.train_split)//2)
         print(ratios)
-        batched_embedding_list=make_batches_same_size(embedding_list,args.batch_size)
+        batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
         batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
 
-        text_embedding_list=[]
+        '''text_embedding_list=[]
         for t in text_list:
             text_embeds, _ = pipeline.encode_prompt(
                     text,
@@ -195,9 +199,9 @@ def main(args):
 
             text_embedding_list.append(text_embeds[0])
 
-        batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)
-        batched_image_list=make_batches_same_size(image_list,args.batch_size)
-        batched_text_list= [text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
+        batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)'''
+        batched_image_list= image_list #make_batches_same_size(image_list,args.batch_size)
+        batched_text_list= text_list #[text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
 
         
         batched_image_list,test_batched_image_list,val_batched_image_list=split_list_by_ratio(batched_image_list,ratios)
@@ -244,7 +248,7 @@ def main(args):
                 image_embeds=projection_layer(embeds_batch)
                 image_embeds=image_embeds.unsqueeze(1)
                 #print(image_embeds.size())
-                prompt=text_batch[0]
+                prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                     prompt=" "
                 if args.training_type=="denoise":

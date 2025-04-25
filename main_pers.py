@@ -110,7 +110,7 @@ def main(args):
             0.5,
             0.5
         ],
-        device:device,
+        "device":torch.cuda.get_device_name(device),
         "image_processor_type": "SiglipImageProcessorFast",
         "image_std": [
             0.5,

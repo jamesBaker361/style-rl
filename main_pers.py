@@ -175,6 +175,7 @@ def main(args):
             unet=pipeline.unet
             text_encoder=pipeline.text_encoder
             scheduler=pipeline.scheduler
+            pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
             '''vae.to(device,torch_dtype)
             unet.to(device,torch_dtype)
             text_encoder.to(device,torch_dtype)

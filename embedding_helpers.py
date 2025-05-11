@@ -3,6 +3,13 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
 from extractor import ViTExtractor
+from extractor import ViTExtractor
+import torch.nn.functional as F
+from PIL import Image
+import random
+from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast, SiglipModel
+
+from transformers.models.siglip.processing_siglip import SiglipProcessor
 
 def inverse_tokenize(x):
             # x: (B, N, embed_dim)
@@ -15,23 +22,26 @@ def inverse_tokenize(x):
 class EmbeddingUtil():
     def __init__(self,device,torch_dtype,
                      embedding:str,
-                     facet:str,
-                     dino_pooling_stride:int,
-                     dino_vit_extractor:ViTExtractor,
-                     ssl_processor,
-                     ssl_model,
-                     siglip_processor,
-                     siglip_model):
+                     facet:str):
         self.device=device
         self.torch_dtype=torch_dtype
         self.embedding=embedding
         self.facet=facet
-        self.dino_pooling_stride=dino_pooling_stride
-        self.dino_vit_extractor=dino_vit_extractor
-        self.ssl_processor=ssl_processor
-        self.ssl_model=ssl_model
-        self.siglip_processor=siglip_processor
-        self.siglip_model=siglip_model
+        if embedding=="dino":
+            self.dino_vit_extractor=ViTExtractor("dino_vits16",device=device,stride=16)
+            self.dino_vit_extractor.model.eval()
+            self.dino_vit_extractor.model.requires_grad_(False)
+        elif embedding=="ssl":
+            self.ssl_processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
+            self.ssl_model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
+            self.ssl_model.to(device,torch_dtype)
+            self.ssl_model.requires_grad_(False)
+        elif embedding=="siglip2":
+            self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
+            processor = SiglipProcessor.from_pretrained("local_config_siglip2")
+            #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
+            self.siglip_model.to(device,torch_dtype)
+            self.siglip_model.requires_grad_(False)
 
     def embed_img_tensor(self,img_tensor:torch.Tensor,
                         )->torch.Tensor:

@@ -30,6 +30,7 @@ from transformers.models.siglip.processing_siglip import SiglipProcessor
 from PIL import Image
 import requests
 from transformers import AutoProcessor, CLIPModel
+from embedding_helpers import EmbeddingUtil
 
 seed=1234
 random.seed(seed)                      # Python
@@ -141,70 +142,9 @@ def main(args):
 
         os.makedirs(args.data_dir,exist_ok=True)
 
-        if args.embedding=="dino":
-            dino_vit_extractor=ViTExtractor("dino_vits16",device=accelerator.device,stride=16)
-            dino_vit_extractor.model.eval()
-            dino_vit_extractor.model.requires_grad_(False)
-        elif args.embedding=="ssl":
-            processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
-            model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
-            model.to(device,torch_dtype)
-            model.requires_grad_(False)
-        elif args.embedding=="siglip2":
-            model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipProcessor.from_pretrained("local_config_siglip2")
-            #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
-            model.to(device,torch_dtype)
-            model.requires_grad_(False)
+        embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet)
 
-        def inverse_tokenize(x):
-            # x: (B, N, embed_dim)
-            B, N, C = x.shape
-            H = W = 224 // 16  # assuming square image/patch
-            x = x.transpose(1, 2).reshape(B, C, H, W)  # (B, embed_dim, H/patch, W/patch)
-            return x
-
-        def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
-            img_tensor=img_tensor.to(device,torch_dtype)
-            if args.embedding=="dino":
-                if len(img_tensor.size())==3:
-                    img_tensor=img_tensor.unsqueeze(0)
-                img_tensor=F.interpolate(img_tensor, size=(224, 224), mode='bilinear', align_corners=False)
-                #dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
-                dino_vit_features=dino_vit_extractor.extract_descriptors(img_tensor,facet=args.facet)
-                batch_size=img_tensor.size()[0]
-                print('dino_vit_features.size()',dino_vit_features.size())
-                dino_vit_features=inverse_tokenize(dino_vit_features)
-                dino_vit_features=F.max_pool2d(dino_vit_features, kernel_size=args.dino_pooling_stride, stride=args.dino_pooling_stride)
-                embedding=dino_vit_features.view(batch_size,-1)
-            elif args.embedding=="ssl":
-                #print("before ",type(img_tensor),img_tensor.size())
-                p_inputs=processor(img_tensor,return_tensors="pt")
-                #print(p_inputs)
-                outputs = model(**p_inputs)
-                cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
-                #print("cls featurs size",cls_features.size())
-                embedding=cls_features
-            elif args.embedding=="siglip2":
-                print("img",img_tensor.device)
-                inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
-                for key in ['input_ids','pixel_values']:
-                    inputs[key]=inputs[key].to(device)
-                outputs = model(**inputs)
-                embedding=outputs.image_embeds
-                
-            return embedding
         
-        def transform_image(pil_image:Image.Image):
-            if args.embedding=="dino":
-                t=transforms.Compose(
-                    [transforms.ToTensor(),transforms.Normalize(dino_vit_extractor.mean,dino_vit_extractor.std)]
-                )
-            elif args.embedding=="ssl" or args.embedding=="siglip2":
-                t=transforms.Compose(
-                    [transforms.ToTensor()]
-                )
-            return t(pil_image)
         
         embedding_list=[]
         text_list=[]
@@ -217,12 +157,12 @@ def main(args):
                     break
                 before_objects=find_cuda_objects()
                 image=row["image"]
-                image_list.append(transform_image(image).to("cpu"))
+                image_list.append(embedding_util.transform_image(image).to("cpu"))
                 text=row["text"]
                 if type(text)==list:
                     text=text[0]
                 
-                embedding=embed_img_tensor(transform_image(image)).unsqueeze(0)
+                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                 #print(embedding.size())
                 embedding.to("cpu")
                 embedding_list.append(embedding)
@@ -238,11 +178,11 @@ def main(args):
 
 
         def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
-            pred_embedding_batch=embed_img_tensor(img_tensor_batch)
+            pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
             return F.mse_loss(pred_embedding_batch,src_embedding_batch)
         
         fake_image=torch.rand((1,3,args.image_size,args.image_size))
-        fake_embedding=embed_img_tensor(fake_image)
+        fake_embedding=embedding_util.embed_img_tensor(fake_image)
         embedding_dim=fake_embedding.size()[-1]
 
         print("embedding dim",embedding_dim)
@@ -325,8 +265,8 @@ def main(args):
                 difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
 
 
-                embedding_real=embed_img_tensor(image_batch)
-                embedding_fake=embed_img_tensor(image)
+                embedding_real=embedding_util.embed_img_tensor(image_batch)
+                embedding_fake=embedding_util.embed_img_tensor(image)
                 embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
                 
                 
@@ -421,7 +361,7 @@ def main(args):
                 elif args.training_type=="reward":
                     with accelerator.accumulate(params):
                         images=pipeline.call_with_grad(prompt=prompt, num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-                        predicted=embed_img_tensor(images)
+                        predicted=embedding_util.embed_img_tensor(images)
                         loss=loss_fn(images,predicted)
                         #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                         accelerator.backward(loss)

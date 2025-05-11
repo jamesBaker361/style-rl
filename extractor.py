@@ -332,7 +332,7 @@ class ViTExtractor:
         else:
             assert not bin, "bin = True and include_cls = True are not supported together, set one of them False."
         if not bin:
-            desc = x.permute(0, 2, 3, 1).flatten(start_dim=-2, end_dim=-1).unsqueeze(dim=1)  # Bx1xtx(dxh)
+            desc = x.permute(0, 2, 3, 1).flatten(start_dim=-2, end_dim=-1)  # Bx1xtx(dxh)
         else:
             desc = self._log_bin(x)
         #print("extract after",len(find_cuda_objects()))

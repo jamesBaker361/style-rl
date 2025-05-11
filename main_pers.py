@@ -334,6 +334,7 @@ def main(args):
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
             metrics["difference"]=np.mean(difference_list)
             metrics["embedding_difference"]=np.mean(embedding_difference_list)
+            metrics["text_alignment"]=np.mean(text_alignment_list)
             if not baseline:
                 accelerator.log(metrics)
             return metrics

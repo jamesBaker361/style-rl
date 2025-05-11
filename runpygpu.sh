@@ -42,5 +42,6 @@ export HPS_ROOT="/scratch/jlb638/hps-cache"
 export IMAGE_REWARD_PATH="/scratch/jlb638/reward-blob"
 export IMAGE_REWARD_CONFIG="/scratch/jlb638/ImageReward/med_config.json"
 export CUDA_LAUNCH_BLOCKING="1"
+export EMBEDDING_DIR="/scratch/jlb638/embedding_src"
 srun python3 -u $@
 conda deactivate

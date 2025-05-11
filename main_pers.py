@@ -63,6 +63,7 @@ parser.add_argument("--validation_interval",type=int,default=20)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 parser.add_argument("--cross_attention_dim",type=int,default=1024)
 parser.add_argument("--limit",type=int,default=-1)
+parser.add_argument("--num_inference_steps",type=int,default=4)
 
 import torch
 import torch.nn.functional as F
@@ -408,7 +409,7 @@ def main(args):
                         optimizer.zero_grad()
                 elif args.training_type=="reward":
                     with accelerator.accumulate():
-                        images=pipeline.call_with_grad(prompt=prompt, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                        images=pipeline.call_with_grad(prompt=prompt, num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                         predicted=embed_img_tensor(images)
                         loss=loss_fn(images,predicted)
                         #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)

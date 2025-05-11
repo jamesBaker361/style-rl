@@ -104,30 +104,6 @@ def main(args):
     device=accelerator.device
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-    siglip_config={
-        "do_normalize": True,
-        "do_rescale":True,
-        "do_resize": True,
-        "image_mean": [
-            0.5,
-            0.5,
-            0.5
-        ],
-        "device":torch.cuda.get_device_name(device),
-        "image_processor_type": "SiglipImageProcessorFast",
-        "image_std": [
-            0.5,
-            0.5,
-            0.5
-        ],
-        "processor_class": "SiglipProcessor",
-        "resample": 2,
-        "rescale_factor": 0.00392156862745098,
-        "size": {
-            "height": 224,
-            "width": 224
-        }
-        }
 
     torch_dtype={
         "no":torch.float32,

@@ -38,7 +38,7 @@ class EmbeddingUtil():
             self.ssl_model.requires_grad_(False)
         elif embedding=="siglip2":
             self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            processor = SiglipProcessor.from_pretrained("local_config_siglip2")
+            self.siglip_processor = SiglipProcessor.from_pretrained("local_config_siglip2")
             #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             self.siglip_model.to(device,torch_dtype)
             self.siglip_model.requires_grad_(False)
@@ -46,7 +46,7 @@ class EmbeddingUtil():
     def embed_img_tensor(self,img_tensor:torch.Tensor,
                         )->torch.Tensor:
         img_tensor=img_tensor.to(self.device,self.torch_dtype)
-        if embedding=="dino":
+        if self.embedding=="dino":
             if len(img_tensor.size())==3:
                 img_tensor=img_tensor.unsqueeze(0)
             img_tensor=F.interpolate(img_tensor, size=(224, 224), mode='bilinear', align_corners=False)
@@ -57,7 +57,7 @@ class EmbeddingUtil():
             dino_vit_features=inverse_tokenize(dino_vit_features)
             dino_vit_features=F.max_pool2d(dino_vit_features, kernel_size=self.dino_pooling_stride, stride=self.dino_pooling_stride)
             embedding=dino_vit_features.view(batch_size,-1)
-        elif embedding=="ssl":
+        elif self.embedding=="ssl":
             #print("before ",type(img_tensor),img_tensor.size())
             p_inputs=self.ssl_processor(img_tensor,return_tensors="pt")
             #print(p_inputs)
@@ -65,7 +65,7 @@ class EmbeddingUtil():
             cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
             #print("cls featurs size",cls_features.size())
             embedding=cls_features
-        elif embedding=="siglip2":
+        elif self.embedding=="siglip2":
             print("img",img_tensor.device)
             inputs = self.siglip_processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
             for key in ['input_ids','pixel_values']:

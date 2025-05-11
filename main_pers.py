@@ -27,6 +27,9 @@ from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from transformers.models.siglip.image_processing_siglip_fast import SiglipImageProcessorFast
 from transformers.models.siglip.processing_siglip import SiglipProcessor
+from PIL import Image
+import requests
+from transformers import AutoProcessor, CLIPModel
 
 seed=1234
 random.seed(seed)                      # Python
@@ -284,10 +287,14 @@ def main(args):
 
         vae,unet,text_encoder,scheduler,optimizer,pipeline=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline)
 
+        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
         def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False):
             metrics={}
             difference_list=[]
             embedding_difference_list=[]
+            text_alignment_list=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 image_embeds=embeds_batch #.unsqueeze(0)
                 prompt=text_batch
@@ -314,6 +321,15 @@ def main(args):
                 
                 do_denormalize= [True] * image.shape[0]
                 pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
+                if prompt!=" ":
+                    inputs = clip_processor(
+                        text=[prompt], images=pil_image, return_tensors="pt", padding=True
+                    )
+
+                    outputs = clip_model(**inputs)
+                    logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
+                    text_alignment_list.append(logits_per_image.cpu().detach().item())
+
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
             metrics["difference"]=np.mean(difference_list)
             metrics["embedding_difference"]=np.mean(embedding_difference_list)

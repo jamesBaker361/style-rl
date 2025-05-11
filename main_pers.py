@@ -265,7 +265,7 @@ def main(args):
         print("after", pipeline.unet.config.sample_size)
         
         ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)
-        print(ratios)
+        print('train/test/val',ratios)
         batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
         batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
 

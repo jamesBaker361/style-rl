@@ -22,11 +22,13 @@ def inverse_tokenize(x):
 class EmbeddingUtil():
     def __init__(self,device,torch_dtype,
                      embedding:str,
-                     facet:str):
+                     facet:str,
+                     dino_pooling_stride:int):
         self.device=device
         self.torch_dtype=torch_dtype
         self.embedding=embedding
         self.facet=facet
+        self.dino_pooling_stride
         if embedding=="dino":
             self.dino_vit_extractor=ViTExtractor("dino_vits16",device=device,stride=16)
             self.dino_vit_extractor.model.eval()

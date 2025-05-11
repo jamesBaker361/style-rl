@@ -118,7 +118,7 @@ def main(args):
 
         os.makedirs(args.data_dir,exist_ok=True)
 
-        embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet)
+        embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
         
         

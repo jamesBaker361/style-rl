@@ -293,7 +293,9 @@ def main(args):
             embedding_difference_list=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 image_embeds=embeds_batch #.unsqueeze(0)
-                prompt=" "
+                prompt=text_batch
+                if random.random() <args.uncaptioned_frac:
+                    prompt=" "
                 image_batch=torch.clamp(image_batch, 0, 1)
                 if baseline:
                     ip_adapter_image=F_v2.resize(image_batch, (224,224)).unsqueeze(0)
@@ -342,7 +344,7 @@ def main(args):
                         latents = vae.encode(image_batch).latent_dist.sample()
                         latents = latents * vae.config.scaling_factor
 
-                        print('latents',latents.requires_grad,latents.size())
+                        #print('latents',latents.requires_grad,latents.size())
 
                         # Sample noise that we'll add to the latents
                         noise = torch.randn_like(latents)
@@ -361,7 +363,7 @@ def main(args):
 
                         
                         encoder_hidden_states = prompt_embeds
-                        print("encoede hiiden states",encoder_hidden_states.requires_grad)
+                        #print("encoede hiiden states",encoder_hidden_states.requires_grad)
                         timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                         #timesteps = timesteps.long()
 

@@ -269,22 +269,7 @@ def main(args):
         batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
         batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
 
-        '''text_embedding_list=[]
-        for t in text_list:
-            text_embeds, _ = pipeline.encode_prompt(
-                    text,
-                    accelerator.device,
-                    1,
-                    pipeline.do_classifier_free_guidance,
-                    negative_prompt=None,
-                    prompt_embeds=None,
-                    negative_prompt_embeds=None,
-                )
-            print('textembeds.size',text_embeds.size())
-
-            text_embedding_list.append(text_embeds[0])
-
-        batched_text_embedding_list=make_batches_same_size(text_embedding_list,args.batch_size)'''
+        
         batched_image_list= image_list #make_batches_same_size(image_list,args.batch_size)
         batched_text_list= text_list #[text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
 
@@ -292,15 +277,7 @@ def main(args):
         batched_image_list,test_batched_image_list,val_batched_image_list=split_list_by_ratio(batched_image_list,ratios)
         batched_text_list,test_batched_text_list,val_batched_text_list=split_list_by_ratio(batched_text_list,ratios)
 
-        #the output of the embeddign thing can be passed as ip_adapter_image_embeds or the image itself can be passed as     ip_adapter_image to the pipeline
-        #multiple projection layers for different layers..?
-
-
-        #cross_attention_dim=unet.config.cross_attention_dim
-        '''projection_layer=IPAdapterFullImageProjection(embedding_dim,args.cross_attention_dim)
-        projection_layer.to(device,torch_dtype)
-        projection_layer.ff.to(device,torch_dtype)
-        projection_layer.requires_grad_(True)'''
+        
 
         params=[p for p in pipeline.unet.parameters() if p.requires_grad]
 
@@ -309,15 +286,7 @@ def main(args):
         optimizer=torch.optim.AdamW(params)
 
         vae,unet,text_encoder,scheduler,optimizer,pipeline=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline)
-        '''if args.training_type=="reward":
-            loss_buffer=[]
-            for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
-                if b==args.buffer_size:
-                    break
-                text=text_batch[0]
-                image=pipeline(text,output_type="pt").images[0]
-                loss=loss_fn(image,embeds_batch[0])
-                loss_buffer.append(loss.cpu().detach().item())'''
+
         def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False):
             metrics={}
             difference_list=[]

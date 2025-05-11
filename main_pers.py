@@ -178,7 +178,7 @@ def main(args):
                 print("img",img_tensor.device)
                 inputs = processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
                 for key in ['input_ids','pixel_values']:
-                    print(key,inputs[key].device)
+                    inputs[key]=inputs[key].to(device)
                 outputs = model(**inputs)
                 embedding=outputs.image_embeds
                 

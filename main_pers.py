@@ -64,6 +64,7 @@ parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 parser.add_argument("--cross_attention_dim",type=int,default=1024)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--num_inference_steps",type=int,default=4)
+parser.add_argument("--dino_pooling_stride",default=4,type=int)
 
 import torch
 import torch.nn.functional as F
@@ -141,7 +142,7 @@ def main(args):
         os.makedirs(args.data_dir,exist_ok=True)
 
         if args.embedding=="dino":
-            dino_vit_extractor=ViTExtractor("dino_vits8",device=accelerator.device)
+            dino_vit_extractor=ViTExtractor("dino_vits16",device=accelerator.device,stride=16)
             dino_vit_extractor.model.eval()
             dino_vit_extractor.model.requires_grad_(False)
         elif args.embedding=="ssl":
@@ -156,6 +157,13 @@ def main(args):
             model.to(device,torch_dtype)
             model.requires_grad_(False)
 
+        def inverse_tokenize(x):
+            # x: (B, N, embed_dim)
+            B, N, C = x.shape
+            H = W = 224 // 16  # assuming square image/patch
+            x = x.transpose(1, 2).reshape(B, C, H, W)  # (B, embed_dim, H/patch, W/patch)
+            return x
+
         def embed_img_tensor(img_tensor:torch.Tensor)->torch.Tensor:
             img_tensor=img_tensor.to(device,torch_dtype)
             if args.embedding=="dino":
@@ -166,6 +174,8 @@ def main(args):
                 dino_vit_features=dino_vit_extractor.extract_descriptors(img_tensor,facet=args.facet)
                 batch_size=img_tensor.size()[0]
                 print('dino_vit_features.size()',dino_vit_features.size())
+                dino_vit_features=inverse_tokenize(dino_vit_features)
+                dino_vit_features=F.max_pool2d(dino_vit_features, kernel_size=args.dino_pooling_stride, stride=args.dino_pooling_stride)
                 embedding=dino_vit_features.view(batch_size,-1)
             elif args.embedding=="ssl":
                 #print("before ",type(img_tensor),img_tensor.size())

@@ -57,7 +57,6 @@ parser.add_argument("--training_type",help="denoise or reward",default="denoise"
 parser.add_argument("--prediction_type",type=str,default="epsilon",help="epsilon or v_prediction")
 parser.add_argument("--train_split",type=float,default=0.96)
 parser.add_argument("--validation_interval",type=int,default=20)
-parser.add_argument("--buffer_size",type=int,default=0)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 parser.add_argument("--cross_attention_dim",type=int,default=1024)
 parser.add_argument("--limit",type=int,default=-1)

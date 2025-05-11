@@ -291,7 +291,7 @@ def main(args):
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
-        def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False):
+        def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False,auto_log:bool=True):
             metrics={}
             difference_list=[]
             embedding_difference_list=[]
@@ -335,7 +335,7 @@ def main(args):
             metrics["difference"]=np.mean(difference_list)
             metrics["embedding_difference"]=np.mean(embedding_difference_list)
             metrics["text_alignment"]=np.mean(text_alignment_list)
-            if not baseline:
+            if auto_log:
                 accelerator.log(metrics)
             return metrics
 
@@ -453,7 +453,7 @@ def main(args):
         training_end=time.time()
         print(f"total trainign time = {training_end-training_start}")
         accelerator.free_memory()
-        metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,pipeline)
+        metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,pipeline,auto_log=False)
         new_metrics={}
         for k,v in metrics.items():
             new_metrics["test_"+k]=v
@@ -462,7 +462,7 @@ def main(args):
         if args.pipeline=="lcm":
             baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
         baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-        baseline_metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,baseline_pipeline,True)
+        baseline_metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,baseline_pipeline,baseline=True)
         new_metrics={}
         for k,v in baseline_metrics.items():
             new_metrics["baseline_"+k]=v

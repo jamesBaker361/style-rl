@@ -66,6 +66,7 @@ parser.add_argument("--cross_attention_dim",type=int,default=1024)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--num_inference_steps",type=int,default=4)
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
+parser.add_argument("--num_image_text_embeds",type=int,default=4)
 
 import torch
 import torch.nn.functional as F
@@ -179,7 +180,8 @@ def main(args):
             component.to(device,torch_dtype)
             component.requires_grad_(False)
         
-        replace_ip_attn(unet,args.cross_attention_dim,embedding_dim)
+        replace_ip_attn(unet,args.cross_attention_dim,embedding_dim,args.num_image_text_embeds)
+        print("image projection",unet.encoder_hid_proj.image_projection_layers[0])
         attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
         attn_layer_list.append( unet.encoder_hid_proj)
         print("len attn_layers",len(attn_layer_list))

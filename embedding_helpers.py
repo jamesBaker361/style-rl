@@ -28,7 +28,7 @@ class EmbeddingUtil():
         self.torch_dtype=torch_dtype
         self.embedding=embedding
         self.facet=facet
-        self.dino_pooling_stride
+        self.dino_pooling_stride=dino_pooling_stride
         if embedding=="dino":
             self.dino_vit_extractor=ViTExtractor("dino_vits16",device=device,stride=16)
             self.dino_vit_extractor.model.eval()

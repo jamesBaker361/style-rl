@@ -284,6 +284,7 @@ def main(args):
                 accelerator.log(metrics)
             return metrics
 
+        print(pipeline.text_encoder.config)
         training_start=time.time()
         for e in range(1, args.epochs+1):
             before_objects=find_cuda_objects()

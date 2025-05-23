@@ -19,6 +19,7 @@ from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
+from torchmetrics.image.fid import FrechetInceptionDistance
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
@@ -218,12 +219,15 @@ def main(args):
 
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        fid = FrechetInceptionDistance(feature=2048,normalize=True)
 
         def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False,auto_log:bool=True):
             metrics={}
             difference_list=[]
             embedding_difference_list=[]
             text_alignment_list=[]
+            fid_list=[]
+
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 image_embeds=embeds_batch #.unsqueeze(0)
                 prompt=text_batch
@@ -246,6 +250,11 @@ def main(args):
                 embedding_real=embedding_util.embed_img_tensor(image_batch)
                 embedding_fake=embedding_util.embed_img_tensor(image)
                 embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
+
+                fid.update(image_batch.cpu(),real=True)
+                fid.update(image.cpu(),real=False)
+
+                fid_list.append(fid.compute().cpu().detach().item())
                 
                 
                 do_denormalize= [True] * image.shape[0]

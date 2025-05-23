@@ -89,6 +89,7 @@ class EmbeddingUtil():
             embedding=outputs.image_embeds
         elif self.embedding=="clip":
             inputs=self.clip_processor(images=img_tensor, return_tensors="pt")
+            inputs["pixel_values"].to(self.device)
             outputs=self.clip_model(**inputs)
             embedding=outputs.pooled_output
             

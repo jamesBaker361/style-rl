@@ -10,7 +10,7 @@
 
 #SBATCH --cpus-per-task=1         # Cores per task (>1 if multithread tasks)
 
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 
 #SBATCH --mem=128000                # Real memory (RAM) required (MB)
 

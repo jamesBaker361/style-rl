@@ -110,7 +110,7 @@ def main(args):
         try:
             raw_data=load_dataset(args.dataset,split="train")
         except OSError:
-            raw_data=load_dataset(args.dataset,split="train",force_download=True)
+            raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
 
         os.makedirs(args.data_dir,exist_ok=True)
 

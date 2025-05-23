@@ -50,7 +50,7 @@ def main(args):
         if k==args.limit:
             break
         image=row["image"]
-        text=row["image"]
+        text=row["text"]
         embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
         new_dataset["image"].append(image)
         new_dataset["embedding"].append(embedding)

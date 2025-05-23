@@ -39,6 +39,7 @@ class EmbeddingUtil():
         self.dino_pooling_stride=dino_pooling_stride
         if embedding=="dino":
             self.dino_vit_extractor=ViTExtractor("dino_vits16",device=device,stride=16)
+            self.dino_vit_extractor.model=self.dino_vit_extractor.model.to(device,torch_dtype)
             self.dino_vit_extractor.model.eval()
             self.dino_vit_extractor.model.requires_grad_(False)
         elif embedding=="ssl":

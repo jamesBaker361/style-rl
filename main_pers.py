@@ -1,9 +1,6 @@
 import os
 import argparse
 from experiment_helpers.gpu_details import print_details
-from experiment_helpers.better_vit_model import BetterViTModel
-from experiment_helpers.better_ddpo_trainer import BetterDDPOTrainer
-from experiment_helpers.unsafe_stable_diffusion_pipeline import UnsafeStableDiffusionPipeline
 from pipelines import CompatibleLatentConsistencyModelPipeline
 from datasets import load_dataset
 import torchvision.transforms as transforms
@@ -11,12 +8,9 @@ import torchvision.transforms as transforms
 import torch
 from accelerate import Accelerator
 import time
-from diffusers.models.embeddings import IPAdapterFullImageProjection
-from extractor import ViTExtractor
 import torch.nn.functional as F
 from PIL import Image
 import random
-from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast, SiglipModel
 from worse_peft import apply_lora
 import wandb
 import numpy as np
@@ -25,10 +19,7 @@ from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
-from transformers.models.siglip.image_processing_siglip_fast import SiglipImageProcessorFast
-from transformers.models.siglip.processing_siglip import SiglipProcessor
-from PIL import Image
-import requests
+
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 

@@ -55,6 +55,8 @@ export CUDA_LAUNCH_BLOCKING="1"
 export SCIKIT_LEARN_DATA="/scratch/jlb638/scikit-learn-data"
 export BRAIN_DATA_DIR="/scratch/jlb638/brain/data"
 export TORCH_DISTRIBUTED_DEBUG="DETAIL"
+export NCCL_DEBUG="INFO"
+export NCCL_DEBUG_SUBSYS="ALL"
 echo "Running on: $(hostname)"
 echo "Allocated GPUs:"
 nvidia-smi

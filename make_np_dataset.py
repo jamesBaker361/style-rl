@@ -26,6 +26,7 @@ parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or sigl
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--limit",type=int,default=-1)
+parser.add_argument("--rewrite",action="store_true")
 
 def main(args):
     accelerator=Accelerator()
@@ -46,6 +47,14 @@ def main(args):
         "text":[]
     }
 
+    try:
+        old_data=load_dataset(args.output_dataset)
+        existing=True
+        len_old=len([r for r in old_data])
+    except:
+        existing=False
+
+
     for k,row in enumerate(raw_data):
         if k==args.limit:
             break
@@ -55,6 +64,17 @@ def main(args):
         new_dataset["image"].append(image)
         new_dataset["embedding"].append(embedding)
         new_dataset["text"].append(text)
+        if k+1 %500==0:
+            if existing==False or args.rewrite:
+                time.sleep(random.randint(1,60))
+                Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
+            else:
+                if k+1> len_old:
+                    time.sleep(random.randint(1,60))
+                    Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
+
+
+
 
     time.sleep(random.randint(1,60))
     Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)

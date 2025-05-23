@@ -21,5 +21,11 @@
           "device": "cpu",
           "pin_memory": true
       }
-  }
+  },
+  "comms_logger": {
+  "enabled": true,
+  "verbose": false,
+  "prof_all": true,
+  "debug": true
+}
 }

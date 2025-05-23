@@ -3,25 +3,8 @@ from diffusers import DiffusionPipeline,LatentConsistencyModelPipeline
 from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img import retrieve_timesteps
 import torch
 from typing import Union,Any,Optional,Callable,List,Dict
-from diffusers.image_processor import PipelineImageInput, VaeImageProcessor
-from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
-from transformers import CLIPImageProcessor, CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
 import torch.utils.checkpoint as checkpoint
-from diffusers.image_processor import PipelineImageInput, VaeImageProcessor
-from diffusers.schedulers import LCMScheduler
-from diffusers.models import AutoencoderKL, ImageProjection, UNet2DConditionModel
-import random
-from diffusers.loaders import FromSingleFileMixin, IPAdapterMixin, StableDiffusionLoraLoaderMixin, TextualInversionLoaderMixin
-from diffusers.utils import (
-    USE_PEFT_BACKEND,
-    deprecate,
-    logging,
-    replace_example_docstring,
-    scale_lora_layers,
-    unscale_lora_layers,
-)
-from diffusers.models.lora import adjust_lora_scale_text_encoder
-from gpu_helpers import *
+from diffusers.image_processor import PipelineImageInput
 from diffusers.utils.outputs import BaseOutput
 from dataclasses import dataclass
 import PIL

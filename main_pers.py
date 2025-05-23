@@ -222,7 +222,7 @@ def main(args):
 
         optimizer=torch.optim.AdamW(params)
 
-        vae,unet,text_encoder,scheduler,optimizer,pipeline=accelerator.prepare(vae,unet,text_encoder,scheduler,optimizer,pipeline)
+        unet,scheduler,optimizer=accelerator.prepare(unet,scheduler,optimizer)
 
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")

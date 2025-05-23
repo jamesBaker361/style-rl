@@ -135,7 +135,12 @@ def main(args):
                     text=text[0]
                 
                 if "embedding" in row:
+                    np_embedding=np.ndarray(row["embedding"])
+                    print("np_embedding",np_embedding.shape)
                     embedding=torch.from_numpy(row["embedding"])
+                    print("embedding",embedding.size())
+                    real_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
+                    print("real embedding",real_embedding.size())
                 else:
                     embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                 #print(embedding.size())

@@ -309,7 +309,8 @@ def main(args):
                         # Sample noise that we'll add to the latents
                         noise = torch.randn_like(latents)
 
-                            # Get the text embedding for conditioning
+                        
+                        pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
                         prompt_embeds, _ = pipeline.encode_prompt(
                                 prompt,
                                 accelerator.device,

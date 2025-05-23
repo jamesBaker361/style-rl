@@ -68,7 +68,7 @@ class EmbeddingUtil():
             #dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
             dino_vit_features=self.dino_vit_extractor.extract_descriptors(img_tensor,facet=self.facet)
             batch_size=img_tensor.size()[0]
-            print('dino_vit_features.size()',dino_vit_features.size())
+            #print('dino_vit_features.size()',dino_vit_features.size())
             dino_vit_features=inverse_tokenize(dino_vit_features)
             dino_vit_features=F.max_pool2d(dino_vit_features, kernel_size=self.dino_pooling_stride, stride=self.dino_pooling_stride)
             embedding=dino_vit_features.view(batch_size,-1)
@@ -81,7 +81,7 @@ class EmbeddingUtil():
             #print("cls featurs size",cls_features.size())
             embedding=cls_features
         elif self.embedding=="siglip2":
-            print("img",img_tensor.device)
+            #print("img",img_tensor.device)
             inputs = self.siglip_processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
             for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)

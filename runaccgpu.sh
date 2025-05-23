@@ -20,7 +20,9 @@
 
 #SBATCH --error=slurm/generic/%j.err   # STDERR output file (optional)
 
-#SBATCH --exclude=gpuk[001-012]
+#SBATCH --exclude=gpuk[001-012],gpu[005,006,010-014,017,018],cuda[001-008],pascal[001-010]
+
+#SBATCH --exclusive
 
 day=$(date +'%m/%d/%Y %R')
 echo "gpu"  ${day} $SLURM_JOBID "node_list" $SLURM_NODELIST $@  "\n" >> jobs.txt
@@ -47,5 +49,5 @@ export BRAIN_DATA_DIR='/scratch/jlb638/brain-diffuser/data'
 export CUDA_LAUNCH_BLOCKING="1"
 export SCIKIT_LEARN_DATA="/scratch/jlb638/scikit-learn-data"
 export BRAIN_DATA_DIR="/scratch/jlb638/brain/data"
-srun accelerate launch  $@
+srun accelerate launch --config_file config.yaml  $@
 conda deactivate

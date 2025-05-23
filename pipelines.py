@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import PIL
 import numpy as np
 from copy import deepcopy
+import random
 
 def register_evil_twin(pipeline:DiffusionPipeline,scale:float):
     unet=pipeline.unet

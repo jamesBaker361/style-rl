@@ -62,7 +62,7 @@ echo "Allocated GPUs:"
 nvidia-smi
 echo "version"
 nvcc --version
-srun accelerate launch --config_file config.yaml  $@
+srun accelerate launch --config_file accelerator_config.yaml  $@
 conda deactivate
 echo "Running on: $(hostname)"
 echo "Allocated GPUs:"

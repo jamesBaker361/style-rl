@@ -44,8 +44,6 @@ parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--data_dir",type=str,default="data_dir")
-parser.add_argument("--save_data_npz",action="store_true")
-parser.add_argument("--load_data_npz",action="store_true")
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=1)
 parser.add_argument("--epochs",type=int,default=10)
@@ -136,7 +134,10 @@ def main(args):
                 if type(text)==list:
                     text=text[0]
                 
-                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
+                if "embedding" in row:
+                    embedding=torch.from_numpy(row["embedding"])
+                else:
+                    embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                 #print(embedding.size())
                 embedding.to("cpu")
                 embedding_list.append(embedding)

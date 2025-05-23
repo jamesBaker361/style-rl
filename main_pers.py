@@ -138,7 +138,7 @@ def main(args):
                     #print(row["embedding"])
                     np_embedding=np.array(row["embedding"])
                     print("np_embedding",np_embedding.shape)
-                    embedding=torch.from_numpy(row["embedding"])
+                    embedding=torch.from_numpy(np_embedding)
                     print("embedding",embedding.size())
                     real_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                     print("real embedding",real_embedding.size())

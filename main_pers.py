@@ -312,6 +312,7 @@ def main(args):
 
                         
                         pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
+                        print(pipeline.text_encoder.config)
                         prompt_embeds, _ = pipeline.encode_prompt(
                                 prompt,
                                 accelerator.device,

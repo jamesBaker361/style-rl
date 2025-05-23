@@ -58,7 +58,7 @@ def main(args):
     for k,row in enumerate(raw_data):
         if k==args.limit:
             break
-        image=row["image"]
+        image=row["image"].convert("RGB")
         text=row["text"]
         embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
         new_dataset["image"].append(image)

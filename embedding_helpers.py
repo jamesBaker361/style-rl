@@ -7,7 +7,15 @@ from extractor import ViTExtractor
 import torch.nn.functional as F
 from PIL import Image
 import random
-from transformers import AutoImageProcessor, Dinov2Model, BaseImageProcessorFast, SiglipModel
+from transformers import (
+    AutoImageProcessor,
+    Dinov2Model,                   
+    SiglipModel,           
+    CLIPProcessor,              
+    CLIPVisionModel,             
+    CLIPVisionModelWithProjection ,
+    BaseImageProcessorFast
+)
 
 from transformers.models.siglip.processing_siglip import SiglipProcessor
 
@@ -44,6 +52,11 @@ class EmbeddingUtil():
             #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             self.siglip_model.to(device,torch_dtype)
             self.siglip_model.requires_grad_(False)
+        elif embedding=="clip":
+            self.clip_model=CLIPVisionModel.from_pretrained("openai/clip-vit-base-patch32")
+            self.clip_processor=CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+            self.clip_model.to(device,torch_dtype)
+            self.clip_model.requires_grad_(False)
 
     def embed_img_tensor(self,img_tensor:torch.Tensor,
                         )->torch.Tensor:
@@ -74,6 +87,10 @@ class EmbeddingUtil():
                 inputs[key]=inputs[key].to(self.device)
             outputs = self.siglip_model(**inputs)
             embedding=outputs.image_embeds
+        elif self.embedding=="clip":
+            inputs=self.clip_processor(images=img_tensor, return_tensors="pt")
+            outputs=self.clip_model(**inputs)
+            embedding=outputs.pooled_output
             
         return embedding
 

@@ -272,6 +272,7 @@ def main(args):
             metrics["difference"]=np.mean(difference_list)
             metrics["embedding_difference"]=np.mean(embedding_difference_list)
             metrics["text_alignment"]=np.mean(text_alignment_list)
+            metrics["fid"]=np.mean(fid_list)
             if auto_log:
                 accelerator.log(metrics)
             return metrics

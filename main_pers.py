@@ -297,6 +297,7 @@ def main(args):
                 prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                     prompt=" "
+                print(pipeline.text_encoder)
                 if args.training_type=="denoise":
                     with accelerator.accumulate(params):
                         # Convert images to latent space

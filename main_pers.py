@@ -136,7 +136,7 @@ def main(args):
                 
                 if "embedding" in row:
                     print(row["embedding"])
-                    np_embedding=np.ndarray(row["embedding"])
+                    np_embedding=np.array(row["embedding"])
                     print("np_embedding",np_embedding.shape)
                     embedding=torch.from_numpy(row["embedding"])
                     print("embedding",embedding.size())

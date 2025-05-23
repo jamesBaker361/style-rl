@@ -99,7 +99,7 @@ class EmbeddingUtil():
             t=transforms.Compose(
                 [transforms.ToTensor(),transforms.Normalize(self.dino_vit_extractor.mean,self.dino_vit_extractor.std)]
             )
-        elif self.embedding=="ssl" or self.embedding=="siglip2":
+        elif self.embedding=="ssl" or self.embedding=="siglip2" or self.embedding=="clip":
             t=transforms.Compose(
                 [transforms.ToTensor()]
             )

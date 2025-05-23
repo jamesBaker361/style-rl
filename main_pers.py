@@ -291,8 +291,7 @@ def main(args):
             loss_buffer=[]
             for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
                 print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
-                embeds_batch.to(device,torch_dtype)
-                image_embeds=embeds_batch #.unsqueeze(1)
+                image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
                 print('image_embeds',image_embeds.requires_grad,image_embeds.size())
                 prompt=text_batch
                 if args.epochs >1 and  random.random() <args.uncaptioned_frac:

@@ -56,6 +56,7 @@ def main(args):
         new_dataset["embedding"].append(embedding)
         new_dataset["text"].append(text)
 
+    time.sleep(random.randint(1,60))
     Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
     
 

@@ -64,9 +64,15 @@ def delete_unique_objects(list1, list2):
                 if obj.grad.grad_fn is not None:
                     obj.grad.detach_()
             obj.grad = None  # Clear gradients first
-        #obj.detach_()
-        obj.to("cpu")
-        del obj  # Delete the object
+            try:
+                obj = obj.detach().cpu()
+            except Exception as e:
+                print(f"Failed to move tensor to CPU: {e}")
+        elif isinstance(obj, torch.nn.Module):
+            try:
+                obj.cpu()
+            except Exception as e:
+                print(f"Failed to move module to CPU: {e}")
 
     # Force garbage collection and free CUDA memory
     gc.collect()

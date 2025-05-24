@@ -174,7 +174,7 @@ def main(args):
     print("embedding dim",embedding_dim)
 
     if args.pipeline=="lcm":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
     vae=pipeline.vae
     unet=pipeline.unet
     text_encoder=pipeline.text_encoder

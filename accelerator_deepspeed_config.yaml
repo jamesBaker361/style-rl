@@ -1,0 +1,29 @@
+deepspeed_config:
+  deepspeed_config_file: ds_config.json
+  zero3_init_flag: true
+distributed_type: DEEPSPEED
+compute_environment: LOCAL_MACHINE
+debug: true
+downcast_bf16: 'no'
+fsdp_config:
+  fsdp_backward_prefetch_policy: BACKWARD_PRE
+  fsdp_forward_prefetch: false
+  fsdp_cpu_ram_efficient_loading: true
+  fsdp_offload_params: true
+  fsdp_sharding_strategy: FULL_SHARD
+  fsdp_state_dict_type: SHARDED_STATE_DICT
+  fsdp_sync_module_states: true
+  fsdp_auto_wrap_policy: SIZE_BASED_WRAP
+  fsdp_min_num_params: 1000000
+  fsdp_use_orig_params: true
+enable_cpu_affinity: false
+machine_rank: 0
+main_training_function: main
+num_machines: 1
+num_processes: 1
+rdzv_backend: static
+same_network: true
+tpu_env: []
+tpu_use_cluster: false
+tpu_use_sudo: false
+use_cpu: false

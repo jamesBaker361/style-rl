@@ -73,6 +73,7 @@ def delete_unique_objects(list1, list2):
                 obj.cpu()
             except Exception as e:
                 print(f"Failed to move module to CPU: {e}")
+        del obj
 
     # Force garbage collection and free CUDA memory
     gc.collect()

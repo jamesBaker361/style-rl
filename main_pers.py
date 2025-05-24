@@ -59,6 +59,7 @@ parser.add_argument("--num_inference_steps",type=int,default=4)
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--num_image_text_embeds",type=int,default=4)
 parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
+parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
 
 import torch
 import torch.nn.functional as F
@@ -181,9 +182,15 @@ def main(args):
         text_encoder.to(device,torch_dtype)
         scheduler.to(device,torch_dtype)'''
         #pipeline.requires_grad_(False)
-        for component in [vae,unet,text_encoder]:
-            component.to(device,torch_dtype)
-            component.requires_grad_(False)
+        if args.fsdp:
+            for component in [vae,text_encoder]:
+                component.to(device,torch_dtype)
+                component.requires_grad_(False)
+            unet.requires_grad_(False)
+        else:
+            for component in [vae,unet,text_encoder]:
+                component.to(device,torch_dtype)
+                component.requires_grad_(False)
         
         replace_ip_attn(unet,
                         embedding_dim,

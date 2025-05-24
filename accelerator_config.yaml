@@ -10,9 +10,14 @@ fsdp_config:
   fsdp_sharding_strategy: FULL_SHARD
   fsdp_state_dict_type: SHARDED_STATE_DICT
   fsdp_sync_module_states: true
-  fsdp_auto_wrap_policy: SIZE_BASED_WRAP
-  fsdp_min_num_params: 10000
+  fsdp_auto_wrap_policy: TRANSFORMER_BASED_WRAP
+  fsdp_transformer_layer_cls:
+    - "DownBlock2D"
+    - "UpBlock2D"
+    - "CrossAttnDownBlock2D"
+    - "MultiIPAdapterImageProjectionWithVisualProjection"
   fsdp_use_orig_params: true
+  fsdp_activation_checkpointing: true
 enable_cpu_affinity: false
 machine_rank: 0
 main_training_function: main

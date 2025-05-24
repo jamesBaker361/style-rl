@@ -1,7 +1,7 @@
 {
     "train_micro_batch_size_per_gpu": 1,
     "gradient_clipping": 1.0,
-    "gradient_accumulation_steps":1,
+    "gradient_accumulation_steps":8,
     "fp16": {
       "enabled": true,
       "autocast":true
@@ -19,6 +19,11 @@
             "pin_memory": true
         }
     },
+    "activation_checkpointing": {
+    "partition_activations": true,
+    "contiguous_memory_optimization": true,
+    "cpu_checkpointing": true
+  },
     "comms_logger": {
     "enabled": true,
     "verbose": true,

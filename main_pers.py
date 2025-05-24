@@ -94,6 +94,7 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
 def main(args):
     if args.deepspeed:
         accelerator=Accelerator(log_with="wandb")
+        print("using deepspeed")
     else:
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)

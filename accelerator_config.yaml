@@ -11,7 +11,8 @@ fsdp_config:
   fsdp_sharding_strategy: FULL_SHARD
   fsdp_state_dict_type: SHARDED_STATE_DICT
   fsdp_sync_module_states: true
-  fsdp_transformer_layer_cls_to_wrap: BertLayer
+  fsdp_auto_wrap_policy: SIZE_BASED_WRAP
+  fsdp_min_num_params: 1e7  # Wrap layers with >10M params
   fsdp_use_orig_params: true
 enable_cpu_affinity: false
 machine_rank: 0

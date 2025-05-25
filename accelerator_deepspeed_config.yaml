@@ -1,6 +1,6 @@
 deepspeed_config:
   deepspeed_config_file: ds_config.json
-  zero3_init_flag: true
+  zero3_init_flag: false
 distributed_type: DEEPSPEED
 compute_environment: LOCAL_MACHINE
 debug: true

@@ -187,15 +187,16 @@ def main(args):
     #pipeline.requires_grad_(False)
     if args.fsdp:
         for component in [vae,text_encoder]:
-            component.to(device,torch_dtype)
+            component.to("cpu")
             component.requires_grad_(False)
         unet.requires_grad_(False)
     else:
         for param in text_encoder.parameters():
             param.requires_grad = False  # DeepSpeed will ignore frozen params
-        for component in [vae,unet,text_encoder]:
-            component.to(device,torch_dtype)
+        for component in [vae,text_encoder]:
             component.requires_grad_(False)
+            component.to("cpu")
+        unet=unet.to(device,torch_dtype)
     
     replace_ip_attn(unet,
                     embedding_dim,
@@ -314,9 +315,15 @@ def main(args):
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
                     # Convert images to latent space
-                    image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)
-                    latents = vae.encode(image_batch).latent_dist.sample()
-                    latents = latents * vae.config.scaling_factor
+                    #if args.deepspeed:
+                    with torch.no_grad():
+                        image_batch=image_batch.unsqueeze(0)
+                        '''else:
+                            image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)'''
+                        latents = vae.encode(image_batch).latent_dist.sample()
+                        latents = latents * vae.config.scaling_factor
+
+                    latents=latents.to(device,torch_dtype)
 
                     #print('latents',latents.requires_grad,latents.size())
 
@@ -326,7 +333,7 @@ def main(args):
                     
                     pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
                     print(pipeline.text_encoder.config)
-                    if args.deepspeed:
+                    if True:
                         with torch.no_grad():
                             prompt_embeds, _ = pipeline.encode_prompt(
                                     prompt,
@@ -351,7 +358,7 @@ def main(args):
                             )
 
                     
-                    encoder_hidden_states = prompt_embeds
+                    encoder_hidden_states = prompt_embeds.to(device,torch_dtype)
                     #print("encoede hiiden states",encoder_hidden_states.requires_grad)
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()

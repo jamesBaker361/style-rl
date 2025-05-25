@@ -311,7 +311,7 @@ def main(args):
             prompt=text_batch
             if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                 prompt=" "
-            print(pipeline.text_encoder)
+            #print(pipeline.text_encoder)
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
                     # Convert images to latent space
@@ -332,7 +332,7 @@ def main(args):
 
                     
                     pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
-                    print(pipeline.text_encoder.config)
+                    #print(pipeline.text_encoder.config)
                     if True:
                         with torch.no_grad():
                             prompt_embeds, _ = pipeline.encode_prompt(

@@ -324,16 +324,29 @@ def main(args):
                     
                     pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
                     print(pipeline.text_encoder.config)
-                    prompt_embeds, _ = pipeline.encode_prompt(
-                            prompt,
-                            accelerator.device,
-                            1,
-                            pipeline.do_classifier_free_guidance,
-                            negative_prompt=None,
-                            prompt_embeds=None,
-                            negative_prompt_embeds=None,
-                            #lora_scale=lora_scale,
-                    )
+                    if args.deepspeed:
+                        with torch.no_grad():
+                            prompt_embeds, _ = pipeline.encode_prompt(
+                                    prompt,
+                                    accelerator.device,
+                                    1,
+                                    pipeline.do_classifier_free_guidance,
+                                    negative_prompt=None,
+                                    prompt_embeds=None,
+                                    negative_prompt_embeds=None,
+                                    #lora_scale=lora_scale,
+                            )
+                    else:
+                        prompt_embeds, _ = pipeline.encode_prompt(
+                                    prompt,
+                                    accelerator.device,
+                                    1,
+                                    pipeline.do_classifier_free_guidance,
+                                    negative_prompt=None,
+                                    prompt_embeds=None,
+                                    negative_prompt_embeds=None,
+                                    #lora_scale=lora_scale,
+                            )
 
                     
                     encoder_hidden_states = prompt_embeds

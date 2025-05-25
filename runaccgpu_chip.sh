@@ -30,7 +30,6 @@ module purge
 module load   Autoconf/2.72-GCCcore-13.3.0 
 module load  CUDA/12.8.0  
 gcc --version
-eval "$(conda shell.bash hook)"
 source myenv/bin/activate
 export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:64
 export TORCH_USE_CUDA_DSA="1"

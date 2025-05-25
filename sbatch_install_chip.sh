@@ -27,4 +27,4 @@ module load   Autoconf/2.72-GCCcore-13.3.0
 module load  CUDA/12.8.0  
 module load Python/3.11.5-GCCcore-13.2.0
 
-srun chip_install.sh
+srun bash chip_install.sh

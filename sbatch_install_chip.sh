@@ -22,9 +22,9 @@
 
 #SBATCH --gres-flags=enforce-binding
 
- 
+module load slurm/chip-gpu/23.11.4
 module load   Autoconf/2.72-GCCcore-13.3.0 
 module load  CUDA/12.8.0  
-moduel load Python/3.11.5-GCCcore-13.2.0
+module load Python/3.11.5-GCCcore-13.2.0
 
 srun chip_install.sh

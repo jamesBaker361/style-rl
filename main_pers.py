@@ -191,6 +191,8 @@ def main(args):
             component.requires_grad_(False)
         unet.requires_grad_(False)
     else:
+        for param in text_encoder.parameters():
+            param.requires_grad = False  # DeepSpeed will ignore frozen params
         for component in [vae,unet,text_encoder]:
             component.to(device,torch_dtype)
             component.requires_grad_(False)

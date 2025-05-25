@@ -337,7 +337,7 @@ def main(args):
                         with torch.no_grad():
                             prompt_embeds, _ = pipeline.encode_prompt(
                                     prompt,
-                                    accelerator.device,
+                                    #accelerator.device,
                                     1,
                                     pipeline.do_classifier_free_guidance,
                                     negative_prompt=None,

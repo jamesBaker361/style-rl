@@ -20,8 +20,6 @@
 
 #SBATCH --error=slurm_chip/generic/%j.err   # STDERR output file (optional)
 
-#SBATCH --exclusive 
-
 #SBATCH --gres-flags=enforce-binding
 
 day=$(date +'%m/%d/%Y %R')

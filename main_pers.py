@@ -25,6 +25,8 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 from data_helpers import CustomTripleDataset
+from custom_vae import public_encode
+from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 
 seed=1234
 random.seed(seed)                      # Python
@@ -140,7 +142,7 @@ def main(args):
     embedding_list=[]
     text_list=[]
     image_list=[]
-    latent_list=[]
+    posterior_list=[]
     shuffled_row_list=[row for row in raw_data]
     random.shuffle(shuffled_row_list)
     composition=transforms.Compose([
@@ -155,8 +157,8 @@ def main(args):
             before_objects=find_cuda_objects()
             image=row["image"]
             image=composition(image)
-            latent=vae.encode(image.unsqueeze(0)).squeeze(0)
-            latent_list.append(latent)
+            posterior=public_encode(vae,image)
+            posterior_list.append(posterior)
             image_list.append(image)
             text=row["text"]
             if type(text)==list:
@@ -190,7 +192,7 @@ def main(args):
                                     #lora_scale=lora_scale,
                             )
             if i ==1:
-                print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",latent.size())
+                print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
             text_list.append(text)
             #print(get_gpu_memory_usage())
             #print("gpu objects:",len(find_cuda_objects()))
@@ -249,11 +251,11 @@ def main(args):
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
     text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
 
-    latent_list,test_latent_list,val_latent_list=split_list_by_ratio(latent_list,ratios)
+    posterior_list,test_posterior_list,val_posterior_list=split_list_by_ratio(posterior_list,ratios)
 
-    train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,args.image_size)
-    val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,args.image_size)
-    test_dataset=CustomTripleDataset(test_image_list,test_embedding_list,test_text_list,args.image_size)
+    train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,posterior_list)
+    val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list)
+    test_dataset=CustomTripleDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list)
 
     train_loader=DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
@@ -344,12 +346,12 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
-            latents_batch=batch["latents"]
+            posterior_batch=batch["posterior"]
             if len(image_batch.size())==3:
                 image_batch=image_batch.unsqueeze(0)
                 text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
-                latents_batch=latents_batch.unsqueeze(0)
+                posterior_batch=posterior_batch.unsqueeze(0)
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())
@@ -361,7 +363,7 @@ def main(args):
                 with accelerator.accumulate(params):
                     # Convert images to latent space
                     #if args.deepspeed:
-                    latents = latents_batch.latent_dist.sample()
+                    latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     latents = latents * vae.config.scaling_factor
 
                     latents=latents.to(device,torch_dtype)

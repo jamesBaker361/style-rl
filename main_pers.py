@@ -64,6 +64,7 @@ parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--num_image_text_embeds",type=int,default=4)
 parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
 parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
+parser.add_argument("--vanilla",action="store_true",help="no distribution")
 
 import torch
 import torch.nn.functional as F
@@ -209,17 +210,10 @@ def main(args):
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
     fake_embedding=embedding_util.embed_img_tensor(fake_image)
     embedding_dim=fake_embedding.size()[-1]
-    if args.fsdp:
-        for component in [vae,text_encoder]:
-            component.to("cpu")
-            component.requires_grad_(False)
-        unet.requires_grad_(False)
-    else:
-        for param in text_encoder.parameters():
-            param.requires_grad = False  # DeepSpeed will ignore frozen params
-        for component in [vae,text_encoder]:
-            component.requires_grad_(False)
-            component.to("cpu")
+
+    for component in [vae,text_encoder]:
+        component.requires_grad_(False)
+        component.to("cpu")
         #unet=unet.to(device,torch_dtype)
     
     replace_ip_attn(unet,
@@ -267,6 +261,9 @@ def main(args):
     print("trainable params: ",len(params))
 
     optimizer=torch.optim.AdamW(params)
+
+    if args.vanilla:
+        unet=unet.to(device,torch_dtype)
 
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
@@ -346,6 +343,9 @@ def main(args):
         start=time.time()
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
+            if args.vanilla:
+                for k,v in batch.items():
+                    batch[k]=v.to(device,torch_dtype)
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -355,10 +355,12 @@ def main(args):
                 text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
                 posterior_batch=posterior_batch.unsqueeze(0)
+            
             if e==1 and b==0:
                 print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
-            image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
-            print('image_embeds',image_embeds.requires_grad,image_embeds.size())
+                print("text size",text_batch.device,"embedding size",embeds_batch.device,"img size",image_batch.device,"latent size",posterior_batch.device)
+            image_embeds=embeds_batch #.to(device) #.unsqueeze(1)
+            #print('image_embeds',image_embeds.requires_grad,image_embeds.size())
             prompt=text_batch
             if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                 prompt=" "

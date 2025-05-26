@@ -406,6 +406,10 @@ def main(args):
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
                     # Predict the noise residual and compute loss
+                    print('noisy_latents.device',noisy_latents.device)
+                    print('timesteps.device',timesteps.device)
+                    print('unet.device',unet.device)
+                    print('unet.time_embedding.device',unet.time_embedding.device)
                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 
                     

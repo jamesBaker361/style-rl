@@ -65,6 +65,9 @@ parser.add_argument("--num_image_text_embeds",type=int,default=4)
 parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
 parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
+parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")
+parser.add_argument("--load",action="store_true",help="whether to load saved version")
+parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
 
 import torch
 import torch.nn.functional as F
@@ -127,6 +130,9 @@ def main(args):
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
     
+    '''if args.load:
+        try:
+            pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained()'''
 
     if args.pipeline=="lcm":
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
@@ -485,6 +491,10 @@ def main(args):
                 print(f"\t validation epoch {e} elapsed {end-start}")
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
+        if e%args.upload_interval==0:
+            pipeline.config.epochs=e
+            pipeline.push_to_hub(args.name,commit_message=f"uploaded epoch {e}")
+            print(f"uploaded {args.name} to hub")
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()

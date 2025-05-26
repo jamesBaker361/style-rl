@@ -22,7 +22,7 @@
 
 #SBATCH --exclusive 
 
-#SBATCH --exclude=gpu[005,006,008,010,011,013,018],cuda[001-008],pascal[006-010],gpuk[001-012]
+#SBATCH --exclude=gpu[005,006,008,010,011,013,014,018],cuda[001-008],pascal[006-010],gpuk[001-012]
 
 #SBATCH --gres-flags=enforce-binding
 

@@ -437,15 +437,9 @@ def main(args):
                     if args.vanilla:
                         with accelerator.autocast():
                             model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-
-                            
-
                             loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     else:
                         model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-
-                            
-
                         loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
 
@@ -454,11 +448,19 @@ def main(args):
             elif args.training_type=="reward":
                 with accelerator.accumulate(params):
                     latents = DiagonalGaussianDistribution(posterior_batch).sample()
-                    images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                   #latents=latents, 
-                                                   num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
-                    predicted=embedding_util.embed_img_tensor(images)
-                    loss=loss_fn(images,predicted)
+                    if args.vanilla:
+                        with accelerator.autocast():
+                            images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                        #latents=latents, 
+                                                        num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                            predicted=embedding_util.embed_img_tensor(images)
+                            loss=loss_fn(images,predicted)
+                    else:
+                        images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                        #latents=latents, 
+                                                        num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                        predicted=embedding_util.embed_img_tensor(images)
+                        loss=loss_fn(images,predicted)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                     accelerator.backward(loss)
 

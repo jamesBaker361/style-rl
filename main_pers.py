@@ -384,7 +384,7 @@ def main(args):
                     
                     encoder_hidden_states = text_batch
                     #print("encoede hiiden states",encoder_hidden_states.requires_grad)
-                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device,dtype=torch_dtype)
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()
 
                     noisy_latents = scheduler.add_noise(latents, noise, timesteps)

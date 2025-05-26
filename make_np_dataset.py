@@ -27,6 +27,7 @@ parser.add_argument("--facet",type=str,default="query",help="dino vit facet to e
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--rewrite",action="store_true")
+parser.add_argument("--text_embedding",action="store_true")
 
 def main(args):
     accelerator=Accelerator()

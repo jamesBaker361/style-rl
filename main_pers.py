@@ -282,9 +282,9 @@ def main(args):
         fid_list=[]
 
         for b,batch in enumerate(data_loader):
-            '''if args.vanilla:
+            if args.vanilla:
                 for k,v in batch.items():
-                    batch[k]=v.to(device,torch_dtype)'''
+                    batch[k]=v.to(device,torch_dtype)
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -344,9 +344,9 @@ def main(args):
         start=time.time()
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
-            '''if args.vanilla:
+            if args.vanilla:
                 for k,v in batch.items():
-                    batch[k]=v.to(device,torch_dtype)'''
+                    batch[k]=v.to(device,torch_dtype)
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]

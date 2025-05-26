@@ -292,7 +292,7 @@ def main(args):
         text_alignment_list=[]
         fid_list=[]
 
-        pipeline.vae=pipeline.vae.to(pipeline.unet)
+        pipeline.vae=pipeline.vae.to(pipeline.unet.device)
 
         for b,batch in enumerate(data_loader):
             if args.vanilla:

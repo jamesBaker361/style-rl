@@ -25,6 +25,7 @@
 day=$(date +'%m/%d/%Y %R')
 echo "gpu"  ${day} $SLURM_JOBID "node_list" $SLURM_NODELIST $@  "\n" >> jobs.txt
 module purge
+export MODULEPATH=$MODULEPATH:/projects/community/modulefiles
 module load intel/17.0.4
 #module load cudnn/7.0.3
 module load gcc/10.3.0-pgarias

@@ -124,18 +124,39 @@ def main(args):
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
     
-    
+
+    if args.pipeline=="lcm":
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+    vae=pipeline.vae
+    unet=pipeline.unet
+    text_encoder=pipeline.text_encoder
+    scheduler=pipeline.scheduler
+    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    '''vae.to(device,torch_dtype)
+    unet.to(device,torch_dtype)
+    text_encoder.to(device,torch_dtype)
+    scheduler.to(device,torch_dtype)'''
+    #pipeline.requires_grad_(False)
     embedding_list=[]
     text_list=[]
     image_list=[]
+    latent_list=[]
     shuffled_row_list=[row for row in raw_data]
     random.shuffle(shuffled_row_list)
+    composition=transforms.Compose([
+            transforms.Resize((args.image_size,args.image_size)),
+             transforms.ToTensor(),
+                transforms.Normalize([0.5], [0.5]),
+        ])
     with torch.no_grad():
         for i,row in enumerate(raw_data):
             if i==args.limit:
                 break
             before_objects=find_cuda_objects()
             image=row["image"]
+            image=composition(image)
+            latent=vae.encode(image.unsqueeze(0)).squeeze(0)
+            latent_list.append(latent)
             image_list.append(image)
             text=row["text"]
             if type(text)==list:
@@ -157,6 +178,19 @@ def main(args):
             accelerator.free_memory()
             torch.cuda.empty_cache()
             
+            
+            text, _ = pipeline.encode_prompt(
+                                    text,
+                                    "cpu", #accelerator.device,
+                                    1,
+                                    pipeline.do_classifier_free_guidance,
+                                    negative_prompt=None,
+                                    prompt_embeds=None,
+                                    negative_prompt_embeds=None,
+                                    #lora_scale=lora_scale,
+                            )
+            if i ==1:
+                print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",latent.size())
             text_list.append(text)
             #print(get_gpu_memory_usage())
             #print("gpu objects:",len(find_cuda_objects()))
@@ -172,21 +206,6 @@ def main(args):
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
     fake_embedding=embedding_util.embed_img_tensor(fake_image)
     embedding_dim=fake_embedding.size()[-1]
-
-    print("embedding dim",embedding_dim)
-
-    if args.pipeline=="lcm":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
-    vae=pipeline.vae
-    unet=pipeline.unet
-    text_encoder=pipeline.text_encoder
-    scheduler=pipeline.scheduler
-    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-    '''vae.to(device,torch_dtype)
-    unet.to(device,torch_dtype)
-    text_encoder.to(device,torch_dtype)
-    scheduler.to(device,torch_dtype)'''
-    #pipeline.requires_grad_(False)
     if args.fsdp:
         for component in [vae,text_encoder]:
             component.to("cpu")
@@ -230,6 +249,8 @@ def main(args):
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
     text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
 
+    latent_list,test_latent_list,val_latent_list=split_list_by_ratio(latent_list,ratios)
+
     train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,args.image_size)
     val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,args.image_size)
     test_dataset=CustomTripleDataset(test_image_list,test_embedding_list,test_text_list,args.image_size)
@@ -271,7 +292,7 @@ def main(args):
                 prompt=" "
             image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
-                ip_adapter_image=F_v2.resize(image_batch, (224,224)).unsqueeze(0)
+                ip_adapter_image=F_v2.resize(image_batch, (224,224))
                 image=pipeline(prompt,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0]
             else:
                 image=pipeline(prompt,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
@@ -323,10 +344,12 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
+            latents_batch=batch["latents"]
             if len(image_batch.size())==3:
                 image_batch=image_batch.unsqueeze(0)
-                text_batch=[text_batch]
+                text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
+                latents_batch=latents_batch.unsqueeze(0)
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())
@@ -338,12 +361,8 @@ def main(args):
                 with accelerator.accumulate(params):
                     # Convert images to latent space
                     #if args.deepspeed:
-                    with torch.no_grad():
-                        #image_batch=image_batch.unsqueeze(0)
-                        '''else:
-                            image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)'''
-                        latents = vae.encode(image_batch).latent_dist.sample()
-                        latents = latents * vae.config.scaling_factor
+                    latents = latents_batch.latent_dist.sample()
+                    latents = latents * vae.config.scaling_factor
 
                     latents=latents.to(device,torch_dtype)
 
@@ -355,32 +374,10 @@ def main(args):
                     
                     pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
                     #print(pipeline.text_encoder.config)
-                    if True:
-                        with torch.no_grad():
-                            prompt_embeds, _ = pipeline.encode_prompt(
-                                    prompt,
-                                    "cpu", #accelerator.device,
-                                    1,
-                                    pipeline.do_classifier_free_guidance,
-                                    negative_prompt=None,
-                                    prompt_embeds=None,
-                                    negative_prompt_embeds=None,
-                                    #lora_scale=lora_scale,
-                            )
-                    else:
-                        prompt_embeds, _ = pipeline.encode_prompt(
-                                    prompt,
-                                    accelerator.device,
-                                    1,
-                                    pipeline.do_classifier_free_guidance,
-                                    negative_prompt=None,
-                                    prompt_embeds=None,
-                                    negative_prompt_embeds=None,
-                                    #lora_scale=lora_scale,
-                            )
+                    
 
                     
-                    encoder_hidden_states = prompt_embeds.to(device,torch_dtype)
+                    encoder_hidden_states = text_batch.to(device,torch_dtype)
                     #print("encoede hiiden states",encoder_hidden_states.requires_grad)
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()

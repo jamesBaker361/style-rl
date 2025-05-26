@@ -294,7 +294,8 @@ def main(args):
         difference_list=[]
         embedding_difference_list=[]
         text_alignment_list=[]
-        fid_list=[]
+        image_list=[]
+        fake_image_list=[]
 
         '''if args.training_type!="reward":
             pipeline.vae=pipeline.vae.to(pipeline.unet.device)'''
@@ -315,25 +316,23 @@ def main(args):
             image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
                 ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
+                fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
             else:
-                image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
+                fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",image.size(),image_batch.size())
             #image_embeds.to("cpu")
-            image_batch=image_batch.to(image.device)
+            image_batch=image_batch.to(fake_image.device)
 
-            difference_list.append(F.mse_loss(image,image_batch).cpu().detach().item())
+            difference_list.append(F.mse_loss(fake_image,image_batch).cpu().detach().item())
 
 
             embedding_real=embedding_util.embed_img_tensor(image_batch)
-            embedding_fake=embedding_util.embed_img_tensor(image)
+            embedding_fake=embedding_util.embed_img_tensor(fake_image)
             embedding_difference_list.append(F.mse_loss(embedding_real,embedding_fake).cpu().detach().item())
 
-            fid.update(image_batch.cpu(),real=True)
-            fid.update(image.cpu(),real=False)
-
-            fid_list.append(fid.compute().cpu().detach().item())
+            image_list.append(image.cpu())
+            fake_image_list.append(fake_image.cpu())
             
             
             do_denormalize= [True] * image.shape[0]
@@ -351,7 +350,9 @@ def main(args):
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         metrics["text_alignment"]=np.mean(text_alignment_list)
-        metrics["fid"]=np.mean(fid_list)
+        fid.update(torch.cat(image_list),real=True)
+        fid.update(torch.cat(fake_image_list),real=False)
+        metrics["fid"]=fid.compute().cpu().detach().item()
         if auto_log:
             accelerator.log(metrics)
         '''if args.training_type!="reward":

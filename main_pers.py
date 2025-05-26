@@ -263,7 +263,7 @@ def main(args):
     optimizer=torch.optim.AdamW(params)
 
     if args.vanilla:
-        unet=unet.to(device,torch_dtype)
+        unet=unet.to(device)
 
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)

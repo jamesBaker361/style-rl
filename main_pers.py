@@ -409,8 +409,8 @@ def main(args):
                     print('noisy_latents.device',noisy_latents.device)
                     print('timesteps.device',timesteps.device)
                     print('unet.device',unet.device)
-                    print('unet.time_embedding.',unet.time_embedding.cond_proj.device)
-                    print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.device)
+                    print('unet.time_embedding.',next(unet.time_embedding.cond_proj.parameters()).device)
+                    print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.image_projection_layers[0].device)
                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 
                     

@@ -55,12 +55,24 @@ def main(args):
     except:
         existing=False
 
+    pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+
 
     for k,row in enumerate(raw_data):
         if k==args.limit:
             break
         image=row["image"].convert("RGB")
         text=row["text"]
+        text, _ = pipeline.encode_prompt(
+                                        text,
+                                        "cpu", #accelerator.device,
+                                        1,
+                                        pipeline.do_classifier_free_guidance,
+                                        negative_prompt=None,
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
         embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
         new_dataset["image"].append(image)
         new_dataset["embedding"].append(embedding)

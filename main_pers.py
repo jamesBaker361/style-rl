@@ -181,17 +181,17 @@ def main(args):
             accelerator.free_memory()
             torch.cuda.empty_cache()
             
-            
-            text, _ = pipeline.encode_prompt(
-                                    text,
-                                    "cpu", #accelerator.device,
-                                    1,
-                                    pipeline.do_classifier_free_guidance,
-                                    negative_prompt=None,
-                                    prompt_embeds=None,
-                                    negative_prompt_embeds=None,
-                                    #lora_scale=lora_scale,
-                            )
+            if type(text)==str:
+                text, _ = pipeline.encode_prompt(
+                                        text,
+                                        "cpu", #accelerator.device,
+                                        1,
+                                        pipeline.do_classifier_free_guidance,
+                                        negative_prompt=None,
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
             text=text.squeeze(0)
             if i ==1:
                 print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())

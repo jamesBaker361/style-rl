@@ -423,7 +423,9 @@ def main(args):
             elif args.training_type=="reward":
                 with accelerator.accumulate(params):
                     latents = DiagonalGaussianDistribution(posterior_batch).sample()
-                    images=pipeline.call_with_grad(prompt_embeds=text_batch, latents=latents, num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                    images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                   #latents=latents, 
+                                                   num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
                     predicted=embedding_util.embed_img_tensor(images)
                     loss=loss_fn(images,predicted)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)

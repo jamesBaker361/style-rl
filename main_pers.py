@@ -261,6 +261,10 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
+            if len(image_batch.size())==3:
+                image_batch=image_batch.unsqueeze(0)
+                text_batch=[text_batch]
+                embeds_batch=embeds_batch.unsqueeze(0)
             image_embeds=embeds_batch #.unsqueeze(0)
             prompt=text_batch
             if random.random() <args.uncaptioned_frac:
@@ -319,6 +323,10 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
+            if len(image_batch.size())==3:
+                image_batch=image_batch.unsqueeze(0)
+                text_batch=[text_batch]
+                embeds_batch=embeds_batch.unsqueeze(0)
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())

@@ -346,7 +346,7 @@ def main(args):
         for b,batch in enumerate(train_loader):
             if args.vanilla:
                 for k,v in batch.items():
-                    batch[k]=v.to(device,torch_dtype)
+                    batch[k]=v.to(device)
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -410,11 +410,19 @@ def main(args):
                     # Predict the noise residual and compute loss
                     
                     #print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.image_projection_layers[0].device)
-                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                    if args.vanilla:
+                        with accelerator.autocast():
+                            model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 
-                    
+                            
 
-                    loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                            loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    else:
+                        model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+
+                            
+
+                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
 
                     optimizer.step()

@@ -313,6 +313,7 @@ def main(args):
         start=time.time()
         loss_buffer=[]
         for b,(text_batch, embeds_batch,image_batch) in enumerate(train_loader):
+            print(len(image_batch),type(image_batch[0]))
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())

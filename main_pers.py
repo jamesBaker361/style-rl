@@ -339,7 +339,7 @@ def main(args):
                     # Convert images to latent space
                     #if args.deepspeed:
                     with torch.no_grad():
-                        image_batch=image_batch.unsqueeze(0)
+                        #image_batch=image_batch.unsqueeze(0)
                         '''else:
                             image_batch=image_batch.to(device,torch_dtype).unsqueeze(0)'''
                         latents = vae.encode(image_batch).latent_dist.sample()

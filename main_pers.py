@@ -344,9 +344,13 @@ def main(args):
         start=time.time()
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
-            if args.vanilla:
-                for k,v in batch.items():
+
+            for k,v in batch.items():
+                if args.vanilla:
                     batch[k]=v.to(device)
+                if args.deepspeed:
+                    batch[k]=v.to(torch_dtype)
+            
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]

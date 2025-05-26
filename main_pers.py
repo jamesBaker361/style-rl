@@ -286,6 +286,8 @@ def main(args):
         text_alignment_list=[]
         fid_list=[]
 
+        pipeline.vae=pipeline.vae.to(pipeline.unet)
+
         for b,batch in enumerate(data_loader):
             if args.vanilla:
                 for k,v in batch.items():
@@ -341,6 +343,7 @@ def main(args):
         metrics["fid"]=np.mean(fid_list)
         if auto_log:
             accelerator.log(metrics)
+        pipeline.vae=pipeline.vae.to("cpu")
         return metrics
 
     training_start=time.time()

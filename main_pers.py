@@ -220,7 +220,7 @@ def main(args):
         for component in [vae,text_encoder]:
             component.requires_grad_(False)
             component.to("cpu")
-        unet=unet.to(device,torch_dtype)
+        #unet=unet.to(device,torch_dtype)
     
     replace_ip_attn(unet,
                     embedding_dim,
@@ -267,10 +267,7 @@ def main(args):
     print("trainable params: ",len(params))
 
     optimizer=torch.optim.AdamW(params)
-    if args.deepspeed:
-        unet=unet.to(device,torch_dtype)
-    else:
-        unet=unet.to(device)
+    unet=unet.to(device)
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
 

@@ -17,7 +17,7 @@ class CustomTripleDataset(Dataset):
     
     def __getitem__(self, index):
         return {
-            "image":self.trans(self.image_list[index]),
+            "image":self.image_list[index],
             "embeds":self.embeds_list[index],
             "text":self.text_list[index],
             "posterior":self.posterior_list[index]

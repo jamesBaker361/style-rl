@@ -222,6 +222,7 @@ def main(args):
         component.to("cpu")
         #unet=unet.to(device,torch_dtype)
     
+    unet.requires_grad_(False)
     replace_ip_attn(unet,
                     embedding_dim,
                     args.intermediate_embedding_dim,

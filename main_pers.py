@@ -337,7 +337,6 @@ def main(args):
             accelerator.log(metrics)
         return metrics
 
-    print(pipeline.text_encoder.config)
     training_start=time.time()
     for e in range(1, args.epochs+1):
         before_objects=find_cuda_objects()
@@ -368,7 +367,7 @@ def main(args):
                     latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     latents = latents * vae.config.scaling_factor
 
-                    latents=latents.to(device,torch_dtype)
+                    #latents=latents.to(device,torch_dtype)
 
                     #print('latents',latents.requires_grad,latents.size())
 
@@ -381,7 +380,7 @@ def main(args):
                     
 
                     
-                    encoder_hidden_states = text_batch.to(device,torch_dtype)
+                    encoder_hidden_states = text_batch
                     #print("encoede hiiden states",encoder_hidden_states.requires_grad)
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (args.batch_size,), device=latents.device)
                     #timesteps = timesteps.long()
@@ -405,7 +404,7 @@ def main(args):
                     # Predict the noise residual and compute loss
                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 
-                    print('model_pred',model_pred.requires_grad)
+                    
 
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)

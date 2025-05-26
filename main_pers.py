@@ -347,7 +347,8 @@ def main(args):
         return metrics
 
     training_start=time.time()
-    for e in range(1, args.epochs+1):
+    start_epoch=1
+    for e in range(start_epoch, args.epochs+1):
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]

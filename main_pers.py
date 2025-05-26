@@ -4,6 +4,7 @@ from experiment_helpers.gpu_details import print_details
 from pipelines import CompatibleLatentConsistencyModelPipeline
 from datasets import load_dataset
 import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
 
 import torch
 from accelerate import Accelerator
@@ -23,6 +24,7 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
+from data_helpers import CustomTripleDataset
 
 seed=1234
 random.seed(seed)                      # Python
@@ -134,7 +136,7 @@ def main(args):
                 break
             before_objects=find_cuda_objects()
             image=row["image"]
-            image_list.append(embedding_util.transform_image(image).to("cpu"))
+            image_list.append(image)
             text=row["text"]
             if type(text)==list:
                 text=text[0]
@@ -217,18 +219,24 @@ def main(args):
     
     ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)
     print('train/test/val',ratios)
-    batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
-    batched_embedding_list,test_batched_embedding_list,val_batched_embedding_list=split_list_by_ratio(batched_embedding_list,ratios)
+    #batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
+    embedding_list,test_embedding_list,val_embedding_list=split_list_by_ratio(embedding_list,ratios)
 
     
-    batched_image_list= image_list #make_batches_same_size(image_list,args.batch_size)
-    batched_text_list= text_list #[text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
+    #image_list= image_list #make_batches_same_size(image_list,args.batch_size)
+    #text_list= text_list #[text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
 
     
-    batched_image_list,test_batched_image_list,val_batched_image_list=split_list_by_ratio(batched_image_list,ratios)
-    batched_text_list,test_batched_text_list,val_batched_text_list=split_list_by_ratio(batched_text_list,ratios)
+    image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
+    text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
 
-    
+    train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,args.image_size)
+    val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,args.image_size)
+    test_dataset=CustomTripleDataset(test_image_list,test_embedding_list,test_text_list,args.image_size)
+
+    train_loader=DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
+    val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
+    test_loader=DataLoader(test_dataset,args.batch_size)
 
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]
 
@@ -236,20 +244,20 @@ def main(args):
 
     optimizer=torch.optim.AdamW(params)
 
-    unet,scheduler,optimizer=accelerator.prepare(unet,scheduler,optimizer)
+    unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
 
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
 
-    def logging(batched_text_list, batched_embedding_list, batched_image_list,pipeline,baseline:bool=False,auto_log:bool=True):
+    def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True):
         metrics={}
         difference_list=[]
         embedding_difference_list=[]
         text_alignment_list=[]
         fid_list=[]
 
-        for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
+        for b,(text_batch, embeds_batch,image_batch) in enumerate(data_loader):
             image_embeds=embeds_batch #.unsqueeze(0)
             prompt=text_batch
             if random.random() <args.uncaptioned_frac:
@@ -304,7 +312,7 @@ def main(args):
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]
-        for b,(text_batch, embeds_batch,image_batch) in enumerate(zip(batched_text_list, batched_embedding_list, batched_image_list)):
+        for b,(text_batch, embeds_batch,image_batch) in enumerate(train_loader):
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())
@@ -426,7 +434,7 @@ def main(args):
             with torch.no_grad():
 
                 start=time.time()
-                logging(val_batched_text_list,val_batched_embedding_list,val_batched_image_list,pipeline)
+                logging(val_loader,pipeline)
                 end=time.time()
                 print(f"\t validation epoch {e} elapsed {end-start}")
             after_objects=find_cuda_objects()
@@ -434,7 +442,7 @@ def main(args):
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()
-    metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,pipeline,auto_log=False)
+    metrics=logging(test_loader,pipeline,auto_log=False)
     new_metrics={}
     for k,v in metrics.items():
         new_metrics["test_"+k]=v
@@ -443,7 +451,7 @@ def main(args):
     if args.pipeline=="lcm":
         baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-    baseline_metrics=logging(test_batched_text_list,test_batched_embedding_list,test_batched_image_list,baseline_pipeline,baseline=True)
+    baseline_metrics=logging(test_loader,baseline_pipeline,baseline=True)
     new_metrics={}
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v

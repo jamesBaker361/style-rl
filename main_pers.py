@@ -267,6 +267,8 @@ def main(args):
     print("trainable params: ",len(params))
 
     optimizer=torch.optim.AdamW(params)
+    if args.deepspeed:
+        unet=unet.to(device,torch_dtype)
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
 

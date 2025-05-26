@@ -157,7 +157,7 @@ def main(args):
             before_objects=find_cuda_objects()
             image=row["image"]
             image=composition(image)
-            posterior=public_encode(vae,image.unsqueeze(0))
+            posterior=public_encode(vae,image.unsqueeze(0)).squeeze(0)
             posterior_list.append(posterior)
             image_list.append(image)
             text=row["text"]
@@ -173,7 +173,7 @@ def main(args):
                 #real_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                 #print("real embedding",real_embedding.size())
             else:
-                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
+                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
             #print(embedding.size())
             embedding.to("cpu")
             embedding_list.append(embedding)
@@ -191,6 +191,7 @@ def main(args):
                                     negative_prompt_embeds=None,
                                     #lora_scale=lora_scale,
                             )
+            text=text.squeeze(0)
             if i ==1:
                 print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
             text_list.append(text)
@@ -352,7 +353,8 @@ def main(args):
                 text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
                 posterior_batch=posterior_batch.unsqueeze(0)
-            print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
+            if e==1 and b==0:
+                print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())
             prompt=text_batch

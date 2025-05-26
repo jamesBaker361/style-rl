@@ -25,8 +25,8 @@
   },
   "comms_logger": {
   "enabled": true,
-  "verbose": true,
-  "prof_all": true,
-  "debug": true
+    "verbose": false,
+    "prof_all": false,
+    "debug": true
 }
 }

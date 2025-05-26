@@ -276,12 +276,12 @@ def main(args):
     if args.vanilla:
         unet=unet.to(device)
 
-    if args.training_type=="reward":
-        vae=vae.to(unet.device)
-        vae,unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(vae,unet,scheduler,optimizer,train_loader,test_loader,val_loader)
-    else:
-        unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
-
+    #if args.training_type=="reward":
+    vae=vae.to(unet.device)
+    vae,unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(vae,unet,scheduler,optimizer,train_loader,test_loader,val_loader)
+    '''else:
+        unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)'''
+    
     pipeline.unet=unet
 
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
@@ -295,8 +295,8 @@ def main(args):
         text_alignment_list=[]
         fid_list=[]
 
-        if args.training_type!="reward":
-            pipeline.vae=pipeline.vae.to(pipeline.unet.device)
+        '''if args.training_type!="reward":
+            pipeline.vae=pipeline.vae.to(pipeline.unet.device)'''
 
         for b,batch in enumerate(data_loader):
             if args.vanilla:
@@ -353,8 +353,8 @@ def main(args):
         metrics["fid"]=np.mean(fid_list)
         if auto_log:
             accelerator.log(metrics)
-        if args.training_type!="reward":
-            pipeline.vae=pipeline.vae.to("cpu")
+        '''if args.training_type!="reward":
+            pipeline.vae=pipeline.vae.to("cpu")'''
         return metrics
 
     training_start=time.time()

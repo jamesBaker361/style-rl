@@ -271,6 +271,8 @@ def main(args):
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
 
+    pipeline.unet=unet
+
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)

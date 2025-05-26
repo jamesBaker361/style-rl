@@ -157,7 +157,7 @@ def main(args):
             before_objects=find_cuda_objects()
             image=row["image"]
             image=composition(image)
-            posterior=public_encode(vae,image)
+            posterior=public_encode(vae,image.unsqueeze(0))
             posterior_list.append(posterior)
             image_list.append(image)
             text=row["text"]

@@ -312,7 +312,8 @@ def main(args):
                 text_batch=[text_batch]
                 embeds_batch=embeds_batch.unsqueeze(0)
             image_embeds=embeds_batch #.unsqueeze(0)
-            
+            if b==1:
+                print("images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
             image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
                 ip_adapter_image=F_v2.resize(image_batch, (224,224))

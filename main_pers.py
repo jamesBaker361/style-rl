@@ -282,9 +282,9 @@ def main(args):
         fid_list=[]
 
         for b,batch in enumerate(data_loader):
-            if args.vanilla:
+            '''if args.vanilla:
                 for k,v in batch.items():
-                    batch[k]=v.to(device,torch_dtype)
+                    batch[k]=v.to(device,torch_dtype)'''
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -344,9 +344,9 @@ def main(args):
         start=time.time()
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
-            if args.vanilla:
+            '''if args.vanilla:
                 for k,v in batch.items():
-                    batch[k]=v.to(device,torch_dtype)
+                    batch[k]=v.to(device,torch_dtype)'''
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -408,10 +408,7 @@ def main(args):
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
                     # Predict the noise residual and compute loss
-                    print('noisy_latents.device',noisy_latents.device)
-                    print('timesteps.device',timesteps.device)
-                    print('unet.device',unet.device)
-                    print('unet.time_embedding.',next(unet.time_embedding.cond_proj.parameters()).device)
+                    
                     #print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.image_projection_layers[0].device)
                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
 

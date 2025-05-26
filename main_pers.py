@@ -276,6 +276,10 @@ def main(args):
     if args.vanilla:
         unet=unet.to(device)
 
+    if args.training_type=="reward":
+        vae=vae.to(unet.device)
+    
+
 
     unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)
 

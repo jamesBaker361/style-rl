@@ -21,4 +21,8 @@ class CustomTripleDataset(Dataset):
         return len(self.image_list)
     
     def __getitem__(self, index):
-        return self.trans(self.image_list[index]),self.embeds_list[index],self.text_list[index]
+        return {
+            "image":self.trans(self.image_list[index]),
+            "embeds":self.embeds_list[index],
+            "text":self.text_list[index]
+        }

@@ -257,7 +257,10 @@ def main(args):
         text_alignment_list=[]
         fid_list=[]
 
-        for b,(text_batch, embeds_batch,image_batch) in enumerate(data_loader):
+        for b,batch in enumerate(data_loader):
+            image_batch=batch["image"]
+            text_batch=batch["text"]
+            embeds_batch=batch["embeds"]
             image_embeds=embeds_batch #.unsqueeze(0)
             prompt=text_batch
             if random.random() <args.uncaptioned_frac:
@@ -312,8 +315,10 @@ def main(args):
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]
-        for b,(text_batch, embeds_batch,image_batch) in enumerate(train_loader):
-            print(len(image_batch),type(image_batch[0]))
+        for b,batch in enumerate(train_loader):
+            image_batch=batch["image"]
+            text_batch=batch["text"]
+            embeds_batch=batch["embeds"]
             print(b,len(text_batch), 'embeds',embeds_batch.size(), "img", image_batch.size())
             image_embeds=embeds_batch.to(device,torch_dtype) #.unsqueeze(1)
             print('image_embeds',image_embeds.requires_grad,image_embeds.size())

@@ -314,9 +314,9 @@ def main(args):
             image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
                 ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0]
+                image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
             else:
-                image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images[0]
+                image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",image.size(),image_batch.size())
             #image_embeds.to("cpu")

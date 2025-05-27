@@ -69,6 +69,7 @@ def main(args):
 
 
         for k,row in enumerate(raw_data):
+            print(k)
             if k==args.limit:
                 break
             image=row["image"].convert("RGB")

@@ -330,7 +330,7 @@ def main(args):
             if args.vanilla:
                 pipeline.vae=pipeline.vae.to(pipeline.unet.device)
                 for k,v in batch.items():
-                    if type(v)!=str:
+                    if type(v)==torch.Tensor:
                         batch[k]=v.to(device,torch_dtype)
             image_batch=batch["image"]
             text_batch=batch["text"]
@@ -407,7 +407,7 @@ def main(args):
         for b,batch in enumerate(train_loader):
 
             for k,v in batch.items():
-                if type(v)!=str:
+                if type(v)==torch.Tensor:
                     if args.vanilla:
                         batch[k]=v.to(device)
                     if args.deepspeed:

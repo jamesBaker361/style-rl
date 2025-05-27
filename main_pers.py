@@ -345,7 +345,7 @@ def main(args):
                 logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
                 text_alignment_list.append(logits_per_image.cpu().detach().item())'''
 
-            metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+            #metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         #metrics["text_alignment"]=np.mean(text_alignment_list)

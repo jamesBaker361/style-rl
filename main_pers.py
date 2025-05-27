@@ -523,7 +523,9 @@ def main(args):
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
-
+    pipeline.config.epochs=e
+    pipeline.push_to_hub(args.name,commit_message=f"uploaded epoch {e}")
+    print(f"uploaded {args.name} to hub")
         
 
                 

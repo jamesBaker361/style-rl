@@ -45,7 +45,8 @@ def main(args):
     new_dataset={
         "image":[],
         "embedding":[],
-        "text":[]
+        "text":[],
+        "prompt":[]
     }
 
     try:
@@ -63,6 +64,7 @@ def main(args):
             break
         image=row["image"].convert("RGB")
         text=row["text"]
+        prompt=row["text"]
         text, _ = pipeline.encode_prompt(
                                         text,
                                         "cpu", #accelerator.device,
@@ -77,6 +79,7 @@ def main(args):
         new_dataset["image"].append(image)
         new_dataset["embedding"].append(embedding)
         new_dataset["text"].append(text)
+        new_dataset["prompt"].append(prompt)
         if k+1 %500==0:
             if existing==False or args.rewrite:
                 time.sleep(random.randint(1,60))

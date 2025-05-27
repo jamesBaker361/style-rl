@@ -24,7 +24,7 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
-from data_helpers import CustomTripleDataset
+from data_helpers import CustomDataset
 from custom_vae import public_encode
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 
@@ -255,9 +255,9 @@ def main(args):
 
         posterior_list,test_posterior_list,val_posterior_list=split_list_by_ratio(posterior_list,ratios)
 
-        train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,posterior_list)
-        val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list)
-        test_dataset=CustomTripleDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list)
+        train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list)
+        val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list)
+        test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list)
 
         train_loader=DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
         val_loader=DataLoader(val_dataset,batch_size=args.batch_size)

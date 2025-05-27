@@ -279,10 +279,11 @@ def main(args):
 
     #if args.training_type=="reward":
     vae=vae.to(unet.device)
-    pipeline,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(pipeline,scheduler,optimizer,train_loader,test_loader,val_loader)
+    post_quant_conv=vae.post_quant_conv.to(unet.device)
+    unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
     '''else:
         unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)'''
-    
+    vae.post_quant_conv=post_quant_conv
     pipeline.unet=unet
     pipeline.vae=vae
 

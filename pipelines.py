@@ -398,7 +398,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             #print("compatiable latenst size call with grad",latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 
-        latents.requires_grad_(True)
+        #latents.requires_grad_(True)
         
        
 

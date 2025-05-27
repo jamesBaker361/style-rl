@@ -531,6 +531,16 @@ def main(args):
     if args.pipeline=="lcm":
         baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    unet=baseline_pipeline.unet.to(device)
+    text_encoder=baseline_pipeline.text_encoder.to(device)
+    vae=baseline_pipeline.vae.to(device)
+    image_encoder=baseline_pipeline.image_encoder.to(device)
+
+    unet,text_encoder,vae,image_encoder=accelerator.prepare(unet,text_encoder,vae,image_encoder)
+    baseline_pipeline.unet=unet
+    baseline_pipeline.text_encoder=text_encoder
+    baseline_pipeline.vae=vae
+    baseline_pipeline.image_encoder=image_encoder
     baseline_metrics=logging(test_loader,baseline_pipeline,baseline=True)
     new_metrics={}
     for k,v in baseline_metrics.items():

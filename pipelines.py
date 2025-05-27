@@ -79,9 +79,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         callback = kwargs.pop("callback", None)
         callback_steps = kwargs.pop("callback_steps", None)
 
+        unwrapped_unet = getattr(self.unet, "module", self.unet)
+        unwrapped_vae=getattr(self.vae,"module",self.vae)
         # 0. Default height and width to unet
-        height = height or self.unet.config.sample_size * self.vae_scale_factor
-        width = width or self.unet.config.sample_size * self.vae_scale_factor
+        height = height or unwrapped_unet.config.sample_size * self.vae_scale_factor
+        width = width or unwrapped_unet.config.sample_size * self.vae_scale_factor
 
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
@@ -108,7 +110,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
 
-        device = self.unet.device
+        device = unwrapped_unet.device
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             image_embeds = self.prepare_ip_adapter_image_embeds(
@@ -164,7 +166,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # CFG formulation, so we need to subtract 1 from the input guidance_scale.
         # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
         w = torch.tensor(self.guidance_scale - 1).repeat(bs)
-        w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=self.unet.config.time_cond_proj_dim).to(
+        w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=unwrapped_unet.config.time_cond_proj_dim).to(
             device=device, dtype=latents.dtype
         )
 
@@ -300,8 +302,10 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         callback_steps = kwargs.pop("callback_steps", None)
 
         # 0. Default height and width to unet
-        height = height or self.unet.config.sample_size * self.vae_scale_factor
-        width = width or self.unet.config.sample_size * self.vae_scale_factor
+        unwrapped_unet = getattr(self.unet, "module", self.unet)
+        unwrapped_vae=getattr(self.vae,"module",self.vae)
+        height = height or unwrapped_unet.config.sample_size * self.vae_scale_factor
+        width = width or unwrapped_unet.config.sample_size * self.vae_scale_factor
         #print("height,width,self.unet.config.sample_size,self.vae_scale_factor",height,width,self.unet.config.sample_size,self.vae_scale_factor)
         with torch.no_grad():
             # 1. Check inputs. Raise error if not correct
@@ -376,7 +380,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             # CFG formulation, so we need to subtract 1 from the input guidance_scale.
             # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
             w = torch.tensor(self.guidance_scale - 1).repeat(bs)
-            w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=self.unet.config.time_cond_proj_dim).to(
+            w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=unwrapped_unet.config.time_cond_proj_dim).to(
                 device=device, dtype=self.unet.dtype
             )
 
@@ -386,7 +390,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         
             # 5. Prepare latent variable
-            num_channels_latents = self.unet.config.in_channels
+            num_channels_latents = unwrapped_unet.config.in_channels
             latents = self.prepare_latents(
                 batch_size * num_images_per_prompt,
                 num_channels_latents,

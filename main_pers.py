@@ -289,7 +289,7 @@ def main(args):
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
 
-    def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True):
+    def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True,clip_model:CLIPModel=clip_model):
         metrics={}
         difference_list=[]
         embedding_difference_list=[]
@@ -299,9 +299,10 @@ def main(args):
 
         '''if args.training_type!="reward":
             pipeline.vae=pipeline.vae.to(pipeline.unet.device)'''
-
+        
         for b,batch in enumerate(data_loader):
             if args.vanilla:
+                pipeline.vae=pipeline.vae.to(pipeline.unet.device)
                 for k,v in batch.items():
                     batch[k]=v.to(device,torch_dtype)
             image_batch=batch["image"]
@@ -315,11 +316,7 @@ def main(args):
             if b==1:
                 print("images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
             image_batch=torch.clamp(image_batch, 0, 1)
-            if baseline:
-                ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
-            else:
-                fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
+            fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             print("img vs real img",fake_image.size(),image_batch.size())
             #image_embeds.to("cpu")
@@ -337,20 +334,20 @@ def main(args):
             
             
             do_denormalize= [True] * image.shape[0]
-            pil_image=pipeline.image_processor.postprocess(image.unsqueeze(0),"pil",do_denormalize)[0]
-            if prompt!=" ":
+            pil_image=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
+            '''if prompt!=" ":
                 inputs = clip_processor(
                     text=[prompt], images=pil_image, return_tensors="pt", padding=True
                 )
 
                 outputs = clip_model(**inputs)
                 logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
-                text_alignment_list.append(logits_per_image.cpu().detach().item())
+                text_alignment_list.append(logits_per_image.cpu().detach().item())'''
 
             metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
-        metrics["text_alignment"]=np.mean(text_alignment_list)
+        #metrics["text_alignment"]=np.mean(text_alignment_list)
         print("size",torch.cat(image_list).size())
         fid.update(torch.cat(image_list),real=True)
         fid.update(torch.cat(fake_image_list),real=False)
@@ -497,7 +494,9 @@ def main(args):
             with torch.no_grad():
 
                 start=time.time()
-                logging(val_loader,pipeline)
+                clip_model=clip_model.to(pipeline.unet.device)
+                logging(val_loader,pipeline,clip_model=clip_model)
+                clip_model=clip_model.cpu()
                 end=time.time()
                 print(f"\t validation epoch {e} elapsed {end-start}")
             after_objects=find_cuda_objects()
@@ -509,6 +508,7 @@ def main(args):
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()
+    clip_model=clip_model.to(pipeline.unet.device)
     metrics=logging(test_loader,pipeline,auto_log=False)
     new_metrics={}
     for k,v in metrics.items():

@@ -18,6 +18,7 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
+from custom_vae import public_encode
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -30,6 +31,11 @@ parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--text_embedding",action="store_true")
 
 def main(args):
+    composition=transforms.Compose([
+            transforms.Resize((args.image_size,args.image_size)),
+             transforms.ToTensor(),
+                transforms.Normalize([0.5], [0.5]),
+        ])
     accelerator=Accelerator()
     device=accelerator.device
 
@@ -46,7 +52,8 @@ def main(args):
         "image":[],
         "embedding":[],
         "text":[],
-        "prompt":[]
+        "prompt":[],
+        "posterior":[]
     }
 
     try:
@@ -63,6 +70,8 @@ def main(args):
         if k==args.limit:
             break
         image=row["image"].convert("RGB")
+        image=composition(image)
+        posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0)
         text=row["text"]
         prompt=row["text"]
         text, _ = pipeline.encode_prompt(
@@ -80,6 +89,7 @@ def main(args):
         new_dataset["embedding"].append(embedding)
         new_dataset["text"].append(text)
         new_dataset["prompt"].append(prompt)
+        new_dataset["posterior"].append(posterior)
         if k+1 %500==0:
             if existing==False or args.rewrite:
                 time.sleep(random.randint(1,60))

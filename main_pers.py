@@ -328,10 +328,10 @@ def main(args):
         
         for b,batch in enumerate(data_loader):
             if args.vanilla:
-                pipeline.vae=pipeline.vae.to(pipeline.unet.device)
+                pipeline.vae=pipeline.vae.to(device)
                 for k,v in batch.items():
                     if type(v)==torch.Tensor:
-                        batch[k]=v.to(device,torch_dtype)
+                        batch[k]=v.to(pipeline.unet.device,torch_dtype)
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
@@ -405,10 +405,10 @@ def main(args):
     for submodule in unet.modules():
     # Get the first parameter or buffer, if any
         try:
-            device = next(submodule.parameters(), None)
-            if device is None:
-                device = next(submodule.buffers(), None)
-            print(type(submodule), device.device if device is not None else "no device (no params/buffers)")
+            p_device = next(submodule.parameters(), None)
+            if p_device is None:
+                p_device = next(submodule.buffers(), None)
+            print(type(submodule), p_device.device if p_device is not None else "no device (no params/buffers)")
         except Exception as e:
             print(type(submodule), "Error:", e)
     for e in range(start_epoch, args.epochs+1):

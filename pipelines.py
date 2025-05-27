@@ -147,13 +147,13 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         )
 
         # 5. Prepare latent variable
-        num_channels_latents = self.unet.config.in_channels
+        num_channels_latents = unwrapped_unet.config.in_channels
         latents = self.prepare_latents(
             batch_size * num_images_per_prompt,
             num_channels_latents,
             height,
             width,
-            self.unet.dtype,
+            unwrapped_unet.dtype,
             device,
             generator,
             latents,
@@ -381,7 +381,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             # LCM CFG formulation:  cfg_noise = noise_cond + cfg_scale * (noise_cond - noise_uncond), (cfg_scale > 0.0 using CFG)
             w = torch.tensor(self.guidance_scale - 1).repeat(bs)
             w_embedding = self.get_guidance_scale_embedding(w, embedding_dim=unwrapped_unet.config.time_cond_proj_dim).to(
-                device=device, dtype=self.unet.dtype
+                device=device, dtype=unwrapped_unet.dtype
             )
 
             # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
@@ -415,7 +415,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     )[0]
                 latents=latents.to(model_pred.device)
             else:
-                latents=latents.to(self.unet.device)
+                latents=latents.to(unwrapped_unet.device)
             #print("compatiable latenst size call with grad",latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 

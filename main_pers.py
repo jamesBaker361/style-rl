@@ -319,7 +319,7 @@ def main(args):
         metrics={}
         difference_list=[]
         embedding_difference_list=[]
-        text_alignment_list=[]
+        clip_alignment_list=[]
         image_list=[]
         fake_image_list=[]
 
@@ -335,6 +335,7 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
+            prompt_batch=batch["prompt"]
             if len(image_batch.size())==3:
                 image_batch=image_batch.unsqueeze(0)
                 text_batch=[text_batch]
@@ -365,20 +366,25 @@ def main(args):
             
             
             do_denormalize= [True] * image.shape[0]
-            pil_image=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
-            '''if prompt!=" ":
-                inputs = clip_processor(
-                    text=[prompt], images=pil_image, return_tensors="pt", padding=True
-                )
+            pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
+            
+            inputs = clip_processor(
+                text=prompt_batch, images=pil_image_set, return_tensors="pt", padding=True
+            )
 
-                outputs = clip_model(**inputs)
-                logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
-                text_alignment_list.append(logits_per_image.cpu().detach().item())'''
+            outputs = clip_model(**inputs)
+            logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
+            clip_text_embeds=outputs.text_embeds
+            clip_image_embeds=outputs.image_embeds
+            clip_difference=F.mse_loss(clip_image_embeds,clip_text_embeds)
+            print()
+            clip_alignment_list.append(clip_difference.cpu().detach().item())
 
-            #metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+            for pil_image,prompt in zip(pil_image_set,prompt_batch):
+                metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
-        #metrics["text_alignment"]=np.mean(text_alignment_list)
+        metrics["text_alignment"]=np.mean(clip_alignment_list)
         print("size",torch.cat(image_list).size())
         start=time.time()
         fid.update(torch.cat(image_list),real=True)

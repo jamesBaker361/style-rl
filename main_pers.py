@@ -490,6 +490,7 @@ def main(args):
                     if args.vanilla:
                         with accelerator.autocast():
                             print("noisy latents",noisy_latents.device,"timesteps",timesteps.device,"encoder states",encoder_hidden_states.device,"image_embeds",image_embeds.device)
+                            print("noisy latents",noisy_latents.dtype,"timesteps",timesteps.dtype,"encoder states",encoder_hidden_states.dtype,"image_embeds",image_embeds.dtype)
                             model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
                             loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     else:

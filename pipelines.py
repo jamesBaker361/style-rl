@@ -290,6 +290,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         gradient_checkpoint: bool = True,
         truncated_backprop_timestep: int = 0,
         truncated_rand_backprop_minmax: tuple = (0, 50),
+        fsdp:bool=False, #if fsdp, we have to do some stupid thing where we call the unet once to get model_pred device
         **kwargs,
     ):
         
@@ -396,6 +397,19 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 generator,
                 latents,
             )
+
+            if fsdp:
+                t=timesteps[0]
+                model_pred = self.unet(
+                        latents,
+                        t,
+                        timestep_cond=w_embedding,
+                        encoder_hidden_states=prompt_embeds,
+                        cross_attention_kwargs=self.cross_attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        return_dict=False,
+                    )[0]
+                latents=latents.to(model_pred.device)
             #print("compatiable latenst size call with grad",latents.size())
         #print("rgb with grad latents",len(find_cuda_objects()))
 
@@ -454,7 +468,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     if i < truncated_backprop_timestep:
                         model_pred = model_pred.detach()
                 # compute the previous noisy sample x_t -> x_t-1
-                #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
+                print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)
                 #latents=latents.to(model_pred.device)
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)

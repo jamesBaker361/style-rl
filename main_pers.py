@@ -26,7 +26,10 @@ from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 from data_helpers import CustomTripleDataset
 from custom_vae import public_encode
-from torch.distributed.fsdp import register_fsdp_forward_method
+try:
+    from torch.distributed.fsdp import register_fsdp_forward_method
+except ImportError:
+    print("cant import register_fsdp_forward_method")
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 
 seed=1234
@@ -282,7 +285,10 @@ def main(args):
     vae=vae.to(unet.device)
     post_quant_conv=vae.post_quant_conv.to(unet.device)
     unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
-    register_fsdp_forward_method(vae,"decode")
+    try:
+        register_fsdp_forward_method(vae,"decode")
+    except:
+        pass
     '''else:
         unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)'''
     vae.post_quant_conv=post_quant_conv

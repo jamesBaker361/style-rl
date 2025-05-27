@@ -154,6 +154,7 @@ def main(args):
     text_list=[]
     image_list=[]
     posterior_list=[]
+    prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
     random.shuffle(shuffled_row_list)
     composition=transforms.Compose([
@@ -167,13 +168,8 @@ def main(args):
                 break
             before_objects=find_cuda_objects()
             image=row["image"]
-            image=composition(image)
-            posterior=public_encode(vae,image.unsqueeze(0)).squeeze(0)
-            posterior_list.append(posterior)
-            image_list.append(image)
-            text=row["text"]
-            if type(text)==list:
-                text=text[0]
+            
+            
             
             if "embedding" in row:
                 #print(row["embedding"])
@@ -184,14 +180,27 @@ def main(args):
                 #real_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0)
                 #print("real embedding",real_embedding.size())
             else:
+                #this should NOT be normalized or transformed
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
+
+            image=composition(image)
+            if "posterior" not in row:
+                posterior=public_encode(vae,image.unsqueeze(0)).squeeze(0)
+            else:
+                np_posterior=np.array(row["posterior"])
+                posterior=torch.from_numpy(np_posterior)
+            posterior.to("cpu")
+            posterior_list.append(posterior)
+            image_list.append(image)
             #print(embedding.size())
             embedding.to("cpu")
             embedding_list.append(embedding)
             accelerator.free_memory()
             torch.cuda.empty_cache()
-            
+
+            text=row["text"]
             if type(text)==str:
+                prompt=text
                 text, _ = pipeline.encode_prompt(
                                         text,
                                         "cpu", #accelerator.device,
@@ -202,10 +211,15 @@ def main(args):
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
+            else:
+                np_text=np.array(text)
+                text=torch.from_numpy(np_text)
+                prompt=row["prompt"]
             text=text.squeeze(0)
             if i ==1:
                 print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
             text_list.append(text)
+            prompt_list.append(prompt)
             #print(get_gpu_memory_usage())
             #print("gpu objects:",len(find_cuda_objects()))
             after_objects=find_cuda_objects()
@@ -258,6 +272,8 @@ def main(args):
     text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
 
     posterior_list,test_posterior_list,val_posterior_list=split_list_by_ratio(posterior_list,ratios)
+
+    prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
     train_dataset=CustomTripleDataset(image_list,embedding_list,text_list,posterior_list)
     val_dataset=CustomTripleDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list)

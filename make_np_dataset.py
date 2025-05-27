@@ -102,13 +102,13 @@ def main(args):
                     Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
                 else:
                     if k+1> len_old:
-                        time.sleep(random.randint(1,60))
+                        time.sleep(random.randint(1,10))
                         Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
 
 
 
 
-        time.sleep(random.randint(1,60))
+        time.sleep(random.randint(1,10))
         Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
     
 

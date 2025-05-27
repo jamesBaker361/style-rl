@@ -408,6 +408,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
         latents_copy=latents.clone()
+        latents=latents.to(self.unet.device)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 #print(f"step {i}/num_inference_steps")
@@ -441,7 +442,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         return_dict=False,
                     )[0]
                 #print("loop model_pred",len(find_cuda_objects()))   
-
+                print("model pred grad",model_pred.requires_grad)
                 if truncated_backprop:
                     if truncated_backprop_rand:
                         rand_timestep = random.randint(
@@ -455,8 +456,10 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 # compute the previous noisy sample x_t -> x_t-1
                 #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)
-                latents=latents.to(model_pred.device)
+                #latents=latents.to(model_pred.device)
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
+                print("latents grad",latents.requires_grad)
+                print("model pred grad",model_pred.requires_grad)
                 #print("loop latents denoised",len(find_cuda_objects()))   
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
@@ -479,6 +482,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         #print("rgb with grad loop",len(find_cuda_objects()))         
 
         denoised = denoised.to(prompt_embeds.dtype)
+        print("denoised grad",denoised.requires_grad)
         has_nsfw_concept = None
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]

@@ -209,8 +209,8 @@ def main(args):
             #print("grads",len(find_cuda_tensors_with_grads()))
 
 
-    def loss_fn(img_tensor_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
-        pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
+    def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
+        #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
         return F.mse_loss(pred_embedding_batch,src_embedding_batch)
     
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
@@ -457,13 +457,13 @@ def main(args):
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images
                             predicted=embedding_util.embed_img_tensor(images)
-                            loss=loss_fn(embeds_batch,predicted)
+                            loss=loss_fn(predicted,embeds_batch)
                     else:
                         images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images
                         predicted=embedding_util.embed_img_tensor(images)
-                        loss=loss_fn(embeds_batch,predicted)
+                        loss=loss_fn(predicted,embeds_batch)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                     accelerator.backward(loss)
 

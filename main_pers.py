@@ -403,7 +403,14 @@ def main(args):
     training_start=time.time()
     start_epoch=1
     for submodule in unet.modules():
-        print(type(submodule), submodule.device)
+    # Get the first parameter or buffer, if any
+        try:
+            device = next(submodule.parameters(), None)
+            if device is None:
+                device = next(submodule.buffers(), None)
+            print(type(submodule), device.device if device is not None else "no device (no params/buffers)")
+        except Exception as e:
+            print(type(submodule), "Error:", e)
     for e in range(start_epoch, args.epochs+1):
         before_objects=find_cuda_objects()
         start=time.time()

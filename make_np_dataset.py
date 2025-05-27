@@ -29,6 +29,7 @@ parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--text_embedding",action="store_true")
+parser.add_argument("--image_size",type=int,default=256)
 
 def main(args):
     composition=transforms.Compose([

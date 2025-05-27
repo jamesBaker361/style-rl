@@ -94,6 +94,7 @@ def main(args):
         posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0)
         new_dataset["posterior"].append(posterior)
         if k+1 %500==0:
+            print("processed: ",k+1)
             if existing==False or args.rewrite:
                 time.sleep(random.randint(1,60))
                 Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)

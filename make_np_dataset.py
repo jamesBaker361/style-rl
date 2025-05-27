@@ -71,8 +71,7 @@ def main(args):
         if k==args.limit:
             break
         image=row["image"].convert("RGB")
-        image=composition(image)
-        posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0)
+        
         text=row["text"]
         prompt=row["text"]
         text, _ = pipeline.encode_prompt(
@@ -90,6 +89,9 @@ def main(args):
         new_dataset["embedding"].append(embedding)
         new_dataset["text"].append(text)
         new_dataset["prompt"].append(prompt)
+
+        image=composition(image)
+        posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0)
         new_dataset["posterior"].append(posterior)
         if k+1 %500==0:
             if existing==False or args.rewrite:

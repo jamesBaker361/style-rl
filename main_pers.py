@@ -457,7 +457,7 @@ def main(args):
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, ip_adapter_image_embeds=[image_embeds],output_type="pt").images
                             predicted=embedding_util.embed_img_tensor(images)
-                            loss=loss_fn(images,predicted)
+                            loss=loss_fn(embeds_batch,predicted)
                     else:
                         images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 

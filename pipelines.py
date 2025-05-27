@@ -429,25 +429,6 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         False,
                         use_reentrant=False
                     )[0]
-                    """
-                    unet forward:
-                    def forward(
-                        self,
-                        sample: torch.Tensor,
-                        timestep: Union[torch.Tensor, float, int],
-                        encoder_hidden_states: torch.Tensor,
-                        class_labels: Optional[torch.Tensor] = None,
-                        timestep_cond: Optional[torch.Tensor] = None,
-                        attention_mask: Optional[torch.Tensor] = None,
-                        cross_attention_kwargs: Optional[Dict[str, Any]] = None,
-                        added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = None,
-                        down_block_additional_residuals: Optional[Tuple[torch.Tensor]] = None,
-                        mid_block_additional_residual: Optional[torch.Tensor] = None,
-                        down_intrablock_additional_residuals: Optional[Tuple[torch.Tensor]] = None,
-                        encoder_attention_mask: Optional[torch.Tensor] = None,
-                        return_dict: bool = True,
-                    ) -> Union[UNet2DConditionOutput, Tuple]:
-                    """
                 else:
                     model_pred = self.unet(
                         latents,

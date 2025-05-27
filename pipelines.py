@@ -216,7 +216,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                     model_pred=evil_twin_model_pred + self.evil_twin_guidance_scale* (model_pred-evil_twin_model_pred)
                 # compute the previous noisy sample x_t -> x_t-1
-                print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
+                #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)
                 latents=latents.to(model_pred.device)
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
@@ -471,7 +471,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     if i < truncated_backprop_timestep:
                         model_pred = model_pred.detach()
                 # compute the previous noisy sample x_t -> x_t-1
-                print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
+                #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)
                 latents=latents.to(model_pred.device)
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)

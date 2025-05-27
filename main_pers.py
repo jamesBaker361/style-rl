@@ -421,7 +421,7 @@ def main(args):
             for k,v in batch.items():
                 if type(v)==torch.Tensor:
                     if args.vanilla:
-                        batch[k]=v.to(device)
+                        batch[k]=v.to(device,torch_dtype)
                     if args.deepspeed:
                         batch[k]=v.to(torch_dtype)
                 

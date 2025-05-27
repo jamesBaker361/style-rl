@@ -275,9 +275,9 @@ def main(args):
 
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
-    train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list)
-    val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list)
-    test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list)
+    train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)
+    val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)
+    test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list,test_prompt_list)
 
     train_loader=DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)

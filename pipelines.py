@@ -243,6 +243,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         denoised = denoised.to(prompt_embeds.dtype)
         has_nsfw_concept = None
         if not output_type == "latent":
+            print("denoised ",denoised.size())
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
             
         else:

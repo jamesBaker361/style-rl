@@ -27,6 +27,7 @@ from embedding_helpers import EmbeddingUtil
 from data_helpers import CustomTripleDataset
 from custom_vae import public_encode
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
+from torch.distributed.fsdp import register_fsdp_forward_method
 
 seed=1234
 random.seed(seed)                      # Python
@@ -278,6 +279,7 @@ def main(args):
         unet=unet.to(device)
 
     #if args.training_type=="reward":
+    register_fsdp_forward_method(vae,"decode")
     vae=vae.to(unet.device)
     post_quant_conv=vae.post_quant_conv.to(unet.device)
     unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)

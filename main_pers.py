@@ -211,7 +211,7 @@ def main(args):
 
     def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
         #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
-        return F.mse_loss(pred_embedding_batch,src_embedding_batch)
+        return F.mse_loss(pred_embedding_batch.float(),src_embedding_batch.float(),reduce="mean")
     
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
     fake_embedding=embedding_util.embed_img_tensor(fake_image)

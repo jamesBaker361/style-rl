@@ -300,7 +300,10 @@ def main(args):
     #if args.training_type=="reward":
     vae=vae.to(unet.device)
     post_quant_conv=vae.post_quant_conv.to(unet.device)
-    unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
+    clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    fid = FrechetInceptionDistance(feature=2048,normalize=True)
+    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
     try:
         register_fsdp_forward_method(vae,"decode")
     except:
@@ -311,9 +314,7 @@ def main(args):
     pipeline.unet=unet
     pipeline.vae=vae
 
-    clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-    clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
-    fid = FrechetInceptionDistance(feature=2048,normalize=True)
+    
 
     def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True,clip_model:CLIPModel=clip_model):
         metrics={}

@@ -95,6 +95,7 @@ def main(args):
             image=composition(image)
             posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0)
             new_dataset["posterior"].append(posterior)
+            torch.cuda.empty_cache()
             if k+1 %500==0:
                 print("processed: ",k+1)
                 if existing==False or args.rewrite:

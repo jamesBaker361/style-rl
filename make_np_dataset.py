@@ -96,7 +96,7 @@ def main(args):
         if k+1 %500==0:
             print("processed: ",k+1)
             if existing==False or args.rewrite:
-                time.sleep(random.randint(1,60))
+                time.sleep(random.randint(1,10))
                 Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
             else:
                 if k+1> len_old:

@@ -402,6 +402,8 @@ def main(args):
 
     training_start=time.time()
     start_epoch=1
+    for submodule in unet.modules():
+        print(type(submodule), submodule.device)
     for e in range(start_epoch, args.epochs+1):
         before_objects=find_cuda_objects()
         start=time.time()

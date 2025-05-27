@@ -410,7 +410,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 #print(f"step {i}/num_inference_steps")
-                latents = latents.to(prompt_embeds.dtype)
+                #latents = latents.to(prompt_embeds.dtype)
                 #print("latents size",latents.size())
                 # model prediction (v-prediction, eps, x)
                 if gradient_checkpoint:

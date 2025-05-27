@@ -369,7 +369,7 @@ def main(args):
             pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
             
             inputs = clip_processor(
-                text=prompt_batch, images=pil_image_set, return_tensors="pt", padding=True,return_dict=False
+                text=prompt_batch, images=pil_image_set, return_tensors="pt", padding=True
             )
             for k,v in inputs.items():
                 inputs[k]=v.to(clip_model.device)

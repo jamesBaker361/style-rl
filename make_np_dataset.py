@@ -42,7 +42,7 @@ def main(args):
         device=accelerator.device
 
 
-        torch_dtype=torch.float32
+        torch_dtype=torch.float16
         try:
             raw_data=load_dataset(args.dataset,split="train")
         except OSError:

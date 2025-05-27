@@ -350,9 +350,12 @@ def main(args):
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         #metrics["text_alignment"]=np.mean(text_alignment_list)
         print("size",torch.cat(image_list).size())
+        start=time.time()
         fid.update(torch.cat(image_list),real=True)
         fid.update(torch.cat(fake_image_list),real=False)
         metrics["fid"]=fid.compute().cpu().detach().item()
+        end=time.time()
+        print("fid elapsed ",end-start)
         if auto_log:
             accelerator.log(metrics)
         '''if args.training_type!="reward":

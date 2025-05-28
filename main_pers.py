@@ -551,10 +551,10 @@ def main(args):
             len_after=len(after_objects)
             delete_unique_objects(before_objects,after_objects)
             after_after_objects=find_cuda_objects()
-            print("deleted ",len_after-len(after_after_objects))
+            #print("deleted ",len_after-len(after_after_objects))
             if torch.cuda.is_available():
                 after_memory=get_gpu_memory_usage()["allocated_mb"]
-                print(f"freed {before_memory-after_memory} mb")
+                #print(f"freed {before_memory-after_memory} mb")
 
         end=time.time()
         elapsed=end-start

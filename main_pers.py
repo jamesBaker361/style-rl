@@ -307,7 +307,7 @@ def main(args):
 
     for name, param in unet.named_parameters():
         if param.requires_grad:
-            print(f"{name} is trainable")
+            print(f"{name} is trainable shape {tuple(param.shape)}")
 
 
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]

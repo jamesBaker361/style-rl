@@ -51,6 +51,7 @@ export BRAIN_DATA_DIR="/umbc/ada/donengel/common/brain/data"
 export TORCH_DISTRIBUTED_DEBUG="DETAIL"
 export NCCL_DEBUG="INFO"
 export NCCL_DEBUG_SUBSYS="ALL"
+export TORCH_LOCAL_DIR="/umbc/ada/donengel/commo/local_torch"
 echo "Running on: $(hostname)"
 echo "Allocated GPUs:"
 nvidia-smi

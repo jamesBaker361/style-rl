@@ -50,6 +50,7 @@ export BRAIN_DATA_DIR='/umbc/ada/donengel/common/brain-diffuser/data'
 export CUDA_LAUNCH_BLOCKING="1"
 export SCIKIT_LEARN_DATA="/umbc/ada/donengel/common/scikit-learn-data"
 export BRAIN_DATA_DIR="/umbc/ada/donengel/common/brain/data"
+export TORCH_LOCAL_DIR="/umbc/ada/donengel/commo/local_torch"
 export TORCH_DISTRIBUTED_DEBUG="DETAIL"
 #export NCCL_DEBUG="INFO"
 #export NCCL_DEBUG_SUBSYS="ALL"

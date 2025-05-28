@@ -51,5 +51,6 @@ export CUDA_LAUNCH_BLOCKING="1"
 export SCIKIT_LEARN_DATA="/scratch/jlb638/scikit-learn-data"
 export BRAIN_DATA_DIR="/scratch/jlb638/brain/data"
 export EMBEDDING_DIR="/scratch/jlb638/embedding_src"
+export TORCH_LOCAL_DIR="/scratch/jlb638/local_torch"
 srun python3 -u $@
 conda deactivate

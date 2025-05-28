@@ -32,10 +32,10 @@ def replace_ip_attn(unet:UNet2DConditionModel
     layers=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
-        new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features)])
+        new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
         new_k_ip.to(unet.device)
         setattr(module, "to_k_ip",new_k_ip)
-        new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features)])
+        new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
         new_v_ip.to(unet.device)
         setattr(module, "to_v_ip",new_v_ip)
 

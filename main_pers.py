@@ -644,6 +644,8 @@ def main(args):
     pipeline.config.epochs=e
     state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
     print("state dict len",len(state_dict))
+    for k in state_dict.keys():
+        print("\t",k)
     torch.save(state_dict,save_path)
     with open(config_path,"w+") as config_file:
         data={"start_epoch":e,

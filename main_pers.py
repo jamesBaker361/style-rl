@@ -293,9 +293,9 @@ def main(args):
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
     test_loader=DataLoader(test_dataset,args.batch_size)
 
-    for name, param in unet.named_parameters():
+    '''for name, param in unet.named_parameters():
         if param.requires_grad:
-            print(f"{name} is trainable")
+            print(f"{name} is trainable")'''
 
 
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]

@@ -27,6 +27,7 @@ def prepare_ip_adapter_image_embeds_distributed(self:LatentConsistencyModelPipel
                                                 num_images_per_prompt:int, 
                                                 do_classifier_free_guidance:bool
     ):
+        unwrapped_unet = getattr(self.unet, "module", self.unet)
         image_embeds = []
         if do_classifier_free_guidance:
             negative_image_embeds = []
@@ -34,13 +35,13 @@ def prepare_ip_adapter_image_embeds_distributed(self:LatentConsistencyModelPipel
             if not isinstance(ip_adapter_image, list):
                 ip_adapter_image = [ip_adapter_image]
 
-            if len(ip_adapter_image) != len(self.unet.encoder_hid_proj.image_projection_layers):
+            if len(ip_adapter_image) != len(unwrapped_unet.encoder_hid_proj.image_projection_layers):
                 raise ValueError(
-                    f"`ip_adapter_image` must have same length as the number of IP Adapters. Got {len(ip_adapter_image)} images and {len(self.unet.encoder_hid_proj.image_projection_layers)} IP Adapters."
+                    f"`ip_adapter_image` must have same length as the number of IP Adapters. Got {len(ip_adapter_image)} images and {len(unwrapped_unet.encoder_hid_proj.image_projection_layers)} IP Adapters."
                 )
 
             for single_ip_adapter_image, image_proj_layer in zip(
-                ip_adapter_image, self.unet.encoder_hid_proj.image_projection_layers
+                ip_adapter_image, unwrapped_unet.encoder_hid_proj.image_projection_layers
             ):
                 output_hidden_state = not isinstance(image_proj_layer, ImageProjection)
                 single_image_embeds, single_negative_image_embeds = self.encode_image(
@@ -164,6 +165,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             unet_type=str(type(self.unet))
+            print(unet_type)
+            #if unet_type.find("distributed")!=
             image_embeds = self.prepare_ip_adapter_image_embeds(
                 ip_adapter_image,
                 ip_adapter_image_embeds,

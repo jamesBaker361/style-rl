@@ -272,6 +272,7 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]
+            print("loaded from ",save_path)
         except Exception as e:
             print("couldnt load locally")
             print(e)
@@ -286,6 +287,7 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]
+            print("loaded from  ",pretrained_weights_path)
         except Exception as e:
             print("couldnt load from hf")
             print(e)

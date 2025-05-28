@@ -575,8 +575,11 @@ def main(args):
             with open(config_path,"w+") as config_file:
                 json.dump({"start_epoch":e},config_file, indent=4)
             print(f"saved {save_path}")
-            api.upload_file(save_path,WEIGHTS_NAME,args.name)
-            api.upload_file(config_path,CONFIG_NAME,args.name)
+            api.upload_file(save_path,
+                            path_in_repo=WEIGHTS_NAME,
+                            repo_id=args.name)
+            api.upload_file(config_path,path_in_repo=CONFIG_NAME,
+                            repo_id=args.name)
             print(f"uploaded {args.name} to hub")
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
@@ -611,8 +614,11 @@ def main(args):
     with open(config_path,"w+") as config_file:
         json.dump({"start_epoch":e},config_file, indent=4)
     print(f"saved {save_path}")
-    api.upload_file(save_path,WEIGHTS_NAME,args.name)
-    api.upload_file(config_path,CONFIG_NAME,args.name)
+    api.upload_file(save_path,
+                            path_in_repo=WEIGHTS_NAME,
+                            repo_id=args.name)
+    api.upload_file(config_path,path_in_repo=CONFIG_NAME,
+                            repo_id=args.name)
     print(f"uploaded {args.name} to hub")
         
 

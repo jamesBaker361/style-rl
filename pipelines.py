@@ -6,6 +6,7 @@ from typing import Union,Any,Optional,Callable,List,Dict
 import torch.utils.checkpoint as checkpoint
 from diffusers.image_processor import PipelineImageInput
 from diffusers.utils.outputs import BaseOutput
+from diffusers.models import ImageProjection
 from dataclasses import dataclass
 import PIL
 import numpy as np
@@ -18,6 +19,55 @@ def register_evil_twin(pipeline:DiffusionPipeline,scale:float):
     pipeline.evil_twin_unet.to(unet.device,unet.dtype)
     pipeline.evil_twin_guidance_scale=scale
     return pipeline.evil_twin_unet
+
+def prepare_ip_adapter_image_embeds_distributed(self:LatentConsistencyModelPipeline, 
+                                                ip_adapter_image, 
+                                                ip_adapter_image_embeds:List[torch.Tensor], 
+                                                device, 
+                                                num_images_per_prompt:int, 
+                                                do_classifier_free_guidance:bool
+    ):
+        image_embeds = []
+        if do_classifier_free_guidance:
+            negative_image_embeds = []
+        if ip_adapter_image_embeds is None:
+            if not isinstance(ip_adapter_image, list):
+                ip_adapter_image = [ip_adapter_image]
+
+            if len(ip_adapter_image) != len(self.unet.encoder_hid_proj.image_projection_layers):
+                raise ValueError(
+                    f"`ip_adapter_image` must have same length as the number of IP Adapters. Got {len(ip_adapter_image)} images and {len(self.unet.encoder_hid_proj.image_projection_layers)} IP Adapters."
+                )
+
+            for single_ip_adapter_image, image_proj_layer in zip(
+                ip_adapter_image, self.unet.encoder_hid_proj.image_projection_layers
+            ):
+                output_hidden_state = not isinstance(image_proj_layer, ImageProjection)
+                single_image_embeds, single_negative_image_embeds = self.encode_image(
+                    single_ip_adapter_image, device, 1, output_hidden_state
+                )
+
+                image_embeds.append(single_image_embeds[None, :])
+                if do_classifier_free_guidance:
+                    negative_image_embeds.append(single_negative_image_embeds[None, :])
+        else:
+            for single_image_embeds in ip_adapter_image_embeds:
+                if do_classifier_free_guidance:
+                    single_negative_image_embeds, single_image_embeds = single_image_embeds.chunk(2)
+                    negative_image_embeds.append(single_negative_image_embeds)
+                image_embeds.append(single_image_embeds)
+
+        ip_adapter_image_embeds = []
+        for i, single_image_embeds in enumerate(image_embeds):
+            single_image_embeds = torch.cat([single_image_embeds] * num_images_per_prompt, dim=0)
+            if do_classifier_free_guidance:
+                single_negative_image_embeds = torch.cat([negative_image_embeds[i]] * num_images_per_prompt, dim=0)
+                single_image_embeds = torch.cat([single_negative_image_embeds, single_image_embeds], dim=0)
+
+            single_image_embeds = single_image_embeds.to(device=device)
+            ip_adapter_image_embeds.append(single_image_embeds)
+
+        return ip_adapter_image_embeds
 
 @dataclass
 class CustomStableDiffusionPipelineOutput(BaseOutput):
@@ -113,6 +163,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         device = unwrapped_unet.device
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
+            unet_type=str(type(self.unet))
             image_embeds = self.prepare_ip_adapter_image_embeds(
                 ip_adapter_image,
                 ip_adapter_image_embeds,

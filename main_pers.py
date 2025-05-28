@@ -73,6 +73,7 @@ parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp trai
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
 parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")
 parser.add_argument("--load",action="store_true",help="whether to load saved version")
+parser.add_argument("--load_hf",action="store_true",help="whether to load saved version from hf")
 parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
 
 import torch

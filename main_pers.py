@@ -265,7 +265,7 @@ def main(args):
     persistent_fid_list=[]
     if args.load:
         try:
-            unet.load_state_dict(torch.load(save_path,weights_only=True))
+            unet.load_state_dict(torch.load(save_path,weights_only=True),use_strict=False)
             with open(config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]
@@ -276,7 +276,7 @@ def main(args):
         try:
             pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
             pretrained_config_path=api.hf_hub_download(args.name,CONFIG_NAME,force_download=True)
-            unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True))
+            unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),use_strict=False)
             with open(pretrained_config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]

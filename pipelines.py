@@ -661,6 +661,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
         latents_copy=latents.clone()
+
+        print("latents",latents.size())
+        print("t",t.size())
+        print("prompt_embeds",prompt_embeds.size())
+        print("image embeds",image_embeds[0].size())
         
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):

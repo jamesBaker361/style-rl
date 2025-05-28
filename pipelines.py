@@ -663,7 +663,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         latents_copy=latents.clone()
 
         print("latents",latents.size())
-        print("t",t.size())
+        print("t",timesteps.size())
         print("prompt_embeds",prompt_embeds.size())
         print("image embeds",image_embeds[0].size())
         

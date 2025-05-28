@@ -533,7 +533,7 @@ def main(args):
                     print("latents",latents.size())
                     print("t",timesteps.size())
                     print("prompt_embeds",encoder_hidden_states.size())
-                    print("image embeds",image_embeds[0].size())
+                    print("image embeds",image_embeds.size())
                     
                     #print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.image_projection_layers[0].device)
                     if args.vanilla:

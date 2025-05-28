@@ -352,8 +352,9 @@ def main(args):
     clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
     try:
         register_fsdp_forward_method(vae,"decode")
-    except:
-        pass
+        print("registered")
+    except Exception as e:
+        print('register_fsdp_forward_method',e)
     vae.post_quant_conv=post_quant_conv
     pipeline.unet=unet
     pipeline.vae=vae

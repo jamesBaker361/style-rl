@@ -48,7 +48,7 @@ def find_cuda_tensors_with_grads():
             pass  # Ignore inaccessible objects
     return tensors_with_grads
 
-def delete_unique_objects(list1, list2):
+def delete_unique_objects(list1, list2,verbose=False):
     """Delete objects that are only in one of the two lists."""
     set1 = {id(obj) for obj in list1}
     set2 = {id(obj) for obj in list2}
@@ -67,12 +67,14 @@ def delete_unique_objects(list1, list2):
             try:
                 obj = obj.detach().cpu()
             except Exception as e:
-                print(f"Failed to move tensor to CPU: {e}")
+                if verbose:
+                    print(f"Failed to move tensor to CPU: {e}")
         elif isinstance(obj, torch.nn.Module):
             try:
                 obj.cpu()
             except Exception as e:
-                print(f"Failed to move module to CPU: {e}")
+                if verbose:
+                    print(f"Failed to move module to CPU: {e}")
         del obj
 
     # Force garbage collection and free CUDA memory

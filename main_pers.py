@@ -569,6 +569,8 @@ def main(args):
             torch.save(unet.state_dict(),save_path)
             with open(config_path,"w+") as config_file:
                 json.dump({"start_epoch":e},config_file, indent=4)
+                pad = " " * 1024  # ~1KB of padding
+                config_file.write(pad)
             print(f"saved {save_path}")
             api.upload_file(path_or_fileobj=save_path,
                             path_in_repo=WEIGHTS_NAME,
@@ -608,6 +610,8 @@ def main(args):
     torch.save(unet.state_dict(),save_path)
     with open(config_path,"w+") as config_file:
         json.dump({"start_epoch":e},config_file, indent=4)
+        pad = " " * 1024  # ~1KB of padding
+        config_file.write(pad)
     print(f"saved {save_path}")
     api.upload_file(path_or_fileobj=save_path,
                             path_in_repo=WEIGHTS_NAME,

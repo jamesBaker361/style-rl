@@ -72,7 +72,7 @@ class EmbeddingUtil():
             #print('dino_vit_features.size()',dino_vit_features.size())
             dino_vit_features=inverse_tokenize(dino_vit_features)
             dino_vit_features=F.max_pool2d(dino_vit_features, kernel_size=self.dino_pooling_stride, stride=self.dino_pooling_stride)
-            embedding=dino_vit_features.view(batch_size,-1)
+            embedding=dino_vit_features.reshape(batch_size,-1)
         elif self.embedding=="ssl":
             #print("before ",type(img_tensor),img_tensor.size())
             p_inputs=self.ssl_processor(img_tensor,return_tensors="pt")

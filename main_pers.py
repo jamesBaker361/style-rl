@@ -257,6 +257,18 @@ def main(args):
                     args.cross_attention_dim,
                     args.num_image_text_embeds)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
+    start_epoch=1
+    if args.load:
+        try:
+            pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME)
+            pretrained_config_path=api.hf_hub_download(args.name,CONFIG_NAME)
+            unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True))
+            with open(pretrained_config_path,"r") as f:
+                data=json.load(f)
+            start_epoch=data["start_epoch"]
+        except Exception as e:
+            print("couldnt load")
+            print(e)
     attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
     attn_layer_list.append( unet.encoder_hid_proj)
     print("len attn_layers",len(attn_layer_list))
@@ -408,7 +420,7 @@ def main(args):
         return metrics
 
     training_start=time.time()
-    start_epoch=1
+    
     '''for submodule in unet.modules():
     # Get the first parameter or buffer, if any
         try:

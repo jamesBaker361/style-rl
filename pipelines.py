@@ -779,7 +779,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.encode_prompt
     def encode_prompt(self, prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt=None, prompt_embeds = None, negative_prompt_embeds = None, lora_scale = None, clip_skip = None):
-        positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+        text_encoder_type=str(type(self.text_encoder))
+        if text_encoder_type.find("DistributedDataParallel")!=-1:
+            positive,negative=encode_prompt_distributed(self,prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
+        else:
+            positive,negative= super().encode_prompt(prompt, device, num_images_per_prompt, do_classifier_free_guidance, negative_prompt, prompt_embeds, negative_prompt_embeds, lora_scale, clip_skip)
         #print("positive shape", positive.size())
         if hasattr(self, "prompt_model"):
             positive=self.prompt_model(self.src_entity,positive)

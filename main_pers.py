@@ -269,6 +269,9 @@ def main(args):
             with open(config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]
+            persistent_loss_list=data["persistent_loss_list"]
+            persistent_text_embedding_list=data["persistent_text_embedding_list"]
+            persistent_fid_list=data["persistent_fid_list"]
         except Exception as e:
             print("couldnt load locally")
             print(e)
@@ -280,6 +283,9 @@ def main(args):
             with open(pretrained_config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]
+            persistent_loss_list=data["persistent_loss_list"]
+            persistent_text_embedding_list=data["persistent_text_embedding_list"]
+            persistent_fid_list=data["persistent_fid_list"]
         except Exception as e:
             print("couldnt load from hf")
             print(e)

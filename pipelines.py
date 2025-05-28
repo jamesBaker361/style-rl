@@ -74,14 +74,16 @@ def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
         """
         # set lora scale so that monkey patched LoRA
         # function of text encoder can correctly access it
+        unwrapped_text_encoder=getattr(self.text_encoder,"module",self.text_encoder)
+        unwrapped_unet = getattr(self.unet, "module", self.unet)
         if lora_scale is not None and isinstance(self, StableDiffusionLoraLoaderMixin):
             self._lora_scale = lora_scale
 
             # dynamically adjust the LoRA scale
             if not USE_PEFT_BACKEND:
-                adjust_lora_scale_text_encoder(self.text_encoder, lora_scale)
+                adjust_lora_scale_text_encoder(unwrapped_text_encoder, lora_scale)
             else:
-                scale_lora_layers(self.text_encoder, lora_scale)
+                scale_lora_layers(unwrapped_text_encoder, lora_scale)
 
         if prompt is not None and isinstance(prompt, str):
             batch_size = 1
@@ -112,7 +114,7 @@ def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
                     untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1]
                 )
 
-            if hasattr(self.text_encoder.config, "use_attention_mask") and self.text_encoder.config.use_attention_mask:
+            if hasattr(unwrapped_text_encoder.config, "use_attention_mask") and unwrapped_text_encoder.config.use_attention_mask:
                 attention_mask = text_inputs.attention_mask.to(device)
             else:
                 attention_mask = None
@@ -134,10 +136,10 @@ def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
                 # layer.
                 prompt_embeds = self.text_encoder.text_model.final_layer_norm(prompt_embeds)
 
-        if self.text_encoder is not None:
-            prompt_embeds_dtype = self.text_encoder.dtype
-        elif self.unet is not None:
-            prompt_embeds_dtype = self.unet.dtype
+        if unwrapped_text_encoder is not None:
+            prompt_embeds_dtype = unwrapped_text_encoder.dtype
+        elif unwrapped_unet is not None:
+            prompt_embeds_dtype = unwrapped_unet = getattr(self.unet, "module", self.unet).dtype
         else:
             prompt_embeds_dtype = prompt_embeds.dtype
 
@@ -182,7 +184,7 @@ def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
                 return_tensors="pt",
             )
 
-            if hasattr(self.text_encoder.config, "use_attention_mask") and self.text_encoder.config.use_attention_mask:
+            if hasattr(unwrapped_text_encoder.config, "use_attention_mask") and unwrapped_text_encoder.config.use_attention_mask:
                 attention_mask = uncond_input.attention_mask.to(device)
             else:
                 attention_mask = None
@@ -202,10 +204,10 @@ def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
             negative_prompt_embeds = negative_prompt_embeds.repeat(1, num_images_per_prompt, 1)
             negative_prompt_embeds = negative_prompt_embeds.view(batch_size * num_images_per_prompt, seq_len, -1)
 
-        if self.text_encoder is not None:
+        if unwrapped_text_encoder is not None:
             if isinstance(self, StableDiffusionLoraLoaderMixin) and USE_PEFT_BACKEND:
                 # Retrieve the original scale by scaling back the LoRA layers
-                unscale_lora_layers(self.text_encoder, lora_scale)
+                unscale_lora_layers(unwrapped_text_encoder, lora_scale)
 
         return prompt_embeds, negative_prompt_embeds
 

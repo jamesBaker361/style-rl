@@ -165,15 +165,23 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             unet_type=str(type(self.unet))
-            print(unet_type)
-            #if unet_type.find("distributed")!=
-            image_embeds = self.prepare_ip_adapter_image_embeds(
-                ip_adapter_image,
-                ip_adapter_image_embeds,
-                device,
-                batch_size * num_images_per_prompt,
-                self.do_classifier_free_guidance,
-            )
+            if unet_type.find("DistributedDataParallel")!=-1:
+                image_embeds=prepare_ip_adapter_image_embeds_distributed(
+                    self,
+                    ip_adapter_image,
+                    ip_adapter_image_embeds,
+                    device,
+                    batch_size * num_images_per_prompt,
+                    self.do_classifier_free_guidance,
+                )
+            else:
+                image_embeds = self.prepare_ip_adapter_image_embeds(
+                    ip_adapter_image,
+                    ip_adapter_image_embeds,
+                    device,
+                    batch_size * num_images_per_prompt,
+                    self.do_classifier_free_guidance,
+                )
 
         # 3. Encode input prompt
         lora_scale = (

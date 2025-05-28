@@ -268,7 +268,7 @@ def main(args):
             unet.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
             with open(config_path,"r") as f:
                 data=json.load(f)
-            start_epoch=data["start_epoch"]
+            start_epoch=data["start_epoch"]+1
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]
@@ -282,7 +282,7 @@ def main(args):
             unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
             with open(pretrained_config_path,"r") as f:
                 data=json.load(f)
-            start_epoch=data["start_epoch"]
+            start_epoch=data["start_epoch"]+1
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]

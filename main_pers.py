@@ -594,7 +594,9 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
-            torch.save(unet.state_dict(),save_path)
+            state_dict={k: v for k, v in unet.state_dict().items() if unet.get_parameter(k).requires_grad}
+            print("state dict len",len(state_dict))
+            torch.save(state_dict,save_path)
             with open(config_path,"w+") as config_file:
                 data={"start_epoch":e,
                       "persistent_loss_list":persistent_loss_list,
@@ -639,7 +641,9 @@ def main(args):
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
     pipeline.config.epochs=e
-    torch.save(unet.state_dict(),save_path)
+    state_dict={k: v for k, v in unet.state_dict().items() if unet.get_parameter(k).requires_grad}
+    print("state dict len",len(state_dict))
+    torch.save(state_dict,save_path)
     with open(config_path,"w+") as config_file:
         data={"start_epoch":e,
                       "persistent_loss_list":persistent_loss_list,

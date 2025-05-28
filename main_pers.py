@@ -345,6 +345,8 @@ def main(args):
     vae=vae.to(unet.device)
     post_quant_conv=vae.post_quant_conv.to(unet.device)
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    if args.fsdp:
+        clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)

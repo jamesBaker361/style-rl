@@ -657,7 +657,6 @@ def main(args):
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
-    pipeline.config.epochs=e
     state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
     print("state dict len",len(state_dict))
     '''for k in state_dict.keys():

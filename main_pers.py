@@ -356,7 +356,7 @@ def main(args):
             else:
                 fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
-            print("img vs real img",fake_image.size(),image_batch.size())
+            #print("img vs real img",fake_image.size(),image_batch.size())
             #image_embeds.to("cpu")
             image_batch=image_batch.to(fake_image.device)
 
@@ -393,7 +393,7 @@ def main(args):
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         metrics["text_alignment"]=np.mean(clip_alignment_list)
-        print("size",torch.cat(image_list).size())
+        #print("size",torch.cat(image_list).size())
         start=time.time()
         fid_dtype=next(fid.inception.parameters()).dtype
         fid_device=next(fid.inception.parameters()).device

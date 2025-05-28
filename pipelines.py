@@ -404,6 +404,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         # 5. Prepare latent variable
         num_channels_latents = unwrapped_unet.config.in_channels
+        vae_type=str(type(self.vae))
+
         latents = self.prepare_latents(
             batch_size * num_images_per_prompt,
             num_channels_latents,
@@ -477,7 +479,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         has_nsfw_concept = None
         if not output_type == "latent":
             #print("denoised ",denoised.size())
-            image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
+            image = unwrapped_vae.decode(denoised / unwrapped_vae.config.scaling_factor, return_dict=False)[0]
             
         else:
             image = denoised

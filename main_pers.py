@@ -258,6 +258,9 @@ def main(args):
                     args.num_image_text_embeds)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
+    persistent_loss_list=[]
+    persistent_text_embedding_list=[]
+    persistent_fid_list=[]
     if args.load:
         try:
             pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
@@ -564,6 +567,7 @@ def main(args):
             "loss_std":np.std(loss_buffer),
             "elapsed":elapsed
         })
+        persistent_loss_list.append(np.mean(loss_buffer))
         accelerator.free_memory()
         if e%args.validation_interval==0:
             before_objects=find_cuda_objects()
@@ -571,10 +575,12 @@ def main(args):
 
                 start=time.time()
                 clip_model=clip_model.to(pipeline.unet.device)
-                logging(val_loader,pipeline,clip_model=clip_model)
+                val_metrics=logging(val_loader,pipeline,clip_model=clip_model)
                 clip_model=clip_model.cpu()
                 end=time.time()
                 print(f"\t validation epoch {e} elapsed {end-start}")
+                persistent_fid_list.append(val_metrics["fid"])
+                persistent_text_embedding_list.append(val_metrics["text_embedding"])
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:

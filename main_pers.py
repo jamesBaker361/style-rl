@@ -391,8 +391,9 @@ def main(args):
         print("size",torch.cat(image_list).size())
         start=time.time()
         fid_dtype=next(fid.inception.parameters()).dtype
-        fid.update(torch.cat(image_list).to(fid_dtype),real=True)
-        fid.update(torch.cat(fake_image_list).to(fid_dtype),real=False)
+        fid_device=next(fid.inception.parameters()).device
+        fid.update(torch.cat(image_list).to(fid_device,fid_dtype),real=True)
+        fid.update(torch.cat(fake_image_list).to(fid_device,fid_dtype),real=False)
         metrics["fid"]=fid.compute().cpu().detach().item()
         end=time.time()
         print("fid elapsed ",end-start)

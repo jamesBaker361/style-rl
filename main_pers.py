@@ -5,6 +5,7 @@ from pipelines import CompatibleLatentConsistencyModelPipeline
 from datasets import load_dataset
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import json
 
 import torch
 from accelerate import Accelerator
@@ -31,6 +32,7 @@ try:
 except ImportError:
     print("cant import register_fsdp_forward_method")
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
+from huggingface_hub import create_repo,HfApi
 
 seed=1234
 random.seed(seed)                      # Python
@@ -114,6 +116,9 @@ def main(args):
     device=accelerator.device
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
+    api=HfApi()
+    create_repo(args.name,exist_ok=True)
+
 
     torch_dtype={
         "no":torch.float32,
@@ -128,8 +133,13 @@ def main(args):
         raw_data=load_dataset(args.dataset,split="train")
     except OSError:
         raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
-
+    WEIGHTS_NAME="unet_model.bin"
+    CONFIG_NAME="config.json"
     os.makedirs(args.data_dir,exist_ok=True)
+    save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
+    os.makedirs(save_dir,exist_ok=True)
+    save_path=os.path.join(save_dir,WEIGHTS_NAME)
+    config_path=os.path.join(save_dir,CONFIG_NAME)
 
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
@@ -561,8 +571,12 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
-            pipeline.config.epochs=e
-            pipeline.push_to_hub(args.name,commit_message=f"uploaded epoch {e}")
+            torch.save(unet.state_dict(),save_path)
+            with open(config_path,"w+") as config_file:
+                json.dump({"start_epoch":e},config_file, indent=4)
+            print(f"saved {save_path}")
+            api.upload_file(save_path,WEIGHTS_NAME,args.name)
+            api.upload_file(config_path,CONFIG_NAME,args.name)
             print(f"uploaded {args.name} to hub")
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
@@ -593,7 +607,12 @@ def main(args):
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
     pipeline.config.epochs=e
-    pipeline.push_to_hub(args.name,commit_message=f"uploaded epoch {e}")
+    torch.save(unet.state_dict(),save_path)
+    with open(config_path,"w+") as config_file:
+        json.dump({"start_epoch":e},config_file, indent=4)
+    print(f"saved {save_path}")
+    api.upload_file(save_path,WEIGHTS_NAME,args.name)
+    api.upload_file(config_path,CONFIG_NAME,args.name)
     print(f"uploaded {args.name} to hub")
         
 

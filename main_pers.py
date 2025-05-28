@@ -595,7 +595,7 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
-            state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
+            state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
             print("state dict len",len(state_dict))
             torch.save(state_dict,save_path)
             with open(config_path,"w+") as config_file:
@@ -626,23 +626,23 @@ def main(args):
     if args.pipeline=="lcm":
         baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-    unet=baseline_pipeline.unet.to(device)
-    text_encoder=baseline_pipeline.text_encoder.to(device)
-    vae=baseline_pipeline.vae.to(device)
-    image_encoder=baseline_pipeline.image_encoder.to(device)
+    b_unet=baseline_pipeline.unet.to(device)
+    b_text_encoder=baseline_pipeline.text_encoder.to(device)
+    b_vae=baseline_pipeline.vae.to(device)
+    b_image_encoder=baseline_pipeline.image_encoder.to(device)
 
-    unet,text_encoder,vae,image_encoder=accelerator.prepare(unet,text_encoder,vae,image_encoder)
-    baseline_pipeline.unet=unet
-    baseline_pipeline.text_encoder=text_encoder
-    baseline_pipeline.vae=vae
-    baseline_pipeline.image_encoder=image_encoder
+    b_unet,b_text_encoder,b_vae,b_image_encoder=accelerator.prepare(b_unet,b_text_encoder,b_vae,b_image_encoder)
+    baseline_pipeline.unet=b_unet
+    baseline_pipeline.text_encoder=b_text_encoder
+    baseline_pipeline.vae=b_vae
+    baseline_pipeline.image_encoder=b_image_encoder
     baseline_metrics=logging(test_loader,baseline_pipeline,baseline=True)
     new_metrics={}
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
     pipeline.config.epochs=e
-    state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
+    state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
     print("state dict len",len(state_dict))
     for k in state_dict.keys():
         print("\t",k)

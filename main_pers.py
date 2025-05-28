@@ -327,9 +327,9 @@ def main(args):
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
     test_loader=DataLoader(test_dataset,args.batch_size)
 
-    for name, param in unet.named_parameters():
+    '''for name, param in unet.named_parameters():
         if param.requires_grad:
-            print(f"{name} is trainable shape {tuple(param.shape)}")
+            print(f"{name} is trainable shape {tuple(param.shape)}")'''
 
 
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]
@@ -652,8 +652,8 @@ def main(args):
     pipeline.config.epochs=e
     state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
     print("state dict len",len(state_dict))
-    for k in state_dict.keys():
-        print("\t",k)
+    '''for k in state_dict.keys():
+        print("\t",k)'''
     torch.save(state_dict,save_path)
     with open(config_path,"w+") as config_file:
         data={"start_epoch":e,

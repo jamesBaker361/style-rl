@@ -586,7 +586,11 @@ def main(args):
         if e%args.upload_interval==0:
             torch.save(unet.state_dict(),save_path)
             with open(config_path,"w+") as config_file:
-                json.dump({"start_epoch":e},config_file, indent=4)
+                data={"start_epoch":e,
+                      "persistent_loss_list":persistent_loss_list,
+                      "persistent_text_embedding_list":persistent_text_embedding_list,
+                      "persistent_fid_list":persistent_fid_list}
+                json.dump(data,config_file, indent=4)
                 pad = " " * 1024  # ~1KB of padding
                 config_file.write(pad)
             print(f"saved {save_path}")
@@ -627,7 +631,11 @@ def main(args):
     pipeline.config.epochs=e
     torch.save(unet.state_dict(),save_path)
     with open(config_path,"w+") as config_file:
-        json.dump({"start_epoch":e},config_file, indent=4)
+        data={"start_epoch":e,
+                      "persistent_loss_list":persistent_loss_list,
+                      "persistent_text_embedding_list":persistent_text_embedding_list,
+                      "persistent_fid_list":persistent_fid_list}
+        json.dump(data,config_file, indent=4)
         pad = " " * 1024  # ~1KB of padding
         config_file.write(pad)
     print(f"saved {save_path}")

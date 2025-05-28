@@ -156,6 +156,7 @@ def main(args):
     text_encoder=pipeline.text_encoder
     scheduler=pipeline.scheduler
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    pipeline.unet.encoder_hid_proj=None
     '''vae.to(device,torch_dtype)
     unet.to(device,torch_dtype)
     text_encoder.to(device,torch_dtype)
@@ -594,7 +595,7 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
-            state_dict={k: v for k, v in unet.state_dict().items() if unet.get_parameter(k).requires_grad}
+            state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
             print("state dict len",len(state_dict))
             torch.save(state_dict,save_path)
             with open(config_path,"w+") as config_file:
@@ -641,7 +642,7 @@ def main(args):
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
     pipeline.config.epochs=e
-    state_dict={k: v for k, v in unet.state_dict().items() if unet.get_parameter(k).requires_grad}
+    state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
     print("state dict len",len(state_dict))
     torch.save(state_dict,save_path)
     with open(config_path,"w+") as config_file:

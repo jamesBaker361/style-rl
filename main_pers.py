@@ -478,9 +478,9 @@ def main(args):
                 embeds_batch=embeds_batch.unsqueeze(0)
                 posterior_batch=posterior_batch.unsqueeze(0)
             
-            if e==1 and b==0:
+            if e==start_epoch and b==0:
                 print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
-                print("text size",text_batch.device,"embedding size",embeds_batch.device,"img size",image_batch.device,"latent size",posterior_batch.device)
+                print("text device",text_batch.device,"embedding device",embeds_batch.device,"img device",image_batch.device,"latent device",posterior_batch.device)
             image_embeds=embeds_batch #.to(device) #.unsqueeze(1)
             #print('image_embeds',image_embeds.requires_grad,image_embeds.size())
             prompt=text_batch

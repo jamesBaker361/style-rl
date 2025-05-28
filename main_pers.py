@@ -117,7 +117,7 @@ def main(args):
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
     api=HfApi()
-    create_repo(args.name,exist_ok=True)
+    api.create_repo(args.name,exist_ok=True)
 
 
     torch_dtype={

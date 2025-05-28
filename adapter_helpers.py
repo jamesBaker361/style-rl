@@ -39,7 +39,7 @@ def replace_ip_attn(unet:UNet2DConditionModel
         new_v_ip.to(unet.device)
         setattr(module, "to_v_ip",new_v_ip)
 
-    multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=unet.device)
+    multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=unet.device)
     #unet.add_module("encoder_hid_proj",multi_ip_adapter)
     #unet.encoder_hid_proj=multi_ip_adapter
     multi_ip_projection=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,unet.device)

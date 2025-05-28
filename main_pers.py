@@ -381,7 +381,6 @@ def main(args):
                 inputs[k]=v.to(clip_model.device)
 
             outputs = clip_model(**inputs)
-            logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
             clip_text_embeds=outputs.text_embeds
             clip_image_embeds=outputs.image_embeds
             clip_difference=F.mse_loss(clip_image_embeds,clip_text_embeds)

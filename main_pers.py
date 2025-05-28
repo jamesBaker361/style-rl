@@ -318,8 +318,6 @@ def main(args):
         register_fsdp_forward_method(vae,"decode")
     except:
         pass
-    '''else:
-        unet,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(unet,scheduler,optimizer,train_loader,test_loader,val_loader)'''
     vae.post_quant_conv=post_quant_conv
     pipeline.unet=unet
     pipeline.vae=vae
@@ -333,9 +331,6 @@ def main(args):
         clip_alignment_list=[]
         image_list=[]
         fake_image_list=[]
-
-        '''if args.training_type!="reward":
-            pipeline.vae=pipeline.vae.to(pipeline.unet.device)'''
         
         for b,batch in enumerate(data_loader):
             if args.vanilla:

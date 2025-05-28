@@ -263,6 +263,15 @@ def main(args):
     persistent_fid_list=[]
     if args.load:
         try:
+            unet.load_state_dict(torch.load(save_path,weights_only=True))
+            with open(config_path,"r") as f:
+                data=json.load(f)
+            start_epoch=data["start_epoch"]
+        except Exception as e:
+            print("couldnt load locally")
+            print(e)
+    if args.load_hf:    
+        try:
             pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
             pretrained_config_path=api.hf_hub_download(args.name,CONFIG_NAME,force_download=True)
             unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True))
@@ -270,7 +279,7 @@ def main(args):
                 data=json.load(f)
             start_epoch=data["start_epoch"]
         except Exception as e:
-            print("couldnt load")
+            print("couldnt load from hf")
             print(e)
     attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
     attn_layer_list.append( unet.encoder_hid_proj)

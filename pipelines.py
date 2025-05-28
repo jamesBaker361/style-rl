@@ -373,6 +373,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     batch_size * num_images_per_prompt,
                     self.do_classifier_free_guidance,
                 )
+            added_cond_kwargs={"image_embeds":image_embeds}
+        else:
+            added_cond_kwargs={}
 
         # 3. Encode input prompt
         lora_scale = (
@@ -425,18 +428,6 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
         # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
-
-        if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
-                image_embeds = self.prepare_ip_adapter_image_embeds(
-                    ip_adapter_image,
-                    ip_adapter_image_embeds,
-                    device,
-                    batch_size * num_images_per_prompt,
-                    self.do_classifier_free_guidance,
-                )
-                added_cond_kwargs={"image_embeds":image_embeds}
-        else:
-            added_cond_kwargs={}
 
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order

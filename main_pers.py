@@ -185,7 +185,7 @@ def main(args):
             
             if "embedding" in row:
                 #print(row["embedding"])
-                np_embedding=np.array(row["embedding"])
+                np_embedding=np.array(row["embedding"])[-1]
                 #print("np_embedding",np_embedding.shape)
                 embedding=torch.from_numpy(np_embedding)
                 #print("embedding",embedding.size())
@@ -193,7 +193,7 @@ def main(args):
                 #print("real embedding",real_embedding.size())
             else:
                 #this should NOT be normalized or transformed
-                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
+                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))[-1]
 
             image=composition(image)
             if "posterior" not in row:

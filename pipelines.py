@@ -526,6 +526,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         truncated_backprop_timestep: int = 0,
         truncated_rand_backprop_minmax: tuple = (0, 50),
         fsdp:bool=False, #if fsdp, we have to do some stupid thing where we call the unet once to get model_pred device
+        reward_training:bool=False, 
         **kwargs,
     ):
         
@@ -570,13 +571,16 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
             if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
                 print("before shape ",ip_adapter_image_embeds[0].size())
-                image_embeds = self.prepare_ip_adapter_image_embeds(
-                    ip_adapter_image,
-                    ip_adapter_image_embeds,
-                    device,
-                    batch_size * num_images_per_prompt,
-                    self.do_classifier_free_guidance,
-                )
+                if reward_training:
+                    image_embeds=ip_adapter_image_embeds
+                else:
+                    image_embeds = self.prepare_ip_adapter_image_embeds(
+                        ip_adapter_image,
+                        ip_adapter_image_embeds,
+                        device,
+                        batch_size * num_images_per_prompt,
+                        self.do_classifier_free_guidance,
+                    )
                 print("after shape",image_embeds[0].size())
                 added_cond_kwargs={"image_embeds":image_embeds}
             else:

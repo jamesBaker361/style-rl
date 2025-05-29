@@ -169,7 +169,6 @@ def main(args):
     prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
     if accelerator.is_main_process:
-        shuffled_row_list = raw_data[:]
         random.shuffle(shuffled_row_list)
     else:
         shuffled_row_list = None

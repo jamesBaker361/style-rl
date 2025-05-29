@@ -174,7 +174,7 @@ def main(args):
         shuffled_row_list = None
     accelerator.wait_for_everyone()
     # Broadcast to all processes
-    shuffled_row_list = accelerator.broadcast_object_list([shuffled_row_list])[0]
+    shuffled_row_list = accelerator.utils.broadcast_object_list([shuffled_row_list])[0]
     composition=transforms.Compose([
             transforms.Resize((args.image_size,args.image_size)),
              transforms.ToTensor(),

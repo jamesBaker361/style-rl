@@ -168,14 +168,21 @@ def main(args):
     posterior_list=[]
     prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
-    random.shuffle(shuffled_row_list)
+    if accelerator.is_main_process:
+        shuffled_row_list = raw_data[:]
+        random.shuffle(shuffled_row_list)
+    else:
+        shuffled_row_list = None
+    accelerator.wait_for_everyone()
+    # Broadcast to all processes
+    shuffled_row_list = accelerator.broadcast_object_list([shuffled_row_list])[0]
     composition=transforms.Compose([
             transforms.Resize((args.image_size,args.image_size)),
              transforms.ToTensor(),
                 transforms.Normalize([0.5], [0.5]),
         ])
     with torch.no_grad():
-        for i,row in enumerate(raw_data):
+        for i,row in enumerate(shuffled_row_list):
             if i==args.limit:
                 break
             before_objects=find_cuda_objects()

@@ -589,7 +589,7 @@ def main(args):
 
         end=time.time()
         elapsed=end-start
-        print(f"\t epoch {e} elapsed {end-start}")
+        accelerator.print(f"\t epoch {e} elapsed {end-start}")
         accelerator.log({
             "loss_mean":np.mean(loss_buffer),
             "loss_std":np.std(loss_buffer),

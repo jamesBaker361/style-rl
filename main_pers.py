@@ -605,24 +605,26 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
-            state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
-            print("state dict len",len(state_dict))
-            torch.save(state_dict,save_path)
-            with open(config_path,"w+") as config_file:
-                data={"start_epoch":e,
-                      "persistent_loss_list":persistent_loss_list,
-                      "persistent_text_embedding_list":persistent_text_embedding_list,
-                      "persistent_fid_list":persistent_fid_list}
-                json.dump(data,config_file, indent=4)
-                pad = " " * 1024  # ~1KB of padding
-                config_file.write(pad)
-            print(f"saved {save_path}")
-            api.upload_file(path_or_fileobj=save_path,
-                            path_in_repo=WEIGHTS_NAME,
-                            repo_id=args.name)
-            api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                            repo_id=args.name)
-            print(f"uploaded {args.name} to hub")
+            accelerator.wait_for_everyone()
+            if accelerator.is_main_process():
+                state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
+                print("state dict len",len(state_dict))
+                torch.save(state_dict,save_path)
+                with open(config_path,"w+") as config_file:
+                    data={"start_epoch":e,
+                        "persistent_loss_list":persistent_loss_list,
+                        "persistent_text_embedding_list":persistent_text_embedding_list,
+                        "persistent_fid_list":persistent_fid_list}
+                    json.dump(data,config_file, indent=4)
+                    pad = " " * 1024  # ~1KB of padding
+                    config_file.write(pad)
+                print(f"saved {save_path}")
+                api.upload_file(path_or_fileobj=save_path,
+                                path_in_repo=WEIGHTS_NAME,
+                                repo_id=args.name)
+                api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                repo_id=args.name)
+                print(f"uploaded {args.name} to hub")
     training_end=time.time()
     print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()
@@ -651,26 +653,28 @@ def main(args):
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
-    state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
-    print("state dict len",len(state_dict))
-    '''for k in state_dict.keys():
-        print("\t",k)'''
-    torch.save(state_dict,save_path)
-    with open(config_path,"w+") as config_file:
-        data={"start_epoch":e,
-                      "persistent_loss_list":persistent_loss_list,
-                      "persistent_text_embedding_list":persistent_text_embedding_list,
-                      "persistent_fid_list":persistent_fid_list}
-        json.dump(data,config_file, indent=4)
-        pad = " " * 1024  # ~1KB of padding
-        config_file.write(pad)
-    print(f"saved {save_path}")
-    api.upload_file(path_or_fileobj=save_path,
-                            path_in_repo=WEIGHTS_NAME,
-                            repo_id=args.name)
-    api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                            repo_id=args.name)
-    print(f"uploaded {args.name} to hub")
+    accelerator.wait_for_everyone()
+    if accelerator.is_main_process():
+        state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
+        print("state dict len",len(state_dict))
+        '''for k in state_dict.keys():
+            print("\t",k)'''
+        torch.save(state_dict,save_path)
+        with open(config_path,"w+") as config_file:
+            data={"start_epoch":e,
+                        "persistent_loss_list":persistent_loss_list,
+                        "persistent_text_embedding_list":persistent_text_embedding_list,
+                        "persistent_fid_list":persistent_fid_list}
+            json.dump(data,config_file, indent=4)
+            pad = " " * 1024  # ~1KB of padding
+            config_file.write(pad)
+        print(f"saved {save_path}")
+        api.upload_file(path_or_fileobj=save_path,
+                                path_in_repo=WEIGHTS_NAME,
+                                repo_id=args.name)
+        api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                repo_id=args.name)
+        print(f"uploaded {args.name} to hub")
     for k in ["persistent_loss_list","persistent_text_embedding_list","persistent_fid_list"]:
         persistent_list=data[k]
         key=k[:-5]

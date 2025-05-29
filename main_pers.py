@@ -359,6 +359,10 @@ def main(args):
     pipeline.unet=unet
     pipeline.vae=vae
 
+    for loader in [test_loader,val_loader,train_loader]:
+        print(getattr(loader.sampler, 'num_replicas', 'Not distributed'))
+        print(getattr(loader.sampler, 'rank', 'Not distributed'))
+
     
 
     def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True,clip_model:CLIPModel=clip_model):

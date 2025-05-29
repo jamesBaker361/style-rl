@@ -613,7 +613,7 @@ def main(args):
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
             accelerator.wait_for_everyone()
-            if accelerator.is_main_process():
+            if accelerator.is_main_process:
                 state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
                 print("state dict len",len(state_dict))
                 torch.save(state_dict,save_path)
@@ -661,7 +661,7 @@ def main(args):
         new_metrics["baseline_"+k]=v
     accelerator.log(new_metrics)
     accelerator.wait_for_everyone()
-    if accelerator.is_main_process():
+    if accelerator.is_main_process:
         state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
         print("state dict len",len(state_dict))
         '''for k in state_dict.keys():

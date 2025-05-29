@@ -7,5 +7,5 @@ for training_type in ["denoise","reward"]:
             command=f"sbatch  -J pers  --err=slurm/test_deep/{name}.err --out=slurm/test_deep/{name}.out"
             command+=" runaccgpu.sh main_pers.py --epochs 2 --limit 10 --project_name testing-pers "
             command+=f" --mixed_precision fp16 --prediction_type {prediction_type} "
-            command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-art_coco_captioned --vanilla "
+            command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-art_coco_captioned --vanilla --name {name} "
             print(command)

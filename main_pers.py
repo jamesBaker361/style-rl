@@ -205,7 +205,7 @@ def main(args):
             posterior_list.append(posterior)
             image_list.append(image)
             #print(embedding.size())
-            embedding.to("cpu").squeeze(0).squeeze(0).squeeze(0)
+            embedding.to("cpu").squeeze()
             embedding_list.append(embedding)
             accelerator.free_memory()
             torch.cuda.empty_cache()

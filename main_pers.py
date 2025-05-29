@@ -473,11 +473,6 @@ def main(args):
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
             posterior_batch=batch["posterior"]
-            if len(image_batch.size())==3:
-                image_batch=image_batch.unsqueeze(0)
-                text_batch=text_batch.unsqueeze(0)
-                embeds_batch=embeds_batch.unsqueeze(0)
-                posterior_batch=posterior_batch.unsqueeze(0)
             
             if e==start_epoch and b==0:
                 print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
@@ -501,12 +496,6 @@ def main(args):
 
                     # Sample noise that we'll add to the latents
                     noise = torch.randn_like(latents)
-
-                    
-                    pipeline.text_encoder.config.max_position_embeddings=pipeline.tokenizer.model_max_length
-                    #print(pipeline.text_encoder.config)
-                    
-
                     
                     encoder_hidden_states = text_batch
                     batch_size=text_batch.size()[0]

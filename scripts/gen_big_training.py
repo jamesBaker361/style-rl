@@ -3,7 +3,7 @@ port=29601
 for training_type in  ["denoise","reward"]:
     for prediction_type in ["epsilon","v_prediction"]:
         for embedding in ["dino","ssl"]:
-            for data in ["league_captioned_tile","league_captioned_splash","coco_captioned","art_coco_captioned","celeb_captioned"]:
+            for data in ["league_captioned_tile","coco_captioned","art_coco_captioned"]:
                 if prediction_type=="epsilon" and training_type=="reward":
                     continue
                 name=f"{training_type}_{prediction_type}_{embedding}"

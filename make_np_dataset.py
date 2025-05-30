@@ -66,6 +66,8 @@ def main(args):
             existing=False
 
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+        pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
+        pipeline=accelerator.prepare(pipeline)
 
 
         for k,row in enumerate(raw_data):

@@ -7,6 +7,7 @@ from extractor import ViTExtractor
 import torch.nn.functional as F
 from PIL import Image
 import random
+from custom_processor import CustomProcessor
 from transformers import (
     AutoImageProcessor,
     Dinov2Model,                   
@@ -49,7 +50,7 @@ class EmbeddingUtil():
             self.ssl_model.requires_grad_(False)
         elif embedding=="siglip2":
             self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            self.siglip_processor = SiglipProcessor.from_pretrained("local_config_siglip2")
+            self.siglip_processor = CustomProcessor()
             #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             self.siglip_model.to(device,torch_dtype)
             self.siglip_model.requires_grad_(False)
@@ -83,7 +84,7 @@ class EmbeddingUtil():
             embedding=cls_features
         elif self.embedding=="siglip2":
             #print("img",img_tensor.device)
-            inputs = self.siglip_processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
+            inputs = self.siglip_processor(images=img_tensor)
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''
             outputs = self.siglip_model(**inputs)

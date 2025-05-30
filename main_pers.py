@@ -682,11 +682,11 @@ def main(args):
         api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
                                 repo_id=args.name)
         print(f"uploaded {args.name} to hub")
-    for k in ["persistent_loss_list","persistent_text_embedding_list","persistent_fid_list"]:
-        persistent_list=data[k]
-        key=k[:-5]
-        for value in persistent_list:
-            accelerator.log({key:value})
+        for k in ["persistent_loss_list","persistent_text_embedding_list","persistent_fid_list"]:
+            persistent_list=data[k]
+            key=k[:-5]
+            for value in persistent_list:
+                accelerator.log({key:value})
     accelerator.log({"finished":True})
         
 

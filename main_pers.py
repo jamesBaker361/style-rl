@@ -419,7 +419,7 @@ def main(args):
             fake_image_list.append(fake_image.cpu())
             
             
-            do_denormalize= [True] * image.shape[0]
+            do_denormalize= [True] * fake_image.shape[0]
             pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
             
             inputs = clip_processor(

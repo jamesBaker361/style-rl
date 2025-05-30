@@ -16,7 +16,7 @@ class CustomProcessor:
         #resize
         images=F_v2.resize(images, (self.size,self.size))
         #rescale
-        images=self.scale*images
+        images=self.rescale_factor*images
         #normalize
         images = Normalize(self.image_mean,self.image_std)(images)
         data={"pixel_values":images}

@@ -33,90 +33,91 @@ parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 
 def main(args):
-    composition=transforms.Compose([
-            transforms.Resize((args.image_size,args.image_size)),
-             transforms.ToTensor(),
-                transforms.Normalize([0.5], [0.5]),
-        ])
-    accelerator=Accelerator(mixed_precision="fp16")
-    with accelerator.autocast():
-        device=accelerator.device
+    with torch.no_grad():
+        composition=transforms.Compose([
+                transforms.Resize((args.image_size,args.image_size)),
+                transforms.ToTensor(),
+                    transforms.Normalize([0.5], [0.5]),
+            ])
+        accelerator=Accelerator(mixed_precision="fp16")
+        with accelerator.autocast():
+            device=accelerator.device
 
 
-        torch_dtype=torch.float16
-        try:
-            raw_data=load_dataset(args.dataset,split="train")
-        except OSError:
-            raw_data=load_dataset(args.dataset,split="train",force_download=True)
+            torch_dtype=torch.float16
+            try:
+                raw_data=load_dataset(args.dataset,split="train")
+            except OSError:
+                raw_data=load_dataset(args.dataset,split="train",force_download=True)
 
-        embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
+            embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
-        new_dataset={
-            "image":[],
-            "embedding":[],
-            "text":[],
-            "prompt":[],
-            "posterior":[]
-        }
+            new_dataset={
+                "image":[],
+                "embedding":[],
+                "text":[],
+                "prompt":[],
+                "posterior":[]
+            }
 
-        try:
-            old_data=load_dataset(args.output_dataset)
-            existing=True
-            len_old=len([r for r in old_data])
-        except:
-            existing=False
+            try:
+                old_data=load_dataset(args.output_dataset)
+                existing=True
+                len_old=len([r for r in old_data])
+            except:
+                existing=False
 
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
-        pipeline=pipeline.to(accelerator.device)
-        pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)
-        pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)
-        pipeline=accelerator.prepare(pipeline)
+            pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            pipeline=pipeline.to(accelerator.device)
+            pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)
+            pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)
+            pipeline=accelerator.prepare(pipeline)
 
 
-        for k,row in enumerate(raw_data):
-            print(k)
-            if k==args.limit:
-                break
-            image=row["image"].convert("RGB")
-            
-            text=row["text"]
-            prompt=row["text"]
-            
-            text, _ = pipeline.encode_prompt(
-                                            text,
-                                             accelerator.device,
-                                            1,
-                                            pipeline.do_classifier_free_guidance,
-                                            negative_prompt=None,
-                                            prompt_embeds=None,
-                                            negative_prompt_embeds=None,
-                                            #lora_scale=lora_scale,
-                                    )
-            embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
-            new_dataset["image"].append(image)
-            new_dataset["embedding"].append(embedding)
-            new_dataset["text"].append(text)
-            new_dataset["prompt"].append(prompt)
+            for k,row in enumerate(raw_data):
+                print(k)
+                if k==args.limit:
+                    break
+                image=row["image"].convert("RGB")
+                
+                text=row["text"]
+                prompt=row["text"]
+                
+                text, _ = pipeline.encode_prompt(
+                                                text,
+                                                accelerator.device,
+                                                1,
+                                                pipeline.do_classifier_free_guidance,
+                                                negative_prompt=None,
+                                                prompt_embeds=None,
+                                                negative_prompt_embeds=None,
+                                                #lora_scale=lora_scale,
+                                        )
+                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
+                new_dataset["image"].append(image)
+                new_dataset["embedding"].append(embedding)
+                new_dataset["text"].append(text)
+                new_dataset["prompt"].append(prompt)
 
-            image=composition(image)
-            posterior=public_encode(pipeline.vae,image.unsqueeze(0).to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
-            new_dataset["posterior"].append(posterior)
-            torch.cuda.empty_cache()
-            if k+1 %500==0:
-                print("processed: ",k+1)
-                if existing==False or args.rewrite:
-                    time.sleep(random.randint(1,10))
-                    Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
-                else:
-                    if k+1> len_old:
+                image=composition(image)
+                posterior=public_encode(pipeline.vae,image.unsqueeze(0).to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
+                new_dataset["posterior"].append(posterior)
+                torch.cuda.empty_cache()
+                if k+1 %500==0:
+                    print("processed: ",k+1)
+                    if existing==False or args.rewrite:
                         time.sleep(random.randint(1,10))
                         Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
+                    else:
+                        if k+1> len_old:
+                            time.sleep(random.randint(1,10))
+                            Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
 
 
 
 
-        time.sleep(random.randint(1,10))
-        Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
+            time.sleep(random.randint(1,10))
+            Dataset.from_dict(new_dataset).push_to_hub(args.output_dataset)
     
 
 

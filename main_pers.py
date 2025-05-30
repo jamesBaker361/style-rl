@@ -236,7 +236,7 @@ def main(args):
                 prompt=row["prompt"]
             text=text.squeeze(0)
             if i ==1:
-                print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
+                accelerator.print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
             text_list.append(text)
             prompt_list.append(prompt)
             #print(get_gpu_memory_usage())
@@ -279,10 +279,10 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]
-            print("loaded from ",save_path)
+            accelerator.print("loaded from ",save_path)
         except Exception as e:
-            print("couldnt load locally")
-            print(e)
+            accelerator.print("couldnt load locally")
+            accelerator.print(e)
     if args.load_hf:    
         try:
             pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
@@ -294,23 +294,23 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_embedding_list=data["persistent_text_embedding_list"]
             persistent_fid_list=data["persistent_fid_list"]
-            print("loaded from  ",pretrained_weights_path)
+            accelerator.print("loaded from  ",pretrained_weights_path)
         except Exception as e:
-            print("couldnt load from hf")
-            print(e)
+            accelerator.print("couldnt load from hf")
+            accelerator.print(e)
     attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
     attn_layer_list.append( unet.encoder_hid_proj)
-    print("len attn_layers",len(attn_layer_list))
+    accelerator.print("len attn_layers",len(attn_layer_list))
     for layer in attn_layer_list:
         layer.requires_grad_(True)
 
 
-    print("before ",pipeline.unet.config.sample_size)
+    accelerator.print("before ",pipeline.unet.config.sample_size)
     pipeline.unet.config.sample_size=args.image_size // pipeline.vae_scale_factor
-    print("after", pipeline.unet.config.sample_size)
+    accelerator.print("after", pipeline.unet.config.sample_size)
     
     ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)
-    print('train/test/val',ratios)
+    accelerator.print('train/test/val',ratios)
     #batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
     embedding_list,test_embedding_list,val_embedding_list=split_list_by_ratio(embedding_list,ratios)
 
@@ -341,7 +341,7 @@ def main(args):
 
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]
 
-    print("trainable params: ",len(params))
+    accelerator.print("trainable params: ",len(params))
 
     optimizer=torch.optim.AdamW(params)
 
@@ -359,9 +359,9 @@ def main(args):
     clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
     try:
         register_fsdp_forward_method(vae,"decode")
-        print("registered")
+        accelerator.print("registered")
     except Exception as e:
-        print('register_fsdp_forward_method',e)
+        accelerator.print('register_fsdp_forward_method',e)
     vae.post_quant_conv=post_quant_conv
     pipeline.unet=unet
     pipeline.vae=vae
@@ -432,7 +432,7 @@ def main(args):
             clip_text_embeds=outputs.text_embeds
             clip_image_embeds=outputs.image_embeds
             clip_difference=F.mse_loss(clip_image_embeds,clip_text_embeds)
-            print()
+            
             clip_alignment_list.append(clip_difference.cpu().detach().item())
 
             for pil_image,prompt in zip(pil_image_set,prompt_batch):
@@ -606,7 +606,7 @@ def main(args):
                 val_metrics=logging(val_loader,pipeline,clip_model=clip_model)
                 clip_model=clip_model.cpu()
                 end=time.time()
-                print(f"\t validation epoch {e} elapsed {end-start}")
+                accelerator.print(f"\t validation epoch {e} elapsed {end-start}")
                 persistent_fid_list.append(val_metrics["fid"])
                 persistent_text_embedding_list.append(val_metrics["text_embedding"])
             after_objects=find_cuda_objects()
@@ -625,15 +625,15 @@ def main(args):
                     json.dump(data,config_file, indent=4)
                     pad = " " * 1024  # ~1KB of padding
                     config_file.write(pad)
-                print(f"saved {save_path}")
+                accelerator.print(f"saved {save_path}")
                 api.upload_file(path_or_fileobj=save_path,
                                 path_in_repo=WEIGHTS_NAME,
                                 repo_id=args.name)
                 api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
                                 repo_id=args.name)
-                print(f"uploaded {args.name} to hub")
+                accelerator.print(f"uploaded {args.name} to hub")
     training_end=time.time()
-    print(f"total trainign time = {training_end-training_start}")
+    accelerator.print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()
     clip_model=clip_model.to(pipeline.unet.device)
     metrics=logging(test_loader,pipeline,auto_log=False)

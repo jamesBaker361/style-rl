@@ -30,6 +30,7 @@ parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--text_embedding",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
+parser.add_argument("--mixed_precision",type=str,default="fp16")
 
 def main(args):
     composition=transforms.Compose([
@@ -67,7 +68,8 @@ def main(args):
 
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
         pipeline=pipeline.to(accelerator.device)
-        pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
+        pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)
+        pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)
         pipeline=accelerator.prepare(pipeline)
 
 

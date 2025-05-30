@@ -56,7 +56,8 @@ class EmbeddingUtil():
             self.siglip_model.requires_grad_(False)
         elif embedding=="clip":
             self.clip_model=CLIPVisionModel.from_pretrained("openai/clip-vit-base-patch32")
-            self.clip_processor=CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+            self.clip_processor=CustomProcessor(image_mean=[0.48145466,0.4578275,0.40821073],
+                                                image_std=[0.26862954,0.26130258,0.27577711])
             self.clip_model.to(device,torch_dtype)
             self.clip_model.requires_grad_(False)
 
@@ -87,12 +88,12 @@ class EmbeddingUtil():
             inputs = self.siglip_processor(images=img_tensor)
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''
-            outputs = self.siglip_model(**inputs)
-            embedding=outputs.image_embeds
+            outputs = self.siglip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
+            embedding=outputs.pooler_output
         elif self.embedding=="clip":
             inputs=self.clip_processor(images=img_tensor, return_tensors="pt")
             #inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
-            outputs=self.clip_model(**inputs)
+            outputs=self.clip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
             embedding=outputs.pooler_output
             
         return embedding

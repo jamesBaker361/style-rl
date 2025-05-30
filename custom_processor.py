@@ -20,4 +20,4 @@ class CustomProcessor:
         #normalize
         images = Normalize(self.image_mean,self.image_std)(images)
         data={"pixel_values":images}
-        return BatchFeature(data=data,tensor_type="pt")
+        return data

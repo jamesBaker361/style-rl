@@ -84,13 +84,13 @@ class EmbeddingUtil():
         elif self.embedding=="siglip2":
             #print("img",img_tensor.device)
             inputs = self.siglip_processor(text=[""], images=img_tensor, padding="max_length", max_length=64, return_tensors="pt")
-            for key in ['input_ids','pixel_values']:
-                inputs[key]=inputs[key].to(self.device)
+            '''for key in ['input_ids','pixel_values']:
+                inputs[key]=inputs[key].to(self.device)'''
             outputs = self.siglip_model(**inputs)
             embedding=outputs.image_embeds
         elif self.embedding=="clip":
             inputs=self.clip_processor(images=img_tensor, return_tensors="pt")
-            inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
+            #inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
             outputs=self.clip_model(**inputs)
             embedding=outputs.pooler_output
             

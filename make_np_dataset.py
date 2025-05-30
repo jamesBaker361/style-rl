@@ -78,7 +78,7 @@ def main(args):
             prompt=row["text"]
             text, _ = pipeline.encode_prompt(
                                             text,
-                                            "cpu", #accelerator.device,
+                                             accelerator.device,
                                             1,
                                             pipeline.do_classifier_free_guidance,
                                             negative_prompt=None,

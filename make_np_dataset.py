@@ -19,6 +19,7 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 from custom_vae import public_encode
+from gpu_helpers import find_cuda_objects, delete_unique_objects
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
@@ -73,7 +74,7 @@ def main(args):
             pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)
             pipeline=accelerator.prepare(pipeline)
 
-
+            before=find_cuda_objects()
             for k,row in enumerate(raw_data):
                 print(k)
                 if k==args.limit:
@@ -103,6 +104,8 @@ def main(args):
                 posterior=public_encode(pipeline.vae,image.unsqueeze(0).to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
                 new_dataset["posterior"].append(posterior)
                 torch.cuda.empty_cache()
+                after=find_cuda_objects()
+                delete_unique_objects(before,after)
                 if k+1 %500==0:
                     print("processed: ",k+1)
                     if existing==False or args.rewrite:

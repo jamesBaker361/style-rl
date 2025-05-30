@@ -92,7 +92,7 @@ def main(args):
             new_dataset["image"].append(image)
             new_dataset["embedding"].append(embedding)
             new_dataset["text"].append(text)
-            new_dataset["prompt"].append(prompt.cpu().detach().numpy())
+            new_dataset["prompt"].append(prompt)
 
             image=composition(image)
             posterior=public_encode(pipeline.vae,image.unsqueeze(0)).squeeze(0).cpu().detach().numpy()

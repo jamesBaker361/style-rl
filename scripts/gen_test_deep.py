@@ -8,7 +8,7 @@ for training_type in ["denoise","reward"]:
             name=f"{training_type}_{prediction_type}_{embedding}"
             port+=1
             command=f"sbatch  -J pers  --err=slurm/test_deep/{name}.err --out=slurm/test_deep/{name}.out"
-            command+=f" runaccgpu.sh --multi_gpu --mixed_precision fp16 --num_processes 2 --main_process_port {port} main_pers.py --epochs 2 --limit 20 --batch_size 4 --project_name testing-pers "
+            command+=f" runaccgpu.sh --multi_gpu --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_pers.py --epochs 2 --limit 20 --batch_size 4 --project_name testing-pers "
             command+=f" --mixed_precision fp16 --prediction_type {prediction_type} "
             command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-art_coco_captioned --vanilla --name jlbaker361/{name} "
             print(command)

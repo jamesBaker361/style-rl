@@ -368,8 +368,7 @@ def main(args):
     pipeline.vae=vae
 
     for loader in [test_loader,val_loader,train_loader]:
-        print(getattr(loader.sampler, 'num_replicas', 'Not distributed'))
-        print(getattr(loader.sampler, 'rank', 'Not distributed'))
+        print(type(loader))
 
     
 

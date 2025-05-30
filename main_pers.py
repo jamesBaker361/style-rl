@@ -356,8 +356,8 @@ def main(args):
         clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
-    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer)
-    train_loader=accelerator.prepare_data_loader(train_loader,True)
+    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
+    #train_loader=accelerator.prepare_data_loader(train_loader,True)
     try:
         register_fsdp_forward_method(vae,"decode")
         accelerator.print("registered")

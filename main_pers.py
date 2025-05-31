@@ -383,7 +383,10 @@ def main(args):
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
+    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer)
+    accelerator.wait_for_everyone()
+    train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
+    accelerator.wait_for_everyone()
     #train_loader=accelerator.prepare_data_loader(train_loader,True)
     try:
         register_fsdp_forward_method(vae,"decode")

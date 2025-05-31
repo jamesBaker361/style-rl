@@ -244,7 +244,11 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
             #print("grads",len(find_cuda_tensors_with_grads()))
-
+    accelerator.print("prompt list",len(prompt_list))
+    accelerator.print("image_list",len(image_list))
+    accelerator.print("text_list",len(text_list))
+    accelerator.print("posterior list",len(posterior_list))
+    accelerator.print("embedding list",len(embedding_list))
 
     def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
         #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
@@ -325,6 +329,12 @@ def main(args):
     posterior_list,test_posterior_list,val_posterior_list=split_list_by_ratio(posterior_list,ratios)
 
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
+
+    accelerator.print("prompt list",len(prompt_list))
+    accelerator.print("image_list",len(image_list))
+    accelerator.print("text_list",len(text_list))
+    accelerator.print("posterior list",len(posterior_list))
+    accelerator.print("embedding list",len(embedding_list))
 
     train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)
     val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)

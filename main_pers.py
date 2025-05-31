@@ -273,7 +273,7 @@ def main(args):
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]
-    persistent_text_embedding_list=[]
+    persistent_text_alignment_list=[]
     persistent_fid_list=[]
     if args.load:
         try:
@@ -282,7 +282,7 @@ def main(args):
                 data=json.load(f)
             start_epoch=data["start_epoch"]+1
             persistent_loss_list=data["persistent_loss_list"]
-            persistent_text_embedding_list=data["persistent_text_embedding_list"]
+            persistent_text_alignment_list=data["persistent_text_alignment_list"]
             persistent_fid_list=data["persistent_fid_list"]
             accelerator.print("loaded from ",save_path)
         except Exception as e:
@@ -297,7 +297,7 @@ def main(args):
                 data=json.load(f)
             start_epoch=data["start_epoch"]+1
             persistent_loss_list=data["persistent_loss_list"]
-            persistent_text_embedding_list=data["persistent_text_embedding_list"]
+            persistent_text_alignment_list=data["persistent_text_alignment_list"]
             persistent_fid_list=data["persistent_fid_list"]
             accelerator.print("loaded from  ",pretrained_weights_path)
         except Exception as e:
@@ -632,7 +632,7 @@ def main(args):
                 end=time.time()
                 accelerator.print(f"\t validation epoch {e} elapsed {end-start}")
                 persistent_fid_list.append(val_metrics["fid"])
-                persistent_text_embedding_list.append(val_metrics["text_embedding"])
+                persistent_text_alignment_list.append(val_metrics["text_alignment"])
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
         if e%args.upload_interval==0:
@@ -644,7 +644,7 @@ def main(args):
                 with open(config_path,"w+") as config_file:
                     data={"start_epoch":e,
                         "persistent_loss_list":persistent_loss_list,
-                        "persistent_text_embedding_list":persistent_text_embedding_list,
+                        "persistent_text_alignment_list":persistent_text_alignment_list,
                         "persistent_fid_list":persistent_fid_list}
                     json.dump(data,config_file, indent=4)
                     pad = " " * 1024  # ~1KB of padding
@@ -694,7 +694,7 @@ def main(args):
         with open(config_path,"w+") as config_file:
             data={"start_epoch":e,
                         "persistent_loss_list":persistent_loss_list,
-                        "persistent_text_embedding_list":persistent_text_embedding_list,
+                        "persistent_text_alignment_list":persistent_text_alignment_list,
                         "persistent_fid_list":persistent_fid_list}
             json.dump(data,config_file, indent=4)
             pad = " " * 1024  # ~1KB of padding
@@ -706,7 +706,7 @@ def main(args):
         api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
                                 repo_id=args.name)
         print(f"uploaded {args.name} to hub")
-        for k in ["persistent_loss_list","persistent_text_embedding_list","persistent_fid_list"]:
+        for k in ["persistent_loss_list","persistent_text_alignment_list","persistent_fid_list"]:
             persistent_list=data[k]
             key=k[:-5]
             for value in persistent_list:

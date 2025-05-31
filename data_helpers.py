@@ -19,10 +19,10 @@ class CustomDataset(Dataset):
     def __getitem__(self, index):
         print("index")
         print({
-                "image":self.image_list[index],
-                "embeds":self.embeds_list[index],
-                "text":self.text_list[index],
-                "posterior":self.posterior_list[index]
+                "image":type(self.image_list[index]),
+                "embeds":type(self.embeds_list[index]),
+                "text":type(self.text_list[index]),
+                "posterior":type(self.posterior_list[index])
             })
         if self.prompt_list is not None:
             return {

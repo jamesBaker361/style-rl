@@ -175,13 +175,13 @@ def main(args):
     posterior_list=[]
     prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
-    if accelerator.is_main_process:
+    '''if accelerator.is_main_process:
         random.shuffle(shuffled_row_list)
     else:
         shuffled_row_list = None
     accelerator.wait_for_everyone()
     # Broadcast to all processes
-    shuffled_row_list = accelerate.utils.broadcast_object_list([shuffled_row_list])[0]
+    shuffled_row_list = accelerate.utils.broadcast_object_list([shuffled_row_list])[0]'''
     composition=transforms.Compose([
             transforms.Resize((args.image_size,args.image_size)),
              transforms.ToTensor(),

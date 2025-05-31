@@ -341,6 +341,11 @@ def main(args):
     val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)
     test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list,test_prompt_list)
 
+    for dataset_batch in train_dataset:
+        break
+
+    accelerator.print(dataset_batch)
+
     train_loader=DataLoader(train_dataset,batch_size=args.batch_size,drop_last=True)
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
     test_loader=DataLoader(test_dataset,args.batch_size)

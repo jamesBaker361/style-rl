@@ -344,12 +344,20 @@ def main(args):
     for dataset_batch in train_dataset:
         break
 
-    accelerator.print(dataset_batch)
+    accelerator.print("dataset batch",type(dataset_batch))
 
     train_loader=DataLoader(train_dataset,batch_size=args.batch_size,drop_last=True)
     val_loader=DataLoader(val_dataset,batch_size=args.batch_size)
     test_loader=DataLoader(test_dataset,args.batch_size)
 
+
+    for train_batch in train_loader:
+        break
+    for val_batch in val_loader:
+        break
+
+    accelerator.print("train batch",type(train_batch))
+    accelerator.print("val batch",type(val_batch))
     '''for name, param in unet.named_parameters():
         if param.requires_grad:
             print(f"{name} is trainable shape {tuple(param.shape)}")'''

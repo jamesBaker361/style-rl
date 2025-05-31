@@ -116,10 +116,11 @@ def main(args):
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     device=accelerator.device
-    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+    if accelerator.is_main_process:
+        accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-    api=HfApi()
-    api.create_repo(args.name,exist_ok=True)
+        api=HfApi()
+        api.create_repo(args.name,exist_ok=True)
 
 
     torch_dtype={
@@ -137,9 +138,10 @@ def main(args):
         raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
     WEIGHTS_NAME="unet_model.bin"
     CONFIG_NAME="config.json"
-    os.makedirs(args.data_dir,exist_ok=True)
-    save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
-    os.makedirs(save_dir,exist_ok=True)
+    if accelerator.is_main_process:
+        os.makedirs(args.data_dir,exist_ok=True)
+        save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
+        os.makedirs(save_dir,exist_ok=True)
     save_path=os.path.join(save_dir,WEIGHTS_NAME)
     config_path=os.path.join(save_dir,CONFIG_NAME)
 
@@ -380,6 +382,7 @@ def main(args):
         clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
+    accelerator.wait_for_everyone()
     clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,train_loader,test_loader,val_loader)
     #train_loader=accelerator.prepare_data_loader(train_loader,True)
     try:

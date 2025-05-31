@@ -10,5 +10,5 @@ for training_type in ["reward"]:# ["denoise","reward"]:
             command=f"sbatch  -J pers  --err=slurm/test_deep/{name}.err --out=slurm/test_deep/{name}.out"
             command+=f" runaccgpu.sh --multi_gpu --mixed_precision fp16 --num_processes 2 --main_process_port {port} main_pers.py --epochs 2 --limit 10 --batch_size 2 --project_name testing-pers "
             command+=f" --mixed_precision fp16 --prediction_type {prediction_type} "
-            command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/art_coco_captioned --vanilla --name jlbaker361/{name} --gradient_accumulation_steps 4 "
+            command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-art_coco_captioned --vanilla --name jlbaker361/{name} --gradient_accumulation_steps 4 "
             print(command)

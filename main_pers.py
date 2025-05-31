@@ -211,11 +211,11 @@ def main(args):
             else:
                 np_posterior=np.array(row["posterior"])
                 posterior=torch.from_numpy(np_posterior)
-            posterior.to("cpu")
+            posterior=posterior.to("cpu")
             posterior_list.append(posterior)
             image_list.append(image)
             #print(embedding.size())
-            embedding.to("cpu").squeeze()
+            embedding=embedding.to("cpu") #.squeeze()
             embedding_list.append(embedding)
             accelerator.free_memory()
             torch.cuda.empty_cache()
@@ -237,7 +237,7 @@ def main(args):
                 np_text=np.array(text)
                 text=torch.from_numpy(np_text)
                 prompt=row["prompt"]
-            text=text.squeeze(0)
+            text=text.to("cpu").squeeze(0)
             if i ==1:
                 accelerator.print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
             text_list.append(text)

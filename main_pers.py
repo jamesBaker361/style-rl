@@ -10,6 +10,7 @@ import json
 import torch
 import accelerate
 from accelerate import Accelerator
+from accelerate import PartialState
 import time
 import torch.nn.functional as F
 from PIL import Image
@@ -116,6 +117,8 @@ def main(args):
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     device=accelerator.device
+    state = PartialState()
+    print(f"Rank {state.process_index} initialized successfully")
     if accelerator.is_main_process:
         accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 

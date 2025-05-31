@@ -1,11 +1,9 @@
 port=29601
 
 for training_type in  ["denoise","reward"]:
-    for prediction_type in ["epsilon","v_prediction"]:
+    for prediction_type in ["epsilon"]:
         for embedding in ["dino","ssl","clip","siglip2"]:
-            for data in ["league_captioned_tile","art_coco_captioned"]:
-                if prediction_type=="epsilon" and training_type=="reward":
-                    continue
+            for data in ["league_captioned_tile"]:
                 name=f"{training_type}_{prediction_type}_{embedding}"
                 port+=1
                 command=f"sbatch  -J pers  --err=slurm/pers_{data}/{name}.err --out=slurm/pers_{data}/{name}.out"

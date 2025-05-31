@@ -95,6 +95,8 @@ class EmbeddingUtil():
         elif self.embedding=="clip":
             inputs=self.clip_processor(images=img_tensor)
             #inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
+            if len(inputs["pixel_values"].size())==3:
+                inputs["pixel_values"]=inputs["pixel_values"].unsqueeze(0)
             outputs=self.clip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
             embedding=outputs.pooler_output
             

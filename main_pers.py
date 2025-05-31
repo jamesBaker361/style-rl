@@ -244,6 +244,7 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
             #print("grads",len(find_cuda_tensors_with_grads()))
+    
     accelerator.print("prompt list",len(prompt_list))
     accelerator.print("image_list",len(image_list))
     accelerator.print("text_list",len(text_list))

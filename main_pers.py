@@ -369,6 +369,11 @@ def main(args):
     params=[p for p in pipeline.unet.parameters() if p.requires_grad]
 
     accelerator.print("trainable params: ",len(params))
+    for i in range(accelerator.num_processes):
+        if accelerator.process_index == i:
+            print(f"Rank {i} checkpoint")
+            torch.cuda.synchronize()
+        accelerator.wait_for_everyone()
 
     optimizer=torch.optim.AdamW(params)
 

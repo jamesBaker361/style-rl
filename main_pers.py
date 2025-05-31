@@ -138,12 +138,13 @@ def main(args):
         raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
     WEIGHTS_NAME="unet_model.bin"
     CONFIG_NAME="config.json"
-    if accelerator.is_main_process:
-        os.makedirs(args.data_dir,exist_ok=True)
-        save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
-        os.makedirs(save_dir,exist_ok=True)
+    save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
     save_path=os.path.join(save_dir,WEIGHTS_NAME)
     config_path=os.path.join(save_dir,CONFIG_NAME)
+    if accelerator.is_main_process:
+        os.makedirs(args.data_dir,exist_ok=True)
+        os.makedirs(save_dir,exist_ok=True)
+    
 
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 

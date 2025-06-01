@@ -106,12 +106,7 @@ class EmbeddingUtil():
         return embedding
 
     def transform_image(self,pil_image:Image.Image):
-        if self.embedding=="dino":
-            t=transforms.Compose(
-                [transforms.ToTensor(),transforms.Normalize(self.dino_vit_extractor.mean,self.dino_vit_extractor.std)]
-            )
-        elif self.embedding=="ssl" or self.embedding=="siglip2" or self.embedding=="clip":
-            t=transforms.Compose(
+        t=transforms.Compose(
                 [transforms.ToTensor()]
             )
         return t(pil_image)

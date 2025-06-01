@@ -90,7 +90,8 @@ class EmbeddingUtil():
             #print("img",img_tensor.device)
             #inputs = self.siglip_processor(images=img_tensor)
             #silglip2 expects tensors to be [-1,1]
-            print(img_tensor.size())
+            if len(img_tensor.size())==3:
+                img_tensor=img_tensor.unsqueeze(0)
             img_tensor=F.interpolate(img_tensor,(224,224))
             inputs={"pixel_values":img_tensor}
             '''for key in ['input_ids','pixel_values']:

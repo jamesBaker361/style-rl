@@ -39,18 +39,20 @@ class EmbeddingUtil():
         self.facet=facet
         self.dino_pooling_stride=dino_pooling_stride
         if embedding=="dino":
+            
             self.dino_vit_extractor=ViTExtractor("dino_vits16",device=device,stride=16)
+            self.dino_processor=CustomProcessor(image_mean=self.dino_vit_extractor.mean,image_std=self.dino_vit_extractor.std)
             self.dino_vit_extractor.model=self.dino_vit_extractor.model.to(device,torch_dtype)
             self.dino_vit_extractor.model.eval()
             self.dino_vit_extractor.model.requires_grad_(False)
         elif embedding=="ssl":
-            self.ssl_processor = BaseImageProcessorFast.from_pretrained('facebook/webssl-dino1b-full2b-224')
+            self.ssl_processor = CustomProcessor(image_mean=[0.485,0.456,0.406],image_std=[0.229,0.224,0.225])
             self.ssl_model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
             self.ssl_model.to(device,torch_dtype)
             self.ssl_model.requires_grad_(False)
         elif embedding=="siglip2":
             self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
-            self.siglip_processor = CustomProcessor()
+            self.siglip_processor = CustomProcessor(image_mean=[0.5,0.5,0.5],image_std=[0.5,0.5,0.5])
             #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             self.siglip_model.to(device,torch_dtype)
             self.siglip_model.requires_grad_(False)
@@ -67,11 +69,7 @@ class EmbeddingUtil():
         if self.embedding=="dino":
             if len(img_tensor.size())==3:
                 img_tensor=img_tensor.unsqueeze(0)
-            img_tensor=F.interpolate(img_tensor, size=(224, 224), mode='bilinear', align_corners=False)
-            #dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
-            img_tensor=(img_tensor+1)/2 #convert from [-1,1] to 0,1
-            norm=transforms.Normalize(self.dino_vit_extractor.mean,self.dino_vit_extractor.std)
-            img_tensor=norm(img_tensor) #normalize using imagenet statistics
+            img_tensor=self.dino_processor(img_tensor)["pixel_values"]
             dino_vit_features=self.dino_vit_extractor.extract_descriptors(img_tensor,facet=self.facet)
             batch_size=img_tensor.size()[0]
             #print('dino_vit_features.size()',dino_vit_features.size())
@@ -88,7 +86,8 @@ class EmbeddingUtil():
             embedding=cls_features
         elif self.embedding=="siglip2":
             #print("img",img_tensor.device)
-            inputs = self.siglip_processor(images=img_tensor)
+            #inputs = self.siglip_processor(images=img_tensor)
+            inputs={"pixel_values":img_tensor}
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''
             if len(inputs["pixel_values"].size())==3:
@@ -96,6 +95,7 @@ class EmbeddingUtil():
             outputs = self.siglip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
             embedding=outputs.pooler_output
         elif self.embedding=="clip":
+            
             inputs=self.clip_processor(images=img_tensor)
             #inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
             if len(inputs["pixel_values"].size())==3:

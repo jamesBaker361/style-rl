@@ -87,6 +87,7 @@ class EmbeddingUtil():
         elif self.embedding=="siglip2":
             #print("img",img_tensor.device)
             #inputs = self.siglip_processor(images=img_tensor)
+            #silglip2 expects tensors to be [-1,1]
             inputs={"pixel_values":img_tensor}
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''
@@ -109,4 +110,6 @@ class EmbeddingUtil():
         t=transforms.Compose(
                 [transforms.ToTensor()]
             )
+        if self.embedding=="siglip2":
+             t=transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5,0.5,0.5],[0.5,0.5,0.5])])
         return t(pil_image)

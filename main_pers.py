@@ -635,6 +635,7 @@ def main(args):
             "elapsed":elapsed
         })
         persistent_loss_list.append(np.mean(loss_buffer))
+        torch.cuda.empty_cache()
         accelerator.free_memory()
         if e%args.validation_interval==0:
             before_objects=find_cuda_objects()

@@ -69,6 +69,9 @@ class EmbeddingUtil():
                 img_tensor=img_tensor.unsqueeze(0)
             img_tensor=F.interpolate(img_tensor, size=(224, 224), mode='bilinear', align_corners=False)
             #dino_vit_prepocessed=dino_vit_extractor.preprocess_pil(content_image.resize((args.image_size,args.image_size))).to(dtype=torch_dtype,device=accelerator.device)
+            img_tensor=(img_tensor+1)/2 #convert from [-1,1] to 0,1
+            norm=transforms.Normalize(self.dino_vit_extractor.mean,self.dino_vit_extractor.std)
+            img_tensor=norm(img_tensor) #normalize using imagenet statistics
             dino_vit_features=self.dino_vit_extractor.extract_descriptors(img_tensor,facet=self.facet)
             batch_size=img_tensor.size()[0]
             #print('dino_vit_features.size()',dino_vit_features.size())

@@ -6,7 +6,7 @@ from torchvision.transforms import Normalize
 
 class CustomProcessor:
     def __init__(self,size:int=224,rescale_factor:float=0.00392156862745098,image_mean:list=[0.5,0.5,0.5],image_std:list=[0.5,0.5,0.5]):
-        self.size=224
+        self.size=size
         self.rescale_factor=rescale_factor
         self.image_mean=image_mean
         self.image_std=image_std

@@ -505,7 +505,7 @@ def main(args):
             print(type(submodule), p_device.device if p_device is not None else "no device (no params/buffers)")
         except Exception as e:
             print(type(submodule), "Error:", e)'''
-    print(f"training from {start_epoch} to {args.epochs}")
+    accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
         before_objects=find_cuda_objects()
         start=time.time()

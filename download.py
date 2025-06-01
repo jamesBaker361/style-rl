@@ -31,6 +31,9 @@ for embedding in ["dino","ssl","siglip2","clip"]:
 for embedding in ["dino","ssl","siglip2","clip"]:
     for data in ["league_captioned_tile","league_captioned_splash","coco_captioned","art_coco_captioned","celeb_captioned"]:
         name=f"jlbaker361/{embedding}-{data}"
-        datasets.load_dataset(name,download_mode="force_download")
-        mini_name=f"{name}-20"
-        datasets.load_dataset(mini_name,download_mode="force_download")
+        try:
+            datasets.load_dataset(name,download_mode="force_download")
+            mini_name=f"{name}-20"
+            datasets.load_dataset(mini_name,download_mode="force_download")
+        except:
+            pass

@@ -1,4 +1,4 @@
-for embedding in ["dino","ssl","siglip2","clip"]:
+for embedding in ["ssl","siglip2"]:
     for data in ["league_captioned_tile","league_captioned_splash","coco_captioned","art_coco_captioned","celeb_captioned"]:
         name=f"{embedding}-{data}"
         command=f"sbatch -J npz --err=slurm/npz_mini/{name}.err --out=slurm/npz_mini/{name}.out runpygpu.sh make_np_dataset.py  --embedding {embedding} "

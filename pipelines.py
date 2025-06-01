@@ -570,7 +570,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             device = self.unet.device
 
             if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
-                print("before shape ",ip_adapter_image_embeds[0].size())
+                #print("before shape ",ip_adapter_image_embeds[0].size())
                 if reward_training:
                     image_embeds=ip_adapter_image_embeds
                 else:
@@ -581,7 +581,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         batch_size * num_images_per_prompt,
                         self.do_classifier_free_guidance,
                     )
-                print("after shape",image_embeds[0].size())
+                #print("after shape",image_embeds[0].size())
                 added_cond_kwargs={"image_embeds":image_embeds}
             else:
                 added_cond_kwargs={}

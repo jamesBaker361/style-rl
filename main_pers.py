@@ -35,6 +35,43 @@ except ImportError:
     print("cant import register_fsdp_forward_method")
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
+from PIL import Image
+
+def concat_images_horizontally(images):
+    """
+    Concatenate a list of PIL.Image objects horizontally.
+
+    Args:
+        images (List[PIL.Image]): List of PIL images.
+
+    Returns:
+        PIL.Image: A new image composed of the input images concatenated side-by-side.
+    """
+    # Resize all images to the same height (optional)
+    heights = [img.height for img in images]
+    min_height = min(heights)
+    resized_images = [
+        img if img.height == min_height else img.resize(
+            (int(img.width * min_height / img.height), min_height),
+            Image.LANCZOS
+        ) for img in images
+    ]
+
+    # Compute total width and max height
+    total_width = sum(img.width for img in resized_images)
+    height = min_height
+
+    # Create new blank image
+    new_img = Image.new('RGB', (total_width, height))
+
+    # Paste images side by side
+    x_offset = 0
+    for img in resized_images:
+        new_img.paste(img, (x_offset, 0))
+        x_offset += img.width
+
+    return new_img
+
 
 seed=1234
 random.seed(seed)                      # Python
@@ -460,6 +497,9 @@ def main(args):
             
             do_denormalize= [True] * fake_image.shape[0]
             pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
+            real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
+
+
             
             inputs = clip_processor(
                 text=prompt_batch, images=pil_image_set, return_tensors="pt", padding=True
@@ -474,8 +514,9 @@ def main(args):
             
             clip_alignment_list.append(clip_difference.cpu().detach().item())
 
-            for pil_image,prompt in zip(pil_image_set,prompt_batch):
-                metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(pil_image)
+            for pil_image,real_pil_image,prompt in zip(pil_image_set,real_pil_image_set,prompt_batch):
+                concat_image=concat_images_horizontally([real_pil_image,pil_image])
+                metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         metrics["text_alignment"]=np.mean(clip_alignment_list)

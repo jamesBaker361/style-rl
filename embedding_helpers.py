@@ -78,7 +78,7 @@ class EmbeddingUtil():
             embedding=dino_vit_features.reshape(batch_size,-1)
         elif self.embedding=="ssl":
             #print("before ",type(img_tensor),img_tensor.size())
-            p_inputs=self.ssl_processor(img_tensor,return_tensors="pt")
+            p_inputs=self.ssl_processor(img_tensor)
             #print(p_inputs)
             outputs = self.ssl_model(**p_inputs)
             cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
@@ -88,6 +88,7 @@ class EmbeddingUtil():
             #print("img",img_tensor.device)
             #inputs = self.siglip_processor(images=img_tensor)
             #silglip2 expects tensors to be [-1,1]
+            img_tensor=F.interpolate(img_tensor,(224,224))
             inputs={"pixel_values":img_tensor}
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''

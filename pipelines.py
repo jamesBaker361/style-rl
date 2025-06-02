@@ -671,7 +671,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         #print("latents",latents.size())
         #print("t",timesteps.size())
         #print("prompt_embeds",prompt_embeds.size())
-        print("image embeds",image_embeds[0].size(),image_embeds[0].device)
+        #print("image embeds",image_embeds[0].size(),image_embeds[0].device)
         
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):

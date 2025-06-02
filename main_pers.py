@@ -641,6 +641,7 @@ def main(args):
                                                         num_inference_steps=args.num_inference_steps, 
                                                         ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
                                                         height=args.image_size,width=args.image_size).images
+                            print("reward max, min",images.max(),images.min())
                             predicted=embedding_util.embed_img_tensor(images)
                             loss=loss_fn(predicted,embeds_batch)
                     else:

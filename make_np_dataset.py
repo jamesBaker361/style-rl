@@ -100,8 +100,8 @@ def main(args):
                 new_dataset["text"].append(text)
                 new_dataset["prompt"].append(prompt)
 
-                image=composition(image)
-                posterior=public_encode(pipeline.vae,image.unsqueeze(0).to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
+                image=pipeline.image_processor.preprocess(image)
+                posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
                 new_dataset["posterior"].append(posterior)
                 torch.cuda.empty_cache()
                 after=find_cuda_objects()

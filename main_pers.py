@@ -245,15 +245,15 @@ def main(args):
                 #this should NOT be normalized or transformed
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))[-1]
 
-            image=composition(image)
+            image=pipeline.image_processor.preprocess(image)
             if "posterior" not in row:
-                posterior=public_encode(vae,image.unsqueeze(0)).squeeze(0)
+                posterior=public_encode(vae,image).squeeze(0)
             else:
                 np_posterior=np.array(row["posterior"])
                 posterior=torch.from_numpy(np_posterior)
             posterior=posterior.to("cpu")
             posterior_list.append(posterior)
-            image_list.append(image)
+            image_list.append(image.squeeze(0))
             #print(embedding.size())
             embedding=embedding.to("cpu") #.squeeze()
             embedding_list.append(embedding)

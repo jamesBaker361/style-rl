@@ -3,7 +3,7 @@ from datasets import load_dataset
 from diffusers import DiffusionPipeline
 import torch
 
-pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",torch_dtype=torch.float16).to("cuda")
 pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 
 def concat_images_horizontally(images):

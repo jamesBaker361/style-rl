@@ -51,6 +51,9 @@ def main(args):
             except OSError:
                 raw_data=load_dataset(args.dataset,split="train",force_download=True)
 
+            raw_data=[row for row in raw_data]
+            random.shuffle(raw_data)
+
             embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
             new_dataset={

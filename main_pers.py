@@ -114,6 +114,7 @@ parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on h
 parser.add_argument("--load",action="store_true",help="whether to load saved version")
 parser.add_argument("--load_hf",action="store_true",help="whether to load saved version from hf")
 parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
+parser.add_argument("--test_prompts",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -275,6 +276,21 @@ def main(args):
     accelerator.print("text_list",len(text_list))
     accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
+
+    unconditioned_text,_=pipeline.encode_prompt(
+                                        " ",
+                                        "cpu", #accelerator.device,
+                                        1,
+                                        pipeline.do_classifier_free_guidance,
+                                        negative_prompt=None,
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
+    
+    for i in range(len(text_list)):
+        if random.random()<=args.unconditional_frac:
+            text_list[i]=unconditioned_text
 
     def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
         #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)

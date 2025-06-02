@@ -14,7 +14,7 @@ with open("test_prompts.txt","r") as file:
         line=line.strip()
         data_dict["prompt"].append(line)
         text_embedding,_=pipe.encode_prompt(line,
-                                        "cpu", #accelerator.device,
+                                        "cuda", #accelerator.device,
                                         1,
                                         pipe.do_classifier_free_guidance,
                                         negative_prompt=None,

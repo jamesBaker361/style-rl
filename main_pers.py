@@ -673,14 +673,14 @@ def main(args):
                                 images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                             #latents=latents, 
                                                             num_inference_steps=args.num_inference_steps, 
-                                                            ip_adapter_image_embeds=[image_embeds],output_type="latents",truncated_backprop=False,reward_training=True,
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="latent",truncated_backprop=False,reward_training=True,
                                                             height=args.image_size,width=args.image_size).images
                                 #print("reward max, min",images.max(),images.min())
                     else:
                         images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps,
-                                                            ip_adapter_image_embeds=[image_embeds],output_type="latents",
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="latent",
                                                             truncated_backprop=False,fsdp=True,reward_training=True,
                                                             height=args.image_size,width=args.image_size).images
                     loss=loss_fn(images,latents)

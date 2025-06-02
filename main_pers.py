@@ -384,7 +384,7 @@ def main(args):
         generic_str_list=[row["prompt"] for row in generic_dataset]
 
         for k in range(len(test_prompt_list)):
-            test_prompt_list[k]=generic_str_list[k%len(generic_str_list)]
+            #test_prompt_list[k]=generic_str_list[k%len(generic_str_list)]
             test_text_list[k]=generic_tensor_list[k%len(generic_str_list)]
 
     train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)

@@ -118,24 +118,6 @@ parser.add_argument("--upload_interval",type=int,default=50,help="how often to u
 import torch
 import torch.nn.functional as F
 
-def make_batches_same_size(tensor_list, batch_size):
-    """
-    Splits a list of equally‑sized tensors into batches.
-
-    Args:
-        tensor_list (List[torch.Tensor]): List of tensors, all with identical shape.
-        batch_size (int): Desired batch size.
-
-    Returns:
-        List[torch.Tensor]: List of batched tensors, each of shape (batch_size, *tensor_shape).
-    """
-    batches = []
-    for i in range(0, len(tensor_list), batch_size):
-        batch = tensor_list[i:i + batch_size]
-        batched = torch.stack(batch, dim=0)
-        batches.append(batched)
-    return batches
-
 def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
     #assert sum(ratios) == 1.0, "Ratios must sum to 1.0"
     n = len(lst)

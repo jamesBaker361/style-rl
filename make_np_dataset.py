@@ -83,7 +83,7 @@ def main(args):
                 print(k)
                 if k==args.limit:
                     break
-                image=row["image"].convert("RGB")
+                image=row["image"].convert("RGB").resize((256,256))
                 
                 text=row["text"]
                 prompt=row["text"]

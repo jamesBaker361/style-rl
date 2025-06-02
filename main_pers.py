@@ -290,7 +290,7 @@ def main(args):
     
     for i in range(len(text_list)):
         if random.random()<=args.uncaptioned_frac:
-            text_list[i]=unconditioned_text.squeeze(0)
+            text_list[i]=unconditioned_text.squeeze(0).clone()
             if i <10:
                 print("uncdoditned",unconditioned_text.squeeze(0).size())
 

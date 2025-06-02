@@ -665,6 +665,31 @@ def main(args):
 
                     optimizer.step()
                     optimizer.zero_grad()
+            elif args.training_type=="latent_reward":
+                with accelerator.accumulate(params):
+                    latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                    if args.vanilla:
+                            with accelerator.autocast():
+                                images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                            #latents=latents, 
+                                                            num_inference_steps=args.num_inference_steps, 
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="latents",truncated_backprop=False,reward_training=True,
+                                                            height=args.image_size,width=args.image_size).images
+                                #print("reward max, min",images.max(),images.min())
+                                predicted=embedding_util.embed_img_tensor(images)
+                                loss=loss_fn(predicted,embeds_batch)
+                    else:
+                        images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                        #latents=latents, 
+                                                        num_inference_steps=args.num_inference_steps,
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="latents",
+                                                            truncated_backprop=False,fsdp=True,reward_training=True,
+                                                            height=args.image_size,width=args.image_size).images
+                    loss=loss_fn(images,latents)
+                    accelerator.backward(loss)
+                    optimizer.step()
+                    optimizer.zero_grad()
+
 
             loss_buffer.append(loss.cpu().detach().item())
             if torch.cuda.is_available():

@@ -479,7 +479,7 @@ def main(args):
                 fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
             else:
                 fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt").images
-            normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images
+            #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             #print("img vs real img",fake_image.size(),image_batch.size())
             #image_embeds.to("cpu")
@@ -515,8 +515,8 @@ def main(args):
             
             clip_alignment_list.append(clip_difference.cpu().detach().item())
 
-            for pil_image,real_pil_image,normal_image,prompt in zip(pil_image_set,real_pil_image_set,normal_image_set,prompt_batch):
-                concat_image=concat_images_horizontally([real_pil_image,pil_image,normal_image])
+            for pil_image,real_pil_image,prompt in zip(pil_image_set,real_pil_image_set,prompt_batch):
+                concat_image=concat_images_horizontally([real_pil_image,pil_image])
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)

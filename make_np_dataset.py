@@ -34,6 +34,7 @@ parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 
 def main(args):
+    random.seed(42)
     with torch.no_grad():
         composition=transforms.Compose([
                 transforms.Resize((args.image_size,args.image_size)),

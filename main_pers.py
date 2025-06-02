@@ -114,7 +114,7 @@ parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on h
 parser.add_argument("--load",action="store_true",help="whether to load saved version")
 parser.add_argument("--load_hf",action="store_true",help="whether to load saved version from hf")
 parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
-parser.add_argument("--test_prompts",action="store_true")
+parser.add_argument("--generic_test_prompts",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -289,7 +289,7 @@ def main(args):
                                 )
     
     for i in range(len(text_list)):
-        if random.random()<=args.unconditional_frac:
+        if random.random()<=args.uncaptioned_frac:
             text_list[i]=unconditioned_text
 
     def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
@@ -377,6 +377,15 @@ def main(args):
     accelerator.print("text_list",len(text_list))
     accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
+
+    if args.generic_test_prompts:
+        generic_dataset=load_dataset("jlbaker361/test_prompts",split="train")
+        generic_tensor_list=[row["text_embedding"] for row in generic_dataset]
+        generic_str_list=[row["prompt"] for row in generic_dataset]
+
+        for k in range(len(test_prompt_list)):
+            test_prompt_list[k]=generic_str_list[k%len(generic_str_list)]
+            test_text_list[k]=generic_tensor_list[k%len(generic_str_list)]
 
     train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)
     val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)

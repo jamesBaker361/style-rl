@@ -633,13 +633,14 @@ def main(args):
                     optimizer.zero_grad()
             elif args.training_type=="reward":
                 with accelerator.accumulate(params):
-                    latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                    #latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     if args.vanilla:
                         with accelerator.autocast():
                             images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, 
-                                                        ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True).images
+                                                        ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
+                                                        height=args.image_size,width=args.image_size).images
                             predicted=embedding_util.embed_img_tensor(images)
                             loss=loss_fn(predicted,embeds_batch)
                     else:
@@ -647,7 +648,8 @@ def main(args):
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps,
                                                           ip_adapter_image_embeds=[image_embeds],output_type="pt",
-                                                          truncated_backprop=False,fsdp=True,reward_training=True).images
+                                                          truncated_backprop=False,fsdp=True,reward_training=True,
+                                                          height=args.image_size,width=args.image_size).images
                         predicted=embedding_util.embed_img_tensor(images)
                         loss=loss_fn(predicted,embeds_batch)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)

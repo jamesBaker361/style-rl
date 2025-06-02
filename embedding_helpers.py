@@ -66,7 +66,7 @@ class EmbeddingUtil():
     def embed_img_tensor(self,img_tensor:torch.Tensor,
                         )->torch.Tensor:
         img_tensor=img_tensor.to(self.device,self.torch_dtype)
-        print("before",img_tensor.max(),img_tensor.min())
+        #print("before",img_tensor.max(),img_tensor.min())
         if self.embedding=="dino":
             if len(img_tensor.size())==3:
                 img_tensor=img_tensor.unsqueeze(0)

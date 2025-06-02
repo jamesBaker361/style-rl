@@ -291,8 +291,6 @@ def main(args):
     for i in range(len(text_list)):
         if random.random()<=args.uncaptioned_frac:
             text_list[i]=unconditioned_text.squeeze(0).clone()
-            if i <10:
-                print("uncdoditned",unconditioned_text.squeeze(0).size())
 
     def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
         #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)

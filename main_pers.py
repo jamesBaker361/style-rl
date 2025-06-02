@@ -676,8 +676,6 @@ def main(args):
                                                             ip_adapter_image_embeds=[image_embeds],output_type="latents",truncated_backprop=False,reward_training=True,
                                                             height=args.image_size,width=args.image_size).images
                                 #print("reward max, min",images.max(),images.min())
-                                predicted=embedding_util.embed_img_tensor(images)
-                                loss=loss_fn(predicted,embeds_batch)
                     else:
                         images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 

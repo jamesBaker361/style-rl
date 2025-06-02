@@ -66,10 +66,12 @@ class EmbeddingUtil():
     def embed_img_tensor(self,img_tensor:torch.Tensor,
                         )->torch.Tensor:
         img_tensor=img_tensor.to(self.device,self.torch_dtype)
+        print("before",img_tensor.max(),img_tensor.min())
         if self.embedding=="dino":
             if len(img_tensor.size())==3:
                 img_tensor=img_tensor.unsqueeze(0)
             img_tensor=self.dino_processor(img_tensor)["pixel_values"]
+            print("after",img_tensor.max(),img_tensor.min())
             dino_vit_features=self.dino_vit_extractor.extract_descriptors(img_tensor,facet=self.facet)
             batch_size=img_tensor.size()[0]
             #print('dino_vit_features.size()',dino_vit_features.size())
@@ -82,6 +84,7 @@ class EmbeddingUtil():
             #print("before ",type(img_tensor),img_tensor.size())
             p_inputs=self.ssl_processor(img_tensor)
             #print(p_inputs)
+            print("after",p_inputs["pixel_values"].max(),p_inputs["pixel_values"].min())
             outputs = self.ssl_model(**p_inputs)
             cls_features = outputs.last_hidden_state[:, 0]  # CLS token features
             #print("cls featurs size",cls_features.size())
@@ -93,6 +96,7 @@ class EmbeddingUtil():
             if len(img_tensor.size())==3:
                 img_tensor=img_tensor.unsqueeze(0)
             img_tensor=F.interpolate(img_tensor,(224,224))
+            print("after",img_tensor.max(),img_tensor.min())
             inputs={"pixel_values":img_tensor}
             '''for key in ['input_ids','pixel_values']:
                 inputs[key]=inputs[key].to(self.device)'''
@@ -106,6 +110,7 @@ class EmbeddingUtil():
             #inputs["pixel_values"]=inputs["pixel_values"].to(self.device)
             if len(inputs["pixel_values"].size())==3:
                 inputs["pixel_values"]=inputs["pixel_values"].unsqueeze(0)
+            print("after",inputs["pixel_values"].max(),inputs["pixel_values"].min())
             outputs=self.clip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
             embedding=outputs.pooler_output
             

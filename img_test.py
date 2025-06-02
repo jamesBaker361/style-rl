@@ -53,10 +53,10 @@ image=row["image"]
 processed=pipe.image_processor.preprocess(image)
 reconstructed=pipe.image_processor.postprocess(processed)[0]
 
-img_20=pipe("woman",ip_adapter_image=image,num_inference_steps=20,height=256,width=256).images[0]
-img_10=pipe("woman",ip_adapter_image=image,num_inference_steps=10,height=256,width=256).images[0]
-img_4=pipe("woman",ip_adapter_image=image,num_inference_steps=4,height=256,width=256).images[0]
-img_2=pipe("woman",ip_adapter_image=image,num_inference_steps=2,height=256,width=256).images[0]
+img_20=pipe("dancing",ip_adapter_image=image,num_inference_steps=20,height=256,width=256).images[0]
+img_10=pipe("dancing",ip_adapter_image=image,num_inference_steps=10,height=256,width=256).images[0]
+img_4=pipe("dancing",ip_adapter_image=image,num_inference_steps=4,height=256,width=256).images[0]
+img_2=pipe("dancing",ip_adapter_image=image,num_inference_steps=2,height=256,width=256).images[0]
 
 concat=concat_images_horizontally([image,reconstructed,img_20,img_10,img_4,img_2])
 concat.save("comparison.jpg")

@@ -40,7 +40,7 @@ def concat_images_horizontally(images):
 
     return new_img
 
-data=load_dataset("jlbaker361/dino-celeb_captioned-20")
+data=load_dataset("jlbaker361/dino-celeb_captioned-20",split="train")
 for row in data:
     break
 

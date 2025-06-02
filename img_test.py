@@ -50,7 +50,7 @@ for row in data:
 image=row["image"]
 
 processed=pipe.image_processor.preprocess(image)
-reconstructed=pipe.image_processor.postprocess(processed)
+reconstructed=pipe.image_processor.postprocess(processed)[0]
 
 concat=concat_images_horizontally([image,reconstructed])
 concat.save("comparison.jpg")

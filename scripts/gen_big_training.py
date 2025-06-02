@@ -4,7 +4,7 @@ for training_type in  ["denoise","reward"]:
     for frac in [0.0,0.5,1.0]:
         for prediction_type in ["epsilon"]:
             for embedding in ["clip"]:
-                for data in ["league_captioned_tile"]:
+                for data in ["league_captioned_splash"]:
                     name=f"{training_type}_{prediction_type}_{embedding}_{frac}"
                     port+=1
                     command=f"sbatch  -J pers  --err=slurm/pers_{data}/{name}.err --out=slurm/pers_{data}/{name}.out"

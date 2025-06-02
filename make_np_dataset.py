@@ -84,7 +84,7 @@ def main(args):
                 text=row["text"]
                 prompt=row["text"]
                 
-                text, _ = pipeline.encode_prompt(
+                encoded_text, _ = pipeline.encode_prompt(
                                                 text,
                                                 accelerator.device,
                                                 1,
@@ -97,7 +97,7 @@ def main(args):
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
                 new_dataset["image"].append(image)
                 new_dataset["embedding"].append(embedding)
-                new_dataset["text"].append(text)
+                new_dataset["text"].append(encoded_text)
                 new_dataset["prompt"].append(prompt)
 
                 image=pipeline.image_processor.preprocess(image)

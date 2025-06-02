@@ -473,7 +473,7 @@ def main(args):
             image_embeds=embeds_batch #.unsqueeze(0)
             if b==1:
                 print("images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
-            image_batch=torch.clamp(image_batch, 0, 1)
+            #image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
                 ip_adapter_image=F_v2.resize(image_batch, (224,224))
                 fake_image=pipeline(prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images

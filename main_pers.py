@@ -691,7 +691,7 @@ def main(args):
                     optimizer.zero_grad()
             elif args.training_type=="mse_reward":
                 batch_size=image_batch.size()[-1]
-                images_batch=pipeline.image_processor.postprocess(image_batch,"pt",[True]*batch_size)
+                image_batch=pipeline.image_processor.postprocess(image_batch,"pt",[True]*batch_size)
                 with accelerator.accumulate(params):
                     #latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     if args.vanilla:

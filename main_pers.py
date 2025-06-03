@@ -115,6 +115,7 @@ parser.add_argument("--load",action="store_true",help="whether to load saved ver
 parser.add_argument("--load_hf",action="store_true",help="whether to load saved version from hf")
 parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
 parser.add_argument("--generic_test_prompts",action="store_true")
+parser.add_argument("--lr",type=float,default=0.0001)
 
 import torch
 import torch.nn.functional as F
@@ -161,6 +162,7 @@ def main(args):
         raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
     WEIGHTS_NAME="unet_model.bin"
     CONFIG_NAME="config.json"
+    LR_SCHEDULER_NAME=""
     save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
     save_path=os.path.join(save_dir,WEIGHTS_NAME)
     config_path=os.path.join(save_dir,CONFIG_NAME)
@@ -422,7 +424,7 @@ def main(args):
             torch.cuda.synchronize()
         accelerator.wait_for_everyone()
 
-    optimizer=torch.optim.AdamW(params)
+    optimizer=torch.optim.AdamW(params,lr=args.lr)
 
     if args.vanilla:
         unet=unet.to(device)

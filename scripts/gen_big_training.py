@@ -1,7 +1,7 @@
 port=29650
 
-for training_type in  ["mse_reward"]: #,"reward","latents_reward"]:
-    for frac in [0.0,0.5,1.0]:
+for training_type in  ["mse_reward","denoise"]: #,"reward","latents_reward"]:
+    for frac in [1.0]:
         for prediction_type in ["epsilon"]:
             for embedding in ["clip"]:
                 for data in ["league_captioned_splash"]:

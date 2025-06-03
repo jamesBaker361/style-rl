@@ -1,6 +1,6 @@
 port=29601
 
-for training_type in  ["denoise","reward"]:
+for training_type in  ["denoise","mse_reward"]:
     for prediction_type in ["epsilon"]:
         for embedding in ["clip"]:
             for data in ["art_coco_captioned"]:

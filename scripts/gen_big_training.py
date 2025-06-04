@@ -1,6 +1,6 @@
 port=29650
 
-for training_type in  ["mse_reward","denoise"]: #,"reward","latents_reward"]:
+for training_type in  ["reward","denoise"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
         for prediction_type in ["epsilon"]:
             for embedding in ["dino","siglip2"]:

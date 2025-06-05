@@ -4,7 +4,7 @@ for training_type in  ["denoise"]:
     for prediction_type in ["epsilon"]:
         for embedding in ["clip"]:
             for data in ["art_coco_captioned"]:
-                for frac in [1,0]:
+                for frac in [1]:
                     for lr in [0.001,0.0001]:
                         n=500
                         name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}"

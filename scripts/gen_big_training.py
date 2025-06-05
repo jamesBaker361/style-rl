@@ -6,7 +6,7 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
             for embedding in ["clip"]:
                 for data in ["league_captioned_splash"]:
                     for lr in [0.001,0.0001]:
-                        n=500
+                        n=1000
                         name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}"
                         port+=1
                         command=f"sbatch  -J pers  --err=slurm/pers_{data}/{name}.err --out=slurm/pers_{data}/{name}.out"

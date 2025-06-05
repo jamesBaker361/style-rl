@@ -25,8 +25,8 @@ class MultiIPAdapterIdentity(torch.nn.Module):
         self.num_image_text_embeds=num_image_text_embeds
 
     def forward(self,  image_embeds: List[torch.Tensor]):
-        batch_size = image_embeds.shape[0]
-        image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
+        batch_size = image_embeds[0].size()[0]
+        image_embeds = [ie.reshape(batch_size, self.num_image_text_embeds, -1) for ie in image_embeds]
         return image_embeds
 
 

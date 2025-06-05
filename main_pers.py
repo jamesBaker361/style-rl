@@ -321,7 +321,7 @@ def main(args):
                     args.intermediate_embedding_dim,
                     args.cross_attention_dim,
                     args.num_image_text_embeds,
-                    use_projection,args.use_identity_adapter)
+                    use_projection,args.identity_adapter)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]

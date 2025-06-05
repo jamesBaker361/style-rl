@@ -317,10 +317,16 @@ def main(args):
         use_projection=False
     else:
         use_projection=True
+
+    cross_attention_dim=args.cross_attention_dim
+    if args.identity_adapter:
+        cross_attention_dim=embedding_dim//args.num_image_text_embeds
+
+    accelerator.print("cross attention dim",cross_attention_dim)
     replace_ip_attn(unet,
                     embedding_dim,
                     args.intermediate_embedding_dim,
-                    args.cross_attention_dim,
+                    cross_attention_dim,
                     args.num_image_text_embeds,
                     use_projection,args.identity_adapter)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])

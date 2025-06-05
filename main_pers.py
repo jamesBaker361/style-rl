@@ -116,6 +116,8 @@ parser.add_argument("--load_hf",action="store_true",help="whether to load saved 
 parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
 parser.add_argument("--generic_test_prompts",action="store_true")
 parser.add_argument("--lr",type=float,default=0.0001)
+parser.add_argument("--disable_projection_adapter",action="store_true",help="whether to use projection for ip adapter ")
+parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 
 import torch
 import torch.nn.functional as F
@@ -310,11 +312,16 @@ def main(args):
         #unet=unet.to(device,torch_dtype)
     
     unet.requires_grad_(False)
+    if args.disable_projection_adapter:
+        use_projection=False
+    else:
+        use_projection=True
     replace_ip_attn(unet,
                     embedding_dim,
                     args.intermediate_embedding_dim,
                     args.cross_attention_dim,
-                    args.num_image_text_embeds)
+                    args.num_image_text_embeds,
+                    use_projection,args.use_identity_adapter)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]

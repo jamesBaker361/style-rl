@@ -322,7 +322,7 @@ def main(args):
     if args.identity_adapter:
         cross_attention_dim=embedding_dim//args.num_image_text_embeds
 
-    accelerator.print("cross attention dim",cross_attention_dim)
+    accelerator.print(f"cross attention dim {embedding_dim} / {args.num_image_text_embeds} =  ",cross_attention_dim)
     replace_ip_attn(unet,
                     embedding_dim,
                     args.intermediate_embedding_dim,

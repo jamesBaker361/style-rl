@@ -18,6 +18,16 @@ class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module):
     def forward(self,  image_embeds: List[torch.Tensor]):
         image_embeds=[self.visual_projection(image) for image in image_embeds]
         return self.multi_ip_adapter(image_embeds)
+    
+class MultiIPAdapterIdentity(torch.nn.Module):
+    def __init__(self,num_image_text_embeds:int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.num_image_text_embeds=num_image_text_embeds
+
+    def forward(self,  image_embeds: List[torch.Tensor]):
+        batch_size = image_embeds.shape[0]
+        image_embeds = image_embeds.reshape(batch_size, self.num_image_text_embeds, -1)
+        return image_embeds
 
 
 def get_modules_of_types(model, target_classes):
@@ -28,7 +38,9 @@ def replace_ip_attn(unet:UNet2DConditionModel
                     ,embedding_dim:int,
                     intermediate_embedding_dim:int,
                     cross_attention_dim:int
-                    ,num_image_text_embeds:int):
+                    ,num_image_text_embeds:int
+                    ,use_projection:bool=True
+                    ,use_identity:bool=False):
     layers=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
@@ -39,12 +51,17 @@ def replace_ip_attn(unet:UNet2DConditionModel
         new_v_ip.to(unet.device)
         setattr(module, "to_v_ip",new_v_ip)
 
-    multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=unet.device)
-    #unet.add_module("encoder_hid_proj",multi_ip_adapter)
-    #unet.encoder_hid_proj=multi_ip_adapter
-    multi_ip_projection=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,unet.device)
-    unet.encoder_hid_proj= multi_ip_projection
-    unet.add_module("encoder_hid_proj",multi_ip_projection)
+    if use_identity:
+        multi_ip_adapter=MultiIPAdapterIdentity(num_image_text_embeds)
+    else:
+
+        multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=unet.device)
+        #unet.add_module("encoder_hid_proj",multi_ip_adapter)
+        if use_projection:
+            #unet.encoder_hid_proj=multi_ip_adapter
+            multi_ip_adapter=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,unet.device)
+    unet.encoder_hid_proj= multi_ip_adapter
+    unet.add_module("encoder_hid_proj",multi_ip_adapter)
     #unet.encoder_hid_proj.to(unet.device)
 
 

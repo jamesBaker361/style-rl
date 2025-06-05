@@ -118,6 +118,7 @@ parser.add_argument("--generic_test_prompts",action="store_true")
 parser.add_argument("--lr",type=float,default=0.0001)
 parser.add_argument("--disable_projection_adapter",action="store_true",help="whether to use projection for ip adapter ")
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
+parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
 
 import torch
 import torch.nn.functional as F

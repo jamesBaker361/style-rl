@@ -184,7 +184,9 @@ def main(args):
     unet=pipeline.unet
     text_encoder=pipeline.text_encoder
     scheduler=pipeline.scheduler
+    accelerator.print(pipeline.scheduler)
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    accelerator.print(pipeline.scheduler)
     pipeline.unet.encoder_hid_proj=None
     '''vae.to(device,torch_dtype)
     unet.to(device,torch_dtype)

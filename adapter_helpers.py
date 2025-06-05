@@ -40,14 +40,32 @@ def replace_ip_attn(unet:UNet2DConditionModel
                     cross_attention_dim:int
                     ,num_image_text_embeds:int
                     ,use_projection:bool=True
-                    ,use_identity:bool=False):
+                    ,use_identity:bool=False,
+                    deep_to_ip_layers:bool=False):
     layers=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
-        new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
+        if deep_to_ip_layers:
+            average_feature_dim=(cross_attention_dim+out_features)//2
+            new_k_ip=torch.nn.ModuleList([
+                torch.nn.Linear(cross_attention_dim,average_feature_dim,bias=True),
+                torch.nn.LayerNorm(average_feature_dim),
+                torch.nn.Linear(average_feature_dim,out_features,bias=False)
+            ])
+        else:
+            new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
         new_k_ip.to(unet.device)
         setattr(module, "to_k_ip",new_k_ip)
-        new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
+
+        if deep_to_ip_layers:
+            average_feature_dim=(cross_attention_dim+out_features)//2
+            new_v_ip=torch.nn.ModuleList([
+                torch.nn.Linear(cross_attention_dim,average_feature_dim,bias=True),
+                torch.nn.LayerNorm(average_feature_dim),
+                torch.nn.Linear(average_feature_dim,out_features,bias=False)
+            ])
+        else:
+            new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
         new_v_ip.to(unet.device)
         setattr(module, "to_v_ip",new_v_ip)
 

@@ -10,6 +10,7 @@ import json
 import torch
 import accelerate
 from accelerate import Accelerator
+from huggingface_hub.errors import HfHubHTTPError
 from accelerate import PartialState
 import time
 import torch.nn.functional as F
@@ -144,10 +145,18 @@ def main(args):
     state = PartialState()
     print(f"Rank {state.process_index} initialized successfully")
     if accelerator.is_main_process:
-        accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+        try:
+            accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-        api=HfApi()
-        api.create_repo(args.name,exist_ok=True)
+            api=HfApi()
+            api.create_repo(args.name,exist_ok=True)
+        except HfHubHTTPError:
+            print("hf hub error!")
+            time.sleep(random.randint(5,65))
+            accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+
+            api=HfApi()
+            api.create_repo(args.name,exist_ok=True)
 
 
     torch_dtype={

@@ -12,7 +12,7 @@ for training_type in  ["denoise"]:
                                 port+=1
                                 command=f"sbatch  --gres=gpu:1  -J pers  --err=slurm_chip/pers_{data}/{name}.err --out=slurm_chip/pers_{data}/{name}.out"
                                 command+=f" runaccgpu_chip.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_pers.py --epochs 5000 --limit -1 --batch_size 2 --project_name {data}-{n} "
-                                command+=f" --mixed_precision fp16 --prediction_type {prediction_type} --upload_interval 50 --uncaptioned_frac {frac} --train_split 0.8 --lr {lr} --load  --generic_test_prompts "
+                                command+=f" --mixed_precision fp16 --prediction_type {prediction_type} --upload_interval 5 --uncaptioned_frac {frac} --train_split 0.8 --lr {lr} --load  --generic_test_prompts "
                                 command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name} --gradient_accumulation_steps 8 "
                                 if suffix=="_no_proj":
                                     command+=" --disable_projection_adapter "

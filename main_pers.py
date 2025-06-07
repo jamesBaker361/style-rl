@@ -811,7 +811,9 @@ def main(args):
     new_metrics={}
     for k,v in metrics.items():
         new_metrics["test_"+k]=v
+        accelerator.print("\tTEST",k,v)
     accelerator.log(new_metrics)
+
 
     if args.pipeline=="lcm":
         baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
@@ -830,6 +832,7 @@ def main(args):
     new_metrics={}
     for k,v in baseline_metrics.items():
         new_metrics["baseline_"+k]=v
+        accelerator.print("\tBASELINE",k,v)
     accelerator.log(new_metrics)
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:

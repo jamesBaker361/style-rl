@@ -190,8 +190,16 @@ def main(args):
         try:
             pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained()'''
 
+    adapter_id = "latent-consistency/lcm-lora-sdv1-5"
     if args.pipeline=="lcm":
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+    elif args.pipeline=="lcm_post_lora":
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+    elif args.pipeline=="lcm_pre_lora":
+        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline.load_lora_weights(adapter_id)
+        pipeline.fuse_lora()
+
     vae=pipeline.vae
     unet=pipeline.unet
     text_encoder=pipeline.text_encoder
@@ -493,6 +501,10 @@ def main(args):
         clip_alignment_list=[]
         image_list=[]
         fake_image_list=[]
+
+        if args.pipeline=="lcm_post_lora":
+            pipeline.load_lora_weights(adapter_id)
+            pipeline.fuse_lora()
         
         for b,batch in enumerate(data_loader):
             if args.vanilla:
@@ -572,6 +584,8 @@ def main(args):
             accelerator.log(metrics)
         '''if args.training_type!="reward":
             pipeline.vae=pipeline.vae.to("cpu")'''
+        if args.pipeline=="lcm_post_lora":
+            pipeline.unfuse_lora()
         return metrics
 
     training_start=time.time()

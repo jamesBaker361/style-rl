@@ -419,7 +419,7 @@ def main(args):
 
     if args.generic_test_prompts:
         generic_dataset=load_dataset("jlbaker361/test_prompts",split="train")
-        generic_tensor_list=[torch.from_numpy(np.array(row["text_embedding"])) for row in generic_dataset]
+        generic_tensor_list=[torch.from_numpy(np.array(row["text_embedding"])[0]) for row in generic_dataset]
         generic_str_list=[row["prompt"] for row in generic_dataset]
 
         for k in range(len(test_prompt_list)):

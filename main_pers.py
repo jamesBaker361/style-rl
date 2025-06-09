@@ -856,7 +856,7 @@ def main(args):
             print("\t",k)'''
         torch.save(state_dict,save_path)
         with open(config_path,"w+") as config_file:
-            data={"start_epoch":e,
+            data={"start_epoch":args.epochs+1,
                         "persistent_loss_list":persistent_loss_list,
                         "persistent_text_alignment_list":persistent_text_alignment_list,
                         "persistent_fid_list":persistent_fid_list}

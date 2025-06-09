@@ -844,7 +844,7 @@ def main(args):
 
 
     if args.pipeline=="lcm":
-        baseline_pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+        baseline_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     b_unet=baseline_pipeline.unet.to(device)
     b_text_encoder=baseline_pipeline.text_encoder.to(device)

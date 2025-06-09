@@ -521,6 +521,7 @@ def main(args):
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
             prompt_batch=batch["prompt"]
+            do_denormalize= [True] * image_batch.size()[0]
             if len(image_batch.size())==3:
                 image_batch=image_batch.unsqueeze(0)
                 text_batch=text_batch.unsqueeze(0)
@@ -552,7 +553,7 @@ def main(args):
             fake_image_list.append(fake_image.cpu())
             
             
-            do_denormalize= [True] * fake_image.shape[0]
+            
             pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
             
 

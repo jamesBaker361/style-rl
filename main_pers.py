@@ -22,6 +22,7 @@ import numpy as np
 import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
+from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -194,9 +195,10 @@ def main(args):
     if args.pipeline=="lcm":
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
     elif args.pipeline=="lcm_post_lora":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
     elif args.pipeline=="lcm_pre_lora":
-        pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
         pipeline.load_lora_weights(adapter_id)
         pipeline.fuse_lora()
 
@@ -503,6 +505,7 @@ def main(args):
         fake_image_list=[]
 
         if args.pipeline=="lcm_post_lora":
+            old_scheduler=pipeline
             pipeline.load_lora_weights(adapter_id)
             pipeline.fuse_lora()
         

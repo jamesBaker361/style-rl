@@ -473,13 +473,14 @@ def main(args):
     #if args.training_type=="reward":
     vae=vae.to(unet.device)
     post_quant_conv=vae.post_quant_conv.to(unet.device)
+    time_embedding=unet.time_embedding.to(unet.device)
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     if args.fsdp:
         clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer)
+    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,time_embedding)
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()
@@ -490,6 +491,7 @@ def main(args):
     except Exception as e:
         accelerator.print('register_fsdp_forward_method',e)
     vae.post_quant_conv=post_quant_conv
+    unet.time_embedding=time_embedding
     pipeline.unet=unet
     pipeline.vae=vae
 
@@ -528,14 +530,18 @@ def main(args):
                 embeds_batch=embeds_batch.unsqueeze(0)
             image_embeds=embeds_batch #.unsqueeze(0)
             if b==0:
+                
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
+                accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)
             #image_batch=torch.clamp(image_batch, 0, 1)
             real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
+            
             if baseline:
                 #ip_adapter_image=F_v2.resize(image_batch, (224,224))
                 fake_image=torch.stack([pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
                 fake_image=pipeline(num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
+            
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))
             #print("img vs real img",fake_image.size(),image_batch.size())

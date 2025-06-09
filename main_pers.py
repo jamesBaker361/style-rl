@@ -532,7 +532,7 @@ def main(args):
             real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
             if baseline:
                 #ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                fake_image=pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=real_pil_image_set,output_type="pt",height=args.image_size,width=args.image_size).images
+                fake_image=torch.stack([pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
                 fake_image=pipeline(num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images

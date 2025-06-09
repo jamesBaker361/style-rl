@@ -505,7 +505,7 @@ def main(args):
         fake_image_list=[]
 
         if args.pipeline=="lcm_post_lora":
-            old_scheduler=pipeline
+            pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
             pipeline.load_lora_weights(adapter_id)
             pipeline.fuse_lora()
         
@@ -571,6 +571,7 @@ def main(args):
             for pil_image,real_pil_image,prompt in zip(pil_image_set,real_pil_image_set,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image])
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
+        pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         metrics["text_alignment"]=np.mean(clip_alignment_list)

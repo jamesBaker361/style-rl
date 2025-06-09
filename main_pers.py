@@ -530,8 +530,8 @@ def main(args):
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
             #image_batch=torch.clamp(image_batch, 0, 1)
             if baseline:
-                ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                fake_image=pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images
+                #ip_adapter_image=F_v2.resize(image_batch, (224,224))
+                fake_image=pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
             else:
                 fake_image=pipeline(num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images

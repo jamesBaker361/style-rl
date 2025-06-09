@@ -13,12 +13,7 @@ import PIL
 import numpy as np
 from copy import deepcopy
 import random
-from diffusers import SanaSprintPipeline
 from diffusers.models.lora import adjust_lora_scale_text_encoder
-from diffusers.schedulers import LCMScheduler
-from diffusers.callbacks import MultiPipelineCallbacks, PipelineCallback
-from diffusers.pipelines.sana.pipeline_output import SanaPipelineOutput
-from diffusers.pipelines.pixart_alpha.pipeline_pixart_alpha import ASPECT_RATIO_1024_BIN
 import warnings
 from diffusers.utils import (
     USE_PEFT_BACKEND,

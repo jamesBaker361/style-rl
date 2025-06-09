@@ -303,11 +303,13 @@ def main(args):
     accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
 
+    do_classifier_free_guidance=False
+
     unconditioned_text,_=pipeline.encode_prompt(
                                         " ",
                                         "cpu", #accelerator.device,
                                         1,
-                                        pipeline.do_classifier_free_guidance,
+                                        do_classifier_free_guidance,
                                         negative_prompt=None,
                                         prompt_embeds=None,
                                         negative_prompt_embeds=None,

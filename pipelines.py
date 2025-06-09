@@ -396,11 +396,15 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             lora_scale=lora_scale,
             clip_skip=self.clip_skip,
         )
-
-        # 4. Prepare timesteps
-        timesteps, num_inference_steps = retrieve_timesteps(
-            self.scheduler, num_inference_steps, device, timesteps, original_inference_steps=original_inference_steps
-        )
+        try:
+            # 4. Prepare timesteps
+            timesteps, num_inference_steps = retrieve_timesteps(
+                self.scheduler, num_inference_steps, device, timesteps, original_inference_steps=original_inference_steps
+            )
+        except TypeError:
+            timesteps, num_inference_steps = retrieve_timesteps(
+                self.scheduler, num_inference_steps, device, timesteps
+            )
 
         # 5. Prepare latent variable
         num_channels_latents = unwrapped_unet.config.in_channels

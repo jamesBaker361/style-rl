@@ -516,6 +516,7 @@ def main(args):
         for b,batch in enumerate(data_loader):
             if args.vanilla:
                 pipeline.vae=pipeline.vae.to(device)
+                pipeline.text_encoder=pipeline.text_encoder.to(device)
                 for k,v in batch.items():
                     if type(v)==torch.Tensor:
                         batch[k]=v.to(pipeline.unet.device,torch_dtype)

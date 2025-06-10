@@ -533,6 +533,11 @@ def main(args):
                 pipeline.vae=pipeline.vae.to(accelerator.device)
                 pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
                 pipeline.unet.time_embedding=pipeline.unet.time_embedding.to(accelerator.device)
+                pipeline.unet.time_embedding.linear_1.weight=pipeline.unet.time_embedding.linear_1.weight.to(accelerator.device)
+                pipeline.unet.time_embedding.linear_1.bias=pipeline.unet.time_embedding.linear_1.bias.to(accelerator.device)
+
+                pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.linear_2.weight.to(accelerator.device)
+                pipeline.unet.time_embedding.linear_2.bias=pipeline.unet.time_embedding.linear_2.bias.to(accelerator.device)
                 for k,v in batch.items():
                     if type(v)==torch.Tensor:
                         batch[k]=v.to(accelerator.device,torch_dtype)
@@ -553,7 +558,7 @@ def main(args):
                 batched_negative_prompt_embeds=None
             image_embeds=embeds_batch #.unsqueeze(0)
             if b==0:
-                print("unet",pipeline.unet.device,"time embedding",pipeline.unet.time_embedding.device)
+                print("unet",pipeline.unet.device,"time embedding",pipeline.unet.time_embedding.linear_1.weight.device)
                 
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)

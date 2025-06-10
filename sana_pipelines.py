@@ -66,6 +66,26 @@ def set_ip_adapter_attn(attn2:Attention,
 
     return attn2
 
+def recursively_prepare_ip_adapter(model:torch.nn.Module,
+                   qk_norm:str,
+                   num_cross_attention_heads:int,
+                   cross_attention_head_dim:int,
+                   ip_cross_attention_dim:int):
+    if type(model)!=torch.nn.Module:
+        return
+    if hasattr(model,"attn2"):
+        model.attn2=set_ip_adapter_attn(model.attn2,
+            qk_norm,
+            num_cross_attention_heads,
+            cross_attention_head_dim,ip_cross_attention_dim)
+    else:
+        for name,mod in model.named_modules():
+            print(name)
+            recursively_prepare_ip_adapter(mod,
+            qk_norm,
+            num_cross_attention_heads,
+            cross_attention_head_dim,ip_cross_attention_dim)
+
 def compatible_forward_sana_transformer_block(
         self:SanaTransformerBlock,
         hidden_states: torch.Tensor,
@@ -243,25 +263,6 @@ def compatible_forward_sana_transformer_model(
 
     return Transformer2DModelOutput(sample=output)
 
-
-def recursively_prepare_ip_adapter(model:torch.nn.Module,
-                   qk_norm:str,
-                   num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,
-                   ip_cross_attention_dim:int):
-    if type(model)!=torch.nn.Module:
-        return
-    if hasattr(model,"attn2"):
-        model.attn2=set_ip_adapter_attn(model.attn2,
-            qk_norm,
-            num_cross_attention_heads,
-            cross_attention_head_dim,ip_cross_attention_dim)
-    else:
-        for mod in model.modules():
-            recursively_prepare_ip_adapter(mod,
-            qk_norm,
-            num_cross_attention_heads,
-            cross_attention_head_dim,ip_cross_attention_dim)
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 

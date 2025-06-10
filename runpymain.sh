@@ -14,9 +14,9 @@
 
 #SBATCH --time=3-00:00:00           # Total run time limit (D-HH:MM:SS)
 
-#SBATCH --output=slurm/out/%j.out  # STDOUT output file
+#SBATCH --output=slurm/generic/%j.out  # STDOUT output file
 
-#SBATCH --error=slurm/err/%j.err   # STDERR output file (optional)
+#SBATCH --error=slurm/generic/%j.err   # STDERR output file (optional)
 
 #SBATCH --exclude=halk[0001-0106]
 

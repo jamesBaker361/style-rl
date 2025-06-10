@@ -52,7 +52,7 @@ def main(args):
                                    config.num_cross_attention_heads,config.cross_attention_head_dim,ip_cross_attention_dim)
     
     for block in pipeline.transformer.transformer_blocks:
-        print(block.attn2)
+        print(block.attn2.processor)
     
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim))).images[0]
 

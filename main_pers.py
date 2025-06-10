@@ -344,6 +344,7 @@ def main(args):
 
     for component in [vae,text_encoder]:
         component.requires_grad_(False)
+        component.to("cpu")
         #unet=unet.to(device,torch_dtype)
     
     unet.requires_grad_(False)

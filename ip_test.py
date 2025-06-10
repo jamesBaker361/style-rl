@@ -106,6 +106,7 @@ parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp trai
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
 parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
 parser.add_argument("--pipeline_type",type=str,default="DiffusionPipeline")
+parser.add_argument("--model",type=str,default="stabilityai/stable-diffusion-2-1")
 
 
 import torch
@@ -175,7 +176,7 @@ def main(args):
             pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
             guidance_scale=8.0
         else:
-            pipeline=pipe_class.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+            pipeline=pipe_class.from_pretrained(args.model,device=accelerator.device)
             pipeline.load_lora_weights(adapter_id)
             guidance_scale=1.0
         pipeline.scheduler=scheduler_class.from_config(pipeline.scheduler.config)

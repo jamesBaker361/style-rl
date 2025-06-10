@@ -25,6 +25,7 @@ def main(args):
     "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
     torch_dtype=torch.bfloat16
     )
+    pipeline.enable_vae_tiling()
     pipeline.to(accelerator.device)
 
     prompt = "a tiny astronaut hatching from an egg on the moon"
@@ -39,6 +40,7 @@ def main(args):
     "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
     torch_dtype=torch.bfloat16
     )
+    pipeline.enable_vae_tiling()
     pipeline.to(accelerator.device)
 
     prompt = "a tiny astronaut hatching from an egg on the moon"

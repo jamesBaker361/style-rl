@@ -44,7 +44,8 @@ def set_ip_adapter_attn(attn2:Attention,
                    hidden_size:int,
                    qk_norm:str,
                    num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,)->Attention:
+                   cross_attention_head_dim:int,
+                   ip_cross_attention_dim:int)->Attention:
     if attn2.to_out!=None:
         out_bias=attn2.to_out[0].bias
     elif attn2.to_add_out!=None:
@@ -60,7 +61,7 @@ def set_ip_adapter_attn(attn2:Attention,
         dropout=attn2.dropout,
         bias=True,
         out_bias=out_bias,
-        processor=IPAdapterAttnProcessor2_0(hidden_size,attn2.cross_attention_dim),
+        processor=IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim),
     )
 
     return attn2
@@ -246,20 +247,21 @@ def compatible_forward_sana_transformer_model(
 def recursively_prepare_ip_adapter(model:torch.nn.Module,hidden_size:int,
                    qk_norm:str,
                    num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,):
+                   cross_attention_head_dim:int,
+                   ip_cross_attention_dim:int):
     if type(model)!=torch.nn.Module:
         return
     if hasattr(model,"attn2"):
         model.attn2=set_ip_adapter_attn(model.attn2,hidden_size,
             qk_norm,
             num_cross_attention_heads,
-            cross_attention_head_dim,)
+            cross_attention_head_dim,ip_cross_attention_dim)
     else:
         for mod in model.modules():
             recursively_prepare_ip_adapter(mod,hidden_size,
             qk_norm,
             num_cross_attention_heads,
-            cross_attention_head_dim,)
+            cross_attention_head_dim,ip_cross_attention_dim)
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 

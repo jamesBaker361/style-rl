@@ -19,7 +19,7 @@ def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     generator=torch.Generator(accelerator.device)
-    generator.seed(123)
+    generator.manual_seed(123)
 
     pipeline = SanaSprintPipeline.from_pretrained(
     "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
@@ -33,7 +33,7 @@ def main(args):
     
 
     generator=torch.Generator(accelerator.device)
-    generator.seed(123)
+    generator.manual_seed(123)
 
     pipeline = CompatibleSanaSprintPipeline.from_pretrained(
     "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",

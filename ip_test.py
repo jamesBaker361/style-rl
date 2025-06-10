@@ -31,6 +31,7 @@ from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 from data_helpers import CustomDataset
 from custom_vae import public_encode
+from diffusers import DDIMScheduler,DEISMultistepScheduler
 try:
     from torch.distributed.fsdp import register_fsdp_forward_method
 except ImportError:
@@ -103,6 +104,8 @@ parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
 parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
+parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
+parser.add_argument("--pipeline_type",type=str,default="DiffusionPipeline")
 
 
 import torch
@@ -155,7 +158,20 @@ def main(args):
     
 
     adapter_id = "latent-consistency/lcm-lora-sdv1-5"
-    pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+
+    pipe_class={
+        "DiffusionPipeline":DiffusionPipeline,
+        "CompatibleLatentConsistencyModelPipeline":CompatibleLatentConsistencyModelPipeline
+    }[args.pipeline_type]
+    scheduler_class={
+        "LCMScheduler":LCMScheduler,
+        "DDIMScheduler":DDIMScheduler,
+        "DEISMultistepScheduler":DEISMultistepScheduler
+    }[args.scheduler_type]
+    pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+    pipeline.scheduler=scheduler_class.from_config(pipeline.scheduler.config)
+
+
 
     vae=pipeline.vae
     unet=pipeline.unet

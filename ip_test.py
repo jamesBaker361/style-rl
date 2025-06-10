@@ -88,9 +88,9 @@ except:
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
-parser.add_argument("--mixed_precision",type=str,default="no")
-parser.add_argument("--project_name",type=str,default="person")
+parser.add_argument("--dataset",type=str,default="jlbaker361/dino-league_captioned_splash-1000")
+parser.add_argument("--mixed_precision",type=str,default="fp16")
+parser.add_argument("--project_name",type=str,default="ip-test")
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")

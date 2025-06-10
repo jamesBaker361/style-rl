@@ -29,7 +29,7 @@ def main(args):
 
     prompt = "a tiny astronaut hatching from an egg on the moon"
 
-    image0 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator).images[0]
+    image0 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
     
 
     generator=torch.Generator(accelerator.device)
@@ -43,7 +43,7 @@ def main(args):
 
     prompt = "a tiny astronaut hatching from an egg on the moon"
 
-    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator).images[0]
+    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
 
     accelerator.log({
         "image1":wandb.Image(image1),

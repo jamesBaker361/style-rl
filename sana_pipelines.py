@@ -40,11 +40,11 @@ from diffusers.utils import (
 from diffusers.models.normalization import FP32LayerNorm,RMSNorm,LpNorm
 
 
-def set_ip_adapter(attn2:Attention,
+def set_ip_adapter_attn(attn2:Attention,
                    hidden_size:int,
                    qk_norm:str,
                    num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,):
+                   cross_attention_head_dim:int,)->Attention:
     if attn2.to_out!=None:
         out_bias=attn2.to_out[0].bias
     elif attn2.to_add_out!=None:
@@ -243,7 +243,23 @@ def compatible_forward_sana_transformer_model(
     return Transformer2DModelOutput(sample=output)
 
 
-
+def recursively_prepare_ip_adapter(model:torch.nn.Module,hidden_size:int,
+                   qk_norm:str,
+                   num_cross_attention_heads:int,
+                   cross_attention_head_dim:int,):
+    if type(model)!=torch.nn.Module:
+        return
+    if hasattr(model,"attn2"):
+        model.attn2=set_ip_adapter_attn(model.attn2,hidden_size,
+            qk_norm,
+            num_cross_attention_heads,
+            cross_attention_head_dim,)
+    else:
+        for mod in model.modules():
+            recursively_prepare_ip_adapter(mod,hidden_size,
+            qk_norm,
+            num_cross_attention_heads,
+            cross_attention_head_dim,)
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
@@ -292,6 +308,11 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             ip_adapter_image_embeds.append(single_image_embeds)
 
         return ip_adapter_image_embeds
+    
+
+
+
+
 
     @torch.no_grad()
     def __call__(

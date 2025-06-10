@@ -620,7 +620,7 @@ def main(args):
             for pil_image,real_pil_image,prompt in zip(pil_image_set,real_pil_image_set,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image])
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
-        pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
+        #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         metrics["difference"]=np.mean(difference_list)
         metrics["embedding_difference"]=np.mean(embedding_difference_list)
         metrics["text_alignment"]=np.mean(clip_alignment_list)
@@ -884,6 +884,11 @@ def main(args):
 
     if args.pipeline=="lcm":
         baseline_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+    else:
+        baseline_pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device,torch_dtype=torch_dtype)
+        
+        baseline_pipeline.load_lora_weights(adapter_id)
+        baseline_pipeline.fuse_lora()
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     b_unet=baseline_pipeline.unet.to(device)
     b_text_encoder=baseline_pipeline.text_encoder.to(device)

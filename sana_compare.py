@@ -50,6 +50,8 @@ def main(args):
     
     recursively_prepare_ip_adapter(pipeline.transformer,config.qk_norm,
                                    config.num_cross_attention_heads,config.cross_attention_head_dim,ip_cross_attention_dim)
+    
+    print(pipeline.transformer.transformer_blocks[0])
 
     
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim))).images[0]

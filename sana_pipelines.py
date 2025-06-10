@@ -79,12 +79,12 @@ def recursively_prepare_ip_adapter(model:torch.nn.Module,
             num_cross_attention_heads,
             cross_attention_head_dim,ip_cross_attention_dim)
     else:
-        for name,mod in model.named_modules():
-            print(name)
-            recursively_prepare_ip_adapter(mod,
-            qk_norm,
-            num_cross_attention_heads,
-            cross_attention_head_dim,ip_cross_attention_dim)
+        if type(model)==SanaTransformer2DModel:
+            for block in model.transformer_blocks:
+                recursively_prepare_ip_adapter(block,qk_norm,num_cross_attention_heads,
+                                               cross_attention_head_dim,ip_cross_attention_dim)
+
+
 
 def compatible_forward_sana_transformer_block(
         self:SanaTransformerBlock,

@@ -553,6 +553,7 @@ def main(args):
                 batched_negative_prompt_embeds=None
             image_embeds=embeds_batch #.unsqueeze(0)
             if b==0:
+                print("unet",pipeline.unet.device,"time embedding",pipeline.unet.time_embedding.device)
                 
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)

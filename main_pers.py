@@ -22,7 +22,7 @@ import numpy as np
 import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
-from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler
+from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler,DDIMScheduler
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -121,6 +121,7 @@ parser.add_argument("--lr",type=float,default=0.0001)
 parser.add_argument("--disable_projection_adapter",action="store_true",help="whether to use projection for ip adapter ")
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
+parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
 
 import torch
 import torch.nn.functional as F
@@ -198,15 +199,24 @@ def main(args):
         pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
     elif args.pipeline=="lcm_pre_lora":
         pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
-        pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
+        
         pipeline.load_lora_weights(adapter_id)
         pipeline.fuse_lora()
+
+    accelerator.print(pipeline.scheduler)
+    scheduler_class={
+            "LCMScheduler":LCMScheduler,
+            "DDIMScheduler":DDIMScheduler,
+            "DEISMultistepScheduler":DEISMultistepScheduler
+    }[args.scheduler_type]
+    pipeline.scheduler = scheduler_class.from_config(pipeline.scheduler.config)
+    accelerator.print(pipeline.scheduler)
 
     vae=pipeline.vae
     unet=pipeline.unet
     text_encoder=pipeline.text_encoder
     scheduler=pipeline.scheduler
-    accelerator.print(pipeline.scheduler)
+    
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     accelerator.print(pipeline.scheduler)
     pipeline.unet.encoder_hid_proj=None

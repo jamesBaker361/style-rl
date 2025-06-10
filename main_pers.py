@@ -530,6 +530,7 @@ def main(args):
         
         for b,batch in enumerate(data_loader):
             if args.vanilla:
+                pipeline=pipeline.to(accelerator.device)
                 pipeline.vae=pipeline.vae.to(accelerator.device)
                 pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
                 pipeline.unet.time_embedding=pipeline.unet.time_embedding.to(accelerator.device)

@@ -314,17 +314,21 @@ def main(args):
     accelerator.print("embedding list",len(embedding_list))
 
     do_classifier_free_guidance=False
+    if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
+        do_classifier_free_guidance=True
 
-    unconditioned_text,_=pipeline.encode_prompt(
+    unconditioned_text,negative_text_embeds=pipeline.encode_prompt(
                                         " ",
                                         "cpu", #accelerator.device,
                                         1,
                                         do_classifier_free_guidance,
-                                        negative_prompt=None,
+                                        negative_prompt="blurry, low quality",
                                         prompt_embeds=None,
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
+    
+    
     
     for i in range(len(text_list)):
         if random.random()<=args.uncaptioned_frac:
@@ -340,7 +344,6 @@ def main(args):
 
     for component in [vae,text_encoder]:
         component.requires_grad_(False)
-        component.to("cpu")
         #unet=unet.to(device,torch_dtype)
     
     unet.requires_grad_(False)
@@ -534,11 +537,17 @@ def main(args):
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
             prompt_batch=batch["prompt"]
-            do_denormalize= [True] * image_batch.size()[0]
+            
             if len(image_batch.size())==3:
                 image_batch=image_batch.unsqueeze(0)
                 text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
+            batch_size=image_batch.size()[0]
+            do_denormalize= [True] * batch_size
+            if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
+                batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1))
+            else:
+                batched_negative_prompt_embeds=None
             image_embeds=embeds_batch #.unsqueeze(0)
             if b==0:
                 
@@ -549,9 +558,13 @@ def main(args):
             
             if baseline:
                 #ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                fake_image=torch.stack([pipeline( num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
+                fake_image=torch.stack([pipeline( num_inference_steps=args.num_inference_steps,
+                                                 prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image, negative_prompt_embeds=batched_negative_prompt_embeds,
+                                                 output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
-                fake_image=pipeline(num_inference_steps=args.num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
+                fake_image=pipeline(num_inference_steps=args.num_inference_steps,
+                                    prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    output_type="pt",height=args.image_size,width=args.image_size).images
             
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))

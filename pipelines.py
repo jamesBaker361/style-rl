@@ -315,6 +315,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         clip_skip: Optional[int] = None,
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
         **kwargs,
     ):
 
@@ -531,6 +532,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         truncated_rand_backprop_minmax: tuple = (0, 50),
         fsdp:bool=False, #if fsdp, we have to do some stupid thing where we call the unet once to get model_pred device
         reward_training:bool=False, 
+        negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
         **kwargs,
     ):
         

@@ -41,7 +41,6 @@ from diffusers.models.normalization import FP32LayerNorm,RMSNorm,LpNorm
 
 
 def set_ip_adapter_attn(attn2:Attention,
-                   hidden_size:int,
                    qk_norm:str,
                    num_cross_attention_heads:int,
                    cross_attention_head_dim:int,
@@ -51,6 +50,7 @@ def set_ip_adapter_attn(attn2:Attention,
     elif attn2.to_add_out!=None:
         out_bias=attn2.to_add_out.bias
 
+    hidden_size=attn2.inner_kv_dim
     attn2 = Attention(
         query_dim=attn2.query_dim,
         qk_norm=qk_norm,
@@ -244,7 +244,7 @@ def compatible_forward_sana_transformer_model(
     return Transformer2DModelOutput(sample=output)
 
 
-def recursively_prepare_ip_adapter(model:torch.nn.Module,hidden_size:int,
+def recursively_prepare_ip_adapter(model:torch.nn.Module,
                    qk_norm:str,
                    num_cross_attention_heads:int,
                    cross_attention_head_dim:int,
@@ -252,13 +252,13 @@ def recursively_prepare_ip_adapter(model:torch.nn.Module,hidden_size:int,
     if type(model)!=torch.nn.Module:
         return
     if hasattr(model,"attn2"):
-        model.attn2=set_ip_adapter_attn(model.attn2,hidden_size,
+        model.attn2=set_ip_adapter_attn(model.attn2,
             qk_norm,
             num_cross_attention_heads,
             cross_attention_head_dim,ip_cross_attention_dim)
     else:
         for mod in model.modules():
-            recursively_prepare_ip_adapter(mod,hidden_size,
+            recursively_prepare_ip_adapter(mod,
             qk_norm,
             num_cross_attention_heads,
             cross_attention_head_dim,ip_cross_attention_dim)

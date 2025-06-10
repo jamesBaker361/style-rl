@@ -3,7 +3,7 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
-from sana_pipelines import CompatibleSanaSprintPipeline
+from sana_pipelines import CompatibleSanaSprintPipeline,recursively_prepare_ip_adapter
 from diffusers import SanaSprintPipeline
 import torch
 import wandb
@@ -30,7 +30,7 @@ def main(args):
     prompt = "a tiny astronaut hatching from an egg on the moon"
 
     image0 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
-    
+    config=pipeline.transformer.config
 
     generator=torch.Generator(accelerator.device)
     generator.manual_seed(123)
@@ -44,6 +44,13 @@ def main(args):
     prompt = "a tiny astronaut hatching from an egg on the moon"
 
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
+    ip_cross_attention_dim=256
+    
+    recursively_prepare_ip_adapter(pipeline.transformer,config.qk_norm,
+                                   config.num_cross_attention_heads,config.cross_attention_head_dim,ip_cross_attention_dim)
+
+    
+    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim))).images[0]
 
     accelerator.log({
         "image1":wandb.Image(image1),

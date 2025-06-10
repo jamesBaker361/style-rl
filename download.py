@@ -1,7 +1,7 @@
 import torch
 import datasets
 from pipelines import CompatibleLatentConsistencyModelPipeline
-from diffusers import DiffusionPipeline
+from diffusers import DiffusionPipeline, SanaSprintPipeline
 from transformers import CLIPModel, AutoProcessor
 from torchmetrics.image.fid import FrechetInceptionDistance
 from embedding_helpers import EmbeddingUtil
@@ -18,6 +18,12 @@ for data in ["league_captioned_tile","league_captioned_splash","coco_captioned",
 
 pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7")
+pipeline = SanaSprintPipeline.from_pretrained(
+    "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
+)
+pipeline = SanaSprintPipeline.from_pretrained(
+    "Efficient-Large-Model/Sana_Sprint_1.6B_1024px_diffusers",
+)
 pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")

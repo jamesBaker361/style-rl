@@ -317,6 +317,10 @@ def main(args):
     if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
         do_classifier_free_guidance=True
 
+
+    for component in [vae,text_encoder]:
+        component.requires_grad_(False)
+        component.to("cpu")
     unconditioned_text,negative_text_embeds=pipeline.encode_prompt(
                                         " ",
                                         "cpu", #accelerator.device,
@@ -342,10 +346,7 @@ def main(args):
     fake_embedding=embedding_util.embed_img_tensor(fake_image)
     embedding_dim=fake_embedding.size()[-1]
 
-    for component in [vae,text_encoder]:
-        component.requires_grad_(False)
-        component.to("cpu")
-        #unet=unet.to(device,torch_dtype)
+    
     
     unet.requires_grad_(False)
     if args.disable_projection_adapter:

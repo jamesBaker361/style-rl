@@ -71,8 +71,7 @@ def recursively_prepare_ip_adapter(model:torch.nn.Module,
                    num_cross_attention_heads:int,
                    cross_attention_head_dim:int,
                    ip_cross_attention_dim:int):
-    if type(model)!=torch.nn.Module:
-        return
+    print(type(model))
     if hasattr(model,"attn2"):
         print("has it???")
         model.attn2=set_ip_adapter_attn(model.attn2,

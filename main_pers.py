@@ -547,7 +547,7 @@ def main(args):
             batch_size=image_batch.size()[0]
             do_denormalize= [True] * batch_size
             if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
-                batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1))
+                batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1)).to(text_batch.device)
             else:
                 batched_negative_prompt_embeds=None
             image_embeds=embeds_batch #.unsqueeze(0)
@@ -555,6 +555,8 @@ def main(args):
                 
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)
+                if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
+                    accelerator.print("testing","negstive",batched_negative_prompt_embeds.size(),batched_negative_prompt_embeds.device)
             #image_batch=torch.clamp(image_batch, 0, 1)
             real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
             

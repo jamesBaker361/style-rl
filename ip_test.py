@@ -88,17 +88,17 @@ except:
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--dataset",type=str,default="jlbaker361/dino-league_captioned_splash-1000")
+parser.add_argument("--dataset",type=str,default="jlbaker361/clip-league_captioned_splash-1000")
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 parser.add_argument("--project_name",type=str,default="ip-test")
 parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--image_size",type=int,default=256)
-parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")
+parser.add_argument("--embedding",type=str,default="clip",help="dino ssl or siglip2")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=1)
-parser.add_argument("--train_split",type=float,default=0.5)
-parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
+parser.add_argument("--train_split",type=float,default=0.8)
+parser.add_argument("--uncaptioned_frac",type=float,default=1.0)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
@@ -168,6 +168,7 @@ def main(args):
             "DDIMScheduler":DDIMScheduler,
             "DEISMultistepScheduler":DEISMultistepScheduler
         }[args.scheduler_type]
+        
         pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
         pipeline.scheduler=scheduler_class.from_config(pipeline.scheduler.config)
 
@@ -180,6 +181,7 @@ def main(args):
         accelerator.print(pipeline.scheduler)
         pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
         accelerator.print(pipeline.scheduler)
+        
 
         #pipeline.requires_grad_(False)
         embedding_list=[]
@@ -280,13 +282,9 @@ def main(args):
             #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
             return F.mse_loss(pred_embedding_batch.float(),src_embedding_batch.float(),reduce="mean")
         
-        fake_image=torch.rand((1,3,args.image_size,args.image_size))
-        fake_embedding=embedding_util.embed_img_tensor(fake_image)
-        embedding_dim=fake_embedding.size()[-1]
 
         for component in [vae,text_encoder]:
             component.requires_grad_(False)
-            component.to("cpu")
             #unet=unet.to(device,torch_dtype)
         
         unet.requires_grad_(False)
@@ -347,9 +345,6 @@ def main(args):
 
         accelerator.print("train batch",type(train_batch))
         accelerator.print("val batch",type(val_batch))
-        '''for name, param in unet.named_parameters():
-            if param.requires_grad:
-                print(f"{name} is trainable shape {tuple(param.shape)}")'''
 
 
 
@@ -361,13 +356,16 @@ def main(args):
         vae=vae.to(unet.device)
         post_quant_conv=vae.post_quant_conv.to(unet.device)
         time_embedding=unet.time_embedding.to(unet.device)
+        image_encoder=pipeline.image_encoder.to(unet.device)
+        pipeline.to(accelerator.device)
+        
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         if args.fsdp:
             clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
         clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         fid = FrechetInceptionDistance(feature=2048,normalize=True)
         accelerator.wait_for_everyone()
-        clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,time_embedding)
+        pipeline,image_encoder,clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,time_embedding=accelerator.prepare(pipeline,image_encoder,clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,time_embedding)
         accelerator.wait_for_everyone()
         train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
         accelerator.wait_for_everyone()

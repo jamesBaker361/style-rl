@@ -18,6 +18,7 @@ for data in ["league_captioned_tile","league_captioned_splash","coco_captioned",
 
 pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7")
+pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
 

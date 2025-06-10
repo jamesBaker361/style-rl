@@ -379,6 +379,7 @@ def main(args):
         unet.time_embedding=time_embedding
         pipeline.unet=unet
         pipeline.vae=vae
+        pipeline.image_encoder=image_encoder
 
         for loader in [test_loader,val_loader,train_loader]:
             print(type(loader))

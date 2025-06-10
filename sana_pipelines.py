@@ -119,130 +119,180 @@ def compatible_forward_sana_transformer_block(
         return hidden_states
 
 
-class CompatibleSanaTransformer2DModel(SanaTransformer2DModel):
-    def forward(
-        self,
-        hidden_states: torch.Tensor,
-        encoder_hidden_states: torch.Tensor,
-        timestep: torch.Tensor,
-        guidance: Optional[torch.Tensor] = None,
-        encoder_attention_mask: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None,
-        attention_kwargs: Optional[Dict[str, Any]] = None,
-        added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = None,
-        controlnet_block_samples: Optional[Tuple[torch.Tensor]] = None,
-        return_dict: bool = True,
-    ) -> Union[Tuple[torch.Tensor, ...], Transformer2DModelOutput]:
-        if attention_kwargs is not None:
-            attention_kwargs = attention_kwargs.copy()
-            lora_scale = attention_kwargs.pop("scale", 1.0)
-        else:
-            lora_scale = 1.0
+def compatible_forward_sana_transformer_model(
+    self:SanaTransformer2DModel,
+    hidden_states: torch.Tensor,
+    encoder_hidden_states: torch.Tensor,
+    timestep: torch.Tensor,
+    guidance: Optional[torch.Tensor] = None,
+    encoder_attention_mask: Optional[torch.Tensor] = None,
+    attention_mask: Optional[torch.Tensor] = None,
+    attention_kwargs: Optional[Dict[str, Any]] = None,
+    added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = None,
+    controlnet_block_samples: Optional[Tuple[torch.Tensor]] = None,
+    return_dict: bool = True,
+) -> Union[Tuple[torch.Tensor, ...], Transformer2DModelOutput]:
+    if attention_kwargs is not None:
+        attention_kwargs = attention_kwargs.copy()
+        lora_scale = attention_kwargs.pop("scale", 1.0)
+    else:
+        lora_scale = 1.0
 
-        if USE_PEFT_BACKEND:
-            # weight the lora layers by setting `lora_scale` for each PEFT layer
-            scale_lora_layers(self, lora_scale)
+    if USE_PEFT_BACKEND:
+        # weight the lora layers by setting `lora_scale` for each PEFT layer
+        scale_lora_layers(self, lora_scale)
 
 
-        # ensure attention_mask is a bias, and give it a singleton query_tokens dimension.
-        #   we may have done this conversion already, e.g. if we came here via UNet2DConditionModel#forward.
-        #   we can tell by counting dims; if ndim == 2: it's a mask rather than a bias.
-        # expects mask of shape:
-        #   [batch, key_tokens]
-        # adds singleton query_tokens dimension:
-        #   [batch,                    1, key_tokens]
-        # this helps to broadcast it as a bias over attention scores, which will be in one of the following shapes:
-        #   [batch,  heads, query_tokens, key_tokens] (e.g. torch sdp attn)
-        #   [batch * heads, query_tokens, key_tokens] (e.g. xformers or classic attn)
-        if attention_mask is not None and attention_mask.ndim == 2:
-            # assume that mask is expressed as:
-            #   (1 = keep,      0 = discard)
-            # convert mask into a bias that can be added to attention scores:
-            #       (keep = +0,     discard = -10000.0)
-            attention_mask = (1 - attention_mask.to(hidden_states.dtype)) * -10000.0
-            attention_mask = attention_mask.unsqueeze(1)
+    # ensure attention_mask is a bias, and give it a singleton query_tokens dimension.
+    #   we may have done this conversion already, e.g. if we came here via UNet2DConditionModel#forward.
+    #   we can tell by counting dims; if ndim == 2: it's a mask rather than a bias.
+    # expects mask of shape:
+    #   [batch, key_tokens]
+    # adds singleton query_tokens dimension:
+    #   [batch,                    1, key_tokens]
+    # this helps to broadcast it as a bias over attention scores, which will be in one of the following shapes:
+    #   [batch,  heads, query_tokens, key_tokens] (e.g. torch sdp attn)
+    #   [batch * heads, query_tokens, key_tokens] (e.g. xformers or classic attn)
+    if attention_mask is not None and attention_mask.ndim == 2:
+        # assume that mask is expressed as:
+        #   (1 = keep,      0 = discard)
+        # convert mask into a bias that can be added to attention scores:
+        #       (keep = +0,     discard = -10000.0)
+        attention_mask = (1 - attention_mask.to(hidden_states.dtype)) * -10000.0
+        attention_mask = attention_mask.unsqueeze(1)
 
-        # convert encoder_attention_mask to a bias the same way we do for attention_mask
-        if encoder_attention_mask is not None and encoder_attention_mask.ndim == 2:
-            encoder_attention_mask = (1 - encoder_attention_mask.to(hidden_states.dtype)) * -10000.0
-            encoder_attention_mask = encoder_attention_mask.unsqueeze(1)
+    # convert encoder_attention_mask to a bias the same way we do for attention_mask
+    if encoder_attention_mask is not None and encoder_attention_mask.ndim == 2:
+        encoder_attention_mask = (1 - encoder_attention_mask.to(hidden_states.dtype)) * -10000.0
+        encoder_attention_mask = encoder_attention_mask.unsqueeze(1)
 
-        # 1. Input
-        batch_size, num_channels, height, width = hidden_states.shape
-        p = self.config.patch_size
-        post_patch_height, post_patch_width = height // p, width // p
+    # 1. Input
+    batch_size, num_channels, height, width = hidden_states.shape
+    p = self.config.patch_size
+    post_patch_height, post_patch_width = height // p, width // p
 
-        hidden_states = self.patch_embed(hidden_states)
+    hidden_states = self.patch_embed(hidden_states)
 
-        if guidance is not None:
-            timestep, embedded_timestep = self.time_embed(
-                timestep, guidance=guidance, hidden_dtype=hidden_states.dtype
-            )
-        else:
-            timestep, embedded_timestep = self.time_embed(
-                timestep, batch_size=batch_size, hidden_dtype=hidden_states.dtype
-            )
-
-        encoder_hidden_states = self.caption_projection(encoder_hidden_states)
-        encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
-
-        encoder_hidden_states = self.caption_norm(encoder_hidden_states)
-
-        # 2. Transformer blocks
-        if torch.is_grad_enabled() and self.gradient_checkpointing:
-            for index_block, block in enumerate(self.transformer_blocks):
-                hidden_states = self._gradient_checkpointing_func(
-                    block,
-                    hidden_states,
-                    attention_mask,
-                    encoder_hidden_states,
-                    encoder_attention_mask,
-                    timestep,
-                    post_patch_height,
-                    post_patch_width,
-                )
-                if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
-                    hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
-
-        else:
-            for index_block, block in enumerate(self.transformer_blocks):
-                hidden_states = block(
-                    hidden_states,
-                    attention_mask,
-                    encoder_hidden_states,
-                    encoder_attention_mask,
-                    timestep,
-                    post_patch_height,
-                    post_patch_width,
-                )
-                if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
-                    hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
-
-        # 3. Normalization
-        hidden_states = self.norm_out(hidden_states, embedded_timestep, self.scale_shift_table)
-
-        hidden_states = self.proj_out(hidden_states)
-
-        # 5. Unpatchify
-        hidden_states = hidden_states.reshape(
-            batch_size, post_patch_height, post_patch_width, self.config.patch_size, self.config.patch_size, -1
+    if guidance is not None:
+        timestep, embedded_timestep = self.time_embed(
+            timestep, guidance=guidance, hidden_dtype=hidden_states.dtype
         )
-        hidden_states = hidden_states.permute(0, 5, 1, 3, 2, 4)
-        output = hidden_states.reshape(batch_size, -1, post_patch_height * p, post_patch_width * p)
+    else:
+        timestep, embedded_timestep = self.time_embed(
+            timestep, batch_size=batch_size, hidden_dtype=hidden_states.dtype
+        )
 
-        if USE_PEFT_BACKEND:
-            # remove `lora_scale` from each PEFT layer
-            unscale_lora_layers(self, lora_scale)
+    encoder_hidden_states = self.caption_projection(encoder_hidden_states)
+    encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
 
-        if not return_dict:
-            return (output,)
+    encoder_hidden_states = self.caption_norm(encoder_hidden_states)
 
-        return Transformer2DModelOutput(sample=output)
+    # 2. Transformer blocks
+    if torch.is_grad_enabled() and self.gradient_checkpointing:
+        for index_block, block in enumerate(self.transformer_blocks):
+            hidden_states = self._gradient_checkpointing_func(
+                compatible_forward_sana_transformer_block,
+                block,
+                hidden_states,
+                attention_mask,
+                encoder_hidden_states,
+                encoder_attention_mask,
+                timestep,
+                post_patch_height,
+                post_patch_width,
+                added_cond_kwargs
+            )
+            if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
+                hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
+
+    else:
+        for index_block, block in enumerate(self.transformer_blocks):
+            hidden_states = compatible_forward_sana_transformer_block(
+                block,
+                hidden_states,
+                attention_mask,
+                encoder_hidden_states,
+                encoder_attention_mask,
+                timestep,
+                post_patch_height,
+                post_patch_width,
+                added_cond_kwargs
+            )
+            if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
+                hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
+
+    # 3. Normalization
+    hidden_states = self.norm_out(hidden_states, embedded_timestep, self.scale_shift_table)
+
+    hidden_states = self.proj_out(hidden_states)
+
+    # 5. Unpatchify
+    hidden_states = hidden_states.reshape(
+        batch_size, post_patch_height, post_patch_width, self.config.patch_size, self.config.patch_size, -1
+    )
+    hidden_states = hidden_states.permute(0, 5, 1, 3, 2, 4)
+    output = hidden_states.reshape(batch_size, -1, post_patch_height * p, post_patch_width * p)
+
+    if USE_PEFT_BACKEND:
+        # remove `lora_scale` from each PEFT layer
+        unscale_lora_layers(self, lora_scale)
+
+    if not return_dict:
+        return (output,)
+
+    return Transformer2DModelOutput(sample=output)
 
 
 
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
+
+    def prepare_ip_adapter_image_embeds(
+        self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance
+    ):
+        image_embeds = []
+        if do_classifier_free_guidance:
+            negative_image_embeds = []
+        if ip_adapter_image_embeds is None:
+            pass #for now we're going to assume that we're passing the embeds
+            '''if not isinstance(ip_adapter_image, list):
+                ip_adapter_image = [ip_adapter_image]
+
+            if len(ip_adapter_image) != len(self.transformer.encoder_hid_proj.image_projection_layers):
+                raise ValueError(
+                    f"`ip_adapter_image` must have same length as the number of IP Adapters. Got {len(ip_adapter_image)} images and {len(self.unet.encoder_hid_proj.image_projection_layers)} IP Adapters."
+                )
+
+            for single_ip_adapter_image, image_proj_layer in zip(
+                ip_adapter_image, self.transformer.encoder_hid_proj.image_projection_layers
+            ):
+                output_hidden_state = not isinstance(image_proj_layer, ImageProjection)
+                single_image_embeds, single_negative_image_embeds = self.encode_image(
+                    single_ip_adapter_image, device, 1, output_hidden_state
+                )
+
+                image_embeds.append(single_image_embeds[None, :])
+                if do_classifier_free_guidance:
+                    negative_image_embeds.append(single_negative_image_embeds[None, :])'''
+        else:
+            for single_image_embeds in ip_adapter_image_embeds:
+                if do_classifier_free_guidance:
+                    single_negative_image_embeds, single_image_embeds = single_image_embeds.chunk(2)
+                    negative_image_embeds.append(single_negative_image_embeds)
+                image_embeds.append(single_image_embeds)
+
+        ip_adapter_image_embeds = []
+        for i, single_image_embeds in enumerate(image_embeds):
+            single_image_embeds = torch.cat([single_image_embeds] * num_images_per_prompt, dim=0)
+            if do_classifier_free_guidance:
+                single_negative_image_embeds = torch.cat([negative_image_embeds[i]] * num_images_per_prompt, dim=0)
+                single_image_embeds = torch.cat([single_negative_image_embeds, single_image_embeds], dim=0)
+
+            single_image_embeds = single_image_embeds.to(device=device)
+            ip_adapter_image_embeds.append(single_image_embeds)
+
+        return ip_adapter_image_embeds
+
     @torch.no_grad()
     def __call__(
         self,
@@ -373,6 +423,18 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
 
+        if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
+            image_embeds = self.prepare_ip_adapter_image_embeds(
+                ip_adapter_image,
+                ip_adapter_image_embeds,
+                device,
+                batch_size * num_images_per_prompt,
+                self.do_classifier_free_guidance,
+            )
+            added_cond_kwargs={"image_embeds": image_embeds}
+        else:
+            added_cond_kwargs=None
+
         # 7. Denoising loop
         timesteps = timesteps[:-1]
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
@@ -396,7 +458,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 )
 
                 # predict noise model_output
-                noise_pred = self.transformer(
+                noise_pred = compatible_forward_sana_transformer_model(
+                    self.transformer,
                     latent_model_input.to(dtype=transformer_dtype),
                     encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
                     encoder_attention_mask=prompt_attention_mask,
@@ -404,6 +467,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     timestep=scm_timestep,
                     return_dict=False,
                     attention_kwargs=self.attention_kwargs,
+                    added_cond_kwargs=added_cond_kwargs
                 )[0]
 
                 noise_pred = (

@@ -1,6 +1,7 @@
 import torch
 import datasets
 from pipelines import CompatibleLatentConsistencyModelPipeline
+from diffusers import DiffusionPipeline
 from transformers import CLIPModel, AutoProcessor
 from torchmetrics.image.fid import FrechetInceptionDistance
 from embedding_helpers import EmbeddingUtil
@@ -16,6 +17,7 @@ for data in ["league_captioned_tile","league_captioned_splash","coco_captioned",
     datasets.load_dataset(path)
 
 pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7")
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
 

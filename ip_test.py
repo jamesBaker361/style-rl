@@ -173,9 +173,11 @@ def main(args):
         if args.scheduler_type=="LCMScheduler" and args.pipeline_type=="CompatibleLatentConsistencyModelPipeline":
         
             pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            guidance_scale=8.0
         else:
             pipeline=pipe_class.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
             pipeline.load_lora_weights(adapter_id)
+            guidance_scale=1.0
         pipeline.scheduler=scheduler_class.from_config(pipeline.scheduler.config)
 
 
@@ -430,7 +432,7 @@ def main(args):
                 
                 if baseline:
                     #ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                    fake_image=torch.stack([pipeline( num_inference_steps=num_inference_steps,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
+                    fake_image=torch.stack([pipeline( num_inference_steps=num_inference_steps,guidance_scale=guidance_scale,prompt_embeds=text_batch,ip_adapter_image=ip_adapter_image,output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
                 else:
                     fake_image=pipeline(num_inference_steps=num_inference_steps,prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],output_type="pt",height=args.image_size,width=args.image_size).images
                 

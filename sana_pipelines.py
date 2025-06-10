@@ -452,7 +452,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 ip_adapter_image_embeds,
                 device,
                 batch_size * num_images_per_prompt,
-                self.do_classifier_free_guidance,
+                False,
             )
             added_cond_kwargs={"image_embeds": image_embeds}
         else:

@@ -131,6 +131,7 @@ def main(args):
     device=accelerator.device
     state = PartialState()
     print(f"Rank {state.process_index} initialized successfully")
+    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
 
 
@@ -168,8 +169,13 @@ def main(args):
             "DDIMScheduler":DDIMScheduler,
             "DEISMultistepScheduler":DEISMultistepScheduler
         }[args.scheduler_type]
+
+        if args.scheduler_type=="LCMScheduler" and args.pipeline_type=="CompatibleLatentConsistencyModelPipeline":
         
-        pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            pipeline=pipe_class.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+        else:
+            pipeline=pipe_class.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+            pipeline.load_lora_weights(adapter_id)
         pipeline.scheduler=scheduler_class.from_config(pipeline.scheduler.config)
 
 

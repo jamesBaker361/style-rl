@@ -99,9 +99,9 @@ def main(args):
                                                 accelerator.device,
                                                 1,
                                                 pipeline.do_classifier_free_guidance,
-                                                negative_prompt=None,
+                                                #negative_prompt=None,
                                                 prompt_embeds=None,
-                                                negative_prompt_embeds=None,
+                                                #negative_prompt_embeds=None,
                                                 #lora_scale=lora_scale,
                                         )
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()

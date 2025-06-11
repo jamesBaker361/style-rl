@@ -563,6 +563,7 @@ def main(args):
                 image_embeds=torch.cat([negative_image_embeds,image_embeds],dim=0)
             else:
                 batched_negative_prompt_embeds=None
+                image_embeds=[image_embeds]
             
             if b==0:
                 print("unet",pipeline.unet.device,"time embedding linear 1",pipeline.unet.time_embedding.linear_1.weight.device, )
@@ -581,7 +582,7 @@ def main(args):
                                                  output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
                 fake_image=pipeline(num_inference_steps=args.num_inference_steps,
-                                    prompt_embeds=text_batch,ip_adapter_image_embeds=[image_embeds],negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    prompt_embeds=text_batch,ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size).images
             
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images

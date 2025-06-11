@@ -1,16 +1,20 @@
-from diffusers import AutoencoderKL
+from diffusers import AutoencoderKL,AutoencoderDC
 import torch
 import functools
+from typing import Union
 
-def public_encode(vae:AutoencoderKL,x: torch.Tensor) -> torch.Tensor:
+def public_encode(vae:Union[AutoencoderKL,AutoencoderDC],x: torch.Tensor) -> torch.Tensor:
+    
     batch_size, num_channels, height, width = x.shape
+    if type(vae)==AutoencoderKL:
+        if vae.use_tiling and (width > vae.tile_sample_min_size or height > vae.tile_sample_min_size):
+            return public_tiled_encode(vae,x)
 
-    if vae.use_tiling and (width > vae.tile_sample_min_size or height > vae.tile_sample_min_size):
-        return public_tiled_encode(vae,x)
-
-    enc = vae.encoder(x)
-    if vae.quant_conv is not None:
-        enc = vae.quant_conv(enc)
+        enc = vae.encoder(x)
+        if vae.quant_conv is not None:
+            enc = vae.quant_conv(enc)
+    elif type(vae)==AutoencoderDC:
+        enc=vae.encode(x,return_dict=False)[0]
 
     return enc
 

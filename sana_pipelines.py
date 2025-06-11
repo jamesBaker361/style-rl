@@ -41,32 +41,26 @@ from diffusers.models.normalization import FP32LayerNorm,RMSNorm,LpNorm
 
 
 def set_ip_adapter_attn(attn2:Attention,
-                   qk_norm:str,
-                   num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,
+                   device,
                    ip_cross_attention_dim:int)->Attention:
     
     hidden_size=attn2.inner_kv_dim
+    ip_adapter_processor=IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim).to(device)
     attn2.set_processor(IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim))
     return attn2
 
 def recursively_prepare_ip_adapter(model:torch.nn.Module,
-                   qk_norm:str,
-                   num_cross_attention_heads:int,
-                   cross_attention_head_dim:int,
+                   device,
                    ip_cross_attention_dim:int):
     print(type(model))
     if hasattr(model,"attn2"):
         print("has it???")
         model.attn2=set_ip_adapter_attn(model.attn2,
-            qk_norm,
-            num_cross_attention_heads,
-            cross_attention_head_dim,ip_cross_attention_dim)
+            device,ip_cross_attention_dim)
     else:
         if type(model)==SanaTransformer2DModel:
             for block in model.transformer_blocks:
-                recursively_prepare_ip_adapter(block,qk_norm,num_cross_attention_heads,
-                                               cross_attention_head_dim,ip_cross_attention_dim)
+                recursively_prepare_ip_adapter(block,device,ip_cross_attention_dim)
 
 
 

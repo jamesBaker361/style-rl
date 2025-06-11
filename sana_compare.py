@@ -48,8 +48,7 @@ def main(args):
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
     ip_cross_attention_dim=256
     
-    recursively_prepare_ip_adapter(pipeline.transformer,config.qk_norm,
-                                   config.num_cross_attention_heads,config.cross_attention_head_dim,ip_cross_attention_dim)
+    recursively_prepare_ip_adapter(pipeline.transformer,accelerator.device,ip_cross_attention_dim)
     
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''

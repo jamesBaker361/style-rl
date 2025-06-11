@@ -51,20 +51,21 @@ def main(args):
 
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
     ip_cross_attention_dim=256
+    embedding_dim=512
     
     prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.bfloat16,ip_cross_attention_dim)
     
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''
     
-    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
+    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
 
     
 
-    pipeline.transformer=replace_ip_attn(pipeline.transformer,256,512,128,4,True)
+    pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True)
     image2 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
 
-    pipeline.transformer=replace_ip_attn(pipeline.transformer,256,512,128,4,True,deep_to_ip_layers=True)
+    pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True,deep_to_ip_layers=True)
     image3 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
 
     accelerator.log({

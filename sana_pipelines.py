@@ -46,26 +46,9 @@ def set_ip_adapter_attn(attn2:Attention,
                    cross_attention_head_dim:int,
                    ip_cross_attention_dim:int)->Attention:
     
-
     hidden_size=attn2.inner_kv_dim
-    new_attn2 = Attention(
-        query_dim=attn2.query_dim,
-        qk_norm=qk_norm,
-        kv_heads=num_cross_attention_heads if qk_norm is not None else None,
-        cross_attention_dim=attn2.cross_attention_dim,
-        heads=attn2.heads,
-        dim_head=cross_attention_head_dim,
-        dropout=attn2.dropout,
-        bias=True,
-        out_bias=False,
-        processor=IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim),
-    )
-    if attn2.to_out!=None:
-        new_attn2.to_out=attn2.to_out
-    elif attn2.to_add_out!=None:
-        new_attn2.to_add_out=attn2.to_add_out
-
-    return new_attn2
+    attn2.set_processor(IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim))
+    return attn2
 
 def recursively_prepare_ip_adapter(model:torch.nn.Module,
                    qk_norm:str,

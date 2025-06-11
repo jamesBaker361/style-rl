@@ -38,6 +38,7 @@ except ImportError:
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from PIL import Image
+from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter
 
 def concat_images_horizontally(images):
     """
@@ -203,7 +204,11 @@ def main(args):
         
         pipeline.load_lora_weights(adapter_id)
         pipeline.fuse_lora()
-
+    elif args.pipeline=="sana":
+        pipeline = CompatibleSanaSprintPipeline.from_pretrained(
+        "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
+        )
+        
     try:
         pipeline.safety_checker=None
     except Exception as err:
@@ -220,7 +225,7 @@ def main(args):
     accelerator.print(pipeline.scheduler)
 
     vae=pipeline.vae
-    unet=pipeline.unet
+    denoising_model=pipeline.unet
     text_encoder=pipeline.text_encoder
     scheduler=pipeline.scheduler
     
@@ -355,7 +360,7 @@ def main(args):
 
     
     
-    unet.requires_grad_(False)
+    denoising_model.requires_grad_(False)
     if args.disable_projection_adapter:
         use_projection=False
     else:
@@ -370,7 +375,10 @@ def main(args):
         
 
     accelerator.print(f"cross attention dim {embedding_dim} / {args.num_image_text_embeds} =  ",cross_attention_dim)
-    replace_ip_attn(unet,
+    if args.pipeline=="sana":
+        prepare_ip_adapter(pipeline.transformer,accelerator.device,torch_dtype,cross_attention_dim)
+    
+    replace_ip_attn(denoising_model,
                     embedding_dim,
                     intermediate_embedding_dim,
                     cross_attention_dim,
@@ -383,7 +391,7 @@ def main(args):
     persistent_fid_list=[]
     if args.load:
         try:
-            unet.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
+            denoising_model.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
             with open(config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]+1
@@ -398,7 +406,7 @@ def main(args):
         try:
             pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
             pretrained_config_path=api.hf_hub_download(args.name,CONFIG_NAME,force_download=True)
-            unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
+            denoising_model.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
             with open(pretrained_config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]+1
@@ -409,8 +417,8 @@ def main(args):
         except Exception as e:
             accelerator.print("couldnt load from hf")
             accelerator.print(e)
-    attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
-    attn_layer_list.append( unet.encoder_hid_proj)
+    attn_layer_list=[p for (name,p ) in get_modules_of_types(denoising_model,IPAdapterAttnProcessor2_0)]
+    attn_layer_list.append( denoising_model.encoder_hid_proj)
     accelerator.print("len attn_layers",len(attn_layer_list))
     for layer in attn_layer_list:
         layer.requires_grad_(True)
@@ -478,7 +486,7 @@ def main(args):
             print(f"{name} is trainable shape {tuple(param.shape)}")'''
 
 
-    params=[p for p in pipeline.unet.parameters() if p.requires_grad]
+    params=[p for p in denoising_model.parameters() if p.requires_grad]
 
     accelerator.print("trainable params: ",len(params))
     for i in range(accelerator.num_processes):
@@ -490,19 +498,19 @@ def main(args):
     optimizer=torch.optim.AdamW(params,lr=args.lr)
 
     if args.vanilla:
-        unet=unet.to(device)
+        denoising_model=denoising_model.to(device)
 
     #if args.training_type=="reward":
-    vae=vae.to(unet.device)
-    post_quant_conv=vae.post_quant_conv.to(unet.device)
-    time_embedding=unet.time_embedding.to(unet.device)
+    vae=vae.to(denoising_model.device)
+    post_quant_conv=vae.post_quant_conv.to(denoising_model.device)
+    time_embedding=denoising_model.time_embedding.to(denoising_model.device)
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     if args.fsdp:
         clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,unet,vae,post_quant_conv,scheduler,optimizer,time_embedding)
+    clip_model,clip_processor,fid,denoising_model,vae,post_quant_conv,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,post_quant_conv,scheduler,optimizer,time_embedding)
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()
@@ -513,8 +521,8 @@ def main(args):
     except Exception as e:
         accelerator.print('register_fsdp_forward_method',e)
     vae.post_quant_conv=post_quant_conv
-    unet.time_embedding=time_embedding
-    pipeline.unet=unet
+    denoising_model.time_embedding=time_embedding
+    pipeline.unet=denoising_model
     pipeline.vae=vae
 
     for loader in [test_loader,val_loader,train_loader]:
@@ -740,10 +748,10 @@ def main(args):
                         with accelerator.autocast():
                             #print("noisy latents",noisy_latents.device,"timesteps",timesteps.device,"encoder states",encoder_hidden_states.device,"image_embeds",image_embeds.device)
                             #print("noisy latents",noisy_latents.dtype,"timesteps",timesteps.dtype,"encoder states",encoder_hidden_states.dtype,"image_embeds",image_embeds.dtype)
-                            model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                            model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
                             loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     else:
-                        model_pred = unet(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                        model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
                         loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
 

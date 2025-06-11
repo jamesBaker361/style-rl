@@ -36,9 +36,9 @@ def get_modules_of_types(model, target_classes):
             if isinstance(module, target_classes)]
 
 def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2DModel]
-                    ,embedding_dim:int,
-                    intermediate_embedding_dim:int,
-                    cross_attention_dim:int
+                    ,embedding_dim:int, #the original embedding dimensions
+                    intermediate_embedding_dim:int, #if we have an intermediare global layer
+                    cross_attention_dim:int #the input dim for each layer
                     ,num_image_text_embeds:int
                     ,use_projection:bool=True
                     ,use_identity:bool=False,

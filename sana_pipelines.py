@@ -46,7 +46,7 @@ def set_ip_adapter_attn(attn2:Attention,
     
     hidden_size=attn2.inner_kv_dim
     ip_adapter_processor=IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim).to(device)
-    attn2.set_processor(IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim))
+    attn2.set_processor(ip_adapter_processor)
     return attn2
 
 def recursively_prepare_ip_adapter(model:torch.nn.Module,

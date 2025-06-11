@@ -122,6 +122,7 @@ parser.add_argument("--disable_projection_adapter",action="store_true",help="whe
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
 parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
+parser.add_argument("--reward_switch_epoch",type=int,default=-1)
 
 import torch
 import torch.nn.functional as F
@@ -658,6 +659,8 @@ def main(args):
             print(type(submodule), "Error:", e)'''
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
+        if e==args.reward_with_epoch:
+            args.training_type="reward"
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]

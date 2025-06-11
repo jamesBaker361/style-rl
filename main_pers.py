@@ -561,7 +561,7 @@ def main(args):
             if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
                 batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1)).to(text_batch.device)
                 negative_image_embeds=torch.zeros(image_embeds.size(),device=image_embeds.device)
-                image_embeds=torch.cat([negative_image_embeds,image_embeds],dim=0)
+                image_embeds=[torch.cat([negative_image_embeds,image_embeds],dim=0)]
             else:
                 batched_negative_prompt_embeds=None
                 image_embeds=[image_embeds]

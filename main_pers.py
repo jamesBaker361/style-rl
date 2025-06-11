@@ -350,7 +350,7 @@ def main(args):
         cross_attention_dim=embedding_dim//args.num_image_text_embeds
     intermediate_embedding_dim=args.intermediate_embedding_dim
     if args.disable_projection_adapter:
-        intermediate_embedding_dim=cross_attention_dim
+        intermediate_embedding_dim=embedding_dim
         
 
     accelerator.print(f"cross attention dim {embedding_dim} / {args.num_image_text_embeds} =  ",cross_attention_dim)

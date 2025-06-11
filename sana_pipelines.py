@@ -87,11 +87,11 @@ def compatible_forward_sana_transformer_block(
         attn_output = self.attn1(norm_hidden_states)
         hidden_states = hidden_states + gate_msa * attn_output
 
-        if added_cond_kwargs!=None:
+        '''if added_cond_kwargs!=None:
             ip_hidden_states=added_cond_kwargs["image_embeds"]
             encoder_hidden_states=(encoder_hidden_states,ip_hidden_states)
-        else:
-            encoder_hidden_states=encoder_hidden_states
+        else:'''
+        encoder_hidden_states=encoder_hidden_states
 
         # 3. Cross Attention
         if self.attn2 is not None:
@@ -113,6 +113,20 @@ def compatible_forward_sana_transformer_block(
 
         return hidden_states
 
+def compatible_process_hidden_states(
+        self:SanaTransformer2DModel, encoder_hidden_states: torch.Tensor, added_cond_kwargs: Dict[str, Any]
+    ) -> torch.Tensor:
+    if self.encoder_hid_proj is not None:
+        if "image_embeds" not in added_cond_kwargs:
+                raise ValueError(
+                    f"{self.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
+                )
+        image_embeds = added_cond_kwargs.get("image_embeds")
+        image_embeds = self.encoder_hid_proj(image_embeds)
+        encoder_hidden_states = (encoder_hidden_states, image_embeds)
+
+    return encoder_hidden_states
+
 
 def compatible_forward_sana_transformer_model(
     self:SanaTransformer2DModel,
@@ -123,7 +137,7 @@ def compatible_forward_sana_transformer_model(
     encoder_attention_mask: Optional[torch.Tensor] = None,
     attention_mask: Optional[torch.Tensor] = None,
     attention_kwargs: Optional[Dict[str, Any]] = None,
-    added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = None,
+    added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = {},
     controlnet_block_samples: Optional[Tuple[torch.Tensor]] = None,
     return_dict: bool = True,
 ) -> Union[Tuple[torch.Tensor, ...], Transformer2DModelOutput]:
@@ -181,6 +195,8 @@ def compatible_forward_sana_transformer_model(
     encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
+
+    encoder_hidden_states=compatible_process_hidden_states(self,encoder_hidden_states,added_cond_kwargs)
 
     # 2. Transformer blocks
     if torch.is_grad_enabled() and self.gradient_checkpointing:

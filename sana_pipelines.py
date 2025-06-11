@@ -246,8 +246,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         if do_classifier_free_guidance:
             negative_image_embeds = []
         if ip_adapter_image_embeds is None:
-            pass #for now we're going to assume that we're passing the embeds
-            '''if not isinstance(ip_adapter_image, list):
+            if not isinstance(ip_adapter_image, list):
                 ip_adapter_image = [ip_adapter_image]
 
             if len(ip_adapter_image) != len(self.transformer.encoder_hid_proj.image_projection_layers):
@@ -265,7 +264,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
                 image_embeds.append(single_image_embeds[None, :])
                 if do_classifier_free_guidance:
-                    negative_image_embeds.append(single_negative_image_embeds[None, :])'''
+                    negative_image_embeds.append(single_negative_image_embeds[None, :])
         else:
             for single_image_embeds in ip_adapter_image_embeds:
                 if do_classifier_free_guidance:

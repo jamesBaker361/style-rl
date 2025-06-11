@@ -7,6 +7,10 @@ from sana_pipelines import CompatibleSanaSprintPipeline,prepare_ip_adapter
 from diffusers import SanaSprintPipeline
 import torch
 import wandb
+from diffusers.utils import load_image
+from adapter_helpers import replace_ip_attn
+
+image = load_image("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/ip_adapter_einstein_base.png")
 
 parser=argparse.ArgumentParser()
 
@@ -55,11 +59,20 @@ def main(args):
     
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
 
+    
+
+    pipeline.transformer=replace_ip_attn(pipeline.transformer,256,512,128,4,True)
+    image2 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[image],device=accelerator.device,dtype=torch.bfloat16).images[0]
+
+    pipeline.transformer=replace_ip_attn(pipeline.transformer,256,512,128,4,True,deep_to_ip_layers=True)
+    image3 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[image],device=accelerator.device,dtype=torch.bfloat16).images[0]
+
     accelerator.log({
         "image1":wandb.Image(image1),
-        "image0":wandb.Image(image0)
-    })
-    
+        "image0":wandb.Image(image0),
+        "image2":wandb.Image(image2),
+        "image3":wandb.Image(image3),
+    })    
 
 
 

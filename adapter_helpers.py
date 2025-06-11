@@ -3,7 +3,8 @@ from diffusers.models.attention import Attention
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from diffusers import UNet2DConditionModel
 import torch
-from typing import List
+from typing import List,Union
+from diffusers import SanaTransformer2DModel
 
 class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module):
     def __init__(self, multi_ip_adapter:MultiIPAdapterImageProjection,
@@ -34,7 +35,7 @@ def get_modules_of_types(model, target_classes):
     return [(name, module) for name, module in model.named_modules()
             if isinstance(module, target_classes)]
 
-def replace_ip_attn(unet:UNet2DConditionModel
+def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2DModel]
                     ,embedding_dim:int,
                     intermediate_embedding_dim:int,
                     cross_attention_dim:int
@@ -42,7 +43,7 @@ def replace_ip_attn(unet:UNet2DConditionModel
                     ,use_projection:bool=True
                     ,use_identity:bool=False,
                     deep_to_ip_layers:bool=False):
-    layers=get_modules_of_types(unet,IPAdapterAttnProcessor2_0)
+    layers=get_modules_of_types(denoising_model,IPAdapterAttnProcessor2_0)
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
         if deep_to_ip_layers:
@@ -54,7 +55,7 @@ def replace_ip_attn(unet:UNet2DConditionModel
             ])
         else:
             new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
-        new_k_ip.to(unet.device)
+        new_k_ip.to(denoising_model.device)
         setattr(module, "to_k_ip",new_k_ip)
 
         if deep_to_ip_layers:
@@ -66,21 +67,21 @@ def replace_ip_attn(unet:UNet2DConditionModel
             ])
         else:
             new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
-        new_v_ip.to(unet.device)
+        new_v_ip.to(denoising_model.device)
         setattr(module, "to_v_ip",new_v_ip)
 
     if use_identity:
         multi_ip_adapter=MultiIPAdapterIdentity(num_image_text_embeds)
     else:
 
-        multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=unet.device)
+        multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=denoising_model.device)
         #unet.add_module("encoder_hid_proj",multi_ip_adapter)
         if use_projection:
             #unet.encoder_hid_proj=multi_ip_adapter
-            multi_ip_adapter=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,unet.device)
-    unet.encoder_hid_proj= multi_ip_adapter.to(unet.device,unet.dtype)
-    unet.add_module("encoder_hid_proj",multi_ip_adapter)
+            multi_ip_adapter=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,denoising_model.device)
+    denoising_model.encoder_hid_proj= multi_ip_adapter.to(denoising_model.device,denoising_model.dtype)
+    denoising_model.add_module("encoder_hid_proj",multi_ip_adapter)
     #unet.encoder_hid_proj.to(unet.device)
 
 
-    return unet
+    return denoising_model

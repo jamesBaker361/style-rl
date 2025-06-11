@@ -50,19 +50,12 @@ def set_ip_adapter_attn(attn2:Attention,
     attn2.set_processor(ip_adapter_processor)
     return attn2
 
-def recursively_prepare_ip_adapter(model:torch.nn.Module,
+def prepare_ip_adapter(model:SanaTransformer2DModel,
                    device,
                    dtype,
                    ip_cross_attention_dim:int):
-    print(type(model))
-    if hasattr(model,"attn2"):
-        print("has it???")
-        model.attn2=set_ip_adapter_attn(model.attn2,
-            device,dtype,ip_cross_attention_dim)
-    else:
-        if type(model)==SanaTransformer2DModel:
-            for block in model.transformer_blocks:
-                recursively_prepare_ip_adapter(block,device,ip_cross_attention_dim)
+    for block in model.transformer_blocks:
+        block.attn2=set_ip_adapter_attn(block.attn2,device,dtype,ip_cross_attention_dim)
 
 
 

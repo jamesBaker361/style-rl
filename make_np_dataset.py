@@ -100,7 +100,7 @@ def main(args):
                                                 num_images_per_prompt=1,
                                                 #pipeline.do_classifier_free_guidance,
                                                 #negative_prompt=None,
-                                                prompt_embeds=None,
+                                                #prompt_embeds=None,
                                                 #negative_prompt_embeds=None,
                                                 #lora_scale=lora_scale,
                                         )

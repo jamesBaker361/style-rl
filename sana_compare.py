@@ -53,7 +53,7 @@ def main(args):
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''
     
-    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim))).images[0]
+    image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
 
     accelerator.log({
         "image1":wandb.Image(image1),

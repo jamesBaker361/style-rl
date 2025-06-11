@@ -6,6 +6,7 @@ from typing import Union
 def public_encode(vae:Union[AutoencoderKL,AutoencoderDC],x: torch.Tensor) -> torch.Tensor:
     
     batch_size, num_channels, height, width = x.shape
+    print(type(vae))
     if type(vae)==AutoencoderKL:
         if vae.use_tiling and (width > vae.tile_sample_min_size or height > vae.tile_sample_min_size):
             return public_tiled_encode(vae,x)

@@ -72,6 +72,8 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
 
     if use_identity:
         multi_ip_adapter=MultiIPAdapterIdentity(num_image_text_embeds)
+        if num_image_text_embeds*cross_attention_dim!=intermediate_embedding_dim:
+            print(f"num_image_text_embeds({num_image_text_embeds}(*cross_attention_dim ({cross_attention_dim})!=intermediate_embedding_dim {intermediate_embedding_dim}")
     else:
 
         multi_ip_adapter=MultiIPAdapterImageProjection([ImageProjection(intermediate_embedding_dim,cross_attention_dim,num_image_text_embeds)]).to(device=denoising_model.device)

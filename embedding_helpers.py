@@ -47,17 +47,17 @@ class EmbeddingUtil():
             self.dino_vit_extractor.model.requires_grad_(False)
         elif embedding=="ssl":
             self.ssl_processor = CustomProcessor(image_mean=[0.485,0.456,0.406],image_std=[0.229,0.224,0.225])
-            self.ssl_model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224')
+            self.ssl_model = Dinov2Model.from_pretrained('facebook/webssl-dino1b-full2b-224').to(device,torch_dtype)
             self.ssl_model.to(device,torch_dtype)
             self.ssl_model.requires_grad_(False)
         elif embedding=="siglip2":
-            self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224")
+            self.siglip_model = SiglipModel.from_pretrained("google/siglip2-base-patch16-224").to(device,torch_dtype)
             self.siglip_processor = CustomProcessor(image_mean=[0.5,0.5,0.5],image_std=[0.5,0.5,0.5])
             #SiglipProcessor.image_processor=SiglipImageProcessorFast.from_pretrained("google/siglip2-base-patch16-224",do_convert_rgb=False,device=torch.cuda.get_device_name(device))
             self.siglip_model.to(device,torch_dtype)
             self.siglip_model.requires_grad_(False)
         elif embedding=="clip":
-            self.clip_model=CLIPVisionModel.from_pretrained("openai/clip-vit-base-patch32")
+            self.clip_model=CLIPVisionModel.from_pretrained("openai/clip-vit-base-patch32").to(device,torch_dtype)
             self.clip_processor=CustomProcessor(image_mean=[0.48145466,0.4578275,0.40821073],
                                                 image_std=[0.26862954,0.26130258,0.27577711])
             self.clip_model.to(device,torch_dtype)

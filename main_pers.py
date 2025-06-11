@@ -555,12 +555,15 @@ def main(args):
                 text_batch=text_batch.unsqueeze(0)
                 embeds_batch=embeds_batch.unsqueeze(0)
             batch_size=image_batch.size()[0]
+            image_embeds=embeds_batch #.unsqueeze(0)
             do_denormalize= [True] * batch_size
             if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
                 batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1)).to(text_batch.device)
+                negative_image_embeds=torch.zeros(image_embeds.size())
+                image_embeds=torch.cat([negative_image_embeds,image_embeds],dim=0)
             else:
                 batched_negative_prompt_embeds=None
-            image_embeds=embeds_batch #.unsqueeze(0)
+            
             if b==0:
                 print("unet",pipeline.unet.device,"time embedding linear 1",pipeline.unet.time_embedding.linear_1.weight.device, )
                 

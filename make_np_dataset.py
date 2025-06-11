@@ -15,6 +15,7 @@ from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
+from sana_pipelines import CompatibleSanaSprintPipeline
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
@@ -32,6 +33,7 @@ parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--text_embedding",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--mixed_precision",type=str,default="fp16")
+parser.add_argument("--pipeline",type=str,default="sana",help="sana or lcm")
 
 def main(args):
     random.seed(42)
@@ -72,7 +74,10 @@ def main(args):
             except:
                 existing=False
 
-            pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            if args.pipeline=="lcm":
+                pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
+            else:
+                pipeline=CompatibleSanaSprintPipeline.from_pretrained("Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",device=accelerator.device)
             pipeline=pipeline.to(accelerator.device)
             pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)
             pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)

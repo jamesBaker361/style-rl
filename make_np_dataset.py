@@ -95,10 +95,10 @@ def main(args):
                 prompt=row["text"]
                 
                 encoded_text, _ = pipeline.encode_prompt(
-                                                text,
-                                                accelerator.device,
-                                                1,
-                                                pipeline.do_classifier_free_guidance,
+                                                prompt=text,
+                                                device=accelerator.device,
+                                                num_images_per_prompt=1,
+                                                #pipeline.do_classifier_free_guidance,
                                                 #negative_prompt=None,
                                                 prompt_embeds=None,
                                                 #negative_prompt_embeds=None,

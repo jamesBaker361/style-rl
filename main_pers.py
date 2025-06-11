@@ -682,10 +682,10 @@ def main(args):
 
             for k,v in batch.items():
                 if type(v)==torch.Tensor:
-                    if args.vanilla:
-                        batch[k]=v.to(device,torch_dtype)
                     if args.deepspeed:
                         batch[k]=v.to(torch_dtype)
+                    else:
+                        batch[k]=v.to(device,torch_dtype)
                 
             image_batch=batch["image"]
             text_batch=batch["text"]
@@ -695,6 +695,7 @@ def main(args):
             if e==start_epoch and b==0:
                 print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
                 print("text device",text_batch.device,"embedding device",embeds_batch.device,"img device",image_batch.device,"latent device",posterior_batch.device)
+                print("text ",text_batch.dtype,"embedding ",embeds_batch.dtype,"img ",image_batch.dtype,"latent ",posterior_batch.dtype)
             image_embeds=embeds_batch #.to(device) #.unsqueeze(1)
             #print('image_embeds',image_embeds.requires_grad,image_embeds.size())
             prompt=text_batch

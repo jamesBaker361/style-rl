@@ -1,4 +1,4 @@
-for training_type in ["denoise"]:
+for training_type in ["denoise","reward"]:
     for prediction_type in ["epsilon","v_prediction"]:
         for embedding in ["dino","ssl","siglip2","clip"]:
             if prediction_type=="epsilon" and training_type=="reward":

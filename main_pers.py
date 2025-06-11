@@ -204,6 +204,12 @@ def main(args):
         pipeline.load_lora_weights(adapter_id)
         pipeline.fuse_lora()
 
+    try:
+        pipeline.safety_checker=None
+    except Exception as err:
+        accelerator.print("tried to set safety checker to None",err)
+
+
     accelerator.print(pipeline.scheduler)
     scheduler_class={
             "LCMScheduler":LCMScheduler,
@@ -897,6 +903,10 @@ def main(args):
         baseline_pipeline.load_lora_weights(adapter_id)
         baseline_pipeline.fuse_lora()
     baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    try:
+        baseline_pipeline.safety_checker=None
+    except Exception as err:
+        accelerator.print("tried to set safety checker to None",err)
     b_unet=baseline_pipeline.unet.to(device)
     b_text_encoder=baseline_pipeline.text_encoder.to(device)
     b_vae=baseline_pipeline.vae.to(device)

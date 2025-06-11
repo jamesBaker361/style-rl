@@ -95,7 +95,6 @@ parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
-parser.add_argument("--data_dir",type=str,default="data_dir")
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=1)
 parser.add_argument("--epochs",type=int,default=10)
@@ -178,21 +177,15 @@ def main(args):
         raw_data=load_dataset(args.dataset,split="train",download_mode="force_redownload")
     WEIGHTS_NAME="unet_model.bin"
     CONFIG_NAME="config.json"
-    LR_SCHEDULER_NAME=""
     save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
     save_path=os.path.join(save_dir,WEIGHTS_NAME)
     config_path=os.path.join(save_dir,CONFIG_NAME)
     if accelerator.is_main_process:
-        os.makedirs(args.data_dir,exist_ok=True)
         os.makedirs(save_dir,exist_ok=True)
     
 
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
-    
-    '''if args.load:
-        try:
-            pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained()'''
 
     adapter_id = "latent-consistency/lcm-lora-sdv1-5"
     if args.pipeline=="lcm":
@@ -232,10 +225,7 @@ def main(args):
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     accelerator.print(pipeline.scheduler)
     pipeline.unet.encoder_hid_proj=None
-    '''vae.to(device,torch_dtype)
-    unet.to(device,torch_dtype)
-    text_encoder.to(device,torch_dtype)
-    scheduler.to(device,torch_dtype)'''
+
     #pipeline.requires_grad_(False)
     embedding_list=[]
     text_list=[]
@@ -243,18 +233,7 @@ def main(args):
     posterior_list=[]
     prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
-    '''if accelerator.is_main_process:
-        random.shuffle(shuffled_row_list)
-    else:
-        shuffled_row_list = None
-    accelerator.wait_for_everyone()
-    # Broadcast to all processes
-    shuffled_row_list = accelerate.utils.broadcast_object_list([shuffled_row_list])[0]'''
-    composition=transforms.Compose([
-            transforms.Resize((args.image_size,args.image_size)),
-             transforms.ToTensor(),
-                transforms.Normalize([0.5], [0.5]),
-        ])
+
     with torch.no_grad():
         for i,row in enumerate(shuffled_row_list):
             if i==args.limit:
@@ -432,11 +411,6 @@ def main(args):
     accelerator.print('train/test/val',ratios)
     #batched_embedding_list= embedding_list #make_batches_same_size(embedding_list,args.batch_size)
     embedding_list,test_embedding_list,val_embedding_list=split_list_by_ratio(embedding_list,ratios)
-
-    
-    #image_list= image_list #make_batches_same_size(image_list,args.batch_size)
-    #text_list= text_list #[text_list[i:i + args.batch_size] for i in range(0, len(text_list), args.batch_size)]
-
     
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
     text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
@@ -481,10 +455,6 @@ def main(args):
 
     accelerator.print("train batch",type(train_batch))
     accelerator.print("val batch",type(val_batch))
-    '''for name, param in unet.named_parameters():
-        if param.requires_grad:
-            print(f"{name} is trainable shape {tuple(param.shape)}")'''
-
 
     params=[p for p in denoising_model.parameters() if p.requires_grad]
 
@@ -656,23 +626,12 @@ def main(args):
         print("fid elapsed ",end-start)
         if auto_log:
             accelerator.log(metrics)
-        '''if args.training_type!="reward":
-            pipeline.vae=pipeline.vae.to("cpu")'''
         if args.pipeline=="lcm_post_lora":
             pipeline.unfuse_lora()
         return metrics
 
     training_start=time.time()
     
-    '''for submodule in unet.modules():
-    # Get the first parameter or buffer, if any
-        try:
-            p_device = next(submodule.parameters(), None)
-            if p_device is None:
-                p_device = next(submodule.buffers(), None)
-            print(type(submodule), p_device.device if p_device is not None else "no device (no params/buffers)")
-        except Exception as e:
-            print(type(submodule), "Error:", e)'''
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
         if e==args.reward_switch_epoch:
@@ -711,9 +670,7 @@ def main(args):
                     latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     latents = latents * vae.config.scaling_factor
 
-                    #latents=latents.to(device,torch_dtype)
 
-                    #print('latents',latents.requires_grad,latents.size())
 
                     # Sample noise that we'll add to the latents
                     noise = torch.randn_like(latents)
@@ -740,17 +697,9 @@ def main(args):
                     
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
-                    # Predict the noise residual and compute loss
-                    #print("latents",latents.size())
-                    #print("t",timesteps.size())
-                    #print("prompt_embeds",encoder_hidden_states.size())
-                    #print("image embeds",image_embeds.size(),image_embeds.device)
-                    
-                    #print('unet.encoder_hid_proj.device',unet.encoder_hid_proj.image_projection_layers[0].device)
+
                     if args.vanilla:
                         with accelerator.autocast():
-                            #print("noisy latents",noisy_latents.device,"timesteps",timesteps.device,"encoder states",encoder_hidden_states.device,"image_embeds",image_embeds.device)
-                            #print("noisy latents",noisy_latents.dtype,"timesteps",timesteps.dtype,"encoder states",encoder_hidden_states.dtype,"image_embeds",image_embeds.dtype)
                             model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
                             loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     else:
@@ -797,7 +746,7 @@ def main(args):
                                                             num_inference_steps=args.num_inference_steps, 
                                                             ip_adapter_image_embeds=[image_embeds],output_type="latent",truncated_backprop=False,reward_training=True,
                                                             height=args.image_size,width=args.image_size).images
-                                #print("reward max, min",images.max(),images.min())
+
                     else:
                         images=pipeline.call_with_grad(prompt_embeds=text_batch, 
                                                         #latents=latents, 
@@ -963,11 +912,6 @@ def main(args):
                 accelerator.log({key:value})
     accelerator.log({"finished":True})
         
-
-                
-
-    
-
 
 if __name__=='__main__':
     print_details()

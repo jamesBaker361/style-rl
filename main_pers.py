@@ -659,7 +659,7 @@ def main(args):
             print(type(submodule), "Error:", e)'''
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
-        if e==args.reward_with_epoch:
+        if e==args.reward_switch_epoch:
             args.training_type="reward"
         before_objects=find_cuda_objects()
         start=time.time()

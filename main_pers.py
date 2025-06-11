@@ -545,15 +545,16 @@ def main(args):
         pipeline=pipeline.to(accelerator.device)
         pipeline.vae=pipeline.vae.to(accelerator.device)
         pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
-        pipeline.unet.time_embedding=pipeline.unet.time_embedding.to(accelerator.device)
-        pipeline.unet.time_embedding.linear_1.weight=pipeline.unet.time_embedding.linear_1.weight.to(accelerator.device)
-        pipeline.unet.time_embedding.linear_1.bias=pipeline.unet.time_embedding.linear_1.bias.to(accelerator.device)
+        if hasattr(pipeline,"unet"):
+            pipeline.unet.time_embedding=pipeline.unet.time_embedding.to(accelerator.device)
+            pipeline.unet.time_embedding.linear_1.weight=pipeline.unet.time_embedding.linear_1.weight.to(accelerator.device)
+            pipeline.unet.time_embedding.linear_1.bias=pipeline.unet.time_embedding.linear_1.bias.to(accelerator.device)
 
-        pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.linear_2.weight.to(accelerator.device)
-        pipeline.unet.time_embedding.linear_2.bias=pipeline.unet.time_embedding.linear_2.bias.to(accelerator.device)
+            pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.linear_2.weight.to(accelerator.device)
+            pipeline.unet.time_embedding.linear_2.bias=pipeline.unet.time_embedding.linear_2.bias.to(accelerator.device)
 
-        if getattr(pipeline.unet.time_embedding, "cond_proj",None) is not None:
-            pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.cond_proj.weight=pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.cond_proj.weight.to(accelerator.device)
+            if getattr(pipeline.unet.time_embedding, "cond_proj",None) is not None:
+                pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.cond_proj.weight=pipeline.unet.time_embedding.linear_2.weight=pipeline.unet.time_embedding.cond_proj.weight.to(accelerator.device)
         
         for b,batch in enumerate(data_loader):
             

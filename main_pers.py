@@ -407,9 +407,9 @@ def main(args):
         layer.requires_grad_(True)
 
 
-    accelerator.print("before ",pipeline.unet.config.sample_size)
-    pipeline.unet.config.sample_size=args.image_size // pipeline.vae_scale_factor
-    accelerator.print("after", pipeline.unet.config.sample_size)
+    accelerator.print("before ",denoising_model.config.sample_size)
+    denoising_model.config.sample_size=args.image_size // pipeline.vae_scale_factor
+    accelerator.print("after", denoising_model.config.sample_size)
     
     ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)
     accelerator.print('train/test/val',ratios)

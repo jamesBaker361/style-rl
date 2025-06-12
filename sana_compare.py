@@ -24,7 +24,7 @@ parser.add_argument("--project_name",type=str,default="compare")
 
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
-    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+    #accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     with accelerator.autocast():
         generator=torch.Generator(accelerator.device)
         generator.manual_seed(123)
@@ -113,12 +113,12 @@ def main(args):
         
         image3 = pipeline(prompt=prompt, num_inference_steps=2,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
 
-        accelerator.log({
+        '''accelerator.log({
             "image1":wandb.Image(image1),
             "image0":wandb.Image(image0),
         # "image2":wandb.Image(image2),
             "image3":wandb.Image(image3),
-        })
+        })'''
 
 
 

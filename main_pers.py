@@ -460,7 +460,7 @@ def main(args):
     accelerator.print("train batch",type(train_batch))
     accelerator.print("val batch",type(val_batch))
 
-    params=[p for p in denoising_model.parameters() if p.requires_grad]
+    params=list(set([p for p in denoising_model.parameters() if p.requires_grad]+[p for p in denoising_model.encoder_hid_proj.parameters() if p.requires_grad]))
 
     accelerator.print("trainable params: ",len(params))
     for i in range(accelerator.num_processes):

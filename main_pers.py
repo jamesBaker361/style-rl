@@ -192,6 +192,8 @@ def main(args):
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
     elif args.pipeline=="lcm_post_lora":
         pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline.load_lora_weights(adapter_id)
+        pipeline.disable_lora()
     elif args.pipeline=="lcm_pre_lora":
         pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
         
@@ -510,8 +512,7 @@ def main(args):
 
         if args.pipeline=="lcm_post_lora":
             pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
-            pipeline.load_lora_weights(adapter_id)
-            pipeline.fuse_lora()
+            pipeline.enable_lora()
         pipeline=pipeline.to(accelerator.device)
         pipeline.vae=pipeline.vae.to(accelerator.device)
         pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device)
@@ -627,7 +628,7 @@ def main(args):
         if auto_log:
             accelerator.log(metrics)
         if args.pipeline=="lcm_post_lora":
-            pipeline.unfuse_lora()
+            pipeline.disable_lora()
         return metrics
 
     training_start=time.time()

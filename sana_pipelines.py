@@ -389,7 +389,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
 
-        device = self._execution_device
+        device = self.transformer.device
         lora_scale = self.attention_kwargs.get("scale", None) if self.attention_kwargs is not None else None
 
         # 3. Encode input prompt

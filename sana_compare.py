@@ -57,7 +57,7 @@ def main(args):
 
     prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.bfloat16,ip_cross_attention_dim)
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
-    encoder_hid_proj=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
+    encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,512,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
     pipeline.set_encoder_hid_proj(encoder_hid_proj)
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))

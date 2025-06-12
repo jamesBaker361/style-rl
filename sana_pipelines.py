@@ -378,6 +378,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         ],
         ip_adapter_image: Optional[PipelineImageInput] = None,
         ip_adapter_image_embeds: Optional[List[torch.Tensor]] = None,
+        negative_prompt_embeds=None, #the negatives are onl here for compatibilty
+        negative_prompt=None
     ) -> Union[SanaPipelineOutput, Tuple]:
         
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
@@ -607,6 +609,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         ],
         ip_adapter_image: Optional[PipelineImageInput] = None,
         ip_adapter_image_embeds: Optional[List[torch.Tensor]] = None,
+        negative_prompt_embeds=None, #the negatives are onl here for compatibilty
+        negative_prompt=None
     ) -> Union[SanaPipelineOutput, Tuple]:
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
             callback_on_step_end_tensor_inputs = callback_on_step_end.tensor_inputs

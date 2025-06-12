@@ -459,7 +459,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         timesteps = timesteps[:-1]
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
         self._num_timesteps = len(timesteps)
-
+        encoder_hid_proj=getattr(self,"encoder_hid_proj",None)
         transformer_dtype = self.transformer.dtype
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
@@ -488,7 +488,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     return_dict=False,
                     attention_kwargs=self.attention_kwargs,
                     added_cond_kwargs=added_cond_kwargs,
-                    encoder_hid_proj=self.encoder_hid_proj
+                    encoder_hid_proj=encoder_hid_proj
                 )[0]
 
                 noise_pred = (

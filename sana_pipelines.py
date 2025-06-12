@@ -257,9 +257,9 @@ def compatible_forward_sana_transformer_model(
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
-    def __init__(self, *args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.encoder_hid_proj=None
+    def set_encoder_hid_proj(self,encoder_hid_proj):
+        self.encoder_hid_proj=encoder_hid_proj
+        self.register_modules(encoder_hid_proj=encoder_hid_proj)
 
     def prepare_ip_adapter_image_embeds(
         self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance

@@ -81,6 +81,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
         if use_projection:
             #unet.encoder_hid_proj=multi_ip_adapter
             multi_ip_adapter=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,denoising_model.device)
+    setattr(denoising_model,"encoder_hid_proj",multi_ip_adapter.to(denoising_model.device,denoising_model.dtype))
     denoising_model.encoder_hid_proj= multi_ip_adapter.to(denoising_model.device,denoising_model.dtype)
     denoising_model.add_module("encoder_hid_proj",multi_ip_adapter)
     #unet.encoder_hid_proj.to(unet.device)

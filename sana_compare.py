@@ -53,6 +53,7 @@ def main(args):
     ip_cross_attention_dim=256
     embedding_dim=512
     
+    
     prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.bfloat16,ip_cross_attention_dim)
     encoder_hid_proj=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
     pipeline.set_encoder_hid_proj(encoder_hid_proj)

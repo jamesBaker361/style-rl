@@ -123,6 +123,8 @@ parser.add_argument("--identity_adapter",action="store_true",help="whether to us
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
 parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
 parser.add_argument("--reward_switch_epoch",type=int,default=-1)
+parser.add_argument("--initial_scale",type=float,default=1.0)
+parser.add_argument("--final_scale",type=float,default=1.0)
 
 import torch
 import torch.nn.functional as F
@@ -635,6 +637,9 @@ def main(args):
     
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
+        scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
+        accelerator.print("scale",e)
+        pipeline.set_ip_adapter_scale(scale)
         if e==args.reward_switch_epoch:
             args.training_type="reward"
         before_objects=find_cuda_objects()

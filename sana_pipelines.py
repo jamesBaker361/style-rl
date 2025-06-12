@@ -329,7 +329,11 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         Set IP-Adapter scales 
         """
         transformer = getattr(self, self.transformer_name) if not hasattr(self, "transformer") else self.transformer
-        
+        for block in transformer.transformer_blocks:
+            attn2=getattr(block, "attn2",None)
+            if attn2 is not None and  isinstance(
+                attn2, (IPAdapterAttnProcessor, IPAdapterAttnProcessor2_0, IPAdapterXFormersAttnProcessor)) :
+                attn2.scale=scale
 
     
 

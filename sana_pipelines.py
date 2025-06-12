@@ -486,7 +486,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     timestep=scm_timestep,
                     return_dict=False,
                     attention_kwargs=self.attention_kwargs,
-                    added_cond_kwargs=added_cond_kwargs
+                    added_cond_kwargs=added_cond_kwargs,
+                    encoder_hid_proj=self.encoder_hid_proj
                 )[0]
 
                 noise_pred = (

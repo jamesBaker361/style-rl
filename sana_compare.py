@@ -78,9 +78,8 @@ def main(args):
 
         attn_layer_list=[(name,p )  for (name,p ) in get_modules_of_types(pipeline.transformer,IPAdapterAttnProcessor2_0)]+[encoder_hid_proj]
         accelerator.print("len attn_layers",len(attn_layer_list))
-        for (name,layer) in attn_layer_list:
+        for layer in attn_layer_list:
             layer.requires_grad_(True)
-            print(name)
 
         
         print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)

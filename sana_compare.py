@@ -31,7 +31,7 @@ def main(args):
 
         pipeline = SanaSprintPipeline.from_pretrained(
         "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
-        torch_dtype=torch.float16
+        #torch_dtype=torch.float16
         )
         pipeline.enable_vae_tiling()
         pipeline.to(accelerator.device)
@@ -46,7 +46,7 @@ def main(args):
 
         pipeline = CompatibleSanaSprintPipeline.from_pretrained(
         "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
-        torch_dtype=torch.float16
+        #torch_dtype=torch.float16
         )
         pipeline.enable_vae_tiling()
         pipeline.to(accelerator.device)
@@ -60,7 +60,9 @@ def main(args):
         
         print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
 
-        prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.float16,ip_cross_attention_dim)
+        prepare_ip_adapter(pipeline.transformer,accelerator.device,
+                           #torch.float16,
+                           ip_cross_attention_dim)
         print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
         encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
         print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
@@ -69,7 +71,9 @@ def main(args):
         '''for block in pipeline.transformer.transformer_blocks:
             print(block.attn2.processor)'''
         #embeds.shape = [N_a,B,N_i,D] N_a= # of adapters, N_i = images per image prompt, D =dimension of embedding
-        image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
+        image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,
+                                                                                                                                             #dtype=torch.float16
+                                                                                                                                             )]).images[0]
 
         print("b4",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
 
@@ -89,8 +93,12 @@ def main(args):
         print(named_params)
         optimizer=torch.optim.AdamW(params)
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
-        output=pipeline.call_with_grad(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
-        target=torch.zeros(output.size(),device=accelerator.device,dtype=torch.float16)
+        output=pipeline.call_with_grad(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,
+                                                                                                                                                          #dtype=torch.float16
+                                                                                                                                                          )]).images[0]
+        target=torch.zeros(output.size(),device=accelerator.device,
+                           #dtype=torch.float16
+                           )
 
         loss=F.mse_loss(output,target)
         accelerator.backward(loss)
@@ -107,11 +115,17 @@ def main(args):
         )
         pipeline.enable_vae_tiling()
         pipeline.to(accelerator.device)
-        prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.float16,ip_cross_attention_dim)
+        prepare_ip_adapter(pipeline.transformer,accelerator.device,
+                           #torch.float16,
+                           ip_cross_attention_dim)
         encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,deep_to_ip_layers=True,return_encoder_hid_proj=True)
-        pipeline.set_encoder_hid_proj(encoder_hid_proj.to(device=accelerator.device,dtype=torch.float16))
+        pipeline.set_encoder_hid_proj(encoder_hid_proj.to(device=accelerator.device,
+                                                          #dtype=torch.float16
+                                                          ))
         
-        image3 = pipeline(prompt=prompt, num_inference_steps=2,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
+        image3 = pipeline(prompt=prompt, num_inference_steps=2,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,
+                                                                                                                         #dtype=torch.float16
+                                                                                                                         )]).images[0]
 
         '''accelerator.log({
             "image1":wandb.Image(image1),

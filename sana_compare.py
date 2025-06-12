@@ -86,7 +86,7 @@ def main(args):
             "image0":wandb.Image(image0),
         # "image2":wandb.Image(image2),
             "image3":wandb.Image(image3),
-        })    
+        })
 
 
 

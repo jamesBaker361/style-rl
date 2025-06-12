@@ -39,6 +39,18 @@ from diffusers.utils import (
     unscale_lora_layers,
 )
 from diffusers.models.normalization import FP32LayerNorm,RMSNorm,LpNorm
+from diffusers.models.attention_processor import (
+    AttnProcessor,
+    AttnProcessor2_0,
+    FluxAttnProcessor2_0,
+    FluxIPAdapterJointAttnProcessor2_0,
+    IPAdapterAttnProcessor,
+    IPAdapterAttnProcessor2_0,
+    IPAdapterXFormersAttnProcessor,
+    JointAttnProcessor2_0,
+    SD3IPAdapterJointAttnProcessor2_0,
+)
+
 
 
 def set_ip_adapter_attn(attn2:Attention,
@@ -310,6 +322,14 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             ip_adapter_image_embeds.append(single_image_embeds)
 
         return ip_adapter_image_embeds
+    
+
+    def set_ip_adapter_scale(self, scale):
+        """
+        Set IP-Adapter scales 
+        """
+        transformer = getattr(self, self.transformer_name) if not hasattr(self, "transformer") else self.transformer
+        
 
     
 

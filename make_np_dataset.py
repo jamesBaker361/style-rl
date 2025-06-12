@@ -94,15 +94,13 @@ def main(args):
                 text=row["text"]
                 prompt=row["text"]
                 
+                
+                
+                
                 encoded_text, _ = pipeline.encode_prompt(
                                                 prompt=text,
                                                 device=accelerator.device,
                                                 num_images_per_prompt=1,
-                                                #pipeline.do_classifier_free_guidance,
-                                                #negative_prompt=None,
-                                                #prompt_embeds=None,
-                                                #negative_prompt_embeds=None,
-                                                #lora_scale=lora_scale,
                                         )
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
                 new_dataset["image"].append(image)

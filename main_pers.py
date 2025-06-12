@@ -868,10 +868,10 @@ def main(args):
         baseline_pipeline.safety_checker=None
     except Exception as err:
         accelerator.print("tried to set safety checker to None",err)
-    b_unet=baseline_pipeline.unet.to(device)
-    b_text_encoder=baseline_pipeline.text_encoder.to(device)
-    b_vae=baseline_pipeline.vae.to(device)
-    b_image_encoder=baseline_pipeline.image_encoder.to(device)
+    b_unet=baseline_pipeline.unet.to(device,torch_dtype)
+    b_text_encoder=baseline_pipeline.text_encoder.to(device,torch_dtype)
+    b_vae=baseline_pipeline.vae.to(device,torch_dtype)
+    b_image_encoder=baseline_pipeline.image_encoder.to(device,torch_dtype)
 
     b_unet,b_text_encoder,b_vae,b_image_encoder=accelerator.prepare(b_unet,b_text_encoder,b_vae,b_image_encoder)
     baseline_pipeline.unet=b_unet

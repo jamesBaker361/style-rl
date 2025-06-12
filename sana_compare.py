@@ -63,7 +63,7 @@ def main(args):
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''
-    
+    #embeds.shape = [N_a,B,N_i,D] N_a= # of adapters, N_i = images per image prompt, D =dimension of embedding
     image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.bfloat16)]).images[0]
 
     

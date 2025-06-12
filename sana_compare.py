@@ -51,8 +51,8 @@ def main(args):
         prompt = "a tiny astronaut hatching from an egg on the moon"
 
         image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256).images[0]
-        ip_cross_attention_dim=256
-        embedding_dim=512
+        ip_cross_attention_dim=16
+        embedding_dim=4
         intermediate_embedding_dim=8
         
         print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))

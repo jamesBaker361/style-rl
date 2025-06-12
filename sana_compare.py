@@ -104,6 +104,8 @@ def main(args):
         "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
         torch_dtype=torch.float16
         )
+        pipeline.enable_vae_tiling()
+        pipeline.to(accelerator.device)
         prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.float16,ip_cross_attention_dim)
         encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,deep_to_ip_layers=True,return_encoder_hid_proj=True)
         pipeline.set_encoder_hid_proj(encoder_hid_proj.to(device=accelerator.device,dtype=torch.float16))

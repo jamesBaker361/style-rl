@@ -42,7 +42,8 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
                     ,num_image_text_embeds:int
                     ,use_projection:bool=True
                     ,use_identity:bool=False,
-                    deep_to_ip_layers:bool=False):
+                    deep_to_ip_layers:bool=False,
+                    return_encoder_hid_proj:bool=False):
     layers=get_modules_of_types(denoising_model,IPAdapterAttnProcessor2_0)
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
@@ -81,10 +82,12 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
         if use_projection:
             #unet.encoder_hid_proj=multi_ip_adapter
             multi_ip_adapter=MultiIPAdapterImageProjectionWithVisualProjection(multi_ip_adapter,embedding_dim,intermediate_embedding_dim,denoising_model.device)
-    setattr(denoising_model,"encoder_hid_proj",multi_ip_adapter.to(denoising_model.device,denoising_model.dtype))
-    denoising_model.encoder_hid_proj= multi_ip_adapter.to(denoising_model.device,denoising_model.dtype)
+    multi_ip_adapter=multi_ip_adapter.to(denoising_model.device,denoising_model.dtype)
+    setattr(denoising_model,"encoder_hid_proj",multi_ip_adapter)
+    denoising_model.encoder_hid_proj= multi_ip_adapter
     denoising_model.add_module("encoder_hid_proj",multi_ip_adapter)
     #unet.encoder_hid_proj.to(unet.device)
-
+    if return_encoder_hid_proj:
+        return multi_ip_adapter
 
     return denoising_model

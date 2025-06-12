@@ -53,10 +53,14 @@ def main(args):
     ip_cross_attention_dim=256
     embedding_dim=512
     
-    
+    print("pipleine params",len([p for  name,p in pipeline.transformers.named_parameters()]))
+
     prepare_ip_adapter(pipeline.transformer,accelerator.device,torch.bfloat16,ip_cross_attention_dim)
+    print("pipleine params",len([p for  name,p in pipeline.transformers.named_parameters()]))
     encoder_hid_proj=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
+    print("pipleine params",len([p for  name,p in pipeline.transformers.named_parameters()]))
     pipeline.set_encoder_hid_proj(encoder_hid_proj)
+    print("pipleine params",len([p for  name,p in pipeline.transformers.named_parameters()]))
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''
     

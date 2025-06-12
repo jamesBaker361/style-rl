@@ -85,7 +85,7 @@ def main(args):
         print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
 
         params=[p for p in pipeline.transformer.parameters() if p.requires_grad]+[p for p in encoder_hid_proj.parameters() if p.requires_grad]
-        named_params=[n for (n,p) in pipeline.transformer.parameters() if p.requires_grad]+[n for (n,p) in encoder_hid_proj.parameters() if p.requires_grad]
+        named_params=[n for (n,p) in pipeline.transformer.named_parameters() if p.requires_grad]+[n for (n,p) in encoder_hid_proj.named_parameters() if p.requires_grad]
         print(named_params)
         optimizer=torch.optim.AdamW(params)
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)

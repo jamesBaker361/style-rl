@@ -66,7 +66,9 @@ def main(args):
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
     encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,return_encoder_hid_proj=True)
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
-    pipeline.set_encoder_hid_proj(encoder_hid_proj)
+    pipeline.set_encoder_hid_proj(encoder_hid_proj.to(device=accelerator.device,
+                                                        dtype=torch.float16
+                                                        ))
     print("pipleine params",len([p for  name,p in pipeline.transformer.named_parameters()]))
     '''for block in pipeline.transformer.transformer_blocks:
         print(block.attn2.processor)'''
@@ -120,7 +122,7 @@ def main(args):
                         ip_cross_attention_dim)
     encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,deep_to_ip_layers=True,return_encoder_hid_proj=True)
     pipeline.set_encoder_hid_proj(encoder_hid_proj.to(device=accelerator.device,
-                                                        #dtype=torch.float16
+                                                        dtype=torch.float16
                                                         ))
     
     image3 = pipeline(prompt=prompt, num_inference_steps=2,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,

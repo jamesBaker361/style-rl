@@ -8,7 +8,7 @@ from diffusers import SanaTransformer2DModel
 from diffusers.configuration_utils import ConfigMixin
 import json
 
-class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module,ConfigMixin):
+class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module):
     def __init__(self, multi_ip_adapter:MultiIPAdapterImageProjection,
                  embedding_dim:int, #embedding dim from the embedding model
                  intermediate_embedding_dim:int, #embedding dim that is NOT the cross attention dim or the result of the embedding model
@@ -26,6 +26,9 @@ class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module,ConfigMi
         config_dict={}
         config_dict["_class_name"] = self.__class__.__name__
         return json.dumps(config_dict, indent=2, sort_keys=True) + "\n"
+    
+    def __repr__(self):
+        return self.__class__.__name__
 
     
 class MultiIPAdapterIdentity(torch.nn.Module,ConfigMixin):

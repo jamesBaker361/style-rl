@@ -76,8 +76,7 @@ def main(args):
         for name,param in pipeline.transformer.named_parameters():
             param.requires_grad_(False)
 
-        attn_layer_list=[(name,p )  for (name,p ) in get_modules_of_types(pipeline.transformer,IPAdapterAttnProcessor2_0)]
-        attn_layer_list+=[(name,p) for name,p in encoder_hid_proj.named_parameters()]
+        attn_layer_list=[(name,p )  for (name,p ) in get_modules_of_types(pipeline.transformer,IPAdapterAttnProcessor2_0)]+[encoder_hid_proj]
         accelerator.print("len attn_layers",len(attn_layer_list))
         for (name,layer) in attn_layer_list:
             layer.requires_grad_(True)
@@ -86,7 +85,10 @@ def main(args):
         
         print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
 
-        optimizer=torch.optim.AdamW([p for _,p in  attn_layer_list])
+        params=[p for p in pipeline.transformer.parameters() if p.requires_grad]+[p for p in encoder_hid_proj.parameters() if p.requires_grad]
+        named_params=[n for (n,p) in pipeline.transformer.parameters() if p.requires_grad]+[n for (n,p) in encoder_hid_proj.parameters() if p.requires_grad]
+        print(named_params)
+        optimizer=torch.optim.AdamW(params)
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
         output=pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images
         target=torch.zeros(output.size())

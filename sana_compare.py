@@ -86,7 +86,7 @@ def main(args):
         
         print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
 
-        optimizer=torch.optim.AdamW(attn_layer_list)
+        optimizer=torch.optim.AdamW([p for _,p in  attn_layer_list])
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
         output=pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images
         target=torch.zeros(output.size())

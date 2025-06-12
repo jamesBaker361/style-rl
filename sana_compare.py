@@ -8,7 +8,9 @@ from diffusers import SanaSprintPipeline
 import torch
 import wandb
 from diffusers.utils import load_image
-from adapter_helpers import replace_ip_attn
+from adapter_helpers import replace_ip_attn,get_modules_of_types
+from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
+
 
 image = load_image("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/ip_adapter_einstein_base.png")
 
@@ -68,6 +70,20 @@ def main(args):
         #embeds.shape = [N_a,B,N_i,D] N_a= # of adapters, N_i = images per image prompt, D =dimension of embedding
         image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
 
+        print("b4",len(param.requires_grad for param in pipeline.transformer.parameters())  )# should be False)
+
+        for name,param in pipeline.transformer.named_parameters():
+            param.requires_grad_(False)
+
+        attn_layer_list=[(name,p )  for (name,p ) in get_modules_of_types(pipeline.transformer,IPAdapterAttnProcessor2_0)]
+        attn_layer_list+=[(name,p) for name,p in encoder_hid_proj.named_parameters()]
+        accelerator.print("len attn_layers",len(attn_layer_list))
+        for (name,layer) in attn_layer_list:
+            layer.requires_grad_(True)
+            print(name)
+
+        
+        print("after",len(param.requires_grad for param in pipeline.transformer.parameters())  )# should be False)
         
 
         #pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True)

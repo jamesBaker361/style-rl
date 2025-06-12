@@ -24,7 +24,7 @@ pipeline = SanaSprintPipeline.from_pretrained(
 pipeline = SanaSprintPipeline.from_pretrained(
     "Efficient-Large-Model/Sana_Sprint_1.6B_1024px_diffusers",
 )
-pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
+pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5",force_download=True)
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
 

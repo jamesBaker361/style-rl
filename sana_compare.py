@@ -89,7 +89,7 @@ def main(args):
         print(named_params)
         optimizer=torch.optim.AdamW(params)
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
-        output=pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images
+        output=pipeline.call_with_grad(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)],return_dict=False).images[0]
         target=torch.zeros(output.size())
 
         loss=F.mse_loss(output,target)

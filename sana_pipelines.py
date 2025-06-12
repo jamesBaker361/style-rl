@@ -114,15 +114,15 @@ def compatible_forward_sana_transformer_block(
         return hidden_states
 
 def compatible_process_hidden_states(
-        self:SanaTransformer2DModel, encoder_hidden_states: torch.Tensor, added_cond_kwargs: Dict[str, Any]
+        encoder_hid_proj:torch.nn.Module, encoder_hidden_states: torch.Tensor, added_cond_kwargs: Dict[str, Any]
     ) -> torch.Tensor:
-    if self.encoder_hid_proj is not None:
+    if encoder_hid_proj is not None:
         if "image_embeds" not in added_cond_kwargs:
                 raise ValueError(
-                    f"{self.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
+                    f"{encoder_hid_proj.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
                 )
         image_embeds = added_cond_kwargs.get("image_embeds")
-        image_embeds = self.encoder_hid_proj(image_embeds)
+        image_embeds = encoder_hid_proj(image_embeds)
         encoder_hidden_states = (encoder_hidden_states, image_embeds)
 
     return encoder_hidden_states
@@ -140,6 +140,7 @@ def compatible_forward_sana_transformer_model(
     added_cond_kwargs: Optional[Dict[str, torch.Tensor]] = {},
     controlnet_block_samples: Optional[Tuple[torch.Tensor]] = None,
     return_dict: bool = True,
+    encoder_hid_proj:torch.nn.Module=None,
 ) -> Union[Tuple[torch.Tensor, ...], Transformer2DModelOutput]:
     if attention_kwargs is not None:
         attention_kwargs = attention_kwargs.copy()
@@ -196,7 +197,7 @@ def compatible_forward_sana_transformer_model(
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
 
-    encoder_hidden_states=compatible_process_hidden_states(self,encoder_hidden_states,added_cond_kwargs)
+    encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
 
     # 2. Transformer blocks
     if torch.is_grad_enabled() and self.gradient_checkpointing:
@@ -255,6 +256,10 @@ def compatible_forward_sana_transformer_model(
 
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
+
+    def __init__(self, *args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.encoder_hid_proj=None
 
     def prepare_ip_adapter_image_embeds(
         self, ip_adapter_image, ip_adapter_image_embeds, device, num_images_per_prompt, do_classifier_free_guidance

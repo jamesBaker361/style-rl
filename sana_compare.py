@@ -10,6 +10,7 @@ import wandb
 from diffusers.utils import load_image
 from adapter_helpers import replace_ip_attn,get_modules_of_types
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
+from torch.nn import functional as F
 
 
 image = load_image("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/ip_adapter_einstein_base.png")
@@ -84,6 +85,17 @@ def main(args):
 
         
         print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
+
+        optimizer=torch.optim.AdamW(attn_layer_list)
+        optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
+        output=pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images
+        target=torch.zeros(output.size())
+
+        loss=F.mse_loss(output,target)
+        accelerator.backward(loss)
+
+        optimizer.step()
+        optimizer.zero_grad()
         
 
         #pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True)

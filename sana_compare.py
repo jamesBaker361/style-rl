@@ -90,7 +90,7 @@ def main(args):
         optimizer=torch.optim.AdamW(params)
         optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
         output=pipeline.call_with_grad(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
-        target=torch.zeros(output.size())
+        target=torch.zeros(output.size(),device=accelerator.device,dtype=torch.float16)
 
         loss=F.mse_loss(output,target)
         accelerator.backward(loss)

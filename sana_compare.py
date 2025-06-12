@@ -72,7 +72,10 @@ def main(args):
 
         #pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True)
         #image2 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=torch.zeros((1,1,ip_cross_attention_dim),device=accelerator.device,dtype=torch.bfloat16)).images[0]
-
+        pipeline = CompatibleSanaSprintPipeline.from_pretrained(
+        "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
+        torch_dtype=torch.float16
+        )
         encoder_hid_proj=replace_ip_attn(pipeline.transformer,embedding_dim,intermediate_embedding_dim,ip_cross_attention_dim,4,True,deep_to_ip_layers=True,return_encoder_hid_proj=True)
         pipeline.set_encoder_hid_proj(encoder_hid_proj)
         

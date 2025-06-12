@@ -70,7 +70,7 @@ def main(args):
         #embeds.shape = [N_a,B,N_i,D] N_a= # of adapters, N_i = images per image prompt, D =dimension of embedding
         image1 = pipeline(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)]).images[0]
 
-        print("b4",len(param.requires_grad for param in pipeline.transformer.parameters())  )# should be False)
+        print("b4",len([param.requires_grad for param in pipeline.transformer.parameters()])  )# should be False)
 
         for name,param in pipeline.transformer.named_parameters():
             param.requires_grad_(False)
@@ -83,7 +83,7 @@ def main(args):
             print(name)
 
         
-        print("after",len(param.requires_grad for param in pipeline.transformer.parameters())  )# should be False)
+        print("after",len([param.requires_grad for param in pipeline.transformer.parameters()])  )# should be False)
         
 
         #pipeline.transformer=replace_ip_attn(pipeline.transformer,ip_cross_attention_dim,512,ip_cross_attention_dim,4,True)

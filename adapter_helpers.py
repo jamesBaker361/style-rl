@@ -6,6 +6,7 @@ import torch
 from typing import List,Union
 from diffusers import SanaTransformer2DModel
 from diffusers.configuration_utils import ConfigMixin
+import json
 
 class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module,ConfigMixin):
     def __init__(self, multi_ip_adapter:MultiIPAdapterImageProjection,
@@ -20,6 +21,12 @@ class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module,ConfigMi
     def forward(self,  image_embeds: List[torch.Tensor]):
         image_embeds=[self.visual_projection(image) for image in image_embeds]
         return self.multi_ip_adapter(image_embeds)
+    
+    def to_json_string(self):
+        config_dict={}
+        config_dict["_class_name"] = self.__class__.__name__
+        return json.dumps(config_dict, indent=2, sort_keys=True) + "\n"
+
     
 class MultiIPAdapterIdentity(torch.nn.Module,ConfigMixin):
     def __init__(self,num_image_text_embeds:int, *args, **kwargs):

@@ -257,6 +257,10 @@ def compatible_forward_sana_transformer_model(
 
 class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
+    def __init__(self, tokenizer, text_encoder, vae, transformer, scheduler,encoder_hid_proj=None):
+        super().__init__(tokenizer, text_encoder, vae, transformer, scheduler)
+        self.encoder_hid_proj=encoder_hid_proj
+
     def set_encoder_hid_proj(self,encoder_hid_proj):
         self.encoder_hid_proj=encoder_hid_proj
         self.register_modules(encoder_hid_proj=encoder_hid_proj)

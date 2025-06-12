@@ -5,8 +5,9 @@ from diffusers import UNet2DConditionModel
 import torch
 from typing import List,Union
 from diffusers import SanaTransformer2DModel
+from diffusers.configuration_utils import ConfigMixin
 
-class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module):
+class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module,ConfigMixin):
     def __init__(self, multi_ip_adapter:MultiIPAdapterImageProjection,
                  embedding_dim:int, #embedding dim from the embedding model
                  intermediate_embedding_dim:int, #embedding dim that is NOT the cross attention dim or the result of the embedding model
@@ -20,7 +21,7 @@ class MultiIPAdapterImageProjectionWithVisualProjection(torch.nn.Module):
         image_embeds=[self.visual_projection(image) for image in image_embeds]
         return self.multi_ip_adapter(image_embeds)
     
-class MultiIPAdapterIdentity(torch.nn.Module):
+class MultiIPAdapterIdentity(torch.nn.Module,ConfigMixin):
     def __init__(self,num_image_text_embeds:int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.num_image_text_embeds=num_image_text_embeds

@@ -831,6 +831,7 @@ def main(args):
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, 
                                                         ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
+                                                        use_resolution_binning=False,
                                                         height=args.image_size,width=args.image_size).images
                             #print("reward max, min",images.max(),images.min())
                             loss=loss_fn(image_batch,images)
@@ -840,6 +841,7 @@ def main(args):
                                                         num_inference_steps=args.num_inference_steps,
                                                           ip_adapter_image_embeds=[image_embeds],output_type="pt",
                                                           truncated_backprop=False,fsdp=True,reward_training=True,
+                                                          use_resolution_binning=False,
                                                           height=args.image_size,width=args.image_size).images
                         loss=loss_fn(image_batch,images)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)

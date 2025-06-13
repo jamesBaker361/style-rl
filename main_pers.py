@@ -217,19 +217,25 @@ def main(args):
     scheduler_class={
             "LCMScheduler":LCMScheduler,
             "DDIMScheduler":DDIMScheduler,
-            "DEISMultistepScheduler":DEISMultistepScheduler
+            "DEISMultistepScheduler":DEISMultistepScheduler,
+            "CompatibleFlowMatchEulerDiscreteScheduler":CompatibleFlowMatchEulerDiscreteScheduler
     }[args.scheduler_type]
     pipeline.scheduler = scheduler_class.from_config(pipeline.scheduler.config)
     accelerator.print(pipeline.scheduler)
 
     vae=pipeline.vae
-    denoising_model=pipeline.unet
+    if args.pipeline=="sana":
+        denoising_model=pipeline.transformer
+    else:
+        denoising_model=pipeline.unet
+        pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+        accelerator.print(pipeline.scheduler)
+        pipeline.unet.encoder_hid_proj=None
     text_encoder=pipeline.text_encoder
     scheduler=pipeline.scheduler
     
-    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-    accelerator.print(pipeline.scheduler)
-    pipeline.unet.encoder_hid_proj=None
+
+    
 
     #pipeline.requires_grad_(False)
     embedding_list=[]

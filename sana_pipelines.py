@@ -530,6 +530,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 ) / torch.sqrt(scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2)
                 noise_pred = noise_pred.float() * self.scheduler.config.sigma_data
 
+                
+
                 # compute previous image: x_t -> x_t-1
                 latents, denoised = self.scheduler.step(
                     noise_pred, timestep, latents, **extra_step_kwargs, return_dict=False
@@ -773,6 +775,17 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         added_cond_kwargs=added_cond_kwargs,
                         encoder_hid_proj=encoder_hid_proj
                     )[0]
+
+                if truncated_backprop:
+                    if truncated_backprop_rand:
+                        rand_timestep = random.randint(
+                            truncated_rand_backprop_minmax[0], truncated_rand_backprop_minmax[1])
+                        if i < rand_timestep:
+                            noise_pred = noise_pred.detach()
+                else:
+                    # fixed truncation process
+                    if i < truncated_backprop_timestep:
+                        noise_pred = noise_pred.detach()
 
                 noise_pred = (
                     (1 - 2 * scm_timestep_expanded) * latent_model_input

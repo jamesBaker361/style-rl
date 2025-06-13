@@ -769,7 +769,7 @@ def main(args):
                                     
                             else:
                                 model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                        loss = F.mse_loss(model_pred, target, reduction="mean")
                         accelerator.backward(loss)
 
                         optimizer.step()

@@ -478,7 +478,8 @@ def main(args):
 
     optimizer=torch.optim.AdamW(params,lr=args.lr)
 
-    denoising_model=denoising_model.to(device,torch_dtype)
+    if args.vanilla:
+        denoising_model=denoising_model.to(device)
 
     #if args.training_type=="reward":
     vae=vae.to(denoising_model.device)
@@ -928,7 +929,6 @@ def main(args):
             baseline_pipeline.safety_checker=None
         except Exception as err:
             accelerator.print("tried to set safety checker to None",err)
-        baseline_pipeline.to(accelerator.device,torch_dtype)
         b_unet=baseline_pipeline.unet.to(device,torch_dtype)
         b_text_encoder=baseline_pipeline.text_encoder.to(device,torch_dtype)
         b_vae=baseline_pipeline.vae.to(device,torch_dtype)
@@ -985,4 +985,4 @@ if __name__=='__main__':
     seconds=end-start
     hours=seconds/(60*60)
     print(f"successful generating:) time elapsed: {seconds} seconds = {hours} hours")
-    print("all done!") 
+    print("all done!")

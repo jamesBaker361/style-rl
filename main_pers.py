@@ -484,17 +484,21 @@ def main(args):
     #if args.training_type=="reward":
     vae=vae.to(denoising_model.device)
     
-    time_embedding=denoising_model.time_embedding.to(denoising_model.device)
+    #time_embedding=denoising_model.time_embedding.to(denoising_model.device)
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     if args.fsdp:
         clip_model.logit_scale = torch.nn.Parameter(torch.tensor([clip_model.config.logit_scale_init_value]))
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer,time_embedding)
+    clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer)
     if hasattr(denoising_model,"post_quant_conv"):
         post_quant_conv=denoising_model.post_quant_conv.to(denoising_model.device)
         post_quant_conv=accelerator.prepare(post_quant_conv)
+
+    if hasattr(denoising_model,"time_embedding"):
+        time_embedding=denoising_model.time_embedding.to(denoising_model.device)
+        time_embedding=accelerator.prepare(time_embedding)
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()

@@ -659,6 +659,8 @@ def main(args):
     training_start=time.time()
     
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
+
+
     for e in range(start_epoch, args.epochs+1):
         scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
         accelerator.print("scale",e)
@@ -743,12 +745,16 @@ def main(args):
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
                     if args.pipeline=="sana":
+                        guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)
+                        guidance = guidance.expand(noisy_latents.shape[0]).to(noisy_latents.dtype)
+                        guidance = guidance * denoising_model.config.guidance_embeds_scale
                         if args.vanilla:
                             with accelerator.autocast():
                                 model_pred=compatible_forward_sana_transformer_model(
                                     denoising_model,
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
+                                    guidance=guidance,
                                     timestep=timesteps,return_dict=False
                                 )[0]
                         else:
@@ -756,7 +762,8 @@ def main(args):
                                     denoising_model,
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
-                                    timestep=timesteps,return_dict=False
+                                    timestep=timesteps,return_dict=False,
+                                    guidance=guidance
                                 )[0]
                     else:
                         if args.vanilla:

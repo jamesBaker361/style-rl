@@ -213,7 +213,7 @@ def compatible_forward_sana_transformer_model(
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
 
     # 2. Transformer blocks
-    if torch.is_grad_enabled() and self.gradient_checkpointing:
+    '''if torch.is_grad_enabled() and self.gradient_checkpointing:
         for index_block, block in enumerate(self.transformer_blocks):
             hidden_states = self._gradient_checkpointing_func(
                 compatible_forward_sana_transformer_block,
@@ -230,21 +230,21 @@ def compatible_forward_sana_transformer_model(
             if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
                 hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
 
-    else:
-        for index_block, block in enumerate(self.transformer_blocks):
-            hidden_states = compatible_forward_sana_transformer_block(
-                block,
-                hidden_states,
-                attention_mask,
-                encoder_hidden_states,
-                encoder_attention_mask,
-                timestep,
-                post_patch_height,
-                post_patch_width,
-                added_cond_kwargs
-            )
-            if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
-                hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
+    else:'''
+    for index_block, block in enumerate(self.transformer_blocks):
+        hidden_states = compatible_forward_sana_transformer_block(
+            block,
+            hidden_states,
+            attention_mask,
+            encoder_hidden_states,
+            encoder_attention_mask,
+            timestep,
+            post_patch_height,
+            post_patch_width,
+            added_cond_kwargs
+        )
+        if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
+            hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
 
     # 3. Normalization
     hidden_states = self.norm_out(hidden_states, embedded_timestep, self.scale_shift_table)

@@ -38,7 +38,7 @@ except ImportError:
 from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from PIL import Image
-from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter
+from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter,compatible_forward_sana_transformer_model
 from custom_scheduler import CompatibleFlowMatchEulerDiscreteScheduler
 
 def concat_images_horizontally(images):
@@ -743,14 +743,30 @@ def main(args):
                     
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
-
-                    if args.vanilla:
-                        with accelerator.autocast():
-                            model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-                            loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    if args.pipeline=="sana":
+                        if args.vanilla:
+                            with accelerator.autocast():
+                                model_pred=compatible_forward_sana_transformer_model(
+                                    denoising_model,
+                                    noisy_latents,
+                                    encoder_hidden_states=encoder_hidden_states,
+                                    timestep=timesteps,return_dict=False
+                                )[0]
+                        else:
+                            model_pred=compatible_forward_sana_transformer_model(
+                                    denoising_model,
+                                    noisy_latents,
+                                    encoder_hidden_states=encoder_hidden_states,
+                                    timestep=timesteps,return_dict=False
+                                )[0]
                     else:
-                        model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                        if args.vanilla:
+                            with accelerator.autocast():
+                                model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                                
+                        else:
+                            model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                    loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
 
                     optimizer.step()

@@ -621,7 +621,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         truncated_rand_backprop_minmax: tuple = (0, 50),
         negative_prompt_embeds=None, #the negatives are onl here for compatibilty
         negative_prompt=None,
-        fsdp:bool=True
+        fsdp:bool=True,
+        reward_training:bool=False,
     ) -> Union[SanaPipelineOutput, Tuple]:
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
             callback_on_step_end_tensor_inputs = callback_on_step_end.tensor_inputs

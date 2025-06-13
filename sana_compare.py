@@ -31,7 +31,7 @@ def main(args):
 
     pipeline = SanaSprintPipeline.from_pretrained(
     "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
-    #torch_dtype=torch.float16
+    torch_dtype=torch.float16
     )
     pipeline.enable_vae_tiling()
     pipeline.to(accelerator.device)

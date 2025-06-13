@@ -483,7 +483,7 @@ def main(args):
 
     #if args.training_type=="reward":
     vae=vae.to(denoising_model.device)
-    post_quant_conv=vae.post_quant_conv.to(denoising_model.device)
+    
     time_embedding=denoising_model.time_embedding.to(denoising_model.device)
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     if args.fsdp:
@@ -491,7 +491,10 @@ def main(args):
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,denoising_model,vae,post_quant_conv,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,post_quant_conv,scheduler,optimizer,time_embedding)
+    clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer,time_embedding=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer,time_embedding)
+    if hasattr(denoising_model,"post_quant_conv"):
+        post_quant_conv=denoising_model.post_quant_conv.to(denoising_model.device)
+        post_quant_conv=accelerator.prepare(post_quant_conv)
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()

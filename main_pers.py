@@ -324,10 +324,10 @@ def main(args):
         component.requires_grad_(False)
         component.to("cpu")
     unconditioned_text,negative_text_embeds=pipeline.encode_prompt(
-                                        " ",
-                                        "cpu", #accelerator.device,
-                                        1,
-                                        do_classifier_free_guidance,
+                                       prompt= " ",
+                                        device="cpu", #accelerator.device,
+                                       num_images_per_prompt= 1,
+                                       do_classifier_free_guidance= do_classifier_free_guidance,
                                         negative_prompt="blurry, low quality",
                                         prompt_embeds=None,
                                         negative_prompt_embeds=None,

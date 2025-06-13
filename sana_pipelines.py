@@ -338,7 +338,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
     
 
     def encode_prompt(self, prompt, num_images_per_prompt = 1, device = None, prompt_embeds = None, prompt_attention_mask = None, clean_caption = False, max_sequence_length = 300, complex_human_instruction = None, lora_scale = None,
-                      negative_prompt=None,negative_prompt_embeds=None): #only for compatibiltiy
+                      negative_prompt=None,negative_prompt_embeds=None, do_classifier_free_guidance:bool=False): #only for compatibiltiy
         return super().encode_prompt(prompt, num_images_per_prompt, device, prompt_embeds, prompt_attention_mask, clean_caption, max_sequence_length, complex_human_instruction, lora_scale)
 
 

@@ -62,12 +62,13 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
         if deep_to_ip_layers:
             average_feature_dim=(cross_attention_dim+out_features)//2
             new_k_ip=torch.nn.ModuleList([
+                torch.nn.Sequential(
                 torch.nn.Linear(cross_attention_dim,average_feature_dim,bias=True),
                 torch.nn.LayerNorm(average_feature_dim),
-                torch.nn.Linear(average_feature_dim,out_features,bias=False)
+                torch.nn.Linear(average_feature_dim,out_features,bias=False)) for _ in range(num_image_text_embeds)
             ])
         else:
-            new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
+            new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False) for _ in range(num_image_text_embeds)])
             print("new_k_ip", [p.size() for p in new_k_ip[0].parameters()])
         new_k_ip.to(denoising_model.device,torch_dtype)
         setattr(module, "to_k_ip",new_k_ip)

@@ -9,6 +9,7 @@ from diffusers.image_processor import PipelineImageInput
 from diffusers.utils.outputs import BaseOutput
 from diffusers.models import ImageProjection
 from dataclasses import dataclass
+import torch.utils.checkpoint as checkpoint
 from diffusers.loaders import FromSingleFileMixin, IPAdapterMixin, StableDiffusionLoraLoaderMixin, TextualInversionLoaderMixin
 from diffusers.models.attention_processor import (
     Attention,
@@ -611,6 +612,11 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         ],
         ip_adapter_image: Optional[PipelineImageInput] = None,
         ip_adapter_image_embeds: Optional[List[torch.Tensor]] = None,
+        truncated_backprop: bool = True,
+        truncated_backprop_rand: bool = True,
+        gradient_checkpoint: bool = True,
+        truncated_backprop_timestep: int = 0,
+        truncated_rand_backprop_minmax: tuple = (0, 50),
         negative_prompt_embeds=None, #the negatives are onl here for compatibilty
         negative_prompt=None
     ) -> Union[SanaPipelineOutput, Tuple]:
@@ -739,19 +745,34 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2
                 )
 
+                if gradient_checkpoint:
+                    noise_pred=checkpoint.checkpoint(
+                        compatible_forward_sana_transformer_model,
+                        self.transformer,
+                        latent_model_input.to(dtype=transformer_dtype),
+                        encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
+                        encoder_attention_mask=prompt_attention_mask,
+                        guidance=guidance,
+                        timestep=scm_timestep,
+                        return_dict=False,
+                        attention_kwargs=self.attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        encoder_hid_proj=encoder_hid_proj
+                    )[0]
+                else:
                 # predict noise model_output
-                noise_pred = compatible_forward_sana_transformer_model(
-                    self.transformer,
-                    latent_model_input.to(dtype=transformer_dtype),
-                    encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
-                    encoder_attention_mask=prompt_attention_mask,
-                    guidance=guidance,
-                    timestep=scm_timestep,
-                    return_dict=False,
-                    attention_kwargs=self.attention_kwargs,
-                    added_cond_kwargs=added_cond_kwargs,
-                    encoder_hid_proj=encoder_hid_proj
-                )[0]
+                    noise_pred = compatible_forward_sana_transformer_model(
+                        self.transformer,
+                        latent_model_input.to(dtype=transformer_dtype),
+                        encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
+                        encoder_attention_mask=prompt_attention_mask,
+                        guidance=guidance,
+                        timestep=scm_timestep,
+                        return_dict=False,
+                        attention_kwargs=self.attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        encoder_hid_proj=encoder_hid_proj
+                    )[0]
 
                 noise_pred = (
                     (1 - 2 * scm_timestep_expanded) * latent_model_input

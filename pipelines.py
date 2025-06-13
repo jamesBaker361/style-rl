@@ -533,6 +533,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         fsdp:bool=False, #if fsdp, we have to do some stupid thing where we call the unet once to get model_pred device
         reward_training:bool=False, 
         negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
+        use_resolution_binning:bool=False,
         **kwargs,
     ):
         

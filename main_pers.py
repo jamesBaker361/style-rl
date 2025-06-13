@@ -681,12 +681,12 @@ def main(args):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
 
-            for k,v in batch.items():
+            '''for k,v in batch.items():
                 if type(v)==torch.Tensor:
                     if args.deepspeed:
                         batch[k]=v.to(torch_dtype)
                     else:
-                        batch[k]=v.to(device,torch_dtype)
+                        batch[k]=v.to(device,torch_dtype)'''
                 
             image_batch=batch["image"]
             text_batch=batch["text"]

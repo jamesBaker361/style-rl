@@ -32,7 +32,7 @@ class CompatibleFlowMatchEulerDiscreteScheduler(FlowMatchEulerDiscreteScheduler)
         while len(sigma.shape) < len(original_samples.shape):
             sigma = sigma.unsqueeze(-1)
 
-        noisy_model_input = (1.0 - sigmas) * original_samples + sigmas * noise
+        noisy_model_input = (1.0 - sigma) * original_samples + sigma * noise
         return noisy_model_input
     
     def get_velocity(self,latents, noise, timesteps):

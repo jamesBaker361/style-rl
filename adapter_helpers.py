@@ -80,7 +80,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
             ])
         else:
             new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
-        new_v_ip.to(denoising_model.device,denoising_model)
+        new_v_ip.to(denoising_model.device,torch_dtype)
         setattr(module, "to_v_ip",new_v_ip)
 
     if use_identity:

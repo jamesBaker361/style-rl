@@ -56,6 +56,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
                     deep_to_ip_layers:bool=False,
                     return_encoder_hid_proj:bool=False):
     layers=get_modules_of_types(denoising_model,IPAdapterAttnProcessor2_0)
+    torch_dtype=next(denoising_model.parameters()).dtype
     for (name,module) in layers:
         out_features=module.to_k_ip[0].out_features
         if deep_to_ip_layers:
@@ -67,7 +68,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
             ])
         else:
             new_k_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
-        new_k_ip.to(denoising_model.device)
+        new_k_ip.to(denoising_model.device,torch_dtype)
         setattr(module, "to_k_ip",new_k_ip)
 
         if deep_to_ip_layers:
@@ -79,7 +80,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
             ])
         else:
             new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
-        new_v_ip.to(denoising_model.device)
+        new_v_ip.to(denoising_model.device,denoising_model)
         setattr(module, "to_v_ip",new_v_ip)
 
     if use_identity:

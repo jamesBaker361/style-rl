@@ -90,6 +90,7 @@ def main(args):
     
     print("after",len([param for param in pipeline.transformer.parameters() if param.requires_grad])  )# should be False)
 
+<<<<<<< HEAD
     params=[p for p in pipeline.transformer.parameters() if p.requires_grad]+[p for p in encoder_hid_proj.parameters() if p.requires_grad]
     named_params=[n for (n,p) in pipeline.transformer.named_parameters() if p.requires_grad]+[n for (n,p) in encoder_hid_proj.named_parameters() if p.requires_grad]
     print(named_params)
@@ -101,6 +102,15 @@ def main(args):
     target=torch.zeros(output.size(),device=accelerator.device,
                         dtype=torch.float16
                         )
+=======
+        params=[p for p in pipeline.transformer.parameters() if p.requires_grad]+[p for p in encoder_hid_proj.parameters() if p.requires_grad]
+        named_params=[n for (n,p) in pipeline.transformer.named_parameters() if p.requires_grad]+[n for (n,p) in encoder_hid_proj.named_parameters() if p.requires_grad]
+        print(named_params)
+        optimizer=torch.optim.AdamW(params)
+        optimizer,pipeline=accelerator.prepare(optimizer,pipeline)
+        output=pipeline.call_with_grad(prompt=prompt, num_inference_steps=2,generator=generator,height=256,width=256,ip_adapter_image_embeds=[torch.zeros((1,1,embedding_dim),device=accelerator.device,dtype=torch.float16)],return_dict=False).images[0]
+        target=torch.zeros(output.size())
+>>>>>>> parent of d843453 (denosie model)
 
     loss=F.mse_loss(output,target)
     accelerator.backward(loss)

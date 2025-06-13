@@ -495,10 +495,11 @@ def main(args):
     if hasattr(denoising_model,"post_quant_conv"):
         post_quant_conv=denoising_model.post_quant_conv.to(denoising_model.device)
         post_quant_conv=accelerator.prepare(post_quant_conv)
-
+        vae.post_quant_conv=post_quant_conv
     if hasattr(denoising_model,"time_embedding"):
         time_embedding=denoising_model.time_embedding.to(denoising_model.device)
         time_embedding=accelerator.prepare(time_embedding)
+        denoising_model.time_embedding=time_embedding
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()
@@ -508,9 +509,11 @@ def main(args):
         accelerator.print("registered")
     except Exception as e:
         accelerator.print('register_fsdp_forward_method',e)
-    vae.post_quant_conv=post_quant_conv
-    denoising_model.time_embedding=time_embedding
-    pipeline.unet=denoising_model
+    
+    if args.pipeline=="sana":
+        pipeline.transformer=denoising_model
+    else:
+        pipeline.unet=denoising_model
     pipeline.vae=vae
 
     for loader in [test_loader,val_loader,train_loader]:
@@ -575,7 +578,8 @@ def main(args):
                 image_embeds=[image_embeds]
             
             if b==0:
-                print("unet",pipeline.unet.device,"time embedding linear 1",pipeline.unet.time_embedding.linear_1.weight.device, )
+                if hasattr(pipeline,"unet"):
+                    print("unet",pipeline.unet.device,"time embedding linear 1",pipeline.unet.time_embedding.linear_1.weight.device, )
                 
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)

@@ -22,7 +22,7 @@ import numpy as np
 import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
-from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler,DDIMScheduler
+from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler,DDIMScheduler,SCMScheduler
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -39,6 +39,7 @@ from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from PIL import Image
 from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter
+from custom_scheduler import CompatibleFlowMatchEulerDiscreteScheduler
 
 def concat_images_horizontally(images):
     """
@@ -512,6 +513,12 @@ def main(args):
         image_list=[]
         fake_image_list=[]
 
+        if args.pipeline=="sana":
+            scheduler=SCMScheduler.from_config(scheduler.config)
+            scheduler=accelerator.prepare(scheduler)
+            pipeline.scheduler=scheduler
+            accelerator.wait_for_everyone()
+
         if args.pipeline=="lcm_post_lora":
             pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
             pipeline.enable_lora()
@@ -642,6 +649,15 @@ def main(args):
         pipeline.set_ip_adapter_scale(scale)
         if e==args.reward_switch_epoch:
             args.training_type="reward"
+
+        if args.pipeline=="sana":
+            if args.training_type=="denoise":
+                scheduler=CompatibleFlowMatchEulerDiscreteScheduler.from_config(scheduler.config)
+            elif args.training_type=="denoise":
+                scheduler=SCMScheduler.from_config(scheduler.config)
+            scheduler=accelerator.prepare(scheduler)
+            pipeline.scheduler=scheduler
+            accelerator.wait_for_everyone()
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]
@@ -673,7 +689,11 @@ def main(args):
                 with accelerator.accumulate(params):
                     # Convert images to latent space
                     #if args.deepspeed:
-                    latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                    if args.pipeline=="sana":
+                        latents=posterior_batch / pipeline.scheduler.config.sigma_data
+                    else:
+                        latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                        
                     latents = latents * vae.config.scaling_factor
 
 
@@ -686,6 +706,9 @@ def main(args):
                     #print("encoede hiiden states",encoder_hidden_states.requires_grad)
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (batch_size,), device=latents.device)
                     #timesteps = timesteps.long()
+
+                    #https://github.com/NVlabs/Sana/blob/main/train_scripts/train_dreambooth_lora_sana.py
+                        
 
                     noisy_latents = scheduler.add_noise(latents, noise, timesteps)
 

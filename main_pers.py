@@ -76,7 +76,6 @@ parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--num_image_text_embeds",type=int,default=4)
-parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
 parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
 parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")
@@ -107,11 +106,7 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
 
 
 def main(args):
-    if args.deepspeed:
-        accelerator=Accelerator(log_with="wandb")
-        print("using deepspeed")
-    else:
-        accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     device=accelerator.device
     state = PartialState()
@@ -669,7 +664,6 @@ def main(args):
                 if args.training_type=="denoise":
                     with accelerator.accumulate(params):
                         # Convert images to latent space
-                        #if args.deepspeed:
                         if args.pipeline=="sana":
                             latents=posterior_batch / pipeline.scheduler.config.sigma_data
                         else:

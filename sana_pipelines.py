@@ -60,7 +60,7 @@ def set_ip_adapter_attn(attn2:Attention,
                    ip_cross_attention_dim:int)->Attention:
     
     hidden_size=attn2.inner_kv_dim
-    ip_adapter_processor=IPAdapterAttnProcessor2_0(ip_cross_attention_dim,hidden_size).to(device,dtype)
+    ip_adapter_processor=IPAdapterAttnProcessor2_0(hidden_size,ip_cross_attention_dim).to(device,dtype)
     attn2.set_processor(ip_adapter_processor)
     return attn2
 

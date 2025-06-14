@@ -525,6 +525,11 @@ def main(args):
         caption_projection=denoising_model.caption_projection.to(denoising_model.device, torch_dtype)
         caption_projection=accelerator.prepare(caption_projection)
         denoising_model.caption_projection=caption_projection
+
+    if hasattr(denoising_model,"encoder_hid_proj"):
+        encoder_hid_proj=denoising_model.encoder_hid_proj.to(denoising_model.device)
+        encoder_hid_proj=accelerator.prepare(encoder_hid_proj)
+        denoising_model.encoder_hid_proj=encoder_hid_proj
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()

@@ -500,6 +500,11 @@ def main(args):
         time_embedding=denoising_model.time_embedding.to(denoising_model.device)
         time_embedding=accelerator.prepare(time_embedding)
         denoising_model.time_embedding=time_embedding
+
+    if hasattr(denoising_model, "patch_embed"):
+        patch_embed=denoising_model.patch_embed.to(denoising_model.device, torch_dtype)
+        patch_embed=accelerator.prepare(patch_embed)
+        denoising_model.patch_embed=patch_embed
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()

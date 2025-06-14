@@ -497,8 +497,8 @@ def main(args):
 
     optimizer=torch.optim.AdamW(params,lr=args.lr)
 
-    #if args.vanilla:
-    #denoising_model=denoising_model.to(device)
+    if args.vanilla:
+        denoising_model=denoising_model.to(device)
 
     #if args.training_type=="reward":
     vae=vae.to(denoising_model.device)

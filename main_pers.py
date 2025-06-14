@@ -758,14 +758,16 @@ def main(args):
                                     denoising_model,
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
-                                    timestep=timesteps,return_dict=False
+                                    timestep=timesteps,return_dict=False,
+                                    guidance=guidance
                                 )[0]
                         else:
                             model_pred=compatible_forward_sana_transformer_model(
                                     denoising_model,
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
-                                    timestep=timesteps,return_dict=False
+                                    timestep=timesteps,return_dict=False,
+                                    guidance=guidance
                                 )[0]
                     else:
                         if args.vanilla:

@@ -383,7 +383,7 @@ def main(args):
     if args.pipeline=="sana":
         prepare_ip_adapter(pipeline.transformer,accelerator.device,torch_dtype,cross_attention_dim)
     
-    print("cross ttention dim",cross_attention_dim,"intermediate_embedding_dim",intermediate_embedding_dim,"embedding_dim",embedding_dim)
+    accelerator.print("cross ttention dim",cross_attention_dim,"intermediate_embedding_dim",intermediate_embedding_dim,"embedding_dim",embedding_dim)
 
     replace_ip_attn(denoising_model,
                     embedding_dim,
@@ -391,6 +391,8 @@ def main(args):
                     cross_attention_dim,
                     args.num_image_text_embeds,
                     use_projection,args.identity_adapter)
+    encoder_hid_proj=getattr(denoising_model,"encoder_hid_proj",None)
+    accelerator.print("encoder_hid_proj",encoder_hid_proj)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]
@@ -527,6 +529,11 @@ def main(args):
         caption_projection=denoising_model.caption_projection.to(denoising_model.device, torch_dtype)
         caption_projection=accelerator.prepare(caption_projection)
         denoising_model.caption_projection=caption_projection
+
+    if hasattr(denoising_model,"encoder_hid_proj"):
+        encoder_hid_proj=denoising_model.encoder_hid_proj.to(denoising_model.device,torch_dtype)
+        encoder_hid_proj=accelerator.prepare(encoder_hid_proj)
+        denoising_model.encoder_hid_proj=encoder_hid_proj
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()
@@ -781,7 +788,8 @@ def main(args):
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
-                                    guidance=guidance
+                                    guidance=guidance,
+                                    encoder_hid_proj=encoder_hid_proj
                                 )[0]
                         else:
                             model_pred=compatible_forward_sana_transformer_model(
@@ -789,7 +797,8 @@ def main(args):
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
-                                    guidance=guidance
+                                    guidance=guidance,
+                                    encoder_hid_proj=encoder_hid_proj
                                 )[0]
                     else:
                         if args.vanilla:

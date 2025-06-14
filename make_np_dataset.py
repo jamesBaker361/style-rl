@@ -64,7 +64,8 @@ def main(args):
                 "embedding":[],
                 "text":[],
                 "prompt":[],
-                "posterior":[]
+                "posterior":[],
+                "attention_mask":[]
             }
 
             try:

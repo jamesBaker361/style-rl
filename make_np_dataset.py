@@ -96,16 +96,24 @@ def main(args):
                 
                 
                 
-                
-                encoded_text, _ = pipeline.encode_prompt(
-                                                prompt=text,
-                                                device=accelerator.device,
-                                                num_images_per_prompt=1,
-                                        )
+                if args.pipeline=="lcm":
+                    encoded_text, _ = pipeline.encode_prompt(
+                                                    prompt=text,
+                                                    device=accelerator.device,
+                                                    num_images_per_prompt=1,
+                                            )
+                else:
+                    encoded_text, encoded_text_attention_mask = pipeline.encode_prompt(
+                                                    prompt=text,
+                                                    device=accelerator.device,
+                                                    num_images_per_prompt=1,
+                                            )
+                    new_dataset["attention_mask"].append(encoded_text_attention_mask)
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
                 new_dataset["image"].append(image)
                 new_dataset["embedding"].append(embedding)
                 new_dataset["text"].append(encoded_text)
+                
                 new_dataset["prompt"].append(prompt)
 
                 image=pipeline.image_processor.preprocess(image)

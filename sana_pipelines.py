@@ -637,6 +637,17 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             orig_height, orig_width = height, width
             height, width = self.image_processor.classify_height_width_bin(height, width, ratios=aspect_ratio_bin)
 
+        # 2. Default height and width to transformer
+        if prompt is not None and isinstance(prompt, str):
+            batch_size = 1
+        elif prompt is not None and isinstance(prompt, list):
+            batch_size = len(prompt)
+        else:
+            batch_size = prompt_embeds.shape[0]
+        
+        if prompt_attention_mask==None:
+            prompt_attention_mask=torch.ones((batch_size))
+
         self.check_inputs(
             prompt=prompt,
             height=height,
@@ -654,13 +665,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         self._attention_kwargs = attention_kwargs
         self._interrupt = False
 
-        # 2. Default height and width to transformer
-        if prompt is not None and isinstance(prompt, str):
-            batch_size = 1
-        elif prompt is not None and isinstance(prompt, list):
-            batch_size = len(prompt)
-        else:
-            batch_size = prompt_embeds.shape[0]
+        
 
         device = self.transformer.device
         lora_scale = self.attention_kwargs.get("scale", None) if self.attention_kwargs is not None else None
@@ -840,51 +845,3 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             return (image,)
 
         return SanaPipelineOutput(images=image)
-    
-    def check_inputs(
-        self,
-        prompt,
-        height,
-        width,
-        num_inference_steps,
-        timesteps,
-        max_timesteps,
-        intermediate_timesteps,
-        callback_on_step_end_tensor_inputs=None,
-        prompt_embeds=None,
-        prompt_attention_mask=None,
-    ):
-        if height % 32 != 0 or width % 32 != 0:
-            raise ValueError(f"`height` and `width` have to be divisible by 32 but are {height} and {width}.")
-
-        if callback_on_step_end_tensor_inputs is not None and not all(
-            k in self._callback_tensor_inputs for k in callback_on_step_end_tensor_inputs
-        ):
-            raise ValueError(
-                f"`callback_on_step_end_tensor_inputs` has to be in {self._callback_tensor_inputs}, but found {[k for k in callback_on_step_end_tensor_inputs if k not in self._callback_tensor_inputs]}"
-            )
-
-        if prompt is not None and prompt_embeds is not None:
-            raise ValueError(
-                f"Cannot forward both `prompt`: {prompt} and `prompt_embeds`: {prompt_embeds}. Please make sure to"
-                " only forward one of the two."
-            )
-        elif prompt is None and prompt_embeds is None:
-            raise ValueError(
-                "Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined."
-            )
-        elif prompt is not None and (not isinstance(prompt, str) and not isinstance(prompt, list)):
-            raise ValueError(f"`prompt` has to be of type `str` or `list` but is {type(prompt)}")
-
-
-        if timesteps is not None and len(timesteps) != num_inference_steps + 1:
-            raise ValueError("If providing custom timesteps, `timesteps` must be of length `num_inference_steps + 1`.")
-
-        if timesteps is not None and max_timesteps is not None:
-            raise ValueError("If providing custom timesteps, `max_timesteps` should not be provided.")
-
-        if timesteps is None and max_timesteps is None:
-            raise ValueError("Should provide either `timesteps` or `max_timesteps`.")
-
-        if intermediate_timesteps is not None and num_inference_steps != 2:
-            raise ValueError("Intermediate timesteps for SCM is not supported when num_inference_steps != 2.")

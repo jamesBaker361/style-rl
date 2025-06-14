@@ -43,7 +43,7 @@ def main(args):
                 transforms.ToTensor(),
                     transforms.Normalize([0.5], [0.5]),
             ])
-        accelerator=Accelerator(mixed_precision="fp16")
+        accelerator=Accelerator(mixed_precision=args.mixed_precision)
         with accelerator.autocast():
             device=accelerator.device
 

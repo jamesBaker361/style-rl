@@ -749,6 +749,9 @@ def main(args):
                     added_cond_kwargs={"image_embeds":[image_embeds]}
 
                     if args.pipeline=="sana":
+                        guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)
+                        guidance = guidance.expand(noisy_latents.shape[0]).to(noisy_latents.dtype)
+                        guidance = guidance * denoising_model.config.guidance_embeds_scale
                         if args.vanilla:
                             with accelerator.autocast():
                                 model_pred=compatible_forward_sana_transformer_model(

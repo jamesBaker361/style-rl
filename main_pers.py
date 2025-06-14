@@ -214,14 +214,14 @@ def main(args):
 
 
     accelerator.print(pipeline.scheduler)
-    scheduler_class={
+    '''scheduler_class={
             "LCMScheduler":LCMScheduler,
             "DDIMScheduler":DDIMScheduler,
             "DEISMultistepScheduler":DEISMultistepScheduler,
             "CompatibleFlowMatchEulerDiscreteScheduler":CompatibleFlowMatchEulerDiscreteScheduler
     }[args.scheduler_type]
     pipeline.scheduler = scheduler_class.from_config(pipeline.scheduler.config)
-    accelerator.print(pipeline.scheduler)
+    accelerator.print(pipeline.scheduler)'''
 
     vae=pipeline.vae
     if args.pipeline=="sana":

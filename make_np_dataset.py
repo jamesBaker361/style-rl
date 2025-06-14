@@ -117,13 +117,17 @@ def main(args):
                 
                 new_dataset["prompt"].append(prompt)
 
+
                 image=pipeline.image_processor.preprocess(image)
                 
                 posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
                 if k==0:
-                    print("image max min",image.max(),image.min())
-                    print("post min max",public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).max(),public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).min())
-                    print("posterior",posterior)
+                    for size in [256,512,1024]:
+                        image=pipeline.image_processor.preprocess(image.resize(size,size))
+                        posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
+                        print("image max min",image.max(),image.min())
+                        print("post min max",public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).max(),public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).min())
+                        print("posterior",posterior)
                 new_dataset["posterior"].append(posterior)
                 torch.cuda.empty_cache()
                 after=find_cuda_objects()

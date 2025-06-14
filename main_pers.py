@@ -520,6 +520,11 @@ def main(args):
         patch_embed=denoising_model.patch_embed.to(denoising_model.device, torch_dtype)
         patch_embed=accelerator.prepare(patch_embed)
         denoising_model.patch_embed=patch_embed
+
+    if hasattr(denoising_model,"caption_projection"):
+        caption_projection=denoising_model.caption_projection.to(denoising_model.device, torch_dtype)
+        caption_projection=accelerator.prepare(caption_projection)
+        denoising_model.caption_projection=caption_projection
     accelerator.wait_for_everyone()
     train_loader,test_loader,val_loader=accelerator.prepare(train_loader,test_loader,val_loader)
     accelerator.wait_for_everyone()

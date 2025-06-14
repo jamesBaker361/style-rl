@@ -383,6 +383,8 @@ def main(args):
     if args.pipeline=="sana":
         prepare_ip_adapter(pipeline.transformer,accelerator.device,torch_dtype,cross_attention_dim)
     
+    print("cross ttention dim",cross_attention_dim,"intermediate_embedding_dim",intermediate_embedding_dim,"embedding_dim",embedding_dim)
+
     replace_ip_attn(denoising_model,
                     embedding_dim,
                     intermediate_embedding_dim,

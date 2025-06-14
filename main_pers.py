@@ -784,7 +784,8 @@ def main(args):
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
-                                    guidance=guidance
+                                    guidance=guidance,
+                                    encoder_hid_proj=encoder_hid_proj
                                 )[0]
                         else:
                             model_pred=compatible_forward_sana_transformer_model(
@@ -792,7 +793,8 @@ def main(args):
                                     noisy_latents,
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
-                                    guidance=guidance
+                                    guidance=guidance,
+                                    encoder_hid_proj=encoder_hid_proj
                                 )[0]
                     else:
                         if args.vanilla:

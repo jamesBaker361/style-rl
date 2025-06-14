@@ -117,7 +117,11 @@ def main(args):
                 new_dataset["prompt"].append(prompt)
 
                 image=pipeline.image_processor.preprocess(image)
+                
                 posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
+                if k==0:
+                    print("image max min",image.max(),image.min())
+                    print("posterior",posterior)
                 new_dataset["posterior"].append(posterior)
                 torch.cuda.empty_cache()
                 after=find_cuda_objects()

@@ -122,13 +122,10 @@ def main(args):
                 
                 posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
                 if k==0:
-                    for size in [256,512,1024]:
-                        image=new_dataset["image"][-1]
-                        image=pipeline.image_processor.preprocess(image.resize((size,size)))
-                        posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
-                        print("image max min",image.max(),image.min())
-                        print("post min max",public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).max(),public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).min())
-                        print("posterior",posterior)
+                    posterior=public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).squeeze(0).cpu().detach().numpy()
+                    print("image max min",image.max(),image.min())
+                    print("post min max",public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).max(),public_encode(pipeline.vae,image.to(accelerator.device,torch_dtype)).min())
+                    print("posterior",posterior)
                 new_dataset["posterior"].append(posterior)
                 torch.cuda.empty_cache()
                 after=find_cuda_objects()

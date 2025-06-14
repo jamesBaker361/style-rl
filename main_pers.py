@@ -323,7 +323,9 @@ def main(args):
     for component in [vae,text_encoder]:
         component.requires_grad_(False)
         component.to("cpu")
-    unconditioned_text,negative_text_embeds=pipeline.encode_prompt(
+
+    if args.pipeline=="sana":
+        unconditioned_text,unconditioned_text_attention_mask=pipeline.encode_prompt(
                                        prompt= " ",
                                         device="cpu", #accelerator.device,
                                        num_images_per_prompt= 1,
@@ -333,6 +335,19 @@ def main(args):
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
+        negative_text_embeds=None
+    else:
+        unconditioned_text,negative_text_embeds=pipeline.encode_prompt(
+                                       prompt= " ",
+                                        device="cpu", #accelerator.device,
+                                       num_images_per_prompt= 1,
+                                       do_classifier_free_guidance= do_classifier_free_guidance,
+                                        negative_prompt="blurry, low quality",
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
+        unconditioned_text_attention_mask=None
     
     
     

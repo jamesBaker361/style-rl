@@ -757,7 +757,9 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         timesteps = timesteps[:-1]
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
         self._num_timesteps = len(timesteps)
-        encoder_hid_proj=getattr(self,"encoder_hid_proj",None)
+        encoder_hid_proj=getattr(self.transformer,"encoder_hid_proj",None)
+        if encoder_hid_proj is None:
+            print("encode hid proj none!!?!?!")
         transformer_dtype = self.transformer.dtype
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):

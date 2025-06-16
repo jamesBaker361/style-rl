@@ -766,6 +766,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         scm_timestep, #timestep=scm_timestep,
                         guidance, #guidance=
                         prompt_attention_mask, #encoder_attention_mask=prompt_attention_mask,
+                        None,
                         self.attention_kwargs, #attention_kwargs=
                         added_cond_kwargs, #added_cond_kwargs=
                         None,

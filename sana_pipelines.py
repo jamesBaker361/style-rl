@@ -104,7 +104,12 @@ def compatible_forward_sana_transformer_block(
             ip_hidden_states=added_cond_kwargs["image_embeds"]
             encoder_hidden_states=(encoder_hidden_states,ip_hidden_states)
         else:'''
-        encoder_hidden_states=encoder_hidden_states
+        print("len encoder_hidden_states",len(encoder_hidden_states))
+        try:
+            print("size encoder_hidden_states",encoder_hidden_states.size())
+        except:
+            print("encoder hidden states couldnt do size")
+        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())
 
         # 3. Cross Attention
         if self.attn2 is not None:
@@ -210,9 +215,15 @@ def compatible_forward_sana_transformer_model(
     encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
-
+    print("before compatible_process_hidden_states", encoder_hidden_states.size())
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
+    print("after compatible_process_hidden_states",len(encoder_hidden_states))
+    try:
+        print("after compatible_process_hidden_states size",encoder_hidden_states.size())
+    except:
+        print("after compatible_process_hidden_states size error")
 
+    print("after compatible_process_hidden_states[0] size",encoder_hidden_states[0].size())
     # 2. Transformer blocks
     '''if torch.is_grad_enabled() and self.gradient_checkpointing:
         for index_block, block in enumerate(self.transformer_blocks):

@@ -772,7 +772,7 @@ def main(args):
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
                     
                     added_cond_kwargs={"image_embeds":[image_embeds]}
-                    print(image_embeds.size())
+                    print('Image embeds size denoising',image_embeds.size())
 
                     if args.pipeline=="sana":
                         guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)

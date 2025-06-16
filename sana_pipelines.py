@@ -136,6 +136,7 @@ def compatible_process_hidden_states(
                 )
         image_embeds = added_cond_kwargs.get("image_embeds")
         image_embeds = encoder_hid_proj(image_embeds)
+        print("image embeds size compatible_process_hidden_states",image_embeds.size())
         encoder_hidden_states = (encoder_hidden_states, image_embeds)
 
     return encoder_hidden_states

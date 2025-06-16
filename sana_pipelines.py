@@ -104,13 +104,15 @@ def compatible_forward_sana_transformer_block(
             ip_hidden_states=added_cond_kwargs["image_embeds"]
             encoder_hidden_states=(encoder_hidden_states,ip_hidden_states)
         else:'''
-        print("len encoder_hidden_states",len(encoder_hidden_states))
+        '''print("len encoder_hidden_states",len(encoder_hidden_states))
         try:
             print("size encoder_hidden_states",encoder_hidden_states.size())
         except:
             print("encoder hidden states couldnt do size")
-        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())
+        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())'''
 
+        print("hidden states size",hidden_states.size())
+        
         # 3. Cross Attention
         if self.attn2 is not None:
             attn_output = self.attn2(

@@ -110,9 +110,9 @@ def compatible_forward_sana_transformer_block(
         except:
             print("encoder hidden states couldnt do size")
         print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())'''
-        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())
-        print("size encoder_hidden_states[1]",encoder_hidden_states[1].size())
-        print("hidden states size",hidden_states.size())
+        
+
+        #print("hidden states size",hidden_states.size())
 
         # 3. Cross Attention
         if self.attn2 is not None:
@@ -233,6 +233,15 @@ def compatible_forward_sana_transformer_model(
         print("after compatible_process_hidden_states size error")
 
     print("after compatible_process_hidden_states[0] size",encoder_hidden_states[0].size())
+    print(" after compatible_process_hidden_states len size encoder_hidden_states[1][0]",len(encoder_hidden_states[1]))
+    if    len(encoder_hidden_states[1])>0:
+        print("type(encoder_hidden_states[1][0]" ,type(encoder_hidden_states[1][0]))
+        try:
+            print("size encoder_hidden_states[1][0]",encoder_hidden_states[1][0].size())
+        except:
+            print("failed for size encoder_hidden_states[1][0] ")
+    else:
+        print("encoder_hidden_states[1] len =0")
     # 2. Transformer blocks
     '''if torch.is_grad_enabled() and self.gradient_checkpointing:
         for index_block, block in enumerate(self.transformer_blocks):
@@ -750,8 +759,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 batch_size * num_images_per_prompt,
                 False,
             )
-            print("image embeds len",len(image_embeds))
-            print("image embeds size",image_embeds[0].size())
+            print("image embeds len ip_adapter_image is not None or ip_adapter_image_embeds is not None",len(image_embeds))
+            print("image embeds size ip_adapter_image is not None or ip_adapter_image_embeds is not None",image_embeds[0].size())
             added_cond_kwargs={"image_embeds": image_embeds}
         else:
             added_cond_kwargs=None

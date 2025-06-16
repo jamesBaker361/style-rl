@@ -50,5 +50,7 @@ for embedding in ["dino","ssl","siglip2","clip"]:
             datasets.load_dataset(mini_name,download_mode="force_redownload")
             mini_name=f"{name}-1000"
             datasets.load_dataset(mini_name,download_mode="force_redownload")
+            sana_name=name+"-sana"
+            datasets.load_dataset(sana_name,download_mode="force_redownload")
         except:
             pass

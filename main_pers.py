@@ -785,7 +785,8 @@ def main(args):
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
                                     guidance=guidance,
-                                    encoder_hid_proj=encoder_hid_proj
+                                    encoder_hid_proj=encoder_hid_proj,
+                                    added_cond_kwargs=added_cond_kwargs
                                 )[0]
                         else:
                             model_pred=compatible_forward_sana_transformer_model(
@@ -794,7 +795,8 @@ def main(args):
                                     encoder_hidden_states=encoder_hidden_states,
                                     timestep=timesteps,return_dict=False,
                                     guidance=guidance,
-                                    encoder_hid_proj=encoder_hid_proj
+                                    encoder_hid_proj=encoder_hid_proj,
+                                    added_cond_kwargs=added_cond_kwargs
                                 )[0]
                     else:
                         if args.vanilla:

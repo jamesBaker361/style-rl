@@ -692,7 +692,7 @@ def main(args):
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
     for e in range(start_epoch, args.epochs+1):
         scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
-        accelerator.print("scale",e)
+        accelerator.print("scale",scale)
         pipeline.set_ip_adapter_scale(scale)
         if e==args.reward_switch_epoch:
             args.training_type="reward"

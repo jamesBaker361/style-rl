@@ -700,7 +700,7 @@ def main(args):
         if args.pipeline=="sana":
             if args.training_type=="denoise":
                 scheduler=CompatibleFlowMatchEulerDiscreteScheduler.from_config(scheduler.config)
-            elif args.training_type=="denoise":
+            elif args.training_type!="denoise":
                 scheduler=SCMScheduler.from_config(scheduler.config)
             scheduler=accelerator.prepare(scheduler)
             pipeline.scheduler=scheduler

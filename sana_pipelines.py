@@ -760,14 +760,15 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         compatible_forward_sana_transformer_model,
                         self.transformer,
                         latent_model_input.to(dtype=transformer_dtype),
-                        encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
-                        encoder_attention_mask=prompt_attention_mask,
-                        guidance=guidance,
-                        timestep=scm_timestep,
-                        return_dict=False,
-                        attention_kwargs=self.attention_kwargs,
-                        added_cond_kwargs=added_cond_kwargs,
-                        encoder_hid_proj=encoder_hid_proj
+                        prompt_embeds.to(dtype=transformer_dtype), #encoder_hidden_states=
+                        scm_timestep, #timestep=scm_timestep,
+                        guidance, #guidance=
+                        prompt_attention_mask, #encoder_attention_mask=prompt_attention_mask,
+                        self.attention_kwargs, #attention_kwargs=
+                        added_cond_kwargs, #added_cond_kwargs=
+                        None,
+                        False, #return_dict=
+                        encoder_hid_proj #encoder_hid_proj=
                     )[0]
                 else:
                 # predict noise model_output

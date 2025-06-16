@@ -729,7 +729,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 batch_size * num_images_per_prompt,
                 False,
             )
-            added_cond_kwargs={"image_embeds": image_embeds}
+            added_cond_kwargs={"image_embeds": [image_embeds]}
         else:
             added_cond_kwargs=None
 

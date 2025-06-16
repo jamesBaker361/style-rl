@@ -338,7 +338,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
                 image_embeds.append(single_image_embeds[None, :])
                 if do_classifier_free_guidance:
-                    negative_image_embeds.append(single_negative_image_embeds[None, :])'''
+                    negative_image_embeds.append(single_negative_image_embeds[None, :])
         else:
             for single_image_embeds in ip_adapter_image_embeds:
                 if do_classifier_free_guidance:
@@ -354,7 +354,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 single_image_embeds = torch.cat([single_negative_image_embeds, single_image_embeds], dim=0)
 
             single_image_embeds = single_image_embeds.to(device=device)
-            ip_adapter_image_embeds.append(single_image_embeds)
+            ip_adapter_image_embeds.append(single_image_embeds)'''
 
         return ip_adapter_image_embeds
     

@@ -730,7 +730,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 False,
             )
             print("image embeds len",len(image_embeds))
-            print("image embeds size",image_embeds.size())
+            print("image embeds size",image_embeds[0].size())
             added_cond_kwargs={"image_embeds": image_embeds}
         else:
             added_cond_kwargs=None

@@ -135,6 +135,7 @@ def compatible_process_hidden_states(
         encoder_hid_proj:torch.nn.Module, encoder_hidden_states: torch.Tensor, added_cond_kwargs: Dict[str, Any]
     ) -> torch.Tensor:
     if encoder_hid_proj is not None:
+        print("not none!")
         if "image_embeds" not in added_cond_kwargs:
                 raise ValueError(
                     f"{encoder_hid_proj.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
@@ -147,7 +148,8 @@ def compatible_process_hidden_states(
             print(" failed image embeds size compatible_process_hidden_states")
         print("image embeds[0] size compatible_process_hidden_states",image_embeds[0].size())
         encoder_hidden_states = (encoder_hidden_states, image_embeds)
-
+    else:
+        print("encode hid proj none!")
     return encoder_hidden_states
 
 

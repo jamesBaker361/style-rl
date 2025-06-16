@@ -143,7 +143,11 @@ def compatible_process_hidden_states(
                 raise ValueError(
                     f"{encoder_hid_proj.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
                 )
+        
         image_embeds = added_cond_kwargs.get("image_embeds")
+        print("compatible_process_hidden_states len(image_embeds) ",len(image_embeds))
+        print("compatible_process_hidden_statesimage_embeds[0].size() ",image_embeds[0].size())
+        print('encoder_hid_proj',encoder_hid_proj)
         image_embeds = encoder_hid_proj(image_embeds)
         try:
             print("image embeds size compatible_process_hidden_states",image_embeds.size())

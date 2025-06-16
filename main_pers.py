@@ -812,6 +812,7 @@ def main(args):
                     optimizer.step()
                     optimizer.zero_grad()
             elif args.training_type=="reward":
+                print("REWARD")
                 with accelerator.accumulate(params):
                     #latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     if args.vanilla:

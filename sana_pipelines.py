@@ -232,7 +232,7 @@ def compatible_forward_sana_transformer_model(
 
     else:'''
     for index_block, block in enumerate(self.transformer_blocks):
-        print("block",index_block)
+        #print("block",index_block)
         hidden_states = compatible_forward_sana_transformer_block(
             block,
             hidden_states,

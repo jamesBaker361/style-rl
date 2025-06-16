@@ -228,7 +228,6 @@ def compatible_forward_sana_transformer_model(
     encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
-    print("before compatible_process_hidden_states", encoder_hidden_states.size())
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
     print("after compatible_process_hidden_states",len(encoder_hidden_states))
     try:

@@ -4,7 +4,7 @@ for training_type in  ["denoise","reward"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
         for prediction_type in ["v_prediction"]:
             for embedding in ["clip",]:
-                for data in ["league_captioned_splash"]:
+                for data in ["art_coco_captioned"]:
                     for suffix in ["_deep_identity",""]:
                         for lr in [0.001,0.0001]:
                             for n in [1000]:

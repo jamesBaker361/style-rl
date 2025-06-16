@@ -110,9 +110,10 @@ def compatible_forward_sana_transformer_block(
         except:
             print("encoder hidden states couldnt do size")
         print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())'''
-
+        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())
+        print("size encoder_hidden_states[1]",encoder_hidden_states[1].size())
         print("hidden states size",hidden_states.size())
-        
+
         # 3. Cross Attention
         if self.attn2 is not None:
             attn_output = self.attn2(

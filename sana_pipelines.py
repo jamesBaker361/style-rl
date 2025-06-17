@@ -642,81 +642,82 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
         
-        if prompt_attention_mask==None:
-            prompt_attention_mask=torch.ones((batch_size))
+        with torch.no_grad():
+            if prompt_attention_mask==None:
+                prompt_attention_mask=torch.ones((batch_size))
 
-        self.check_inputs(
-            prompt=prompt,
-            height=height,
-            width=width,
-            num_inference_steps=num_inference_steps,
-            timesteps=timesteps,
-            max_timesteps=max_timesteps,
-            intermediate_timesteps=intermediate_timesteps,
-            callback_on_step_end_tensor_inputs=callback_on_step_end_tensor_inputs,
-            prompt_embeds=prompt_embeds,
-            prompt_attention_mask=prompt_attention_mask,
-        )
+            self.check_inputs(
+                prompt=prompt,
+                height=height,
+                width=width,
+                num_inference_steps=num_inference_steps,
+                timesteps=timesteps,
+                max_timesteps=max_timesteps,
+                intermediate_timesteps=intermediate_timesteps,
+                callback_on_step_end_tensor_inputs=callback_on_step_end_tensor_inputs,
+                prompt_embeds=prompt_embeds,
+                prompt_attention_mask=prompt_attention_mask,
+            )
 
-        self._guidance_scale = guidance_scale
-        self._attention_kwargs = attention_kwargs
-        self._interrupt = False
+            self._guidance_scale = guidance_scale
+            self._attention_kwargs = attention_kwargs
+            self._interrupt = False
 
-        
+            
 
-        device = self.transformer.device
-        lora_scale = self.attention_kwargs.get("scale", None) if self.attention_kwargs is not None else None
+            device = self.transformer.device
+            lora_scale = self.attention_kwargs.get("scale", None) if self.attention_kwargs is not None else None
 
-        # 3. Encode input prompt
-        (
-            prompt_embeds,
-            prompt_attention_mask,
-        ) = self.encode_prompt(
-            prompt,
-            num_images_per_prompt=num_images_per_prompt,
-            device=device,
-            prompt_embeds=prompt_embeds,
-            prompt_attention_mask=prompt_attention_mask,
-            clean_caption=clean_caption,
-            max_sequence_length=max_sequence_length,
-            complex_human_instruction=complex_human_instruction,
-            lora_scale=lora_scale,
-        )
+            # 3. Encode input prompt
+            (
+                prompt_embeds,
+                prompt_attention_mask,
+            ) = self.encode_prompt(
+                prompt,
+                num_images_per_prompt=num_images_per_prompt,
+                device=device,
+                prompt_embeds=prompt_embeds,
+                prompt_attention_mask=prompt_attention_mask,
+                clean_caption=clean_caption,
+                max_sequence_length=max_sequence_length,
+                complex_human_instruction=complex_human_instruction,
+                lora_scale=lora_scale,
+            )
 
-        # 4. Prepare timesteps
-        timesteps, num_inference_steps = retrieve_timesteps(
-            self.scheduler,
-            num_inference_steps,
-            device,
-            timesteps,
-            sigmas=None,
-            max_timesteps=max_timesteps,
-            intermediate_timesteps=intermediate_timesteps,
-        )
-        if hasattr(self.scheduler, "set_begin_index"):
-            self.scheduler.set_begin_index(0)
+            # 4. Prepare timesteps
+            timesteps, num_inference_steps = retrieve_timesteps(
+                self.scheduler,
+                num_inference_steps,
+                device,
+                timesteps,
+                sigmas=None,
+                max_timesteps=max_timesteps,
+                intermediate_timesteps=intermediate_timesteps,
+            )
+            if hasattr(self.scheduler, "set_begin_index"):
+                self.scheduler.set_begin_index(0)
 
-        # 5. Prepare latents.
-        latent_channels = self.transformer.config.in_channels
-        latents = self.prepare_latents(
-            batch_size * num_images_per_prompt,
-            latent_channels,
-            height,
-            width,
-            torch.float32,
-            device,
-            generator,
-            latents,
-        )
+            # 5. Prepare latents.
+            latent_channels = self.transformer.config.in_channels
+            latents = self.prepare_latents(
+                batch_size * num_images_per_prompt,
+                latent_channels,
+                height,
+                width,
+                torch.float32,
+                device,
+                generator,
+                latents,
+            )
 
-        latents = latents * self.scheduler.config.sigma_data
+            latents = latents * self.scheduler.config.sigma_data
 
-        guidance = torch.full([1], guidance_scale, device=device, dtype=torch.float32)
-        guidance = guidance.expand(latents.shape[0]).to(prompt_embeds.dtype)
-        guidance = guidance * self.transformer.config.guidance_embeds_scale
+            guidance = torch.full([1], guidance_scale, device=device, dtype=torch.float32)
+            guidance = guidance.expand(latents.shape[0]).to(prompt_embeds.dtype)
+            guidance = guidance * self.transformer.config.guidance_embeds_scale
 
-        # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
-        extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
+            # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
+            extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
 
         if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
             image_embeds = self.prepare_ip_adapter_image_embeds(

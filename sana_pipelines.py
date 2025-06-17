@@ -99,22 +99,7 @@ def compatible_forward_sana_transformer_block(
 
         attn_output = self.attn1(norm_hidden_states)
         hidden_states = hidden_states + gate_msa * attn_output
-
-        '''if added_cond_kwargs!=None:
-            ip_hidden_states=added_cond_kwargs["image_embeds"]
-            encoder_hidden_states=(encoder_hidden_states,ip_hidden_states)
-        else:'''
-        '''print("len encoder_hidden_states",len(encoder_hidden_states))
-        try:
-            print("size encoder_hidden_states",encoder_hidden_states.size())
-        except:
-            print("encoder hidden states couldnt do size")
-        print("size encoder_hidden_states[0]",encoder_hidden_states[0].size())'''
         
-
-        print("hidden states size",hidden_states.size())
-        print("encoder hidden states",encoder_hidden_states[1][0].size() )
-        print("mask",encoder_attention_mask)
         # 3. Cross Attention
         if self.attn2 is not None:
             attn_output = self.attn2(
@@ -139,22 +124,15 @@ def compatible_process_hidden_states(
         encoder_hid_proj:torch.nn.Module, encoder_hidden_states: torch.Tensor, added_cond_kwargs: Dict[str, Any]
     ) -> torch.Tensor:
     if encoder_hid_proj is not None:
-        print("not none!")
         if "image_embeds" not in added_cond_kwargs:
                 raise ValueError(
                     f"{encoder_hid_proj.__class__} has the config param `encoder_hid_dim_type` set to 'ip_image_proj' which requires the keyword argument `image_embeds` to be passed in `added_cond_kwargs`"
                 )
         
         image_embeds = added_cond_kwargs.get("image_embeds")
-        print("compatible_process_hidden_states len(image_embeds) ",len(image_embeds))
-        print("compatible_process_hidden_statesimage_embeds[0].size() ",image_embeds[0].size())
-        print('encoder_hid_proj',encoder_hid_proj)
+
         image_embeds = encoder_hid_proj(image_embeds)
-        try:
-            print("image embeds size compatible_process_hidden_states",image_embeds.size())
-        except:
-            print(" failed image embeds size compatible_process_hidden_states")
-        print("image embeds[0] size compatible_process_hidden_states",image_embeds[0].size())
+
         encoder_hidden_states = (encoder_hidden_states, image_embeds)
     else:
         print("encode hid proj none!")
@@ -230,15 +208,7 @@ def compatible_forward_sana_transformer_model(
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
-    print("encoder_hidden_states[0].size()",encoder_hidden_states[0].size())
-    if    len(encoder_hidden_states[1])>0:
-        print("type(encoder_hidden_states[1][0]" ,type(encoder_hidden_states[1][0]))
-        try:
-            print("size encoder_hidden_states[1][0]",encoder_hidden_states[1][0].size())
-        except:
-            print("failed for size encoder_hidden_states[1][0] ")
-    else:
-        print("encoder_hidden_states[1] len =0")
+
     # 2. Transformer blocks
     '''if torch.is_grad_enabled() and self.gradient_checkpointing:
         for index_block, block in enumerate(self.transformer_blocks):
@@ -756,8 +726,6 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 batch_size * num_images_per_prompt,
                 False,
             )
-            print("image embeds len ip_adapter_image is not None or ip_adapter_image_embeds is not None",len(image_embeds))
-            print("image embeds size ip_adapter_image is not None or ip_adapter_image_embeds is not None",image_embeds[0].size())
             added_cond_kwargs={"image_embeds": image_embeds}
         else:
             added_cond_kwargs=None

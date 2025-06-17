@@ -8,7 +8,7 @@ class CustomProcessor:
     def __init__(self,size:int=224,
                  rescale_factor:float=1.0, #0.00392156862745098,
                  image_mean:list=[0.485,0.456,0.406],image_std:list=[0.229,0.224,0.225],
-                 denormalize:bool=False):
+                 denormalize:bool=True):
         self.size=size
         self.rescale_factor=rescale_factor
         self.image_mean=image_mean

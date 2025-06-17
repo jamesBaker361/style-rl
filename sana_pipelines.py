@@ -841,7 +841,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
 
         if not output_type == "latent":
             do_denormalize=[denormalize_option] * image.shape[0]
-            image = self.image_processor.postprocess(image, output_type=output_type)
+            image = self.image_processor.postprocess(image, output_type=output_type,do_denormalize=do_denormalize)
 
         # Offload all models
         self.maybe_free_model_hooks()

@@ -612,7 +612,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         ],
         ip_adapter_image: Optional[PipelineImageInput] = None,
         ip_adapter_image_embeds: Optional[List[torch.Tensor]] = None,
-        truncated_backprop: bool = True,
+        truncated_backprop: bool = False,
         truncated_backprop_rand: bool = True,
         gradient_checkpoint: bool = True,
         truncated_backprop_timestep: int = 0,

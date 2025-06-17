@@ -794,7 +794,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         prompt_embeds.to(dtype=transformer_dtype), #encoder_hidden_states=
                         scm_timestep, #timestep=scm_timestep,
                         guidance, #guidance=
-                        prompt_attention_mask, #encoder_attention_mask=prompt_attention_mask,
+                        None, #encoder_attention_mask=prompt_attention_mask,
                         None,
                         self.attention_kwargs, #attention_kwargs=
                         added_cond_kwargs, #added_cond_kwargs=
@@ -808,7 +808,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         self.transformer,
                         latent_model_input.to(dtype=transformer_dtype),
                         encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
-                        encoder_attention_mask=prompt_attention_mask,
+                        encoder_attention_mask=None,
                         guidance=guidance,
                         timestep=scm_timestep,
                         return_dict=False,

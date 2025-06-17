@@ -22,7 +22,7 @@ import numpy as np
 import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
-from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler,DDIMScheduler,SCMScheduler
+from diffusers import LCMScheduler,DiffusionPipeline,DEISMultistepScheduler,DDIMScheduler,SCMScheduler,AutoencoderDC
 from diffusers.models.attention_processor import IPAdapterAttnProcessor2_0
 from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -206,7 +206,7 @@ def main(args):
         pipeline = CompatibleSanaSprintPipeline.from_pretrained(
         "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
         )
-        
+        #pipeline.vae=AutoencoderDC.from_pretrained("")
     try:
         pipeline.safety_checker=None
     except Exception as err:

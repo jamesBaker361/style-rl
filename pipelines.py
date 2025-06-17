@@ -534,6 +534,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         reward_training:bool=False, 
         negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
         use_resolution_binning:bool=False,
+        denormalize_option:bool=True,
         **kwargs,
     ):
         
@@ -757,7 +758,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         has_nsfw_concept = None
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
-            do_denormalize = [True] * image.shape[0]
+            do_denormalize = [denormalize_option] * image.shape[0]
             try:
                 image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
             except RuntimeError:

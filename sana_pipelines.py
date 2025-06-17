@@ -621,6 +621,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         negative_prompt=None,
         fsdp:bool=True,
         reward_training:bool=False,
+        denormalize_option:bool=False,
+        **kwargs
     ) -> Union[SanaPipelineOutput, Tuple]:
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
             callback_on_step_end_tensor_inputs = callback_on_step_end.tensor_inputs
@@ -838,6 +840,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
 
         if not output_type == "latent":
+            do_denormalize=[denormalize_option] * image.shape[0]
             image = self.image_processor.postprocess(image, output_type=output_type)
 
         # Offload all models

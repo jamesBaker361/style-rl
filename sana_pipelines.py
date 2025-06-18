@@ -526,7 +526,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     (1 - 2 * scm_timestep_expanded) * latent_model_input
                     + (1 - 2 * scm_timestep_expanded + 2 * scm_timestep_expanded**2) * noise_pred
                 ) / torch.sqrt(scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2)
-                noise_pred = noise_pred.float() * self.scheduler.config.sigma_data
+                noise_pred = noise_pred * self.scheduler.config.sigma_data
 
                 
 

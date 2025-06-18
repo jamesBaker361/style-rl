@@ -163,7 +163,7 @@ def compatible_forward_sana_transformer_model(
         # weight the lora layers by setting `lora_scale` for each PEFT layer
         scale_lora_layers(self, lora_scale)
 
-
+    print(f"\t  encoder hideen states ",encoder_hidden_states.requires_grad)
     # ensure attention_mask is a bias, and give it a singleton query_tokens dimension.
     #   we may have done this conversion already, e.g. if we came here via UNet2DConditionModel#forward.
     #   we can tell by counting dims; if ndim == 2: it's a mask rather than a bias.
@@ -203,10 +203,14 @@ def compatible_forward_sana_transformer_model(
             timestep, batch_size=batch_size, hidden_dtype=hidden_states.dtype
         )
 
+    print("\t len trainable self", len([p for p in self.parameters() if p.requires_grad]))
     encoder_hidden_states = self.caption_projection(encoder_hidden_states)
+    print(f"\t  encoder hideen states post caption",encoder_hidden_states.requires_grad)
     encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
+    print(f"\t  encoder hideen states post view",encoder_hidden_states.requires_grad)
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
+    print(f"\t  encoder hideen states post caption_norm",encoder_hidden_states.requires_grad)
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
 
     # 2. Transformer blocks
@@ -233,6 +237,7 @@ def compatible_forward_sana_transformer_model(
         print("\t hidden states",hidden_states.requires_grad)
         if index_block==0 or index_block==1:
             print(f"\t {index_block} encoder hideen states",encoder_hidden_states[1])
+        print("\t len trainable block", len([p for p in block.parameters() if p.requires_grad]))
         hidden_states = compatible_forward_sana_transformer_block(
             block,
             hidden_states,

@@ -1,6 +1,6 @@
 port=29650
 
-for training_type in  ["reward","denoise"]: #,"reward","latents_reward"]:
+for training_type in  ["denoise"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
         for prediction_type in ["v_prediction"]:
             for embedding in ["clip",]:

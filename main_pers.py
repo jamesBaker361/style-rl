@@ -158,7 +158,7 @@ def main(args):
             api.create_repo(args.name,exist_ok=True)
         except HfHubHTTPError:
             print("hf hub error!")
-            time.sleep(random.randint(5,100))
+            time.sleep(random.randint(5,120))
             accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
             api=HfApi()

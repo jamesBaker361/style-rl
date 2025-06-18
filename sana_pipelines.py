@@ -230,6 +230,7 @@ def compatible_forward_sana_transformer_model(
     else:'''
     for index_block, block in enumerate(self.transformer_blocks):
         #print("block",index_block)
+        print("\t hidden states",hidden_states.requires_grad)
         hidden_states = compatible_forward_sana_transformer_block(
             block,
             hidden_states,
@@ -244,17 +245,22 @@ def compatible_forward_sana_transformer_model(
         if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
             hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
 
+    print("\t hidden states post blocks",hidden_states.requires_grad)
     # 3. Normalization
     hidden_states = self.norm_out(hidden_states, embedded_timestep, self.scale_shift_table)
-
+    print("\t hidden states post norm",hidden_states.requires_grad)
     hidden_states = self.proj_out(hidden_states)
+    print("\t hidden states post proj",hidden_states.requires_grad)
 
     # 5. Unpatchify
     hidden_states = hidden_states.reshape(
         batch_size, post_patch_height, post_patch_width, self.config.patch_size, self.config.patch_size, -1
     )
+    print("\t hidden states post reshape",hidden_states.requires_grad)
     hidden_states = hidden_states.permute(0, 5, 1, 3, 2, 4)
+    print("\t hidden states post permute",hidden_states.requires_grad)
     output = hidden_states.reshape(batch_size, -1, post_patch_height * p, post_patch_width * p)
+    print("\t hidden states post rshape 2",hidden_states.requires_grad)
 
     if USE_PEFT_BACKEND:
         # remove `lora_scale` from each PEFT layer
@@ -762,8 +768,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     noise_pred=checkpoint.checkpoint(
                         compatible_forward_sana_transformer_model,
                         self.transformer,
-                        latent_model_input.to(dtype=transformer_dtype),
-                        prompt_embeds.to(dtype=transformer_dtype), #encoder_hidden_states=
+                        latent_model_input,  #.to(dtype=transformer_dtype),
+                        prompt_embeds, #.to(dtype=transformer_dtype), #encoder_hidden_states=
                         scm_timestep, #timestep=scm_timestep,
                         guidance, #guidance=
                         None, #encoder_attention_mask=prompt_attention_mask,
@@ -778,8 +784,8 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 # predict noise model_output
                     noise_pred = compatible_forward_sana_transformer_model(
                         self.transformer,
-                        latent_model_input.to(dtype=transformer_dtype),
-                        encoder_hidden_states=prompt_embeds.to(dtype=transformer_dtype),
+                        latent_model_input,  #.to(dtype=transformer_dtype),
+                        encoder_hidden_states=prompt_embeds, #.to(dtype=transformer_dtype),
                         encoder_attention_mask=None,
                         guidance=guidance,
                         timestep=scm_timestep,

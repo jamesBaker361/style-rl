@@ -759,13 +759,15 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         #print("denoised grad",denoised.requires_grad)
         has_nsfw_concept = None
         if not output_type == "latent":
+
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
-            do_denormalize = [denormalize_option] * image.shape[0]
-            #print("imahe decoded",image.requires_grad)
-            try:
-                image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
-            except RuntimeError:
-                image = self.image_processor.postprocess(image.detach(), output_type=output_type, do_denormalize=do_denormalize)
+            if denormalize_option==True:
+                do_denormalize = [denormalize_option] * image.shape[0]
+                #print("imahe decoded",image.requires_grad)
+                try:
+                    image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
+                except RuntimeError:
+                    image = self.image_processor.postprocess(image.detach(), output_type=output_type, do_denormalize=do_denormalize)
             #print("imahe processed",image.requires_grad)
         else:
             image = denoised

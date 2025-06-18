@@ -788,6 +788,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         encoder_hid_proj=encoder_hid_proj
                     )[0]
 
+                print('post rtransformer forward',noise_pred.requires_grad, noise_pred.grad_fn)
                 if truncated_backprop:
                     if truncated_backprop_rand:
                         rand_timestep = random.randint(
@@ -798,17 +799,18 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     # fixed truncation process
                     if i < truncated_backprop_timestep:
                         noise_pred = noise_pred.detach()
-
+                print('post truncated',noise_pred.requires_grad, noise_pred.grad_fn)
                 noise_pred = (
                     (1 - 2 * scm_timestep_expanded) * latent_model_input
                     + (1 - 2 * scm_timestep_expanded + 2 * scm_timestep_expanded**2) * noise_pred
                 ) / torch.sqrt(scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2)
                 noise_pred = noise_pred * self.scheduler.config.sigma_data
-
+                print('post trig stuff',noise_pred.requires_grad, noise_pred.grad_fn)
                 # compute previous image: x_t -> x_t-1
                 latents, denoised = self.scheduler.step(
                     noise_pred, timestep, latents, **extra_step_kwargs, return_dict=False
                 )
+                print('post steps',noise_pred.requires_grad, noise_pred.grad_fn)
 
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
@@ -824,10 +826,12 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     progress_bar.update()
 
         latents = denoised / self.scheduler.config.sigma_data
+        print("latents ",latents.requires_grad, latents.grad_fn)
         if output_type == "latent":
             image = latents
         else:
             latents = latents.to(self.vae.dtype)
+            print("latents casted ",latents.requires_grad, latents.grad_fn)
             try:
                 image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
             except torch.cuda.OutOfMemoryError as e:
@@ -836,13 +840,14 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     f"Try to use VAE tiling for large images. For example: \n"
                     f"pipe.vae.enable_tiling(tile_sample_min_width=512, tile_sample_min_height=512)"
                 )
+            print("iamge decoded ",image.requires_grad, image.grad_fn)
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
-
+            print("iamge resize ",image.requires_grad, image.grad_fn)
         if not output_type == "latent":
             do_denormalize=[denormalize_option] * image.shape[0]
             image = self.image_processor.postprocess(image, output_type=output_type,do_denormalize=do_denormalize)
-
+            print("iamge post process ",image.requires_grad, image.grad_fn)
         # Offload all models
         self.maybe_free_model_hooks()
 

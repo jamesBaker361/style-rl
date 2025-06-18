@@ -163,7 +163,7 @@ def compatible_forward_sana_transformer_model(
         # weight the lora layers by setting `lora_scale` for each PEFT layer
         scale_lora_layers(self, lora_scale)
 
-    print(f"\t  encoder hideen states ",encoder_hidden_states.requires_grad)
+    #print(f"\t  encoder hideen states ",encoder_hidden_states.requires_grad)
     # ensure attention_mask is a bias, and give it a singleton query_tokens dimension.
     #   we may have done this conversion already, e.g. if we came here via UNet2DConditionModel#forward.
     #   we can tell by counting dims; if ndim == 2: it's a mask rather than a bias.
@@ -203,17 +203,17 @@ def compatible_forward_sana_transformer_model(
             timestep, batch_size=batch_size, hidden_dtype=hidden_states.dtype
         )
 
-    print("\t len trainable self", len([p for p in self.parameters() if p.requires_grad]))
+    #print("\t len trainable self", len([p for p in self.parameters() if p.requires_grad]))
     encoder_hidden_states = self.caption_projection(encoder_hidden_states)
-    print(f"\t  encoder hideen states post caption",encoder_hidden_states.requires_grad)
+    #print(f"\t  encoder hideen states post caption",encoder_hidden_states.requires_grad)
     encoder_hidden_states = encoder_hidden_states.view(batch_size, -1, hidden_states.shape[-1])
-    print(f"\t  encoder hideen states post view",encoder_hidden_states.requires_grad)
+    #print(f"\t  encoder hideen states post view",encoder_hidden_states.requires_grad)
 
     encoder_hidden_states = self.caption_norm(encoder_hidden_states)
-    print(f"\t  encoder hideen states post caption_norm",encoder_hidden_states.requires_grad)
+    #print(f"\t  encoder hideen states post caption_norm",encoder_hidden_states.requires_grad)
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
 
-    print("\t  eencoder_hid_proj",len([p for p in encoder_hid_proj.parameters() if p.requires_grad]))
+    #print("\t  eencoder_hid_proj",len([p for p in encoder_hid_proj.parameters() if p.requires_grad]))
 
     # 2. Transformer blocks
     '''if torch.is_grad_enabled() and self.gradient_checkpointing:
@@ -236,10 +236,7 @@ def compatible_forward_sana_transformer_model(
     else:'''
     for index_block, block in enumerate(self.transformer_blocks):
         #print("block",index_block)
-        print("\t hidden states",hidden_states.requires_grad)
-        if index_block==0 or index_block==1:
-            print(f"\t {index_block} encoder hideen states",encoder_hidden_states[1])
-        print("\t len trainable block", len([p for p in block.parameters() if p.requires_grad]))
+        #print("\t hidden states",hidden_states.requires_grad)
         hidden_states = compatible_forward_sana_transformer_block(
             block,
             hidden_states,
@@ -254,22 +251,22 @@ def compatible_forward_sana_transformer_model(
         if controlnet_block_samples is not None and 0 < index_block <= len(controlnet_block_samples):
             hidden_states = hidden_states + controlnet_block_samples[index_block - 1]
 
-    print("\t hidden states post blocks",hidden_states.requires_grad)
+    #print("\t hidden states post blocks",hidden_states.requires_grad)
     # 3. Normalization
     hidden_states = self.norm_out(hidden_states, embedded_timestep, self.scale_shift_table)
-    print("\t hidden states post norm",hidden_states.requires_grad)
+    #print("\t hidden states post norm",hidden_states.requires_grad)
     hidden_states = self.proj_out(hidden_states)
-    print("\t hidden states post proj",hidden_states.requires_grad)
+    #print("\t hidden states post proj",hidden_states.requires_grad)
 
     # 5. Unpatchify
     hidden_states = hidden_states.reshape(
         batch_size, post_patch_height, post_patch_width, self.config.patch_size, self.config.patch_size, -1
     )
-    print("\t hidden states post reshape",hidden_states.requires_grad)
+    #print("\t hidden states post reshape",hidden_states.requires_grad)
     hidden_states = hidden_states.permute(0, 5, 1, 3, 2, 4)
-    print("\t hidden states post permute",hidden_states.requires_grad)
+    #print("\t hidden states post permute",hidden_states.requires_grad)
     output = hidden_states.reshape(batch_size, -1, post_patch_height * p, post_patch_width * p)
-    print("\t hidden states post rshape 2",hidden_states.requires_grad)
+    #print("\t hidden states post rshape 2",hidden_states.requires_grad)
 
     if USE_PEFT_BACKEND:
         # remove `lora_scale` from each PEFT layer
@@ -756,7 +753,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         if encoder_hid_proj is None:
             print("encode hid proj none!!?!?!")
         transformer_dtype = self.transformer.dtype
-        print("latents befor eloop",latents.requires_grad)
+        #print("latents befor eloop",latents.requires_grad)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
@@ -772,7 +769,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 latent_model_input = latents_model_input * torch.sqrt(
                     scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2
                 )
-                print("latents_model_input befor eloop",latents_model_input.requires_grad)
+                #print("latents_model_input befor eloop",latents_model_input.requires_grad)
                 if gradient_checkpoint:
                     noise_pred=checkpoint.checkpoint(
                         compatible_forward_sana_transformer_model,
@@ -804,7 +801,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                         encoder_hid_proj=encoder_hid_proj
                     )[0]
 
-                print('post rtransformer forward',noise_pred.requires_grad, noise_pred.grad_fn)
+                #print('post rtransformer forward',noise_pred.requires_grad, noise_pred.grad_fn)
                 if truncated_backprop:
                     if truncated_backprop_rand:
                         rand_timestep = random.randint(
@@ -815,18 +812,18 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     # fixed truncation process
                     if i < truncated_backprop_timestep:
                         noise_pred = noise_pred.detach()
-                print('post truncated',noise_pred.requires_grad, noise_pred.grad_fn)
+                #print('post truncated',noise_pred.requires_grad, noise_pred.grad_fn)
                 noise_pred = (
                     (1 - 2 * scm_timestep_expanded) * latent_model_input
                     + (1 - 2 * scm_timestep_expanded + 2 * scm_timestep_expanded**2) * noise_pred
                 ) / torch.sqrt(scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2)
                 noise_pred = noise_pred * self.scheduler.config.sigma_data
-                print('post trig stuff',noise_pred.requires_grad, noise_pred.grad_fn)
+                #print('post trig stuff',noise_pred.requires_grad, noise_pred.grad_fn)
                 # compute previous image: x_t -> x_t-1
                 latents, denoised = self.scheduler.step(
                     noise_pred, timestep, latents, **extra_step_kwargs, return_dict=False
                 )
-                print('post steps',noise_pred.requires_grad, noise_pred.grad_fn)
+                #print('post steps',noise_pred.requires_grad, noise_pred.grad_fn)
 
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
@@ -842,12 +839,12 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     progress_bar.update()
 
         latents = denoised / self.scheduler.config.sigma_data
-        print("latents ",latents.requires_grad, latents.grad_fn)
+        #print("latents ",latents.requires_grad, latents.grad_fn)
         if output_type == "latent":
             image = latents
         else:
             latents = latents.to(self.vae.dtype)
-            print("latents casted ",latents.requires_grad, latents.grad_fn)
+            #print("latents casted ",latents.requires_grad, latents.grad_fn)
             try:
                 image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
             except torch.cuda.OutOfMemoryError as e:
@@ -856,14 +853,14 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                     f"Try to use VAE tiling for large images. For example: \n"
                     f"pipe.vae.enable_tiling(tile_sample_min_width=512, tile_sample_min_height=512)"
                 )
-            print("iamge decoded ",image.requires_grad, image.grad_fn)
+            #print("iamge decoded ",image.requires_grad, image.grad_fn)
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
-            print("iamge resize ",image.requires_grad, image.grad_fn)
+            #print("iamge resize ",image.requires_grad, image.grad_fn)
         if not output_type == "latent":
             do_denormalize=[denormalize_option] * image.shape[0]
             image = self.image_processor.postprocess(image, output_type=output_type,do_denormalize=do_denormalize)
-            print("iamge post process ",image.requires_grad, image.grad_fn)
+            #print("iamge post process ",image.requires_grad, image.grad_fn)
         # Offload all models
         self.maybe_free_model_hooks()
 

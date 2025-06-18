@@ -778,6 +778,7 @@ def main(args):
                         guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)
                         guidance = guidance.expand(noisy_latents.shape[0]).to(noisy_latents.dtype)
                         guidance = guidance * denoising_model.config.guidance_embeds_scale
+                        print("noisy_latents",noisy_latents.requires_grad)
                         if args.vanilla:
                             with accelerator.autocast():
                                 model_pred=compatible_forward_sana_transformer_model(
@@ -799,6 +800,7 @@ def main(args):
                                     encoder_hid_proj=encoder_hid_proj,
                                     added_cond_kwargs=added_cond_kwargs
                                 )[0]
+                        print("model pred",model_pred.requires_grad)
                     else:
                         if args.vanilla:
                             with accelerator.autocast():

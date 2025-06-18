@@ -859,6 +859,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             #print("iamge resize ",image.requires_grad, image.grad_fn)
         if not output_type == "latent":
             do_denormalize=[denormalize_option] * image.shape[0]
+            print("before postprocess",image.min(),image.max())
             image = self.image_processor.postprocess(image, output_type=output_type,do_denormalize=do_denormalize)
             #print("iamge post process ",image.requires_grad, image.grad_fn)
         # Offload all models

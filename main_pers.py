@@ -808,6 +808,7 @@ def main(args):
                                 
                         else:
                             model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                    #print("params with grad")
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
 

@@ -846,57 +846,7 @@ def main(args):
 
                     optimizer.step()
                     optimizer.zero_grad()
-            elif args.training_type=="latents_reward":
-                with accelerator.accumulate(params):
-                    latents = DiagonalGaussianDistribution(posterior_batch).sample()
-                    if args.vanilla:
-                            with accelerator.autocast():
-                                images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                            #latents=latents, 
-                                                            num_inference_steps=args.num_inference_steps, 
-                                                            ip_adapter_image_embeds=[image_embeds],output_type="latent",truncated_backprop=False,reward_training=True,
-                                                            height=args.image_size,width=args.image_size).images
-
-                    else:
-                        images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                        #latents=latents, 
-                                                        num_inference_steps=args.num_inference_steps,
-                                                            ip_adapter_image_embeds=[image_embeds],output_type="latent",
-                                                            truncated_backprop=False,fsdp=True,reward_training=True,
-                                                            height=args.image_size,width=args.image_size).images
-                    loss=loss_fn(images,latents)
-                    accelerator.backward(loss)
-                    optimizer.step()
-                    optimizer.zero_grad()
-            elif args.training_type=="mse_reward":
-                batch_size=image_batch.size()[-1]
-                image_batch=pipeline.image_processor.postprocess(image_batch,"pt",[True]*batch_size)
-                with accelerator.accumulate(params):
-                    #latents = DiagonalGaussianDistribution(posterior_batch).sample()
-                    if args.vanilla:
-                        with accelerator.autocast():
-                            images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                        #latents=latents, 
-                                                        num_inference_steps=args.num_inference_steps, 
-                                                        ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
-                                                        use_resolution_binning=False,
-                                                        height=args.image_size,width=args.image_size).images
-                            #print("reward max, min",images.max(),images.min())
-                            loss=loss_fn(image_batch,images)
-                    else:
-                        images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                        #latents=latents, 
-                                                        num_inference_steps=args.num_inference_steps,
-                                                          ip_adapter_image_embeds=[image_embeds],output_type="pt",
-                                                          truncated_backprop=False,fsdp=True,reward_training=True,
-                                                          use_resolution_binning=False,
-                                                          height=args.image_size,width=args.image_size).images
-                        loss=loss_fn(image_batch,images)
-                    #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
-                    accelerator.backward(loss)
-
-                    optimizer.step()
-                    optimizer.zero_grad()
+            
             loss_buffer.append(loss.cpu().detach().item())
             if torch.cuda.is_available():
                 before_memory=get_gpu_memory_usage()["allocated_mb"]

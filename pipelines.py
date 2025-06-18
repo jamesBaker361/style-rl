@@ -680,7 +680,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         #print("t",timesteps.size())
         #print("prompt_embeds",prompt_embeds.size())
         #print("image embeds",image_embeds[0].size(),image_embeds[0].device)
-        print("latents befor eloop",latents.requires_grad)
+        #print("latents befor eloop",latents.requires_grad)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 #print(f"step {i}/num_inference_steps")
@@ -714,7 +714,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         return_dict=False,
                     )[0]
                 #print("loop model_pred",len(find_cuda_objects()))   
-                print("model pred grad post unet",model_pred.requires_grad)
+                #print("model pred grad post unet",model_pred.requires_grad)
                 if truncated_backprop:
                     if truncated_backprop_rand:
                         rand_timestep = random.randint(
@@ -727,11 +727,11 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                         model_pred = model_pred.detach()
                 # compute the previous noisy sample x_t -> x_t-1
                 #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
-                print("model pred grad post truncation",model_pred.requires_grad)
+                #print("model pred grad post truncation",model_pred.requires_grad)
                 t=t.to(model_pred.device)
                 #latents=latents.to(model_pred.device)
                 latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
-                print("dnoised post step", denoised.requires_grad)
+                #print("dnoised post step", denoised.requires_grad)
                 #print("latents grad",latents.requires_grad)
                 #print("model pred grad",model_pred.requires_grad)
                 #print("loop latents denoised",len(find_cuda_objects()))   
@@ -761,12 +761,12 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         if not output_type == "latent":
             image = self.vae.decode(denoised / self.vae.config.scaling_factor, return_dict=False)[0]
             do_denormalize = [denormalize_option] * image.shape[0]
-            print("imahe decoded",image.requires_grad)
+            #print("imahe decoded",image.requires_grad)
             try:
                 image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
             except RuntimeError:
                 image = self.image_processor.postprocess(image.detach(), output_type=output_type, do_denormalize=do_denormalize)
-            print("imahe processed",image.requires_grad)
+            #print("imahe processed",image.requires_grad)
         else:
             image = denoised
 

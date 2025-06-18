@@ -213,6 +213,8 @@ def compatible_forward_sana_transformer_model(
     print(f"\t  encoder hideen states post caption_norm",encoder_hidden_states.requires_grad)
     encoder_hidden_states=compatible_process_hidden_states(encoder_hid_proj,encoder_hidden_states,added_cond_kwargs)
 
+    print("\t  eencoder_hid_proj",len([p for p in encoder_hid_proj.parameters() if p.requires_grad]))
+
     # 2. Transformer blocks
     '''if torch.is_grad_enabled() and self.gradient_checkpointing:
         for index_block, block in enumerate(self.transformer_blocks):

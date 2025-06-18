@@ -741,6 +741,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
         if encoder_hid_proj is None:
             print("encode hid proj none!!?!?!")
         transformer_dtype = self.transformer.dtype
+        print("latents befor eloop",latents.requires_grad)
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
@@ -756,7 +757,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
                 latent_model_input = latents_model_input * torch.sqrt(
                     scm_timestep_expanded**2 + (1 - scm_timestep_expanded) ** 2
                 )
-
+                print("latents_model_input befor eloop",latents_model_input.requires_grad)
                 if gradient_checkpoint:
                     noise_pred=checkpoint.checkpoint(
                         compatible_forward_sana_transformer_model,

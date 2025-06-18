@@ -231,6 +231,14 @@ def compatible_forward_sana_transformer_model(
     for index_block, block in enumerate(self.transformer_blocks):
         #print("block",index_block)
         print("\t hidden states",hidden_states.requires_grad)
+        if index_block==0:
+            print("\tattention mask",attention_mask)
+            print("\tencoder hideen states",encoder_hidden_states)
+            print("\t encoder attn mask",encoder_attention_mask)
+            print("\timestep",timestep)
+            print("\t post_patch_height",post_patch_height)
+            print("\t post path width ",post_patch_width)
+            print("\t cadded cond kawrskgs ",added_cond_kwargs)
         hidden_states = compatible_forward_sana_transformer_block(
             block,
             hidden_states,

@@ -815,6 +815,9 @@ def main(args):
                     optimizer.zero_grad()
             elif args.training_type=="reward":
                 with accelerator.accumulate(params):
+                    gradient_checkpoint=True
+                    if args.pipeline=="sana":
+                        gradient_checkpoint=False
                     #latents = DiagonalGaussianDistribution(posterior_batch).sample()
                     if args.vanilla:
                         with accelerator.autocast():
@@ -822,7 +825,7 @@ def main(args):
                                                         #latents=latents, 
                                                         num_inference_steps=args.num_inference_steps, 
                                                         ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
-                                                        use_resolution_binning=False,
+                                                        use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
                                                         height=args.image_size,width=args.image_size,denormalize_option=False).images
                             #print("reward max, min",images.max(),images.min())
                             predicted=embedding_util.embed_img_tensor(images)
@@ -833,7 +836,7 @@ def main(args):
                                                         num_inference_steps=args.num_inference_steps,
                                                           ip_adapter_image_embeds=[image_embeds],output_type="pt",
                                                           truncated_backprop=False,fsdp=True,reward_training=True,
-                                                          use_resolution_binning=False,
+                                                          use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
                                                           height=args.image_size,width=args.image_size,denormalize_option=False).images
                         predicted=embedding_util.embed_img_tensor(images)
                         loss=loss_fn(predicted,embeds_batch)

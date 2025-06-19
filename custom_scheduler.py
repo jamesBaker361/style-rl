@@ -14,10 +14,6 @@ class CompatibleSCMScheduler(SCMScheduler):
         t=torch.arctan(torch.exp(timesteps)/self.config.sigma_data).view(-1,1,1,1)
         noise=self.config.sigma_data*noise
 
-        print("t size",t.size())
-        print("original sample",original_samples.size())
-        print("noise",noise.size())
-
         noisy_model_input = torch.cos(t) * original_samples + torch.sin(t) * noise
         return noisy_model_input/self.config.sigma_data,t,noise
 

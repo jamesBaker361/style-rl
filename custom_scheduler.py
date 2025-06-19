@@ -9,15 +9,7 @@ class CompatibleSCMScheduler(SCMScheduler):
         noise: torch.Tensor,
         timesteps: torch.Tensor,
     ) -> torch.Tensor:
-        # Make sure sigmas and timesteps have the same device and dtype as original_samples
-        sigmas = self.sigmas.to(device=original_samples.device, dtype=original_samples.dtype)
-        if original_samples.device.type == "mps" and torch.is_floating_point(timesteps):
-            # mps does not support float64
-            schedule_timesteps = self.timesteps.to(original_samples.device, dtype=torch.float32)
-            timesteps = timesteps.to(original_samples.device, dtype=torch.float32)
-        else:
-            schedule_timesteps = self.timesteps.to(original_samples.device)
-            timesteps = timesteps.to(original_samples.device)
+
 
         t=torch.arctan(torch.exp(timesteps)/self.config.sigma_data)
         noise=self.config.sigma_data*noise

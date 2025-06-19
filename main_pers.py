@@ -39,7 +39,7 @@ from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from PIL import Image
 from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter,compatible_forward_sana_transformer_model
-from custom_scheduler import CompatibleFlowMatchEulerDiscreteScheduler
+from custom_scheduler import CompatibleFlowMatchEulerDiscreteScheduler,CompatibleSCMScheduler
 
 def concat_images_horizontally(images):
     """
@@ -126,6 +126,7 @@ parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
 parser.add_argument("--reward_switch_epoch",type=int,default=-1)
 parser.add_argument("--initial_scale",type=float,default=1.0)
 parser.add_argument("--final_scale",type=float,default=1.0)
+parser.add_argument("--sigma_data",type=float,default=-0.8)
 
 import torch
 import torch.nn.functional as F
@@ -698,10 +699,7 @@ def main(args):
             args.training_type="reward"
 
         if args.pipeline=="sana":
-            if args.training_type=="denoise":
-                scheduler=CompatibleFlowMatchEulerDiscreteScheduler.from_config(scheduler.config)
-            elif args.training_type!="denoise":
-                scheduler=SCMScheduler.from_config(scheduler.config)
+            scheduler=CompatibleSCMScheduler.from_config(scheduler.config)
             scheduler=accelerator.prepare(scheduler)
             pipeline.scheduler=scheduler
             accelerator.wait_for_everyone()
@@ -756,8 +754,10 @@ def main(args):
 
                     #https://github.com/NVlabs/Sana/blob/main/train_scripts/train_dreambooth_lora_sana.py
                         
-
-                    noisy_latents = scheduler.add_noise(latents, noise, timesteps)
+                    if type(scheduler)==CompatibleSCMScheduler:
+                        noisy_latents,transformed_t,noise=scheduler.add_noise(latents, noise, timesteps)
+                    else:
+                        noisy_latents = scheduler.add_noise(latents, noise, timesteps)
 
                     # Get the target for loss depending on the prediction type
                     if args.prediction_type is not None:
@@ -768,6 +768,8 @@ def main(args):
                         target = noise
                     elif scheduler.config.prediction_type == "v_prediction":
                         target = scheduler.get_velocity(latents, noise, timesteps)
+                    elif scheduler.config.prediction_type=="trigflow":
+                        target= torch.cos(transformed_t) * noise - torch.sin(transformed_t)*latents
                     else:
                         raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
                     
@@ -800,7 +802,9 @@ def main(args):
                                     encoder_hid_proj=encoder_hid_proj,
                                     added_cond_kwargs=added_cond_kwargs
                                 )[0]
-                        print("model pred",model_pred.requires_grad)
+                        #print("model pred",model_pred.requires_grad)
+                        if scheduler.config.prediction_type=="trig_flow":
+                            model_pred=scheduler.config.sigma_data*model_pred
                     else:
                         if args.vanilla:
                             with accelerator.autocast():

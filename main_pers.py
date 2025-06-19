@@ -706,6 +706,7 @@ def main(args):
         before_objects=find_cuda_objects()
         start=time.time()
         loss_buffer=[]
+        grad_norm_buffer=[]
         for b,batch in enumerate(train_loader):
 
             for k,v in batch.items():
@@ -729,6 +730,7 @@ def main(args):
             prompt=text_batch
             if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                 prompt=" "
+            grad_norm=0.0
             #print(pipeline.text_encoder)
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
@@ -815,7 +817,7 @@ def main(args):
                     #print("params with grad")
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     accelerator.backward(loss)
-
+                    grad_norm+=np.mean([param.grad.cpu().data.norm(2) for param in params])
                     optimizer.step()
                     optimizer.zero_grad()
             elif args.training_type=="reward":
@@ -847,7 +849,7 @@ def main(args):
                         loss=loss_fn(predicted,embeds_batch)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
                     accelerator.backward(loss)
-
+                    grad_norm+=np.mean([param.grad.cpu().data.norm(2) for param in params])
                     optimizer.step()
                     optimizer.zero_grad()
             
@@ -879,7 +881,7 @@ def main(args):
             with torch.no_grad():
 
                 start=time.time()
-                clip_model=clip_model.to(pipeline.unet.device)
+                clip_model=clip_model.to(denoising_model.device)
                 val_metrics=logging(val_loader,pipeline,clip_model=clip_model)
                 clip_model=clip_model.cpu()
                 end=time.time()
@@ -891,7 +893,7 @@ def main(args):
         if e%args.upload_interval==0:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
-                state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
+                state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
                 print("state dict len",len(state_dict))
                 torch.save(state_dict,save_path)
                 with open(config_path,"w+") as config_file:
@@ -912,7 +914,7 @@ def main(args):
     training_end=time.time()
     accelerator.print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()
-    clip_model=clip_model.to(pipeline.unet.device)
+    clip_model=clip_model.to(denoising_model.device)
     metrics=logging(test_loader,pipeline,auto_log=False)
     new_metrics={}
     for k,v in metrics.items():
@@ -951,7 +953,7 @@ def main(args):
         accelerator.log(new_metrics)
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
-        state_dict={name: param for name, param in pipeline.unet.named_parameters() if param.requires_grad}
+        state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
         print("state dict len",len(state_dict))
         '''for k in state_dict.keys():
             print("\t",k)'''

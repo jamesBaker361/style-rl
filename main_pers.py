@@ -816,8 +816,10 @@ def main(args):
                             model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
                     #print("params with grad")
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
                     accelerator.backward(loss)
-                    grad_norm+=np.mean([param.grad.cpu().data.norm(2) for param in params])
+                    print("params with grad ",len([p for p in params if p.grad is not None]))
+                    #grad_norm+=np.mean([param.grad.data.norm(2) for param in params])
                     optimizer.step()
                     optimizer.zero_grad()
             elif args.training_type=="reward":
@@ -848,8 +850,10 @@ def main(args):
                         predicted=embedding_util.embed_img_tensor(images)
                         loss=loss_fn(predicted,embeds_batch)
                     #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
+                    print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
                     accelerator.backward(loss)
-                    grad_norm+=np.mean([param.grad.cpu().data.norm(2) for param in params])
+                    print("params with grad ",len([p for p in params if p.grad is not None]))
+                    #grad_norm+=np.mean([param.grad.cpu().data.norm(2) for param in params])
                     optimizer.step()
                     optimizer.zero_grad()
             

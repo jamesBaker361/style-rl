@@ -821,7 +821,7 @@ def main(args):
                     #print("params with grad ",len([p for p in params if p.grad is not None]))
                     
                     for param in params:
-                        if param.grad is None:
+                        if param.grad is not None:
                             grad_norm+=param.grad.data.norm(2)
 
                     optimizer.step()
@@ -858,7 +858,7 @@ def main(args):
                     accelerator.backward(loss)
                     #print("params with grad ",len([p for p in params if p.grad is not None]))
                     for param in params:
-                        if param.grad is None:
+                        if param.grad is not None:
                             grad_norm+=param.grad.data.norm(2)
                             
                     optimizer.step()

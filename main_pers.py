@@ -393,6 +393,7 @@ def main(args):
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]
+    persistent_grad_norm_list=[]
     persistent_text_alignment_list=[]
     persistent_fid_list=[]
     if args.load:
@@ -404,6 +405,10 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_alignment_list=data["persistent_text_alignment_list"]
             persistent_fid_list=data["persistent_fid_list"]
+            try:
+                persistent_grad_norm_list=data["persistent_grad_norm_list"]
+            except KeyError:
+                print("key error persistent_grad_norm_list list")
             accelerator.print("loaded from ",save_path)
         except Exception as e:
             accelerator.print("couldnt load locally")
@@ -419,6 +424,10 @@ def main(args):
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_alignment_list=data["persistent_text_alignment_list"]
             persistent_fid_list=data["persistent_fid_list"]
+            try:
+                persistent_grad_norm_list=data["persistent_grad_norm_list"]
+            except KeyError:
+                print("key error persistent_grad_norm_list list")
             accelerator.print("loaded from  ",pretrained_weights_path)
         except Exception as e:
             accelerator.print("couldnt load from hf")
@@ -880,6 +889,7 @@ def main(args):
             "elapsed":elapsed
         })
         persistent_loss_list.append(np.mean(loss_buffer))
+        persistent_grad_norm_list.append(np.mean(grad_norm_buffer))
         torch.cuda.empty_cache()
         accelerator.free_memory()
         if e%args.validation_interval==0:
@@ -904,6 +914,7 @@ def main(args):
                 torch.save(state_dict,save_path)
                 with open(config_path,"w+") as config_file:
                     data={"start_epoch":e,
+                          "persistent_grad_norm_list":persistent_grad_norm_list,
                         "persistent_loss_list":persistent_loss_list,
                         "persistent_text_alignment_list":persistent_text_alignment_list,
                         "persistent_fid_list":persistent_fid_list}
@@ -966,6 +977,7 @@ def main(args):
         torch.save(state_dict,save_path)
         with open(config_path,"w+") as config_file:
             data={"start_epoch":args.epochs+1,
+                   "persistent_grad_norm_list":persistent_grad_norm_list,
                         "persistent_loss_list":persistent_loss_list,
                         "persistent_text_alignment_list":persistent_text_alignment_list,
                         "persistent_fid_list":persistent_fid_list}
@@ -979,7 +991,7 @@ def main(args):
         api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
                                 repo_id=args.name)
         print(f"uploaded {args.name} to hub")
-        for k in ["persistent_loss_list","persistent_text_alignment_list","persistent_fid_list"]:
+        for k in ["persistent_loss_list","persistent_text_alignment_list","persistent_fid_list","persistent_grad_norm_list"]:
             persistent_list=data[k]
             key=k[:-5]
             for value in persistent_list:

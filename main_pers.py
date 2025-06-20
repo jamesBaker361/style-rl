@@ -560,12 +560,6 @@ def main(args):
         image_list=[]
         fake_image_list=[]
 
-        if args.pipeline=="sana":
-            scheduler=SCMScheduler.from_config(scheduler.config)
-            scheduler=accelerator.prepare(scheduler)
-            pipeline.scheduler=scheduler
-            accelerator.wait_for_everyone()
-
         if args.pipeline=="lcm_post_lora":
             pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
             pipeline.enable_lora()

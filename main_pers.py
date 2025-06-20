@@ -816,7 +816,7 @@ def main(args):
                     
                     for param in params:
                         if param.grad is not None:
-                            grad_norm+=param.grad.data.norm(2)
+                            grad_norm_buffer.append(param.grad.data.norm(2))
 
                     optimizer.step()
                     optimizer.zero_grad()
@@ -853,7 +853,7 @@ def main(args):
                     #print("params with grad ",len([p for p in params if p.grad is not None]))
                     for param in params:
                         if param.grad is not None:
-                            grad_norm+=param.grad.data.norm(2)
+                            grad_norm_buffer.append(param.grad.data.norm(2))
                             
                     optimizer.step()
                     optimizer.zero_grad()
@@ -874,6 +874,7 @@ def main(args):
         elapsed=end-start
         accelerator.print(f"\t epoch {e} elapsed {end-start}")
         accelerator.log({
+            "grad_norm":np.mean(grad_norm_buffer),
             "loss_mean":np.mean(loss_buffer),
             "loss_std":np.std(loss_buffer),
             "elapsed":elapsed

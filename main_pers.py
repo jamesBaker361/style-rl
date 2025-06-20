@@ -819,7 +819,11 @@ def main(args):
                     #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
                     accelerator.backward(loss)
                     #print("params with grad ",len([p for p in params if p.grad is not None]))
-                    grad_norm+=np.mean([param.grad.data.norm(2) for param in params])
+                    
+                    for param in params:
+                        if param.grad is None:
+                            grad_norm+=param.grad.data.norm(2)
+
                     optimizer.step()
                     optimizer.zero_grad()
             elif args.training_type=="reward":
@@ -853,7 +857,10 @@ def main(args):
                     #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
                     accelerator.backward(loss)
                     #print("params with grad ",len([p for p in params if p.grad is not None]))
-                    grad_norm+=np.mean([param.grad.data.norm(2) for param in params])
+                    for param in params:
+                        if param.grad is None:
+                            grad_norm+=param.grad.data.norm(2)
+                            
                     optimizer.step()
                     optimizer.zero_grad()
             

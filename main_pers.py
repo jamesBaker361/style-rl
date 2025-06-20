@@ -888,8 +888,8 @@ def main(args):
             "loss_std":np.std(loss_buffer),
             "elapsed":elapsed
         })
-        persistent_loss_list.append(np.mean(loss_buffer))
-        persistent_grad_norm_list.append(np.mean(grad_norm_buffer))
+        persistent_loss_list.append(float(np.mean(loss_buffer)))
+        persistent_grad_norm_list.append(float(np.mean(grad_norm_buffer)))
         torch.cuda.empty_cache()
         accelerator.free_memory()
         if e%args.validation_interval==0:

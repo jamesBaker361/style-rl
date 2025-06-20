@@ -18,6 +18,7 @@ for training_type in  ["reward","denoise"]: #,"reward","latents_reward"]:
                                     command+=f" --mixed_precision fp16 --prediction_type {prediction_type} --upload_interval 5 --uncaptioned_frac {frac} --train_split 0.95 --lr {lr} --load --generic_test_prompts "
                                     command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-{data}-{n}-{pipeline} --vanilla --name jlbaker361/{name} --gradient_accumulation_steps 8  "
                                     command+=f" --num_inference_steps 2 "
+                                    command+=f" {pipeline} "
                                     if training_type=="reward":
                                         command+=" --initial_scale 0.25 "
                                     if suffix=="_no_proj":

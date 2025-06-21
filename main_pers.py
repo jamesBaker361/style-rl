@@ -747,7 +747,6 @@ def main(args):
             prompt=text_batch
             if args.epochs >1 and  random.random() <args.uncaptioned_frac:
                 prompt=" "
-            grad_norm=0.0
             #print(pipeline.text_encoder)
             if args.training_type=="denoise":
                 with accelerator.accumulate(params):
@@ -882,16 +881,9 @@ def main(args):
                     optimizer.zero_grad()
             
             loss_buffer.append(loss.cpu().detach().item())
-            if torch.cuda.is_available():
-                before_memory=get_gpu_memory_usage()["allocated_mb"]
+
             after_objects=find_cuda_objects()
-            len_after=len(after_objects)
             delete_unique_objects(before_objects,after_objects)
-            after_after_objects=find_cuda_objects()
-            #print("deleted ",len_after-len(after_after_objects))
-            if torch.cuda.is_available():
-                after_memory=get_gpu_memory_usage()["allocated_mb"]
-                #print(f"freed {before_memory-after_memory} mb")
 
         end=time.time()
         elapsed=end-start
@@ -923,6 +915,7 @@ def main(args):
         if e%args.upload_interval==0:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
+                before_objects=find_cuda_objects()
                 state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
                 print("state dict len",len(state_dict))
                 torch.save(state_dict,save_path)
@@ -942,6 +935,9 @@ def main(args):
                 api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
                                 repo_id=args.name)
                 accelerator.print(f"uploaded {args.name} to hub")
+                after_objects=find_cuda_objects()
+                delete_unique_objects(before_objects,after_objects)
+                
     training_end=time.time()
     accelerator.print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()

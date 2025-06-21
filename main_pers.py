@@ -575,6 +575,7 @@ def main(args):
     
 
     def logging(data_loader,pipeline,baseline:bool=False,auto_log:bool=True,clip_model:CLIPModel=clip_model):
+        before_objects=find_cuda_objects()
         metrics={}
         difference_list=[]
         embedding_difference_list=[]
@@ -702,6 +703,9 @@ def main(args):
             accelerator.log(metrics)
         if args.pipeline=="lcm_post_lora":
             pipeline.disable_lora()
+        
+        after_objects=find_cuda_objects()
+        delete_unique_objects(before_objects,after_objects)
         return metrics
 
     training_start=time.time()

@@ -570,7 +570,6 @@ def main(args):
         fake_image_list=[]
 
         if args.pipeline=="lcm_post_lora":
-            pipeline.scheduler = LCMScheduler.from_config(pipeline.scheduler.config)
             pipeline.enable_lora()
         pipeline=pipeline.to(accelerator.device)
         pipeline.vae=pipeline.vae.to(accelerator.device)

@@ -652,6 +652,7 @@ def main(args):
             
             
             pil_image_set=pipeline.image_processor.postprocess(fake_image,"pil",do_denormalize)
+            pil_image_set_unnorm=pipeline.image_processor.postprocess(fake_image,"pil",[False]*batch_size)
             
 
 
@@ -669,8 +670,8 @@ def main(args):
             
             clip_alignment_list.append(clip_difference.cpu().detach().item())
 
-            for pil_image,real_pil_image,prompt in zip(pil_image_set,real_pil_image_set,prompt_batch):
-                concat_image=concat_images_horizontally([real_pil_image,pil_image])
+            for pil_image,real_pil_image,pil_image_unnorm,prompt in zip(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
+                concat_image=concat_images_horizontally([real_pil_image,pil_image_set_unnorm,pil_image])
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         metrics["difference"]=np.mean(difference_list)

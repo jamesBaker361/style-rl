@@ -222,6 +222,12 @@ def main(args):
 
 
     accelerator.print(pipeline.scheduler)
+
+    for attribute in ["add_noise","get_velocity","step"]:
+        if getattr(pipeline.scheduler,attribute,None) is not None:
+            print(f"scheduler {attribute} exists")
+        else:
+            print(f"scheduler {attribute} does not exist ")
     '''scheduler_class={
             "LCMScheduler":LCMScheduler,
             "DDIMScheduler":DDIMScheduler,
@@ -709,9 +715,6 @@ def main(args):
             args.training_type="reward"
 
         if args.pipeline=="sana":
-            scheduler=CompatibleSCMScheduler.from_config(scheduler.config)
-            scheduler=accelerator.prepare(scheduler)
-            pipeline.scheduler=scheduler
             accelerator.wait_for_everyone()
         before_objects=find_cuda_objects()
         start=time.time()

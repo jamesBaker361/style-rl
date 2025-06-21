@@ -39,7 +39,7 @@ from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from PIL import Image
 from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter,compatible_forward_sana_transformer_model
-from custom_scheduler import CompatibleFlowMatchEulerDiscreteScheduler,CompatibleSCMScheduler
+from custom_scheduler import *
 
 def concat_images_horizontally(images):
     """
@@ -212,6 +212,13 @@ def main(args):
         pipeline.safety_checker=None
     except Exception as err:
         accelerator.print("tried to set safety checker to None",err)
+
+    if type(pipeline.scheduler)==SCMScheduler:
+        pipeline.scheduler=CompatibleSCMScheduler.from_config(pipeline.scheduler.config)
+    elif type(pipeline.scheduler)==DEISMultistepScheduler:
+        pipeline.scheduler=CompatibleDEISMultistepScheduler.from_config(pipeline.scheduler.config)
+    elif type(pipeline.scheduler)==FlowMatchEulerDiscreteScheduler:
+        pipeline.scheduler=CompatibleFlowMatchEulerDiscreteScheduler.from_config(pipeline.scheduler.config)
 
 
     accelerator.print(pipeline.scheduler)

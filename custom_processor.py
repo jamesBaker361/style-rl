@@ -18,13 +18,14 @@ class CustomProcessor:
     def __call__(self, images:torch.Tensor)->dict:
 
         if self.denormalize and images.min()>=0:
-            print(f"images are already denormalized max: {images.max()} min: {images.min()}")
+            print(f"images are already denormalized max: {images.max()} min: {images.min()}, NOT denormalizing")
+        elif self.denormalize:
+            images=(images+1)/2 #convert from [-1,1] to 0,1
         if self.denormalize==False and images.min()<0:
             print(f"images should be denormalized max: {images.max()} min: {images.min()}")
         
         #resize
-        if self.denormalize:
-            images=(images+1)/2 #convert from [-1,1] to 0,1
+        
 
         
         images=F_v2.resize(images, (self.size,self.size))

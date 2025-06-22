@@ -15,7 +15,7 @@ for training_type in  ["denoise","reward"]: #,"reward","latents_reward"]:
                                     port+=1
                                     command=f"sbatch  -J pers  --err=slurm/pers_{data}/{name}.err --out=slurm/pers_{data}/{name}.out --gres=gpu:1 "
                                     command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_pers.py --epochs 500 --limit -1 --batch_size 2 --project_name {data}-{n} "
-                                    command+=f" --mixed_precision fp16 --prediction_type {prediction_type} --upload_interval 5 --uncaptioned_frac {frac} --train_split 0.95 --lr {lr} --load --generic_test_prompts "
+                                    command+=f" --mixed_precision fp16 --prediction_type {prediction_type} --upload_interval 1 --uncaptioned_frac {frac} --train_split 0.95 --lr {lr} --load --generic_test_prompts "
                                     command+=f" --embedding {embedding} --training_type {training_type} --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name} --gradient_accumulation_steps 8  "
                                     command+=f" --pipeline {pipeline} "
                                     if training_type=="reward":

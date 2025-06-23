@@ -25,7 +25,6 @@ for root, dirs, files in os.walk(os.path.join(slurm_folder,dataset)):
             with open(os.path.join(root,name),"r") as read_file:
                 for line in read_file:
                     if line.startswith("OOM"):
-                        print(name)
                         target_job_list.append(name)
 
 command_list=[]

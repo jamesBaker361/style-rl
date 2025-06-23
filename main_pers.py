@@ -671,7 +671,7 @@ def main(args):
 
             
             inputs = clip_processor(
-                text=prompt_batch, images=pil_image_set, return_tensors="pt", padding=True
+                text=prompt_batch, images=pil_image_set_unnorm, return_tensors="pt", padding=True
             )
             for k,v in inputs.items():
                 inputs[k]=v.to(clip_model.device)

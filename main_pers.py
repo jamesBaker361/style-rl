@@ -713,193 +713,194 @@ def main(args):
     training_start=time.time()
     
     accelerator.print(f"training from {start_epoch} to {args.epochs}")
-    for e in range(start_epoch, args.epochs+1):
-        scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
-        accelerator.print("scale",scale)
-        pipeline.set_ip_adapter_scale(scale)
-        if e==args.reward_switch_epoch:
-            args.training_type="reward"
+    try:
+        for e in range(start_epoch, args.epochs+1):
+            scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
+            accelerator.print("scale",scale)
+            pipeline.set_ip_adapter_scale(scale)
+            if e==args.reward_switch_epoch:
+                args.training_type="reward"
 
-        if args.pipeline=="sana":
-            accelerator.wait_for_everyone()
-        before_objects=find_cuda_objects()
-        start=time.time()
-        loss_buffer=[]
-        grad_norm_buffer=[]
-        for b,batch in enumerate(train_loader):
+            if args.pipeline=="sana":
+                accelerator.wait_for_everyone()
+            before_objects=find_cuda_objects()
+            start=time.time()
+            loss_buffer=[]
+            grad_norm_buffer=[]
+            for b,batch in enumerate(train_loader):
 
-            for k,v in batch.items():
-                if type(v)==torch.Tensor:
-                    if args.deepspeed:
-                        batch[k]=v.to(torch_dtype)
-                    else:
-                        batch[k]=v.to(device,torch_dtype)
+                for k,v in batch.items():
+                    if type(v)==torch.Tensor:
+                        if args.deepspeed:
+                            batch[k]=v.to(torch_dtype)
+                        else:
+                            batch[k]=v.to(device,torch_dtype)
+                    
+                image_batch=batch["image"]
+                text_batch=batch["text"]
+                embeds_batch=batch["embeds"]
+                posterior_batch=batch["posterior"]
                 
-            image_batch=batch["image"]
-            text_batch=batch["text"]
-            embeds_batch=batch["embeds"]
-            posterior_batch=batch["posterior"]
-            
-            if e==start_epoch and b==0:
-                print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
-                print("text device",text_batch.device,"embedding device",embeds_batch.device,"img device",image_batch.device,"latent device",posterior_batch.device)
-                print("text ",text_batch.dtype,"embedding ",embeds_batch.dtype,"img ",image_batch.dtype,"latent ",posterior_batch.dtype)
-            image_embeds=embeds_batch #.to(device) #.unsqueeze(1)
-            #print('image_embeds',image_embeds.requires_grad,image_embeds.size())
-            prompt=text_batch
-            if args.epochs >1 and  random.random() <args.uncaptioned_frac:
-                prompt=" "
-            #print(pipeline.text_encoder)
-            if args.training_type=="denoise":
-                with accelerator.accumulate(params):
-                    # Convert images to latent space
-                    #if args.deepspeed:
-                    if args.pipeline=="sana":
-                        latents=posterior_batch / pipeline.scheduler.config.sigma_data
-                    else:
-                        latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                if e==start_epoch and b==0:
+                    print("text size",text_batch.size(),"embedding size",embeds_batch.size(),"img size",image_batch.size(),"latent size",posterior_batch.size())
+                    print("text device",text_batch.device,"embedding device",embeds_batch.device,"img device",image_batch.device,"latent device",posterior_batch.device)
+                    print("text ",text_batch.dtype,"embedding ",embeds_batch.dtype,"img ",image_batch.dtype,"latent ",posterior_batch.dtype)
+                image_embeds=embeds_batch #.to(device) #.unsqueeze(1)
+                #print('image_embeds',image_embeds.requires_grad,image_embeds.size())
+                prompt=text_batch
+                if args.epochs >1 and  random.random() <args.uncaptioned_frac:
+                    prompt=" "
+                #print(pipeline.text_encoder)
+                if args.training_type=="denoise":
+                    with accelerator.accumulate(params):
+                        # Convert images to latent space
+                        #if args.deepspeed:
+                        if args.pipeline=="sana":
+                            latents=posterior_batch / pipeline.scheduler.config.sigma_data
+                        else:
+                            latents = DiagonalGaussianDistribution(posterior_batch).sample()
+                            
+                        latents = latents * vae.config.scaling_factor
+
+
+
+                        # Sample noise that we'll add to the latents
+                        noise = torch.randn_like(latents)
                         
-                    latents = latents * vae.config.scaling_factor
+                        encoder_hidden_states = text_batch
+                        batch_size=text_batch.size()[0]
+                        #print("encoede hiiden states",encoder_hidden_states.requires_grad)
+                        timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (batch_size,), device=latents.device)
+                        #timesteps = timesteps.long()
 
+                        #https://github.com/NVlabs/Sana/blob/main/train_scripts/train_dreambooth_lora_sana.py
+                            
+                        if type(scheduler)==CompatibleSCMScheduler:
+                            noisy_latents,transformed_t,noise=scheduler.add_noise(latents, noise, timesteps)
+                        else:
+                            noisy_latents = scheduler.add_noise(latents, noise, timesteps)
 
+                        # Get the target for loss depending on the prediction type
+                        if args.prediction_type is not None:
+                            # set prediction_type of scheduler if defined
+                            scheduler.register_to_config(prediction_type=args.prediction_type)
 
-                    # Sample noise that we'll add to the latents
-                    noise = torch.randn_like(latents)
-                    
-                    encoder_hidden_states = text_batch
-                    batch_size=text_batch.size()[0]
-                    #print("encoede hiiden states",encoder_hidden_states.requires_grad)
-                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (batch_size,), device=latents.device)
-                    #timesteps = timesteps.long()
-
-                    #https://github.com/NVlabs/Sana/blob/main/train_scripts/train_dreambooth_lora_sana.py
+                        if scheduler.config.prediction_type == "epsilon":
+                            target = noise
+                        elif scheduler.config.prediction_type == "v_prediction":
+                            target = scheduler.get_velocity(latents, noise, timesteps)
+                        elif scheduler.config.prediction_type=="trigflow":
+                            target= torch.cos(transformed_t) * noise - torch.sin(transformed_t)*latents
+                        else:
+                            raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
                         
-                    if type(scheduler)==CompatibleSCMScheduler:
-                        noisy_latents,transformed_t,noise=scheduler.add_noise(latents, noise, timesteps)
-                    else:
-                        noisy_latents = scheduler.add_noise(latents, noise, timesteps)
+                        added_cond_kwargs={"image_embeds":[image_embeds]}
+                        #print('Image embeds size denoising',image_embeds.size())
 
-                    # Get the target for loss depending on the prediction type
-                    if args.prediction_type is not None:
-                        # set prediction_type of scheduler if defined
-                        scheduler.register_to_config(prediction_type=args.prediction_type)
-
-                    if scheduler.config.prediction_type == "epsilon":
-                        target = noise
-                    elif scheduler.config.prediction_type == "v_prediction":
-                        target = scheduler.get_velocity(latents, noise, timesteps)
-                    elif scheduler.config.prediction_type=="trigflow":
-                        target= torch.cos(transformed_t) * noise - torch.sin(transformed_t)*latents
-                    else:
-                        raise ValueError(f"Unknown prediction type {scheduler.config.prediction_type}")
-                    
-                    added_cond_kwargs={"image_embeds":[image_embeds]}
-                    #print('Image embeds size denoising',image_embeds.size())
-
-                    if args.pipeline=="sana":
-                        guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)
-                        guidance = guidance.expand(noisy_latents.shape[0]).to(noisy_latents.dtype)
-                        guidance = guidance * denoising_model.config.guidance_embeds_scale
-                        #print("noisy_latents",noisy_latents.requires_grad)
-                        if args.vanilla:
-                            with accelerator.autocast():
+                        if args.pipeline=="sana":
+                            guidance = torch.full([1], 4.5, device=device, dtype=torch.float32)
+                            guidance = guidance.expand(noisy_latents.shape[0]).to(noisy_latents.dtype)
+                            guidance = guidance * denoising_model.config.guidance_embeds_scale
+                            #print("noisy_latents",noisy_latents.requires_grad)
+                            if args.vanilla:
+                                with accelerator.autocast():
+                                    model_pred=compatible_forward_sana_transformer_model(
+                                        denoising_model,
+                                        noisy_latents,
+                                        encoder_hidden_states=encoder_hidden_states,
+                                        timestep=timesteps,return_dict=False,
+                                        guidance=guidance,
+                                        encoder_hid_proj=encoder_hid_proj,
+                                        added_cond_kwargs=added_cond_kwargs
+                                    )[0]
+                            else:
                                 model_pred=compatible_forward_sana_transformer_model(
-                                    denoising_model,
-                                    noisy_latents,
-                                    encoder_hidden_states=encoder_hidden_states,
-                                    timestep=timesteps,return_dict=False,
-                                    guidance=guidance,
-                                    encoder_hid_proj=encoder_hid_proj,
-                                    added_cond_kwargs=added_cond_kwargs
-                                )[0]
+                                        denoising_model,
+                                        noisy_latents,
+                                        encoder_hidden_states=encoder_hidden_states,
+                                        timestep=timesteps,return_dict=False,
+                                        guidance=guidance,
+                                        encoder_hid_proj=encoder_hid_proj,
+                                        added_cond_kwargs=added_cond_kwargs
+                                    )[0]
+                            #print("model pred",model_pred.requires_grad)
+                            if scheduler.config.prediction_type=="trig_flow":
+                                model_pred=scheduler.config.sigma_data*model_pred
                         else:
-                            model_pred=compatible_forward_sana_transformer_model(
-                                    denoising_model,
-                                    noisy_latents,
-                                    encoder_hidden_states=encoder_hidden_states,
-                                    timestep=timesteps,return_dict=False,
-                                    guidance=guidance,
-                                    encoder_hid_proj=encoder_hid_proj,
-                                    added_cond_kwargs=added_cond_kwargs
-                                )[0]
-                        #print("model pred",model_pred.requires_grad)
-                        if scheduler.config.prediction_type=="trig_flow":
-                            model_pred=scheduler.config.sigma_data*model_pred
-                    else:
+                            if args.vanilla:
+                                with accelerator.autocast():
+                                    model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                                    
+                            else:
+                                model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
+                        #print("params with grad")
+                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                        #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
+                        accelerator.backward(loss)
+                        #print("params with grad ",len([p for p in params if p.grad is not None]))
+                        
+                        for param in params:
+                            if param.grad is not None:
+                                grad_norm_buffer.append(param.grad.data.norm(2).clone().cpu().detach())
+
+                        optimizer.step()
+                        optimizer.zero_grad()
+                elif args.training_type=="reward":
+                    with accelerator.accumulate(params):
+                        gradient_checkpoint=True
+                        if args.pipeline=="sana":
+                            gradient_checkpoint=False
+                        #latents = DiagonalGaussianDistribution(posterior_batch).sample()
                         if args.vanilla:
                             with accelerator.autocast():
-                                model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-                                
+                                images=pipeline.call_with_grad(prompt_embeds=text_batch, 
+                                                            #latents=latents, 
+                                                            num_inference_steps=args.num_inference_steps, 
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
+                                                            use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
+                                                            height=args.image_size,width=args.image_size,denormalize_option=False).images
+                                #print("reward max, min",images.max(),images.min())
+                                predicted=embedding_util.embed_img_tensor(images)
+                                loss=loss_fn(predicted,embeds_batch)
                         else:
-                            model_pred = denoising_model(noisy_latents, timesteps, encoder_hidden_states, added_cond_kwargs=added_cond_kwargs,return_dict=False)[0]
-                    #print("params with grad")
-                    loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
-                    #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
-                    accelerator.backward(loss)
-                    #print("params with grad ",len([p for p in params if p.grad is not None]))
-                    
-                    for param in params:
-                        if param.grad is not None:
-                            grad_norm_buffer.append(param.grad.data.norm(2).clone().cpu().detach())
-
-                    optimizer.step()
-                    optimizer.zero_grad()
-            elif args.training_type=="reward":
-                with accelerator.accumulate(params):
-                    gradient_checkpoint=True
-                    if args.pipeline=="sana":
-                        gradient_checkpoint=False
-                    #latents = DiagonalGaussianDistribution(posterior_batch).sample()
-                    if args.vanilla:
-                        with accelerator.autocast():
                             images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                        #latents=latents, 
-                                                        num_inference_steps=args.num_inference_steps, 
-                                                        ip_adapter_image_embeds=[image_embeds],output_type="pt",truncated_backprop=False,reward_training=True,
-                                                        use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
-                                                        height=args.image_size,width=args.image_size,denormalize_option=False).images
-                            #print("reward max, min",images.max(),images.min())
+                                                            #latents=latents, 
+                                                            num_inference_steps=args.num_inference_steps,
+                                                            ip_adapter_image_embeds=[image_embeds],output_type="pt",
+                                                            truncated_backprop=False,fsdp=True,reward_training=True,
+                                                            use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
+                                                            height=args.image_size,width=args.image_size,denormalize_option=False).images
                             predicted=embedding_util.embed_img_tensor(images)
                             loss=loss_fn(predicted,embeds_batch)
-                    else:
-                        images=pipeline.call_with_grad(prompt_embeds=text_batch, 
-                                                        #latents=latents, 
-                                                        num_inference_steps=args.num_inference_steps,
-                                                          ip_adapter_image_embeds=[image_embeds],output_type="pt",
-                                                          truncated_backprop=False,fsdp=True,reward_training=True,
-                                                          use_resolution_binning=False, gradient_checkpoint=gradient_checkpoint,
-                                                          height=args.image_size,width=args.image_size,denormalize_option=False).images
-                        predicted=embedding_util.embed_img_tensor(images)
-                        loss=loss_fn(predicted,embeds_batch)
-                    #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
-                    #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
-                    accelerator.backward(loss)
-                    #print("params with grad ",len([p for p in params if p.grad is not None]))
-                    for param in params:
-                        if param.grad is not None:
-                            grad_norm_buffer.append(param.grad.data.norm(2).clone().cpu().detach())
-                            
-                    optimizer.step()
-                    optimizer.zero_grad()
-            
-            loss_buffer.append(loss.cpu().detach().item())
+                        #loss=(loss-np.mean(loss_buffer))/np.std(loss_buffer)
+                        #print("b4 backwards params with grad ",len([p for p in params if p.grad is not None]))
+                        accelerator.backward(loss)
+                        #print("params with grad ",len([p for p in params if p.grad is not None]))
+                        for param in params:
+                            if param.grad is not None:
+                                grad_norm_buffer.append(param.grad.data.norm(2).clone().cpu().detach())
+                                
+                        optimizer.step()
+                        optimizer.zero_grad()
+                
+                loss_buffer.append(loss.cpu().detach().item())
 
-            after_objects=find_cuda_objects()
-            delete_unique_objects(before_objects,after_objects)
+                after_objects=find_cuda_objects()
+                delete_unique_objects(before_objects,after_objects)
 
-        end=time.time()
-        elapsed=end-start
-        accelerator.print(f"\t epoch {e} elapsed {end-start}")
-        accelerator.log({
-            "grad_norm":np.mean(grad_norm_buffer),
-            "loss_mean":np.mean(loss_buffer),
-            "loss_std":np.std(loss_buffer),
-            "elapsed":elapsed
-        })
-        persistent_loss_list.append(float(np.mean(loss_buffer)))
-        persistent_grad_norm_list.append(float(np.mean(grad_norm_buffer)))
-        torch.cuda.empty_cache()
-        accelerator.free_memory()
+            end=time.time()
+            elapsed=end-start
+            accelerator.print(f"\t epoch {e} elapsed {end-start}")
+            accelerator.log({
+                "grad_norm":np.mean(grad_norm_buffer),
+                "loss_mean":np.mean(loss_buffer),
+                "loss_std":np.std(loss_buffer),
+                "elapsed":elapsed
+            })
+            persistent_loss_list.append(float(np.mean(loss_buffer)))
+            persistent_grad_norm_list.append(float(np.mean(grad_norm_buffer)))
+            torch.cuda.empty_cache()
+            accelerator.free_memory()
         if e%args.validation_interval==0:
             before_objects=find_cuda_objects()
             with torch.no_grad():
@@ -939,7 +940,9 @@ def main(args):
                 accelerator.print(f"uploaded {args.name} to hub")
                 after_objects=find_cuda_objects()
                 delete_unique_objects(before_objects,after_objects)
-                
+    except torch.OutOfMemoryError:
+        accelerator.print("\nOOM ",args.name.split("/")[-1])
+        exit()
     training_end=time.time()
     accelerator.print(f"total trainign time = {training_end-training_start}")
     accelerator.free_memory()

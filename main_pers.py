@@ -186,6 +186,8 @@ def main(args):
     config_path=os.path.join(save_dir,CONFIG_NAME)
     if accelerator.is_main_process:
         os.makedirs(save_dir,exist_ok=True)
+
+    accelerator.print("\nMODEL-NAME ",args.name.split("/")[-1])
     
 
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)

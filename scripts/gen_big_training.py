@@ -2,7 +2,7 @@ port=29650
 
 for training_type in  ["denoise","reward"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
-        for prediction_type in ["v_prediction"]:
+        for prediction_type in ["v_prediction","epsilon"]:
             for embedding in ["clip",]:
                 for data in ["league_captioned_splash"]:
                     for suffix in ["_deep_identity",""]:
@@ -10,6 +10,8 @@ for training_type in  ["denoise","reward"]: #,"reward","latents_reward"]:
                             for n in [1000]:
                                 #for scheduler in ["LCMScheduler"]:
                                 for pipeline in ["lcm","lcm_pre_lora","lcm_post_lora"]:
+                                    if prediction_type=="epsilon" and training_type=="reward":
+                                        continue
                         
                                     name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}"
                                     port+=1

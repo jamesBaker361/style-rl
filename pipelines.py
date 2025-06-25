@@ -9,6 +9,8 @@ from diffusers.utils.outputs import BaseOutput
 from diffusers.models import ImageProjection
 from dataclasses import dataclass
 from diffusers.loaders import FromSingleFileMixin, IPAdapterMixin, StableDiffusionLoraLoaderMixin, TextualInversionLoaderMixin
+from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion import rescale_noise_cfg
+from diffusers import StableDiffusionPipeline
 import PIL
 import numpy as np
 from copy import deepcopy
@@ -779,7 +781,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         self.maybe_free_model_hooks()
 
         if not return_dict:
-            return (image, has_nsfw_concept)
+            return (image, has_nsfw_concept,latents_copy)
 
         #print("called with grad",len(find_cuda_objects()))
         return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)
@@ -863,3 +865,253 @@ class KeywordDDPOStableDiffusionPipeline(DefaultDDPOStableDiffusionPipeline):
         else:
             return super().rgb_with_grad(*args,**kwargs)
         
+class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
+    def call_with_grad(self, 
+                       prompt = None, 
+                       height = None, 
+                       width = None, 
+                       num_inference_steps = 50,
+                         timesteps = None, sigmas = None, 
+                         guidance_scale = 7.5, negative_prompt = None, 
+                         num_images_per_prompt = 1, eta = 0, generator = None, 
+                         latents = None, prompt_embeds = None, negative_prompt_embeds = None, 
+                         ip_adapter_image = None, ip_adapter_image_embeds = None, output_type = "pt", 
+                         return_dict = True, cross_attention_kwargs = None, guidance_rescale = 0, 
+                         clip_skip = None, callback_on_step_end = None, callback_on_step_end_tensor_inputs = ...,
+                         truncated_backprop: bool = True,
+                        gradient_checkpoint: bool = True,
+                        truncated_backprop_timestep: int = 0,
+                        truncated_rand_backprop_minmax: tuple = (0, 50),
+                        fsdp:bool=False, #if fsdp, we have to do some stupid thing where we call the unet once to get model_pred device
+                        reward_training:bool=False, 
+                        use_resolution_binning:bool=False,
+                        denormalize_option:bool=True,
+                           **kwargs):
+        unwrapped_unet = getattr(self.unet, "module", self.unet)
+
+        # 0. Default height and width to unet
+        if not height or not width:
+            height = (
+                unwrapped_unet.config.sample_size
+                if self._is_unet_config_sample_size_int
+                else unwrapped_unet.config.sample_size[0]
+            )
+            width = (
+                unwrapped_unet.config.sample_size
+                if self._is_unet_config_sample_size_int
+                else unwrapped_unet.config.sample_size[1]
+            )
+            height, width = height * self.vae_scale_factor, width * self.vae_scale_factor
+        # to deal with lora scaling and other possible forward hooks
+
+        # 1. Check inputs. Raise error if not correct
+        self.check_inputs(
+            prompt,
+            height,
+            width,
+            None,
+            negative_prompt,
+            prompt_embeds,
+            negative_prompt_embeds,
+            ip_adapter_image,
+            ip_adapter_image_embeds,
+            callback_on_step_end_tensor_inputs,
+        )
+
+        self._guidance_scale = guidance_scale
+        self._guidance_rescale = guidance_rescale
+        self._clip_skip = clip_skip
+        self._cross_attention_kwargs = cross_attention_kwargs
+        self._interrupt = False
+
+        # 2. Define call parameters
+        if prompt is not None and isinstance(prompt, str):
+            batch_size = 1
+        elif prompt is not None and isinstance(prompt, list):
+            batch_size = len(prompt)
+        else:
+            batch_size = prompt_embeds.shape[0]
+
+        device = self._execution_device
+
+        # 3. Encode input prompt
+        lora_scale = (
+            self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
+        )
+
+        prompt_embeds, negative_prompt_embeds = self.encode_prompt(
+            prompt,
+            device,
+            num_images_per_prompt,
+            self.do_classifier_free_guidance,
+            negative_prompt,
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_prompt_embeds,
+            lora_scale=lora_scale,
+            clip_skip=self.clip_skip,
+        )
+
+        # For classifier free guidance, we need to do two forward passes.
+        # Here we concatenate the unconditional and text embeddings into a single batch
+        # to avoid doing two forward passes
+        if self.do_classifier_free_guidance:
+            prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
+
+        if ip_adapter_image is not None or ip_adapter_image_embeds is not None:
+                #print("before shape ",ip_adapter_image_embeds[0].size())
+                if reward_training:
+                    image_embeds=ip_adapter_image_embeds
+                else:
+                    image_embeds = self.prepare_ip_adapter_image_embeds(
+                        ip_adapter_image,
+                        ip_adapter_image_embeds,
+                        device,
+                        batch_size * num_images_per_prompt,
+                        self.do_classifier_free_guidance,
+                    )
+                #print("after shape",image_embeds[0].size())
+                added_cond_kwargs={"image_embeds":image_embeds}
+        else:
+            added_cond_kwargs={}
+
+        # 4. Prepare timesteps
+        timesteps, num_inference_steps = retrieve_timesteps(
+            self.scheduler, num_inference_steps, device, timesteps, sigmas
+        )
+
+        # 5. Prepare latent variables
+        num_channels_latents = self.unet.config.in_channels
+        latents = self.prepare_latents(
+            batch_size * num_images_per_prompt,
+            num_channels_latents,
+            height,
+            width,
+            prompt_embeds.dtype,
+            device,
+            generator,
+            latents,
+        )
+
+        # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
+        extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
+
+        # 6.2 Optionally get Guidance Scale Embedding
+        timestep_cond = None
+        if self.unet.config.time_cond_proj_dim is not None:
+            guidance_scale_tensor = torch.tensor(self.guidance_scale - 1).repeat(batch_size * num_images_per_prompt)
+            timestep_cond = self.get_guidance_scale_embedding(
+                guidance_scale_tensor, embedding_dim=self.unet.config.time_cond_proj_dim
+            ).to(device=device, dtype=latents.dtype)
+
+        # 7. Denoising loop
+        num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
+        latents_copy=latents.clone()
+        self._num_timesteps = len(timesteps)
+        with self.progress_bar(total=num_inference_steps) as progress_bar:
+            for i, t in enumerate(timesteps):
+                if self.interrupt:
+                    continue
+
+                # expand the latents if we are doing classifier free guidance
+                latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
+                latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
+
+                '''
+                if gradient_checkpoint:
+                    #print("516 added condkwagrs",added_cond_kwargs)
+                    model_pred = checkpoint.checkpoint(
+                        self.unet,
+                        latents,
+                        t,
+                        prompt_embeds,
+                        None,
+                        w_embedding,
+                        None,
+                        self.cross_attention_kwargs,
+                        added_cond_kwargs,
+                        None,None,None,None,
+                        False,
+                        use_reentrant=False
+                    )[0]
+                else:
+                    model_pred = self.unet(
+                        latents,
+                        t,
+                        timestep_cond=w_embedding,
+                        encoder_hidden_states=prompt_embeds,
+                        cross_attention_kwargs=self.cross_attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        return_dict=False,
+                    )[0]
+                '''
+
+
+                # predict the noise residual
+                if gradient_checkpoint:
+                    noise_pred=checkpoint.checkpoint(
+                        self.unet,
+                        latent_model_input,
+                        t,
+                        prompt_embeds,
+                        None,
+                        timestep_cond,
+                        None,
+                        self.cross_attention_kwargs,
+                        added_cond_kwargs,
+                        None,None,None,None,False
+                    )
+                
+                else:
+                    noise_pred = self.unet(
+                        latent_model_input,
+                        t,
+                        encoder_hidden_states=prompt_embeds,
+                        timestep_cond=timestep_cond,
+                        cross_attention_kwargs=self.cross_attention_kwargs,
+                        added_cond_kwargs=added_cond_kwargs,
+                        return_dict=False,
+                    )[0]
+
+                # perform guidance
+                if self.do_classifier_free_guidance:
+                    noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
+                    noise_pred = noise_pred_uncond + self.guidance_scale * (noise_pred_text - noise_pred_uncond)
+
+                if self.do_classifier_free_guidance and self.guidance_rescale > 0.0:
+                    # Based on 3.4. in https://huggingface.co/papers/2305.08891
+                    noise_pred = rescale_noise_cfg(noise_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
+
+                # compute the previous noisy sample x_t -> x_t-1
+                latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)[0]
+
+                if callback_on_step_end is not None:
+                    callback_kwargs = {}
+                    for k in callback_on_step_end_tensor_inputs:
+                        callback_kwargs[k] = locals()[k]
+                    callback_outputs = callback_on_step_end(self, i, t, callback_kwargs)
+
+                    latents = callback_outputs.pop("latents", latents)
+                    prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
+                    negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
+
+
+        if not output_type == "latent":
+            image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False, generator=generator)[
+                0
+            ]
+            has_nsfw_concept = None
+        else:
+            image = latents
+            has_nsfw_concept = None
+
+        do_denormalize = [denormalize_option] * image.shape[0]
+        image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
+
+        # Offload all models
+        self.maybe_free_model_hooks()
+
+        if not return_dict:
+            return (image, has_nsfw_concept,latents_copy)
+
+        #print("called with grad",len(find_cuda_objects()))
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)

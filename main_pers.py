@@ -1,7 +1,7 @@
 import os
 import argparse
 from experiment_helpers.gpu_details import print_details
-from pipelines import CompatibleLatentConsistencyModelPipeline
+from pipelines import CompatibleLatentConsistencyModelPipeline,CompatibleStableDiffusionPipeline
 from datasets import load_dataset
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
@@ -197,11 +197,11 @@ def main(args):
     if args.pipeline=="lcm":
         pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
     elif args.pipeline=="lcm_post_lora":
-        pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline=CompatibleStableDiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
         pipeline.load_lora_weights(adapter_id)
         pipeline.disable_lora()
     elif args.pipeline=="lcm_pre_lora":
-        pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
+        pipeline=CompatibleStableDiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device)
         
         pipeline.load_lora_weights(adapter_id)
         pipeline.fuse_lora()

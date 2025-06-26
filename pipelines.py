@@ -877,7 +877,7 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
                          latents = None, prompt_embeds = None, negative_prompt_embeds = None, 
                          ip_adapter_image = None, ip_adapter_image_embeds = None, output_type = "pt", 
                          return_dict = True, cross_attention_kwargs = None, guidance_rescale = 0, 
-                         clip_skip = None, callback_on_step_end = None, callback_on_step_end_tensor_inputs = ...,
+                         clip_skip = None, callback_on_step_end = None, callback_on_step_end_tensor_inputs : List[str] = ["latents"],
                          truncated_backprop: bool = True,
                         gradient_checkpoint: bool = True,
                         truncated_backprop_timestep: int = 0,

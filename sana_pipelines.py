@@ -565,14 +565,7 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             image = latents
         else:
             latents = latents.to(self.vae.dtype)
-            try:
-                image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
-            except torch.cuda.OutOfMemoryError as e:
-                warnings.warn(
-                    f"{e}. \n"
-                    f"Try to use VAE tiling for large images. For example: \n"
-                    f"pipe.vae.enable_tiling(tile_sample_min_width=512, tile_sample_min_height=512)"
-                )
+            image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
 
@@ -844,16 +837,9 @@ class CompatibleSanaSprintPipeline(SanaSprintPipeline):
             image = latents
         else:
             latents = latents.to(self.vae.dtype)
-            #print("latents casted ",latents.requires_grad, latents.grad_fn)
-            try:
-                image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
-            except torch.cuda.OutOfMemoryError as e:
-                warnings.warn(
-                    f"{e}. \n"
-                    f"Try to use VAE tiling for large images. For example: \n"
-                    f"pipe.vae.enable_tiling(tile_sample_min_width=512, tile_sample_min_height=512)"
-                )
-            #print("iamge decoded ",image.requires_grad, image.grad_fn)
+
+            image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
+            
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
             #print("iamge resize ",image.requires_grad, image.grad_fn)

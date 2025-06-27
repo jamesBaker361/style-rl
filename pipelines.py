@@ -27,13 +27,6 @@ from diffusers.utils import (
     unscale_lora_layers,
 )
 
-def register_evil_twin(pipeline:DiffusionPipeline,scale:float):
-    unet=pipeline.unet
-    pipeline.evil_twin_unet=deepcopy(unet)
-    pipeline.evil_twin_unet.to(unet.device,unet.dtype)
-    pipeline.evil_twin_guidance_scale=scale
-    return pipeline.evil_twin_unet
-
 def encode_prompt_distributed(self:LatentConsistencyModelPipeline,
         prompt,
         device,

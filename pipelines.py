@@ -925,7 +925,7 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
 
-        device = self._execution_device
+        device = self.unet.device
 
         # 3. Encode input prompt
         lora_scale = (
@@ -1040,30 +1040,33 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
 
 
                 # predict the noise residual
-                if gradient_checkpoint:
-                    noise_pred=checkpoint.checkpoint(
-                        self.unet,
-                        latent_model_input,
-                        t,
-                        prompt_embeds,
-                        None,
-                        timestep_cond,
-                        None,
-                        self.cross_attention_kwargs,
-                        added_cond_kwargs,
-                        None,None,None,None,False
-                    )
-                
-                else:
-                    noise_pred = self.unet(
-                        latent_model_input,
-                        t,
-                        encoder_hidden_states=prompt_embeds,
-                        timestep_cond=timestep_cond,
-                        cross_attention_kwargs=self.cross_attention_kwargs,
-                        added_cond_kwargs=added_cond_kwargs,
-                        return_dict=False,
-                    )[0]
+                try:
+                    if gradient_checkpoint:
+                        noise_pred=checkpoint.checkpoint(
+                            self.unet,
+                            latent_model_input,
+                            t,
+                            prompt_embeds,
+                            None,
+                            timestep_cond,
+                            None,
+                            self.cross_attention_kwargs,
+                            added_cond_kwargs,
+                            None,None,None,None,False
+                        )
+                    
+                    else:
+                        noise_pred = self.unet(
+                            latent_model_input,
+                            t,
+                            encoder_hidden_states=prompt_embeds,
+                            timestep_cond=timestep_cond,
+                            cross_attention_kwargs=self.cross_attention_kwargs,
+                            added_cond_kwargs=added_cond_kwargs,
+                            return_dict=False,
+                        )[0]
+                except RuntimeError as runtime_error:
+                    print("unet ",self.unet.device, "prompt_embeds ",prompt_embeds.device, " timestep ",timestep_cond.device)
 
                 # perform guidance
                 if self.do_classifier_free_guidance:

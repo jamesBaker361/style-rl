@@ -902,6 +902,8 @@ def main(args):
             torch.cuda.empty_cache()
             accelerator.free_memory()
         if e%args.validation_interval==0:
+            val_start=time.time()
+            print("validation interval ",e)
             before_objects=find_cuda_objects()
             with torch.no_grad():
 
@@ -915,6 +917,7 @@ def main(args):
                 persistent_text_alignment_list.append(val_metrics["text_alignment"])
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
+            print("validation interval ",e, f" elapsed {time.time()-val_start}")
         if e%args.upload_interval==0:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:

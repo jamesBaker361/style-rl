@@ -921,31 +921,30 @@ def main(args):
                 after_objects=find_cuda_objects()
                 delete_unique_objects(after_objects,before_objects)
                 print("validation interval ",e, f" elapsed {time.time()-val_start}")
-            if True:
+            if accelerator.is_main_process or state.num_processes==1:
                 accelerator.wait_for_everyone()
-                if accelerator.is_main_process or state.num_processes==1:
-                    before_objects=find_cuda_objects()
-                    state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
-                    print("state dict len",len(state_dict))
-                    torch.save(state_dict,save_path)
-                    with open(config_path,"w+") as config_file:
-                        data={"start_epoch":e,
-                            "persistent_grad_norm_list":persistent_grad_norm_list,
-                            "persistent_loss_list":persistent_loss_list,
-                            "persistent_text_alignment_list":persistent_text_alignment_list,
-                            "persistent_fid_list":persistent_fid_list}
-                        json.dump(data,config_file, indent=4)
-                        pad = " " * 1024  # ~1KB of padding
-                        config_file.write(pad)
-                    accelerator.print(f"saved {save_path}")
-                    api.upload_file(path_or_fileobj=save_path,
-                                    path_in_repo=WEIGHTS_NAME,
-                                    repo_id=args.name)
-                    api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                                    repo_id=args.name)
-                    accelerator.print(f"uploaded {args.name} to hub")
-                    after_objects=find_cuda_objects()
-                    delete_unique_objects(before_objects,after_objects)
+                before_objects=find_cuda_objects()
+                state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
+                print("state dict len",len(state_dict))
+                torch.save(state_dict,save_path)
+                with open(config_path,"w+") as config_file:
+                    data={"start_epoch":e,
+                        "persistent_grad_norm_list":persistent_grad_norm_list,
+                        "persistent_loss_list":persistent_loss_list,
+                        "persistent_text_alignment_list":persistent_text_alignment_list,
+                        "persistent_fid_list":persistent_fid_list}
+                    json.dump(data,config_file, indent=4)
+                    pad = " " * 1024  # ~1KB of padding
+                    config_file.write(pad)
+                accelerator.print(f"saved {save_path}")
+                api.upload_file(path_or_fileobj=save_path,
+                                path_in_repo=WEIGHTS_NAME,
+                                repo_id=args.name)
+                api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                repo_id=args.name)
+                accelerator.print(f"uploaded {args.name} to hub")
+                after_objects=find_cuda_objects()
+                delete_unique_objects(before_objects,after_objects)
     except torch.OutOfMemoryError:
         accelerator.print("\nOOM ",args.name.split("/")[-1])
         exit()

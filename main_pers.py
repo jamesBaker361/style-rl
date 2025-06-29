@@ -919,7 +919,7 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
             print("validation interval ",e, f" elapsed {time.time()-val_start}")
-        if e%args.upload_interval==0:
+        if True:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
                 before_objects=find_cuda_objects()

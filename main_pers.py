@@ -151,9 +151,9 @@ def main(args):
     device=accelerator.device
     state = PartialState()
     print(f"Rank {state.process_index} initialized successfully")
-    if accelerator.is_main_process:
+    if accelerator.is_main_process or state.num_processes==1:
         accelerator.print(f"main process = {state.process_index}")
-    if accelerator.is_main_process:
+    if accelerator.is_main_process or state.num_processes==1:
         try:
             accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
@@ -186,7 +186,7 @@ def main(args):
     save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
     save_path=os.path.join(save_dir,WEIGHTS_NAME)
     config_path=os.path.join(save_dir,CONFIG_NAME)
-    if accelerator.is_main_process:
+    if accelerator.is_main_process or state.num_processes==1:
         os.makedirs(save_dir,exist_ok=True)
 
     accelerator.print("\nMODEL-NAME ",args.name.split("/")[-1])
@@ -923,7 +923,7 @@ def main(args):
             print("validation interval ",e, f" elapsed {time.time()-val_start}")
         if True:
             accelerator.wait_for_everyone()
-            if accelerator.is_main_process:
+            if accelerator.is_main_process or state.num_processes==1:
                 before_objects=find_cuda_objects()
                 state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
                 print("state dict len",len(state_dict))
@@ -990,7 +990,7 @@ def main(args):
             accelerator.print("\tBASELINE",k,v)
         accelerator.log(new_metrics)
     accelerator.wait_for_everyone()
-    if accelerator.is_main_process:
+    if accelerator.is_main_process or state.num_processes==1:
         state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
         print("state dict len",len(state_dict))
         '''for k in state_dict.keys():

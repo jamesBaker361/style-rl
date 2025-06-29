@@ -152,7 +152,7 @@ def main(args):
     state = PartialState()
     print(f"Rank {state.process_index} initialized successfully")
     if accelerator.is_main_process:
-        accelerator.print("main process!")
+        accelerator.print(f"main process = {state.process_index}")
     if accelerator.is_main_process:
         try:
             accelerator.init_trackers(project_name=args.project_name,config=vars(args))

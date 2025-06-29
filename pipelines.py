@@ -944,6 +944,9 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
             clip_skip=self.clip_skip,
         )
 
+        if negative_prompt_embeds is not None:
+            negative_prompt_embeds=torch.cat([negative_prompt_embeds for _ in range(batch_size)])
+
         # For classifier free guidance, we need to do two forward passes.
         # Here we concatenate the unconditional and text embeddings into a single batch
         # to avoid doing two forward passes

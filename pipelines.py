@@ -905,6 +905,9 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
         else:
             batch_size = prompt_embeds.shape[0]
 
+        if negative_prompt_embeds is not None and negative_prompt_embeds.shape[0]==1:
+            negative_prompt_embeds=torch.cat([negative_prompt_embeds for _ in range(batch_size)])
+
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
             prompt,
@@ -919,8 +922,7 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
             callback_on_step_end_tensor_inputs,
         )
 
-        if negative_prompt_embeds is not None and negative_prompt_embeds.shape[0]==1:
-            negative_prompt_embeds=torch.cat([negative_prompt_embeds for _ in range(batch_size)])
+        
 
         self._guidance_scale = guidance_scale
         self._guidance_rescale = guidance_rescale

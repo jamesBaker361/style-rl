@@ -88,8 +88,12 @@ class CompatibleDEISMultistepScheduler(DEISMultistepScheduler):
             sigmas = np.concatenate([sigmas, sigmas[-1:]]).astype(np.float32)
         else:
             sigmas = np.interp(timesteps, np.arange(0, len(sigmas)), sigmas)
-            sigma_last = ((1 - self.alphas_cumprod[0]) / self.alphas_cumprod[0]) ** 0.5
-            sigmas = np.concatenate([sigmas, [sigma_last]]).astype(np.float32)
+            try:
+                sigma_last = ((1 - self.alphas_cumprod[0]) / self.alphas_cumprod[0]) ** 0.5
+                sigmas = np.concatenate([sigmas, [sigma_last]]).astype(np.float32)
+            except TypeError:
+                sigma_last = ((1 - self.alphas_cumprod.cpu()[0]) / self.alphas_cumprod.cpu()[0]) ** 0.5
+                sigmas = np.concatenate([sigmas, [sigma_last]]).astype(np.float32)
 
         self.sigmas = torch.from_numpy(sigmas)
         self.timesteps = torch.from_numpy(timesteps).to(device=device, dtype=torch.int64)

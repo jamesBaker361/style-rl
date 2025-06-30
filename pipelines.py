@@ -897,6 +897,14 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
             height, width = height * self.vae_scale_factor, width * self.vae_scale_factor
         # to deal with lora scaling and other possible forward hooks
 
+        # 2. Define call parameters
+        if prompt is not None and isinstance(prompt, str):
+            batch_size = 1
+        elif prompt is not None and isinstance(prompt, list):
+            batch_size = len(prompt)
+        else:
+            batch_size = prompt_embeds.shape[0]
+
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
             prompt,
@@ -911,19 +919,16 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
             callback_on_step_end_tensor_inputs,
         )
 
+        if negative_prompt_embeds is not None and negative_prompt_embeds.shape[0]==1:
+            negative_prompt_embeds=torch.cat([negative_prompt_embeds for _ in range(batch_size)])
+
         self._guidance_scale = guidance_scale
         self._guidance_rescale = guidance_rescale
         self._clip_skip = clip_skip
         self._cross_attention_kwargs = cross_attention_kwargs
         self._interrupt = False
 
-        # 2. Define call parameters
-        if prompt is not None and isinstance(prompt, str):
-            batch_size = 1
-        elif prompt is not None and isinstance(prompt, list):
-            batch_size = len(prompt)
-        else:
-            batch_size = prompt_embeds.shape[0]
+        
 
         device = self.unet.device
 
@@ -944,8 +949,7 @@ class CompatibleStableDiffusionPipeline(StableDiffusionPipeline):
             clip_skip=self.clip_skip,
         )
 
-        if negative_prompt_embeds is not None:
-            negative_prompt_embeds=torch.cat([negative_prompt_embeds for _ in range(batch_size)])
+        
 
         # For classifier free guidance, we need to do two forward passes.
         # Here we concatenate the unconditional and text embeddings into a single batch

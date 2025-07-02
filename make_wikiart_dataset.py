@@ -25,6 +25,7 @@ from torchvision.transforms.v2 import functional as F_v2
 from torchmetrics.image.fid import FrechetInceptionDistance
 from pipelines import CompatibleLatentConsistencyModelPipeline
 from sana_pipelines import CompatibleSanaSprintPipeline
+from diffusers import StableDiffusionPipeline
 
 from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
@@ -93,7 +94,7 @@ def main(args):
             elif args.pipeline=="sana":
                 pipeline=CompatibleSanaSprintPipeline.from_pretrained("Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",device=accelerator.device)
             elif args.pipeline=="stability":
-                pipeline=UnsafeStableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
+                pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
                 pipeline.do_classifier_free_guidance=False
             pipeline=pipeline.to(accelerator.device)
             pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)

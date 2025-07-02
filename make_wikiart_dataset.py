@@ -121,13 +121,20 @@ def main(args):
                                                     device=accelerator.device,
                                                     num_images_per_prompt=1,
                                             )
-                else:
+                elif args.pipeline=="sana":
                     encoded_text, encoded_text_attention_mask = pipeline.encode_prompt(
                                                     prompt=text,
                                                     device=accelerator.device,
                                                     num_images_per_prompt=1,
                                             )
                     new_dataset["attention_mask"].append(encoded_text_attention_mask)
+                elif args.pipeline=="stability":
+                    encoded_text, _ = pipeline.encode_prompt(
+                                                    prompt=text,
+                                                    device=accelerator.device,
+                                                    num_images_per_prompt=1,
+                                                    do_classifier_free_guidance=False
+                                            )
 
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
                 new_dataset["image"].append(image)

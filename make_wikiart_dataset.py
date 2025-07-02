@@ -114,7 +114,7 @@ def main(args):
                 out = model.generate(**blip_inputs)
                 text=processor.decode(out[0], skip_special_tokens=True)
                 prompt=text
-
+                encoded_text_attention_mask=-1
                 if args.pipeline=="lcm":
                     encoded_text, _ = pipeline.encode_prompt(
                                                     prompt=text,
@@ -127,7 +127,7 @@ def main(args):
                                                     device=accelerator.device,
                                                     num_images_per_prompt=1,
                                             )
-                    new_dataset["attention_mask"].append(encoded_text_attention_mask)
+                    
                 elif args.pipeline=="stability":
                     encoded_text, _ = pipeline.encode_prompt(
                                                     prompt=text,
@@ -135,7 +135,7 @@ def main(args):
                                                     num_images_per_prompt=1,
                                                     do_classifier_free_guidance=False
                                             )
-
+                new_dataset["attention_mask"].append(encoded_text_attention_mask)
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image)).unsqueeze(0).cpu().detach().numpy()
                 new_dataset["image"].append(image)
                 new_dataset["embedding"].append(embedding)

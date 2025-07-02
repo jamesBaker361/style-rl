@@ -90,8 +90,10 @@ def main(args):
 
             if args.pipeline=="lcm":
                 pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device)
-            else:
+            elif args.pipleine=="sana":
                 pipeline=CompatibleSanaSprintPipeline.from_pretrained("Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",device=accelerator.device)
+            elif args.pipeline=="stability":
+                pipeline=UnsafeStableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",device=accelerator.device)
                 pipeline.do_classifier_free_guidance=False
             pipeline=pipeline.to(accelerator.device)
             pipeline.text_encoder=pipeline.text_encoder.to(accelerator.device,torch_dtype)

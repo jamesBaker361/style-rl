@@ -31,6 +31,7 @@ from transformers import AutoProcessor, CLIPModel
 from embedding_helpers import EmbeddingUtil
 from custom_vae import public_encode
 from gpu_helpers import find_cuda_objects, delete_unique_objects
+import kagglehub
 
 
 parser=argparse.ArgumentParser()
@@ -44,6 +45,20 @@ parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--pipeline",type=str,default="sana",help="sana or lcm")
+parser.add_argument("--pad",action="store_true")
+
+from PIL import Image, ImageOps
+
+def pad_to_square(img, color=(0, 0, 0)):
+    width, height = img.size
+    max_dim = max(width, height)
+    padding = (
+        (max_dim - width) // 2,   # left
+        (max_dim - height) // 2,  # top
+        (max_dim - width + 1) // 2,  # right
+        (max_dim - height + 1) // 2  # bottom
+    )
+    return ImageOps.expand(img, padding, fill=color)
 
 def main(args):
     
@@ -63,12 +78,33 @@ def main(args):
             processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
             model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large").to(device,torch_dtype)
 
-            try:
-                raw_data=load_dataset(args.dataset,split="test")
-            except OSError:
-                raw_data=load_dataset(args.dataset,split="test",force_download=True)
+            if args.dataset=="kaustubhdhote/human-faces-dataset":
+                path = kagglehub.dataset_download("kaustubhdhote/human-faces-dataset")
 
-            raw_data=[row for row in raw_data]
+                print("Path to dataset files:", path)
+                real_images="Real Images"
+
+                real_dir=os.path.join(path,"Human Faces Dataset",real_images)
+
+                jpg_files = [f for f in os.listdir(real_dir) if f.lower().endswith('.jpg')]
+                print(jpg_files[0])
+
+
+
+                print("len",len(jpg_files))
+
+                raw_data=[Image.open(os.path.join(real_dir, file)) for file in jpg_files]
+            else:
+                try:
+                    raw_data=load_dataset(args.dataset,split="test")
+                except OSError:
+                    raw_data=load_dataset(args.dataset,split="test",force_download=True)
+
+                raw_data=[row for row in raw_data]
+            
+            if args.pad:
+                raw_data=[pad_to_square(image) for image in raw_data]
+            
             random.shuffle(raw_data)
 
             embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)

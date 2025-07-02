@@ -36,5 +36,6 @@ export IMAGE_REWARD_PATH="/scratch/jlb638/reward-blob"
 export IMAGE_REWARD_CONFIG="/scratch/jlb638/ImageReward/med_config.json"
 export EMBEDDING_DIR="/scratch/jlb638/embedding_src"
 export TORCH_LOCAL_DIR="/scratch/jlb638/local_torch"
+export KAGGLEHUB_CACHE="/scratch/jlb638/kaggle_cache"
 srun python3 $@
 conda deactivate

@@ -60,9 +60,9 @@ def main(args):
             model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large").to(device,torch_dtype)
 
             try:
-                raw_data=load_dataset(args.dataset,split="train")
+                raw_data=load_dataset(args.dataset,split="test")
             except OSError:
-                raw_data=load_dataset(args.dataset,split="train",force_download=True)
+                raw_data=load_dataset(args.dataset,split="test",force_download=True)
 
             raw_data=[row for row in raw_data]
             random.shuffle(raw_data)

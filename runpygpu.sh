@@ -53,5 +53,6 @@ export BRAIN_DATA_DIR="/scratch/jlb638/brain/data"
 export EMBEDDING_DIR="/scratch/jlb638/embedding_src"
 export TORCH_LOCAL_DIR="/scratch/jlb638/local_torch"
 export KAGGLEHUB_CACHE="/scratch/jlb638/kaggle_cache"
+export KAGGLE_CONFIG_DIR="/scratch/jlb638/kaggle_config"
 srun python3 -u $@
 conda deactivate

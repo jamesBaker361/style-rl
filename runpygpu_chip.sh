@@ -53,6 +53,7 @@ export NCCL_DEBUG="INFO"
 export NCCL_DEBUG_SUBSYS="ALL"
 export TORCH_LOCAL_DIR="/umbc/ada/donengel/common/local_torch"
 export KAGGLEHUB_CACHE="/umbc/ada/donengel/common/kaggle_cache"
+export KAGGLE_CONFIG_DIR="/umbc/ada/donengel/common/kaggle_config"
 echo "Running on: $(hostname)"
 echo "Allocated GPUs:"
 nvidia-smi

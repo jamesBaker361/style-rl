@@ -42,7 +42,7 @@ parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--rewrite",action="store_true")
 parser.add_argument("--image_size",type=int,default=256)
-parser.add_argument("--mixed_precision",type=str,default="fp16")
+parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--pipeline",type=str,default="sana",help="sana or lcm")
 
 def main(args):
@@ -120,6 +120,7 @@ def main(args):
                                                     prompt=text,
                                                     device=accelerator.device,
                                                     num_images_per_prompt=1,
+                                                    do_classifier_free_guidance=False
                                             )
                 elif args.pipeline=="sana":
                     encoded_text, encoded_text_attention_mask = pipeline.encode_prompt(

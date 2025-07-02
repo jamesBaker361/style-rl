@@ -7,7 +7,7 @@ path = kagglehub.dataset_download("kaustubhdhote/human-faces-dataset")
 print("Path to dataset files:", path)
 real_images="Real Images"
 
-real_dir=os.path.join(path,real_images)
+real_dir=os.path.join(path,"Human Faces Dataset",real_images)
 
 jpg_files = [f for f in os.listdir(real_dir) if f.lower().endswith('.jpg')]
 

@@ -53,7 +53,10 @@ def main(args):
         
         accelerator=Accelerator(mixed_precision=args.mixed_precision)
         with accelerator.autocast():
-            torch_dtype=torch.float16
+            torch_dtype={
+                "fp16":torch.float16,
+                "no":torch.float32
+            }[args.mixed_precision]
             device=accelerator.device
 
             processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")

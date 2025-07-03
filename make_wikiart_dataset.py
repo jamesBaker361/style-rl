@@ -93,7 +93,7 @@ def main(args):
 
                 print("len",len(jpg_files))
 
-                raw_data=[Image.open(os.path.join(real_dir, file)) for file in jpg_files]
+                raw_data=[{"image":Image.open(os.path.join(real_dir, file))} for file in jpg_files]
             else:
                 try:
                     raw_data=load_dataset(args.dataset,split="test")
@@ -138,8 +138,9 @@ def main(args):
             pipeline.vae=pipeline.vae.to(accelerator.device,torch_dtype)
             pipeline,model=accelerator.prepare(pipeline,model)
 
-            before=find_cuda_objects()
+            
             for k,row in enumerate(raw_data):
+                before=find_cuda_objects()
                 print(k)
                 if k==args.limit:
                     break

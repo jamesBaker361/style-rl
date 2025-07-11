@@ -937,12 +937,15 @@ def main(args):
                     pad = " " * 1024  # ~1KB of padding
                     config_file.write(pad)
                 accelerator.print(f"saved {save_path}")
-                api.upload_file(path_or_fileobj=save_path,
-                                path_in_repo=WEIGHTS_NAME,
-                                repo_id=args.name)
-                api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                                repo_id=args.name)
-                accelerator.print(f"uploaded {args.name} to hub")
+                try:
+                    api.upload_file(path_or_fileobj=save_path,
+                                    path_in_repo=WEIGHTS_NAME,
+                                    repo_id=args.name)
+                    api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                    repo_id=args.name)
+                    accelerator.print(f"uploaded {args.name} to hub")
+                except:
+                    accelerator.print("failed to upload")
                 after_objects=find_cuda_objects()
                 delete_unique_objects(before_objects,after_objects)
     except torch.OutOfMemoryError:
@@ -1005,12 +1008,15 @@ def main(args):
             pad = " " * 1024  # ~1KB of padding
             config_file.write(pad)
         print(f"saved {save_path}")
-        api.upload_file(path_or_fileobj=save_path,
-                                path_in_repo=WEIGHTS_NAME,
-                                repo_id=args.name)
-        api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                                repo_id=args.name)
-        print(f"uploaded {args.name} to hub")
+        try:
+            api.upload_file(path_or_fileobj=save_path,
+                                    path_in_repo=WEIGHTS_NAME,
+                                    repo_id=args.name)
+            api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                    repo_id=args.name)
+            print(f"uploaded {args.name} to hub")
+        except:
+            accelerator.print("failed to upload")
         for k in ["persistent_loss_list","persistent_text_alignment_list","persistent_fid_list","persistent_grad_norm_list"]:
             persistent_list=data[k]
             key=k[:-5]

@@ -397,7 +397,6 @@ def main(args):
         intermediate_embedding_dim=embedding_dim
         
 
-    accelerator.print(f"cross attention dim {embedding_dim} / {args.num_image_text_embeds} =  ",cross_attention_dim)
     if args.pipeline=="sana":
         prepare_ip_adapter(pipeline.transformer,accelerator.device,torch_dtype,cross_attention_dim)
     

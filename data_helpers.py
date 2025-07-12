@@ -39,3 +39,19 @@ class CustomDataset(Dataset):
                 "text":self.text_list[index],
                 "posterior":self.posterior_list[index]
             }
+        
+
+class ScaleDataset(Dataset):
+    def __init__(self,embedding_list,image_list):
+        super().__init__()
+        self.embedding_list=embedding_list
+        self.image_list=image_list
+        
+    def __len__(self):
+        return len(self.image_list)
+    
+    def __getitem__(self, index):
+        return {
+                "image":self.image_list[index],
+                "embeds":self.embeds_list[index],
+            }

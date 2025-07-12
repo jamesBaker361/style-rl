@@ -42,8 +42,8 @@ from data_helpers import ScaleDataset
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="fp16")
-parser.add_argument("--project_name",type=str,default="person")
-parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
+parser.add_argument("--project_name",type=str,default="refiner")
+parser.add_argument("--gradient_accumulation_steps",type=int,default=2)
 parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")
 parser.add_argument("--lr",type=float,default=0.0001)
 parser.add_argument("--dataset",type=str,default="jlbaker361/siglip2-art_coco_captioned")
@@ -60,11 +60,12 @@ parser.add_argument("--disable_projection_adapter",action="store_true",help="whe
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
 parser.add_argument("--train_split",type=float,default=0.5)
-parser.add_argument("--epochs",type=int,default=100)
+parser.add_argument("--epochs",type=int,default=4)
 parser.add_argument("--use_lora",action="store_true")
 parser.add_argument("--patch_scale",type=int,default=8)
-parser.add_argument("--validation_interval",type=int,default=40)
-parser.add_argument("--num_inference_steps",type=int,default=4)
+parser.add_argument("--validation_interval",type=int,default=2)
+parser.add_argument("--num_inference_steps",type=int,default=2)
+parser.add_argument("--limit",type=int,default=8)
 
 
 def image_to_patches(img, patch_size):
@@ -317,7 +318,9 @@ def main(args):
     def logging(loader,unet,scheduler):
         pil_image_list=[]
         logging_loss_buffer=[]
-        for batch in loader:
+        for b,batch in enumerate(loader):
+            if b==args.limit:
+                break
             image_patches=loader["images"]
             embeddings=loader["embeds"]
 
@@ -350,6 +353,8 @@ def main(args):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
             with accelerator.accumulate(params):
+                if b==args.limit:
+                    break
                 embedding=batch["embedding"].to(device)
                 images=batch["image"].to(device)
                 bsz=images.size()[0]

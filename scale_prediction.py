@@ -67,6 +67,8 @@ parser.add_argument("--validation_interval",type=int,default=2)
 parser.add_argument("--num_inference_steps",type=int,default=2)
 parser.add_argument("--limit",type=int,default=8)
 parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")
+parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
+
 
 
 def image_to_patches(img, patch_size):

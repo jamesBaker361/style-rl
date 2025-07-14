@@ -283,9 +283,9 @@ def main(args):
     val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list)
     test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
 
-    train_dataset=ScaleDataset(image_list,embedding_list)
-    val_dataset=ScaleDataset(val_image_list,val_embedding_list)
-    test_dataset=ScaleDataset(test_image_list,test_embedding_list)
+    train_dataset=ScaleDataset(image_list=image_list,embedding_list=embedding_list)
+    val_dataset=ScaleDataset(image_list=val_image_list,embedding_list=val_embedding_list)
+    test_dataset=ScaleDataset(image_list=test_image_list,embedding_list=test_embedding_list)
 
     for dataset_batch in train_dataset:
         break

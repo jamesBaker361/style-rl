@@ -53,5 +53,5 @@ class ScaleDataset(Dataset):
     def __getitem__(self, index):
         return {
                 "image":self.image_list[index],
-                "embeds":self.embeds_list[index],
+                "embeds":self.embedding_list[index],
             }

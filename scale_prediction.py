@@ -365,6 +365,11 @@ def main(args):
                 images=batch["image"].to(device)
                 bsz=images.size()[0]
 
+                if e==1 and b==0:
+                    accelerator.print('images.size()',images.size())
+                    accelerator.print('embedding.size()',embedding.size())
+
+
                 if random.random()<0.5:
                     down_scale_factor=0.5
                 else:

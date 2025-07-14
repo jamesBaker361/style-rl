@@ -193,7 +193,8 @@ def main(args):
             else:
                 #this should NOT be normalized or transformed
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))[-1]
-            image_list.append( pipeline.image_processor.preprocess(image))
+            image=pipeline.image_processor.preprocess(image)
+            image_list.append( image)
             #print(embedding.size())
             embedding=embedding.to("cpu") #.squeeze()
             embedding_list.append(embedding)

@@ -42,6 +42,7 @@ from data_helpers import ScaleDataset
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="fp16")
+parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--project_name",type=str,default="refiner")
 parser.add_argument("--gradient_accumulation_steps",type=int,default=2)
 parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")

@@ -225,7 +225,7 @@ def main(args):
 
     params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
-    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
 
     params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))

@@ -352,7 +352,16 @@ def main(args):
             pil_image=pipeline.image_processor.postprocess(processed_image)
             pil_image_list.append(pil_image)
         return pil_image_list,logging_loss_buffer
-
+    unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
+                                       prompt= " ",
+                                        device="cpu", #accelerator.device,
+                                       num_images_per_prompt= 1,
+                                       do_classifier_free_guidance= True,
+                                        negative_prompt="blurry, low quality",
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
 
     start_epoch=1
     for e in range(start_epoch, args.epochs+1):
@@ -388,7 +397,10 @@ def main(args):
 
                 added_cond_kwargs={"image_embeds":embedding}
 
-                model_pred = unet(noisy_images, timesteps, added_cond_kwargs=added_cond_kwargs, return_dict=False)[0]
+                model_pred = unet(noisy_images, timesteps, 
+                                  added_cond_kwargs=added_cond_kwargs, 
+                                  encoder_hidden_states=unconditioned_text_embeds,
+                                  return_dict=False)[0]
 
                 if scheduler.config.prediction_type == "epsilon":
                     target = upscaled

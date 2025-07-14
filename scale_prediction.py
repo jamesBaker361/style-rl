@@ -210,7 +210,7 @@ def main(args):
             after_objects=find_cuda_objects()
             delete_unique_objects(after_objects,before_objects)
 
-    pipeline=DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1")
+    pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
     unet=pipeline.unet.to(device)
     scheduler=pipeline.scheduler
     if args.use_lora:

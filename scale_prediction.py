@@ -223,7 +223,7 @@ def main(args):
 
         unet.add_adapter(unet_lora_config)
 
-    params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+    params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 

@@ -301,8 +301,8 @@ def main(args):
     for val_batch in val_loader:
         break
 
-    accelerator.print("train batch",type(train_batch))
-    accelerator.print("val batch",type(val_batch))
+    accelerator.print("train batch",type(train_batch),train_batch["image"].size())
+    accelerator.print("val batch",type(val_batch),val_batch["image"].size())
 
     optimizer=torch.optim.AdamW(params,lr=args.lr)
     unet=unet.to(device)

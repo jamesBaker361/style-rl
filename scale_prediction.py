@@ -224,7 +224,10 @@ def main(args):
         target_modules=["to_k", "to_q", "to_v", "to_out.0"],)
 
         unet.add_adapter(unet_lora_config)
-
+    unet.conv_in=torch.nn.Conv2d(3,unet.conv_in.out_channels,
+                                 unet.conv_in.kernel_size,
+                                 unet.conv_in.stride,
+                                 unet.conv_in.padding)
     params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)

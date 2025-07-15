@@ -389,13 +389,13 @@ def main(args):
             with accelerator.accumulate(params):
                 if b==args.limit:
                     break
-                embedding=batch["embedding"].to(device)
-                images=batch["image"].to(device)
-                bsz=images.size()[0]
+                embedding_batch=batch["embedding"].to(device)
+                images_batch=batch["image"].to(device)
+                bsz=images_batch.size()[0]
 
                 if e==1 and b==0:
-                    accelerator.print('images.size()',images.size())
-                    accelerator.print('embedding.size()',embedding.size())
+                    accelerator.print('images.size()',images_batch.size())
+                    accelerator.print('embedding.size()',embedding_batch.size())
 
 
                 if random.random()<0.5:
@@ -406,15 +406,17 @@ def main(args):
                 up_scale_factor=1.0/down_scale_factor
 
                 with torch.no_grad():
-                    lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
-                    upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
+                    #lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                    #upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
 
-                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images.device)
+                    upscaled=torch.randn_like(images_batch)
+
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
                     timesteps = timesteps.long()
 
-                    noisy_images=scheduler.add_noise(images, upscaled,timesteps)
+                    noisy_images=scheduler.add_noise(images_batch, upscaled,timesteps)
 
-                    added_cond_kwargs={"image_embeds":embedding}
+                    added_cond_kwargs={"image_embeds":embedding_batch}
 
                 model_pred = unet(noisy_images, timesteps, 
                                   added_cond_kwargs=added_cond_kwargs, 
@@ -424,7 +426,7 @@ def main(args):
                 if scheduler.config.prediction_type == "epsilon":
                     target = upscaled.detach()
                 elif scheduler.config.prediction_type == "v_prediction":
-                    target = scheduler.get_velocity(images, upscaled, timesteps).detach()
+                    target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
 
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 

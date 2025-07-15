@@ -42,10 +42,11 @@ class CustomDataset(Dataset):
         
 
 class ScaleDataset(Dataset):
-    def __init__(self,embedding_list,image_list):
+    def __init__(self,embedding_list,image_list,text_embedding):
         super().__init__()
         self.embedding_list=embedding_list
         self.image_list=image_list
+        self.text_embedding_list=[text_embedding.clone() for _ in embedding_list]
         
     def __len__(self):
         return len(self.image_list)
@@ -54,4 +55,5 @@ class ScaleDataset(Dataset):
         return {
                 "image":self.image_list[index],
                 "embedding":self.embedding_list[index],
+                "text_embedding":self.text_embedding_list[index]
             }

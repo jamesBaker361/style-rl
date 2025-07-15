@@ -423,7 +423,7 @@ def main(args):
 
                 model_pred = unet(noisy_images, timesteps, 
                                   added_cond_kwargs=added_cond_kwargs, 
-                                  encoder_hidden_states=unconditioned_text_embeds.clone(),
+                                  encoder_hidden_states=encoder_hidden_states,
                                   return_dict=False)[0]
 
                 if scheduler.config.prediction_type == "epsilon":

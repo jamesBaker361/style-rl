@@ -303,6 +303,7 @@ def main(args):
     test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
 
     pipeline.text_encoder.to(device)
+    pipeline.text_encoder.requires_grad_(False)
 
     unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
                                        prompt= " ",
@@ -314,7 +315,7 @@ def main(args):
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
-    unconditioned_text_embeds=unconditioned_text_embeds.squeeze(0)
+    unconditioned_text_embeds=unconditioned_text_embeds.squeeze(0).cpu().detach()
     accelerator.print("text embeds",unconditioned_text_embeds.size())
     
     train_dataset=ScaleDataset(image_list=image_list,embedding_list=embedding_list,text_embedding=unconditioned_text_embeds)

@@ -449,6 +449,7 @@ def main(args):
             # Check if any tensors are being reused
             print(f"Target requires_grad: {target.requires_grad}")
             print(f"Model_pred requires_grad: {model_pred.requires_grad}")
+            print("model grad_fn",model_pred.grad_fn)
 
             accelerator.backward(loss)
             # Only step optimizer after accumulation steps

@@ -229,6 +229,12 @@ def main(args):
                                  unet.conv_in.stride,
                                  unet.conv_in.padding)
     unet.conv_in.requires_grad_(True)
+
+    unet.conv_out=torch.nn.Conv2d(unet.conv_out.in_channels,3,
+                                  unet.conv_out.kernel_size,
+                                  unet.conv_out.stride,
+                                  unet.conv_out.padding)
+    unet.conv_out.require_grad_(True)
     params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
@@ -375,7 +381,7 @@ def main(args):
                                         #lora_scale=lora_scale,
                                 )
     accelerator.print("text embeds",unconditioned_text_embeds.size())
-    accelerator.print(unet)
+    #accelerator.print(unet)
     start_epoch=1
     for e in range(start_epoch, args.epochs+1):
         loss_buffer=[]

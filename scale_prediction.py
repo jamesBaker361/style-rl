@@ -234,7 +234,7 @@ def main(args):
                                   unet.conv_out.kernel_size,
                                   unet.conv_out.stride,
                                   unet.conv_out.padding)
-    unet.conv_out.require_grad_(True)
+    unet.conv_out.requires_grad_(True)
     params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)

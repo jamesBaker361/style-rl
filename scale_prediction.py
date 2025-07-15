@@ -366,7 +366,7 @@ def main(args):
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
-
+    print("text embeds",unconditioned_text_embeds.size())
     start_epoch=1
     for e in range(start_epoch, args.epochs+1):
         loss_buffer=[]

@@ -300,9 +300,21 @@ def main(args):
     val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list)
     test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
 
-    train_dataset=ScaleDataset(image_list=image_list,embedding_list=embedding_list)
-    val_dataset=ScaleDataset(image_list=val_image_list,embedding_list=val_embedding_list)
-    test_dataset=ScaleDataset(image_list=test_image_list,embedding_list=test_embedding_list)
+    unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
+                                       prompt= " ",
+                                        device=device, #accelerator.device,
+                                       num_images_per_prompt= 1,
+                                       do_classifier_free_guidance= True,
+                                        negative_prompt="blurry, low quality",
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )
+    accelerator.print("text embeds",unconditioned_text_embeds.size())
+    
+    train_dataset=ScaleDataset(image_list=image_list,embedding_list=embedding_list,text_embedding=unconditioned_text_embeds)
+    val_dataset=ScaleDataset(image_list=val_image_list,embedding_list=val_embedding_list,text_embedding=unconditioned_text_embeds)
+    test_dataset=ScaleDataset(image_list=test_image_list,embedding_list=test_embedding_list,text_embedding=unconditioned_text_embeds)
 
     for dataset_batch in train_dataset:
         break
@@ -370,17 +382,7 @@ def main(args):
             pil_image_list.append(pil_image)
         return pil_image_list,logging_loss_buffer
     pipeline.text_encoder.to(device)
-    unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
-                                       prompt= " ",
-                                        device=device, #accelerator.device,
-                                       num_images_per_prompt= 1,
-                                       do_classifier_free_guidance= True,
-                                        negative_prompt="blurry, low quality",
-                                        prompt_embeds=None,
-                                        negative_prompt_embeds=None,
-                                        #lora_scale=lora_scale,
-                                )
-    accelerator.print("text embeds",unconditioned_text_embeds.size())
+    
     #accelerator.print(unet)
     start_epoch=1
     for e in range(start_epoch, args.epochs+1):
@@ -391,6 +393,7 @@ def main(args):
                     break
                 embedding_batch=batch["embedding"].to(device)
                 images_batch=batch["image"].to(device)
+                encoder_hidden_states=batch["text_embedding"].to(device)
                 bsz=images_batch.size()[0]
 
                 if e==1 and b==0:

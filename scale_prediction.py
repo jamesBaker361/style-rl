@@ -238,9 +238,9 @@ def main(args):
     unet.conv_out.requires_grad_(True)
     params=list(set([p for p in unet.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
-    pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
+    #pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
 
-    params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+    #params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
 
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
@@ -264,14 +264,14 @@ def main(args):
     if use_projection and args.identity_adapter:
         accelerator.print("use_projection and args.identity_adapter are both true")
 
-    replace_ip_attn(unet,
+    '''replace_ip_attn(unet,
                     embedding_dim,
                     intermediate_embedding_dim,
                     cross_attention_dim,
                     args.num_image_text_embeds,
-                    use_projection,args.identity_adapter,args.deep_to_ip_layers)
+                    use_projection,args.identity_adapter,args.deep_to_ip_layers)'''
 
-    params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+    #params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
 
 
@@ -432,7 +432,7 @@ def main(args):
             
             target=target.detach()
             model_pred = unet(noisy_images, timesteps, 
-                            added_cond_kwargs=added_cond_kwargs, 
+                            #added_cond_kwargs=added_cond_kwargs, 
                             encoder_hidden_states=encoder_hidden_states,
                             return_dict=False)[0]
 

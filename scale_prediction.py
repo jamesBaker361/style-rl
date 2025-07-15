@@ -451,6 +451,16 @@ def main(args):
             print(f"Model_pred requires_grad: {model_pred.requires_grad}")
             print("model grad_fn",model_pred.grad_fn)
 
+            print("=== Parameter Check ===")
+            corrupted_params = []
+            for name, param in unet.named_parameters():
+                if param.grad_fn is not None or not param.is_leaf:
+                    corrupted_params.append(name)
+                    print(f"CORRUPTED: {name} - grad_fn: {param.grad_fn}, is_leaf: {param.is_leaf}")
+
+            if corrupted_params:
+                print(f"Found {len(corrupted_params)} corrupted parameters!")
+
             accelerator.backward(loss)
             # Only step optimizer after accumulation steps
             #if accelerator.sync_gradients:

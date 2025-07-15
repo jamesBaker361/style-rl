@@ -253,12 +253,15 @@ def main(args):
     accelerator.print("embedding_dim",embedding_dim)
     accelerator.print("cross_attention_dim",cross_attention_dim)
 
+    if use_projection and args.identity_adapter:
+        accelerator.print("use_projection and args.identity_adapter are both true")
+
     replace_ip_attn(unet,
                     embedding_dim,
                     intermediate_embedding_dim,
                     cross_attention_dim,
                     args.num_image_text_embeds,
-                    use_projection,args.identity_adapter)
+                    use_projection,args.identity_adapter,args.deep_to_ip_layers)
 
     params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))

@@ -395,6 +395,9 @@ def main(args):
     intermediate_embedding_dim=args.intermediate_embedding_dim
     if args.disable_projection_adapter:
         intermediate_embedding_dim=embedding_dim
+
+    if use_projection and args.identity_adapter:
+        accelerator.print("use_projection and args.identity_adapter are both true")
         
 
     if args.pipeline=="sana":
@@ -405,7 +408,7 @@ def main(args):
                     intermediate_embedding_dim,
                     cross_attention_dim,
                     args.num_image_text_embeds,
-                    use_projection,args.identity_adapter)
+                    use_projection,args.identity_adapter,args.deep_to_ip_layers)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
     persistent_loss_list=[]

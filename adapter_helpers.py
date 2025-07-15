@@ -80,7 +80,7 @@ def replace_ip_attn(denoising_model:Union[ UNet2DConditionModel,SanaTransformer2
                 torch.nn.Linear(average_feature_dim,out_features,bias=False)
             ])
         else:
-            new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False)])
+            new_v_ip=torch.nn.ModuleList([torch.nn.Linear(cross_attention_dim,out_features,bias=False) for _ in range(num_image_text_embeds)])
         new_v_ip.to(denoising_model.device,torch_dtype)
         setattr(module, "to_v_ip",new_v_ip)
 

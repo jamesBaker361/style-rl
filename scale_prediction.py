@@ -391,44 +391,44 @@ def main(args):
     for e in range(start_epoch, args.epochs+1):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
+            
+            if b==args.limit:
+                break
+            embedding_batch=batch["embedding"].to(device)
+            images_batch=batch["image"].to(device)
+            encoder_hidden_states=batch["text_embedding"].to(device)
+            bsz=images_batch.size()[0]
+
+            if e==1 and b==0:
+                accelerator.print('images.size()',images_batch.size())
+                accelerator.print('embedding.size()',embedding_batch.size())
+
+
+            if random.random()<0.5:
+                down_scale_factor=0.5
+            else:
+                down_scale_factor=0.25
+
+            up_scale_factor=1.0/down_scale_factor
+
+            with torch.no_grad():
+                lowres = F.interpolate(images_batch.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
+
+                #upscaled=torch.randn_like(images_batch)
+
+                timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
+                timesteps = timesteps.long()
+
+                noisy_images=scheduler.add_noise(images_batch, upscaled,timesteps)
+
+                added_cond_kwargs={"image_embeds":embedding_batch}
+
+                if scheduler.config.prediction_type == "epsilon":
+                    target = upscaled.detach()
+                elif scheduler.config.prediction_type == "v_prediction":
+                    target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
             with accelerator.accumulate(params):
-                if b==args.limit:
-                    break
-                embedding_batch=batch["embedding"].to(device)
-                images_batch=batch["image"].to(device)
-                encoder_hidden_states=batch["text_embedding"].to(device)
-                bsz=images_batch.size()[0]
-
-                if e==1 and b==0:
-                    accelerator.print('images.size()',images_batch.size())
-                    accelerator.print('embedding.size()',embedding_batch.size())
-
-
-                if random.random()<0.5:
-                    down_scale_factor=0.5
-                else:
-                    down_scale_factor=0.25
-
-                up_scale_factor=1.0/down_scale_factor
-
-                with torch.no_grad():
-                    lowres = F.interpolate(images_batch.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
-                    upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
-
-                    #upscaled=torch.randn_like(images_batch)
-
-                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
-                    timesteps = timesteps.long()
-
-                    noisy_images=scheduler.add_noise(images_batch, upscaled,timesteps)
-
-                    added_cond_kwargs={"image_embeds":embedding_batch}
-
-                    if scheduler.config.prediction_type == "epsilon":
-                        target = upscaled.detach()
-                    elif scheduler.config.prediction_type == "v_prediction":
-                        target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
-
                 model_pred = unet(noisy_images, timesteps, 
                                   added_cond_kwargs=added_cond_kwargs, 
                                   encoder_hidden_states=encoder_hidden_states,

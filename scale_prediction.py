@@ -406,10 +406,10 @@ def main(args):
                 up_scale_factor=1.0/down_scale_factor
 
                 with torch.no_grad():
-                    #lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
-                    #upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
+                    lowres = F.interpolate(images_batch.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                    upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
 
-                    upscaled=torch.randn_like(images_batch)
+                    #upscaled=torch.randn_like(images_batch)
 
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
                     timesteps = timesteps.long()

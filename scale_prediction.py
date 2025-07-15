@@ -40,6 +40,7 @@ from huggingface_hub import create_repo,HfApi
 from embedding_helpers import EmbeddingUtil
 from data_helpers import ScaleDataset
 from torchviz import make_dot
+torch.autograd.set_detect_anomaly(True)
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="fp16")

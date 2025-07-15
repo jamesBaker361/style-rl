@@ -73,6 +73,7 @@ parser.add_argument("--limit",type=int,default=8)
 parser.add_argument("--embedding",type=str,default="siglip2",help="dino ssl or siglip2")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
+parser.add_argument("--verbose",action="store_true")
 
 
 def image_to_patches(img, patch_size):
@@ -442,26 +443,28 @@ def main(args):
 
             loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
-            print("=== Debug Info ===")
-            print(f"Batch {b}, Epoch {e}")
-            print(f"Loss requires_grad: {loss.requires_grad}")
-            print(f"Loss is_leaf: {loss.is_leaf}")
-            print(f"Loss grad_fn: {loss.grad_fn}")
+            if args.verbose:
 
-            # Check if any tensors are being reused
-            print(f"Target requires_grad: {target.requires_grad}")
-            print(f"Model_pred requires_grad: {model_pred.requires_grad}")
-            print("model grad_fn",model_pred.grad_fn)
+                print("=== Debug Info ===")
+                print(f"Batch {b}, Epoch {e}")
+                print(f"Loss requires_grad: {loss.requires_grad}")
+                print(f"Loss is_leaf: {loss.is_leaf}")
+                print(f"Loss grad_fn: {loss.grad_fn}")
 
-            print("=== Parameter Check ===")
-            corrupted_params = []
-            for name, param in unet.named_parameters():
-                if param.grad_fn is not None or not param.is_leaf:
-                    corrupted_params.append(name)
-                    print(f"CORRUPTED: {name} - grad_fn: {param.grad_fn}, is_leaf: {param.is_leaf}")
+                # Check if any tensors are being reused
+                print(f"Target requires_grad: {target.requires_grad}")
+                print(f"Model_pred requires_grad: {model_pred.requires_grad}")
+                print("model grad_fn",model_pred.grad_fn)
 
-            if corrupted_params:
-                print(f"Found {len(corrupted_params)} corrupted parameters!")
+                print("=== Parameter Check ===")
+                corrupted_params = []
+                for name, param in unet.named_parameters():
+                    if param.grad_fn is not None or not param.is_leaf:
+                        corrupted_params.append(name)
+                        print(f"CORRUPTED: {name} - grad_fn: {param.grad_fn}, is_leaf: {param.is_leaf}")
+
+                if corrupted_params:
+                    print(f"Found {len(corrupted_params)} corrupted parameters!")
 
             accelerator.backward(loss)
             # Only step optimizer after accumulation steps

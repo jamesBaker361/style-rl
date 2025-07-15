@@ -356,6 +356,7 @@ def main(args):
             pil_image=pipeline.image_processor.postprocess(processed_image)
             pil_image_list.append(pil_image)
         return pil_image_list,logging_loss_buffer
+    pipeline.text_encoder.to(device)
     unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
                                        prompt= " ",
                                         device=device, #accelerator.device,

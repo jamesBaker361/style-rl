@@ -292,7 +292,7 @@ def main(args):
         for old_image,old_embedding in zip(old_image_list,old_embedding_list):
             patches=image_to_patches(old_image,patch_size)
             for p in patches:
-                new_image_list.append(p)
+                new_image_list.append(torch.randn(3,patch_size,patch_size))
                 new_embedding_list.append(old_embedding.clone())
         return new_image_list,new_embedding_list
 

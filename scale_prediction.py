@@ -422,9 +422,9 @@ def main(args):
                                   return_dict=False)[0]
 
                 if scheduler.config.prediction_type == "epsilon":
-                    target = upscaled
+                    target = upscaled.detach()
                 elif scheduler.config.prediction_type == "v_prediction":
-                    target = scheduler.get_velocity(images, upscaled, timesteps)
+                    target = scheduler.get_velocity(images, upscaled, timesteps).detach()
 
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 

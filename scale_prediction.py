@@ -406,7 +406,7 @@ def main(args):
                 up_scale_factor=1.0/down_scale_factor
 
                 # For shape (B, C, H, W)
-                lowres = F.interpolate(images, scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
                 upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
 
                 timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images.device)

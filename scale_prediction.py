@@ -39,6 +39,7 @@ from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import create_repo,HfApi
 from embedding_helpers import EmbeddingUtil
 from data_helpers import ScaleDataset
+from torchviz import make_dot
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="fp16")
@@ -439,8 +440,15 @@ def main(args):
 
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
-                accelerator.print('loss',loss.requires_grad)
-                accelerator.print('target',target.requires_grad)
+                print("=== Debug Info ===")
+                print(f"Batch {b}, Epoch {e}")
+                print(f"Loss requires_grad: {loss.requires_grad}")
+                print(f"Loss is_leaf: {loss.is_leaf}")
+                print(f"Loss grad_fn: {loss.grad_fn}")
+
+                # Check if any tensors are being reused
+                print(f"Target requires_grad: {target.requires_grad}")
+                print(f"Model_pred requires_grad: {model_pred.requires_grad}")
 
                 accelerator.backward(loss)
                 # Only step optimizer after accumulation steps

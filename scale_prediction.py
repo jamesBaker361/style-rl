@@ -439,8 +439,10 @@ def main(args):
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
                 accelerator.backward(loss)
-                optimizer.step()
-                optimizer.zero_grad()
+                # Only step optimizer after accumulation steps
+                if accelerator.sync_gradients:
+                    optimizer.step()
+                    optimizer.zero_grad()
 
             loss_buffer.append(loss.cpu().detach().item())
         end=time.time()

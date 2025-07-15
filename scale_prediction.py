@@ -444,9 +444,9 @@ def main(args):
 
                 accelerator.backward(loss)
                 # Only step optimizer after accumulation steps
-                if accelerator.sync_gradients:
-                    optimizer.step()
-                    optimizer.zero_grad()
+            if accelerator.sync_gradients:
+                optimizer.step()
+                optimizer.zero_grad()
 
             loss_buffer.append(loss.cpu().detach().item())
         end=time.time()

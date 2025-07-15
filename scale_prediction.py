@@ -438,6 +438,9 @@ def main(args):
 
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
+                accelerator.print('loss',loss.requires_grad)
+                accelerator.print('target',target.requires_grad)
+
                 accelerator.backward(loss)
             # Only step optimizer after accumulation steps
             if accelerator.sync_gradients:

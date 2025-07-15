@@ -405,16 +405,16 @@ def main(args):
 
                 up_scale_factor=1.0/down_scale_factor
 
-                # For shape (B, C, H, W)
-                lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
-                upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
+                with torch.no_grad():
+                    lowres = F.interpolate(images.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                    upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
 
-                timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images.device)
-                timesteps = timesteps.long()
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images.device)
+                    timesteps = timesteps.long()
 
-                noisy_images=scheduler.add_noise(images, upscaled,timesteps)
+                    noisy_images=scheduler.add_noise(images, upscaled,timesteps)
 
-                added_cond_kwargs={"image_embeds":embedding}
+                    added_cond_kwargs={"image_embeds":embedding}
 
                 model_pred = unet(noisy_images, timesteps, 
                                   added_cond_kwargs=added_cond_kwargs, 

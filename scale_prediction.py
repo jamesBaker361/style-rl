@@ -292,7 +292,7 @@ def main(args):
         for old_image,old_embedding in zip(old_image_list,old_embedding_list):
             patches=image_to_patches(old_image,patch_size)
             for p in patches:
-                new_image_list.append(torch.randn(3,patch_size,patch_size))
+                new_image_list.append(p)
                 new_embedding_list.append(old_embedding.clone())
         return new_image_list,new_embedding_list
 
@@ -392,7 +392,6 @@ def main(args):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
             with accelerator.accumulate(params):
-                optimizer.zero_grad()
                 if b==args.limit:
                     break
                 embedding_batch=batch["embedding"].to(device)
@@ -425,15 +424,17 @@ def main(args):
 
                     added_cond_kwargs={"image_embeds":embedding_batch}
 
+                    if scheduler.config.prediction_type == "epsilon":
+                        target = upscaled.detach()
+                    elif scheduler.config.prediction_type == "v_prediction":
+                        target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
+
                 model_pred = unet(noisy_images, timesteps, 
                                   added_cond_kwargs=added_cond_kwargs, 
                                   encoder_hidden_states=encoder_hidden_states,
                                   return_dict=False)[0]
 
-                if scheduler.config.prediction_type == "epsilon":
-                    target = upscaled.detach()
-                elif scheduler.config.prediction_type == "v_prediction":
-                    target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
+                
 
                 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
@@ -441,7 +442,7 @@ def main(args):
                 optimizer.step()
                 optimizer.zero_grad()
 
-                loss_buffer.append(loss.cpu().detach().item())
+            loss_buffer.append(loss.cpu().detach().item())
         end=time.time()
         elapsed=end-start
         accelerator.print(f"\t epoch {e} elapsed {elapsed}")

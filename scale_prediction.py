@@ -300,6 +300,8 @@ def main(args):
     val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list)
     test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
 
+    pipeline.text_encoder.to(device)
+
     unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
                                        prompt= " ",
                                         device=device, #accelerator.device,
@@ -381,7 +383,7 @@ def main(args):
             pil_image=pipeline.image_processor.postprocess(processed_image)
             pil_image_list.append(pil_image)
         return pil_image_list,logging_loss_buffer
-    pipeline.text_encoder.to(device)
+    
     
     #accelerator.print(unet)
     start_epoch=1

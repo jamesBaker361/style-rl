@@ -293,7 +293,7 @@ def main(args):
             patches=image_to_patches(old_image,patch_size)
             for p in patches:
                 new_image_list.append(p)
-                new_embedding_list.append(old_embedding)
+                new_embedding_list.append(old_embedding.clone())
         return new_image_list,new_embedding_list
 
     image_list,embedding_list=patchify_lists(image_list,embedding_list)

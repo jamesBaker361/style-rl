@@ -429,10 +429,11 @@ def main(args):
                     elif scheduler.config.prediction_type == "v_prediction":
                         target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
                 
-                    model_pred = unet(noisy_images, timesteps, 
-                                    added_cond_kwargs=added_cond_kwargs, 
-                                    encoder_hidden_states=encoder_hidden_states,
-                                    return_dict=False)[0]
+                target=target.detach()
+                model_pred = unet(noisy_images, timesteps, 
+                                added_cond_kwargs=added_cond_kwargs, 
+                                encoder_hidden_states=encoder_hidden_states,
+                                return_dict=False)[0]
 
                 
 

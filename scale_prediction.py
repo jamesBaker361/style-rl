@@ -392,6 +392,7 @@ def main(args):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
             with accelerator.accumulate(params):
+                optimizer.zero_grad()
                 if b==args.limit:
                     break
                 embedding_batch=batch["embedding"].to(device)

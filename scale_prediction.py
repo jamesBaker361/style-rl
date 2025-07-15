@@ -358,7 +358,7 @@ def main(args):
         return pil_image_list,logging_loss_buffer
     unconditioned_text_embeds,negative_text_embeds=pipeline.encode_prompt(
                                        prompt= " ",
-                                        device="cpu", #accelerator.device,
+                                        device=device, #accelerator.device,
                                        num_images_per_prompt= 1,
                                        do_classifier_free_guidance= True,
                                         negative_prompt="blurry, low quality",

@@ -312,6 +312,7 @@ def main(args):
                                         negative_prompt_embeds=None,
                                         #lora_scale=lora_scale,
                                 )
+    unconditioned_text_embeds=unconditioned_text_embeds.squeeze(0)
     accelerator.print("text embeds",unconditioned_text_embeds.size())
     
     train_dataset=ScaleDataset(image_list=image_list,embedding_list=embedding_list,text_embedding=unconditioned_text_embeds)

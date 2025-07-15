@@ -249,6 +249,9 @@ def main(args):
     if args.identity_adapter:
         cross_attention_dim=embedding_dim//args.num_image_text_embeds
     intermediate_embedding_dim=args.intermediate_embedding_dim
+    
+    accelerator.print("embedding_dim",embedding_dim)
+    accelerator.print("cross_attention_dim",cross_attention_dim)
 
     replace_ip_attn(unet,
                     embedding_dim,

@@ -252,6 +252,7 @@ def main(args):
     
     accelerator.print("embedding_dim",embedding_dim)
     accelerator.print("cross_attention_dim",cross_attention_dim)
+    accelerator.print("intermediate",intermediate_embedding_dim)
 
     if use_projection and args.identity_adapter:
         accelerator.print("use_projection and args.identity_adapter are both true")

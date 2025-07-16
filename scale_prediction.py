@@ -135,6 +135,15 @@ def main(args):
     device=accelerator.device
     state = PartialState()
     print(f"Rank {state.process_index} initialized successfully")
+    WEIGHTS_NAME="unet_model.bin"
+    CONFIG_NAME="config.json"
+    save_dir=os.path.join(os.environ["TORCH_LOCAL_DIR"],args.name)
+    save_path=os.path.join(save_dir,WEIGHTS_NAME)
+    config_path=os.path.join(save_dir,CONFIG_NAME)
+    if accelerator.is_main_process or state.num_processes==1:
+        os.makedirs(save_dir,exist_ok=True)
+
+    accelerator.print("\nMODEL-NAME ",args.name.split("/")[-1])
     if accelerator.is_main_process or state.num_processes==1:
         accelerator.print(f"main process = {state.process_index}")
     if accelerator.is_main_process or state.num_processes==1:
@@ -177,6 +186,7 @@ def main(args):
     embedding_util=EmbeddingUtil(device,torch_dtype,args.embedding,args.facet,args.dino_pooling_stride)
 
     pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+    persistent_loss_list=[]
 
     with torch.no_grad():
         for i,row in enumerate(shuffled_row_list):
@@ -482,7 +492,7 @@ def main(args):
             "loss_mean":np.mean(loss_buffer),
             "loss_std":np.std(loss_buffer),
         })
-
+        persistent_loss_list.append(np.mean(loss_buffer))
         torch.cuda.empty_cache()
         accelerator.free_memory()
         if e%args.validation_interval==0 or args.validation_interval==-1:
@@ -495,6 +505,31 @@ def main(args):
                 accelerator.log({
                     f"val_{k}":wandb.Image(val_image)
                 })
+
+        if accelerator.is_main_process or state.num_processes==1:
+            accelerator.wait_for_everyone()
+            before_objects=find_cuda_objects()
+            state_dict={name: param for name, param in unet.named_parameters() if param.requires_grad}
+            print("state dict len",len(state_dict))
+            torch.save(state_dict,save_path)
+            with open(config_path,"w+") as config_file:
+                data={"start_epoch":e,
+                    "persistent_loss_list":persistent_loss_list,}
+                json.dump(data,config_file, indent=4)
+                pad = " " * 1024  # ~1KB of padding
+                config_file.write(pad)
+            accelerator.print(f"saved {save_path}")
+            try:
+                api.upload_file(path_or_fileobj=save_path,
+                                path_in_repo=WEIGHTS_NAME,
+                                repo_id=args.name)
+                api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
+                                repo_id=args.name)
+                accelerator.print(f"uploaded {args.name} to hub")
+            except:
+                accelerator.print("failed to upload")
+            after_objects=find_cuda_objects()
+            delete_unique_objects(before_objects,after_objects)
 
     test_image_list,test_loss_buffer=logging(test_loader,unet,scheduler)
     accelerator.log({

@@ -367,11 +367,6 @@ def main(args):
             embeddings=batch["embedding"]
             encoder_hidden_states=batch["text_embedding"]
 
-            if b==0:
-                accelerator.print("logging image_batches",image_patches.size())
-                accelerator.print("logging embeddings",embeddings.size())
-                accelerator.print("logging encoder",encoder_hidden_states.size())
-
             if random.random()<0.5:
                 down_scale_factor=0.5
             else:

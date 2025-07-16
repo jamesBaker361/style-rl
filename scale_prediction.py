@@ -67,7 +67,7 @@ parser.add_argument("--train_split",type=float,default=0.5)
 parser.add_argument("--epochs",type=int,default=4)
 parser.add_argument("--use_lora",action="store_true")
 parser.add_argument("--patch_scale",type=int,default=8)
-parser.add_argument("--validation_interval",type=int,default=2)
+parser.add_argument("--validation_interval",type=int,default=2,help= "how often to do validation -1 if constantly")
 parser.add_argument("--num_inference_steps",type=int,default=2)
 parser.add_argument("--limit",type=int,default=8)
 parser.add_argument("--embedding",type=str,default="siglip2",help="dino ssl or siglip2")
@@ -485,7 +485,7 @@ def main(args):
 
         torch.cuda.empty_cache()
         accelerator.free_memory()
-        if e%args.validation_interval==0:
+        if e%args.validation_interval==0 or args.validation_interval==-1:
             val_image_list,val_loss_buffer=logging(val_loader,unet,scheduler)
             accelerator.log({
                 "val_loss_mean":np.mean(val_loss_buffer),

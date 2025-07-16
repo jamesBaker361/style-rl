@@ -722,7 +722,7 @@ def main(args):
             scale=args.initial_scale+(float(e)/args.epochs)*(args.final_scale-args.initial_scale)
             accelerator.print("scale",scale)
             pipeline.set_ip_adapter_scale(scale)
-            if e==args.reward_switch_epoch:
+            if args.reward_switch_epoch>0 and e>=args.reward_switch_epoch:
                 args.training_type="reward"
 
             if args.pipeline=="sana":

@@ -363,7 +363,7 @@ def main(args):
         for b,batch in enumerate(loader):
             if b==args.limit:
                 break
-            image_patches=batch["images"]
+            image_patches=batch["image"]
             embeddings=batch["embeds"]
 
             if random.random()<0.5:

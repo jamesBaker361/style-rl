@@ -1,12 +1,12 @@
 port=29650
 
-for training_type in  ["denoise","reward"]: #,"reward","latents_reward"]:
+for training_type in  ["denoise"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
         for prediction_type in ["v_prediction","epsilon"]:
             for embedding in ["clip",]:
                 for data in ["league_captioned_splash"]:
                     for suffix in ["_deep_identity",""]:
-                        for lr in [0.001,0.0001]:
+                        for lr in [0.001]:
                             for n in [1000]:
                                 #for scheduler in ["LCMScheduler"]:
                                 for pipeline in ["lcm","lcm_pre_lora","lcm_post_lora"]:

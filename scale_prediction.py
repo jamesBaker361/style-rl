@@ -287,7 +287,7 @@ def main(args):
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
 
     patch_size=args.image_size//args.patch_scale
-    print(f"args.image_size {args.image_size} // args.patch_scale {args.patch_scale} ={patch_size}; patch_size **2 ={patch_size**2}")
+    print(f"args.image_size {args.image_size} // args.patch_scale {args.patch_scale} ={patch_size}; args.patch_scale **2 ={args.patch_scale**2}")
 
     def patchify_lists(old_image_list,old_embedding_list):
         new_image_list=[]
@@ -329,8 +329,8 @@ def main(args):
     accelerator.print("dataset batch",type(dataset_batch))
 
     train_loader=DataLoader(train_dataset,batch_size=args.batch_size,drop_last=True,shuffle=True)
-    val_loader=DataLoader(val_dataset,batch_size=patch_size**2)
-    test_loader=DataLoader(test_dataset,batch_size=patch_size**2) #each test batch is one image
+    val_loader=DataLoader(val_dataset,batch_size=args.patch_scale**2)
+    test_loader=DataLoader(test_dataset,batch_size=args.patch_scale**2) #each test batch is one image
 
     for train_batch in train_loader:
         break

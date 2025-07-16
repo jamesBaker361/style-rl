@@ -395,82 +395,82 @@ def main(args):
     for e in range(start_epoch, args.epochs+1):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):
-            #with accelerator.accumulate(params):
-            if b==args.limit:
-                break
-            embedding_batch=batch["embedding"].to(device)
-            images_batch=batch["image"].to(device)
-            encoder_hidden_states=batch["text_embedding"].to(device)
-            bsz=images_batch.size()[0]
+            with accelerator.accumulate(params):
+                if b==args.limit:
+                    break
+                embedding_batch=batch["embedding"].to(device)
+                images_batch=batch["image"].to(device)
+                encoder_hidden_states=batch["text_embedding"].to(device)
+                bsz=images_batch.size()[0]
 
-            if e==1 and b==0:
-                accelerator.print('images.size()',images_batch.size())
-                accelerator.print('embedding.size()',embedding_batch.size())
+                if e==1 and b==0:
+                    accelerator.print('images.size()',images_batch.size())
+                    accelerator.print('embedding.size()',embedding_batch.size())
 
 
-            if random.random()<0.5:
-                down_scale_factor=0.5
-            else:
-                down_scale_factor=0.25
+                if random.random()<0.5:
+                    down_scale_factor=0.5
+                else:
+                    down_scale_factor=0.25
 
-            up_scale_factor=1.0/down_scale_factor
+                up_scale_factor=1.0/down_scale_factor
 
-            with torch.no_grad():
-                lowres = F.interpolate(images_batch.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
-                upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
+                with torch.no_grad():
+                    lowres = F.interpolate(images_batch.clone().detach(), scale_factor=down_scale_factor, mode='bilinear', align_corners=False)
+                    upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False).detach()
 
-                #upscaled=torch.randn_like(images_batch)
+                    #upscaled=torch.randn_like(images_batch)
 
-                timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
-                timesteps = timesteps.long()
+                    timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (bsz,), device=images_batch.device)
+                    timesteps = timesteps.long()
 
-                noisy_images=scheduler.add_noise(images_batch, upscaled,timesteps)
+                    noisy_images=scheduler.add_noise(images_batch, upscaled,timesteps)
 
-                added_cond_kwargs={"image_embeds":embedding_batch}
+                    added_cond_kwargs={"image_embeds":embedding_batch}
 
-                if scheduler.config.prediction_type == "epsilon":
-                    target = upscaled.detach()
-                elif scheduler.config.prediction_type == "v_prediction":
-                    target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
-            
-            target=target.detach()
-            model_pred = unet(noisy_images, timesteps, 
-                            added_cond_kwargs=added_cond_kwargs, 
-                            encoder_hidden_states=encoder_hidden_states,
-                            return_dict=False)[0]
+                    if scheduler.config.prediction_type == "epsilon":
+                        target = upscaled.detach()
+                    elif scheduler.config.prediction_type == "v_prediction":
+                        target = scheduler.get_velocity(images_batch, upscaled, timesteps).detach()
+                
+                target=target.detach()
+                model_pred = unet(noisy_images, timesteps, 
+                                added_cond_kwargs=added_cond_kwargs, 
+                                encoder_hidden_states=encoder_hidden_states,
+                                return_dict=False)[0]
 
-            
+                
 
-            loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
 
-            if args.verbose:
+                if args.verbose:
 
-                print("=== Debug Info ===")
-                print(f"Batch {b}, Epoch {e}")
-                print(f"Loss requires_grad: {loss.requires_grad}")
-                print(f"Loss is_leaf: {loss.is_leaf}")
-                print(f"Loss grad_fn: {loss.grad_fn}")
+                    print("=== Debug Info ===")
+                    print(f"Batch {b}, Epoch {e}")
+                    print(f"Loss requires_grad: {loss.requires_grad}")
+                    print(f"Loss is_leaf: {loss.is_leaf}")
+                    print(f"Loss grad_fn: {loss.grad_fn}")
 
-                # Check if any tensors are being reused
-                print(f"Target requires_grad: {target.requires_grad}")
-                print(f"Model_pred requires_grad: {model_pred.requires_grad}")
-                print("model grad_fn",model_pred.grad_fn)
+                    # Check if any tensors are being reused
+                    print(f"Target requires_grad: {target.requires_grad}")
+                    print(f"Model_pred requires_grad: {model_pred.requires_grad}")
+                    print("model grad_fn",model_pred.grad_fn)
 
-                print("=== Parameter Check ===")
-                corrupted_params = []
-                for name, param in unet.named_parameters():
-                    if param.grad_fn is not None or not param.is_leaf:
-                        corrupted_params.append(name)
-                        print(f"CORRUPTED: {name} - grad_fn: {param.grad_fn}, is_leaf: {param.is_leaf}")
+                    print("=== Parameter Check ===")
+                    corrupted_params = []
+                    for name, param in unet.named_parameters():
+                        if param.grad_fn is not None or not param.is_leaf:
+                            corrupted_params.append(name)
+                            print(f"CORRUPTED: {name} - grad_fn: {param.grad_fn}, is_leaf: {param.is_leaf}")
 
-                if corrupted_params:
-                    print(f"Found {len(corrupted_params)} corrupted parameters!")
+                    if corrupted_params:
+                        print(f"Found {len(corrupted_params)} corrupted parameters!")
 
-            accelerator.backward(loss)
-            # Only step optimizer after accumulation steps
-            #if accelerator.sync_gradients:
-            optimizer.step()
-            optimizer.zero_grad()
+                accelerator.backward(loss)
+                # Only step optimizer after accumulation steps
+                #if accelerator.sync_gradients:
+                optimizer.step()
+                optimizer.zero_grad()
 
             loss_buffer.append(loss.cpu().detach().item())
         end=time.time()

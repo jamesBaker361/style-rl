@@ -501,19 +501,19 @@ def main(args):
                     f"val_{k}":wandb.Image(val_image)
                 })
 
-        test_image_list,test_loss_buffer=logging(test_loader,unet,scheduler)
+    test_image_list,test_loss_buffer=logging(test_loader,unet,scheduler)
+    accelerator.log({
+        "test_loss_mean":np.mean(test_loss_buffer),
+        "test_loss_std":np.std(test_loss_buffer)
+    })
+    for k,test_image in enumerate(test_image_list):
         accelerator.log({
-            "test_loss_mean":np.mean(test_loss_buffer),
-            "test_loss_std":np.std(test_loss_buffer)
+            f"test_{k}":wandb.Image(test_image)
         })
-        for k,test_image in enumerate(test_image_list):
-            accelerator.log({
-                f"test_{k}":wandb.Image(test_image)
-            })
-        accelerator.print({
-            "test_loss_mean":np.mean(test_loss_buffer),
-            "test_loss_std":np.std(test_loss_buffer)
-        })
+    accelerator.print({
+        "test_loss_mean":np.mean(test_loss_buffer),
+        "test_loss_std":np.std(test_loss_buffer)
+    })
 
 
 

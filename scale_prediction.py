@@ -508,6 +508,7 @@ def main(args):
         })
         for k,test_image in enumerate(test_image_list):
             print('type(test_image)',type(test_image))
+            print('type(test_image[0])',type(test_image[0]))
             accelerator.log({
                 f"test_{k}":wandb.Image(test_image)
             })

@@ -347,9 +347,9 @@ def main(args):
 
     @torch.no_grad()
     def forward(unet,noise:torch.Tensor,embedding,encoder_hidden_states,scheduler,num_inference_steps:int)->torch.Tensor:
-        accelerator.print("logging image_batches",noise.size())
-        accelerator.print("logging embeddings",embedding.size())
-        accelerator.print("logging encoder",encoder_hidden_states.size())
+        accelerator.print("\t forward image_batches",noise.size())
+        accelerator.print("\t forward embeddings",embedding.size())
+        accelerator.print("\t forward encoder",encoder_hidden_states.size())
         added_cond_kwargs={"image_embeds":embedding}
         scheduler.set_timesteps(num_inference_steps, device=device)
         timesteps = scheduler.timesteps
@@ -387,7 +387,7 @@ def main(args):
             upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
 
             mini_batches=[
-                forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,(patch_size**2)//args.batch_size,args.batch_size)
+                forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,((patch_size**2)//args.batch_size-1),args.batch_size)
             ]
             processed_patches=torch.cat(mini_batches)
 

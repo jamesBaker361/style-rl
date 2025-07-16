@@ -364,7 +364,7 @@ def main(args):
             if b==args.limit:
                 break
             image_patches=batch["image"]
-            embeddings=batch["embeds"]
+            embeddings=batch["embedding"]
 
             if random.random()<0.5:
                 down_scale_factor=0.5

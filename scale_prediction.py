@@ -387,7 +387,7 @@ def main(args):
             upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
 
             mini_batches=[
-                forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,((patch_size**2)//args.batch_size-1),args.batch_size)
+                forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,((patch_size**2)//args.batch_size),args.batch_size) if upscaled[i:i+args.batch_size].size()!=0
             ]
             processed_patches=torch.cat(mini_batches)
 

@@ -393,7 +393,7 @@ def main(args):
 
 
             logging_loss_buffer.append(F.mse_loss(processed_patches.float(), image_patches.float()).cpu().detach().numpy())
-            processed_image=patches_to_image(processed_patches,args.image_size,args.image_size)
+            processed_image=patches_to_image(processed_patches,args.image_size,args.image_size).unsqueeze(0)
             pil_image=pipeline.image_processor.postprocess(processed_image)
             pil_image_list.append(pil_image)
         return pil_image_list,logging_loss_buffer

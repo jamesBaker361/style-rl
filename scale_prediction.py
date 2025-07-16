@@ -347,9 +347,6 @@ def main(args):
 
     @torch.no_grad()
     def forward(unet,noise:torch.Tensor,embedding,encoder_hidden_states,scheduler,num_inference_steps:int)->torch.Tensor:
-        accelerator.print("\t forward image_batches",noise.size())
-        accelerator.print("\t forward embeddings",embedding.size())
-        accelerator.print("\t forward encoder",encoder_hidden_states.size())
         added_cond_kwargs={"image_embeds":embedding}
         scheduler.set_timesteps(num_inference_steps, device=device)
         timesteps = scheduler.timesteps

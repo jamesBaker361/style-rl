@@ -507,6 +507,7 @@ def main(args):
             "test_loss_std":np.std(test_loss_buffer)
         })
         for k,test_image in enumerate(test_image_list):
+            print('type(test_image)',type(test_image))
             accelerator.log({
                 f"test_{k}":wandb.Image(test_image)
             })

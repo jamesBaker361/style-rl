@@ -74,6 +74,8 @@ parser.add_argument("--embedding",type=str,default="siglip2",help="dino ssl or s
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--verbose",action="store_true")
+parser.add_argument("--load",action="store_true")
+parser.add_argument("--load_hf",action="store_true")
 
 
 def image_to_patches(img, patch_size):
@@ -248,11 +250,9 @@ def main(args):
                                   unet.conv_out.stride,
                                   unet.conv_out.padding)
     unet.conv_out.requires_grad_(True)
-    params=list(set([p for p in unet.parameters() if p.requires_grad]))
-    accelerator.print("len params",len(params))
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
 
-    params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+    #params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
     accelerator.print("len params",len(params))
 
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
@@ -282,9 +282,46 @@ def main(args):
                     cross_attention_dim,
                     args.num_image_text_embeds,
                     use_projection,args.identity_adapter,args.deep_to_ip_layers)
-
     params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
-    accelerator.print("len params",len(params))
+    accelerator.print("len params before",len(params))
+    start_epoch=1
+    if args.load:
+        try:
+            unet.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
+            with open(config_path,"r") as f:
+                data=json.load(f)
+            start_epoch=data["start_epoch"]+1
+            persistent_loss_list=data["persistent_loss_list"]
+            accelerator.print("loaded from ",save_path)
+        except Exception as e:
+            accelerator.print("couldnt load locally")
+            accelerator.print(e)
+    if args.load_hf:    
+        try:
+            pretrained_weights_path=api.hf_hub_download(args.name,WEIGHTS_NAME,force_download=True)
+            pretrained_config_path=api.hf_hub_download(args.name,CONFIG_NAME,force_download=True)
+            unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
+            with open(pretrained_config_path,"r") as f:
+                data=json.load(f)
+            start_epoch=data["start_epoch"]+1
+            persistent_loss_list=data["persistent_loss_list"]
+            accelerator.print("loaded from  ",pretrained_weights_path)
+        except Exception as e:
+            accelerator.print("couldnt load from hf")
+            accelerator.print(e)
+
+    unet.conv_in.requires_grad_(True)
+    unet.conv_out.requires_grad_(True)
+    for name, param in unet.named_parameters():
+        if "lora" in name:
+            param.requires_grad = True
+    attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
+    attn_layer_list.append( unet.encoder_hid_proj)
+    accelerator.print("len attn_layers",len(attn_layer_list))
+    for layer in attn_layer_list:
+        layer.requires_grad_(True)
+    params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+    accelerator.print("len params after",len(params))
 
 
     
@@ -402,7 +439,7 @@ def main(args):
     
     
     #accelerator.print(unet)
-    start_epoch=1
+    
     for e in range(start_epoch, args.epochs+1):
         loss_buffer=[]
         for b,batch in enumerate(train_loader):

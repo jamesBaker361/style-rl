@@ -287,7 +287,7 @@ def main(args):
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
 
     patch_size=args.image_size//args.patch_scale
-    print(f"args.image_size {args.image_size} // args.patch_scale {args.patch_scale} ={patch_size}")
+    print(f"args.image_size {args.image_size} // args.patch_scale {args.patch_scale} ={patch_size}; patch_size **2 ={patch_size**2}")
 
     def patchify_lists(old_image_list,old_embedding_list):
         new_image_list=[]

@@ -368,7 +368,7 @@ def main(args):
             encoder_hidden_states=batch["text_embedding"]
 
             if b==0:
-                accelerator.print("logging image_batches",images_batch.size())
+                accelerator.print("logging image_batches",image_patches.size())
                 accelerator.print("logging embeddings",embeddings.size())
                 accelerator.print("logging encoder",encoder_hidden_states.size())
 
@@ -384,7 +384,7 @@ def main(args):
             upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
 
             mini_batches=[
-                forward(unet,upscaled[i:i+args.batch_size],embeddings,encoder_hidden_states,scheduler,args.num_inference_steps )for i in range(0,(patch_size**2)//args.batch_size,args.batch_size)
+                forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,(patch_size**2)//args.batch_size,args.batch_size)
             ]
             processed_patches=torch.cat(mini_batches)
 

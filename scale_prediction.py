@@ -252,9 +252,6 @@ def main(args):
     unet.conv_out.requires_grad_(True)
     pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
 
-    #params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
-    accelerator.print("len params",len(params))
-
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
     fake_embedding=embedding_util.embed_img_tensor(fake_image)
     embedding_dim=fake_embedding.size()[-1]

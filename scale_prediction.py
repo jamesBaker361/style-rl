@@ -435,7 +435,7 @@ def main(args):
             
             target=target.detach()
             model_pred = unet(noisy_images, timesteps, 
-                            #added_cond_kwargs=added_cond_kwargs, 
+                            added_cond_kwargs=added_cond_kwargs, 
                             encoder_hidden_states=encoder_hidden_states,
                             return_dict=False)[0]
 

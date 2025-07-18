@@ -4,6 +4,7 @@ from datetime import datetime
 from experiment_helpers import gpu_details
 import os
 
+
 gpu_details.print_details()
 
 def get_pending_job_ids(user):

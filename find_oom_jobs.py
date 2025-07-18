@@ -20,7 +20,7 @@ dataset_list={
 target_job_list=[]
 
 for dataset in dataset_list:
-    for root, dirs, files in os.walk(os.path.join(slurm_folder,dataset_list)):
+    for root, dirs, files in os.walk(os.path.join(slurm_folder,dataset)):
         for name in files:
             if name.endswith("out"):
                 with open(os.path.join(root,name),"r") as read_file:

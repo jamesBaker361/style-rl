@@ -451,9 +451,9 @@ def main(args):
                     bsz=images_batch.size()[0]
 
                     if e==1 and b==0:
-                        accelerator.print('images.size()',images_batch.size())
-                        accelerator.print('embedding.size()',embedding_batch.size())
-                        accelerator.print("encoder",encoder_hidden_states.size())
+                        print("size",encoder_hidden_states.size(),"embedding size",embedding_batch.size(),"img size",images_batch.size())
+                        print("device",encoder_hidden_states.device,"embedding device",embedding_batch.device,"img device",images_batch.device)
+                        print("text ",encoder_hidden_states.dtype,"embedding ",embedding_batch.dtype,"img ",images_batch.dtype,)
 
 
                     if random.random()<0.5:

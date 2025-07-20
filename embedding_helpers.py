@@ -114,7 +114,7 @@ class EmbeddingUtil():
             outputs=self.clip_model.vision_model(pixel_values=inputs["pixel_values"],output_attentions=False,output_hidden_states=False)
             embedding=outputs.pooler_output
             
-        return embedding
+        return embedding.to(self.torch_dtype)
 
     def transform_image(self,pil_image:Image.Image):
         t=transforms.Compose(

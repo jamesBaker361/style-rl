@@ -43,5 +43,5 @@ def run_job():
 count=0
 while True:
     run_job()
-    time.sleep(4 * 60 * 60)  # Wait for 6 hours
+    time.sleep(10 * 60)  # Wait for 10 minutes
     count+=1

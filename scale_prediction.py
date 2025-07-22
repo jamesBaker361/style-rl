@@ -445,9 +445,10 @@ def main(args):
                 with accelerator.accumulate(params):
                     if b==args.limit:
                         break
-                    embedding_batch=batch["embedding"].to(device)
+                    
                     images_batch=batch["image"].to(device)
                     encoder_hidden_states=batch["text_embedding"].to(device)
+                    embedding_batch=batch["embedding"].to(device,images_batch.dtype)
                     bsz=images_batch.size()[0]
 
                     if e==1 and b==0:

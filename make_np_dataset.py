@@ -102,6 +102,7 @@ def main(args):
                                                     prompt=text,
                                                     device=accelerator.device,
                                                     num_images_per_prompt=1,
+                                                    do_classifier_free_guidance=True
                                             )
                 else:
                     encoded_text, encoded_text_attention_mask = pipeline.encode_prompt(

@@ -428,6 +428,10 @@ def main(args):
                     print("size",encoder_hidden_states.size(),"embedding size",embedding_batch.size(),"img size",upscaled.size())
                     print("device",encoder_hidden_states.device,"embedding device",embedding_batch.device,"img device",upscaled.device)
                     print("text ",encoder_hidden_states.dtype,"embedding ",embedding_batch.dtype,"img ",upscaled.dtype,)
+                    dtype = next(unet.parameters()).dtype
+                    device = next(unet.parameters()).device
+
+                    print(f"UNet dtype: {dtype}, device: {device}")
 
                 mini_batches=[
                     forward(unet,upscaled[i:i+args.batch_size],embeddings[i:i+args.batch_size],encoder_hidden_states[i:i+args.batch_size],scheduler,args.num_inference_steps )for i in range(0,((patch_size**2)//args.batch_size),args.batch_size) if upscaled[i:i+args.batch_size].size()[0]!=0

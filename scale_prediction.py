@@ -410,7 +410,7 @@ def main(args):
                 if b==args.limit:
                     break
                 image_patches=batch["image"]
-                embeddings=batch["embedding"]
+                embeddings=batch["embedding"].to(image_patches.dtype)
                 encoder_hidden_states=batch["text_embedding"]
 
                 if random.random()<0.5:

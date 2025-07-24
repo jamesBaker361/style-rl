@@ -425,9 +425,9 @@ def main(args):
                 upscaled = F.interpolate(lowres, scale_factor=up_scale_factor, mode='bilinear', align_corners=False)
 
                 if  b==0:
-                    print("size",encoder_hidden_states.size(),"embedding size",embedding_batch.size(),"img size",upscaled.size())
-                    print("device",encoder_hidden_states.device,"embedding device",embedding_batch.device,"img device",upscaled.device)
-                    print("text ",encoder_hidden_states.dtype,"embedding ",embedding_batch.dtype,"img ",upscaled.dtype,)
+                    print("size",encoder_hidden_states.size(),"embedding size",embeddings.size(),"img size",upscaled.size())
+                    print("device",encoder_hidden_states.device,"embedding device",embeddings.device,"img device",upscaled.device)
+                    print("text ",encoder_hidden_states.dtype,"embedding ",embeddings.dtype,"img ",upscaled.dtype,)
                     dtype = next(unet.parameters()).dtype
                     device = next(unet.parameters()).device
 

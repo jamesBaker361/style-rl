@@ -397,7 +397,7 @@ def main(args):
             scheduler.set_timesteps(num_inference_steps, device=device)
             timesteps = scheduler.timesteps
             for i, t in enumerate(timesteps):
-                noise_pred=unet(noise,t,added_cond_kwargs=added_cond_kwargs,encoder_hidden_states=encoder_hidden_states,return_dict=False)[0]
+                noise_pred=unet(noise,t.long(),added_cond_kwargs=added_cond_kwargs,encoder_hidden_states=encoder_hidden_states,return_dict=False)[0]
                 noise=scheduler.step(noise_pred, t, noise,  return_dict=False)[0]
 
             return noise

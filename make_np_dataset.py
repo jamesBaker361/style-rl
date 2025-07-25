@@ -64,9 +64,10 @@ def main(args):
                 "embedding":[],
                 "text":[],
                 "prompt":[],
-                "posterior":[],
-                "attention_mask":[]
+                "posterior":[]
             }
+            if args.pipeline=="sana":
+                new_dataset["attention_mask"]=[]
 
             try:
                 old_data=load_dataset(args.output_dataset)

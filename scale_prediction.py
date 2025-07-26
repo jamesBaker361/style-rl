@@ -76,6 +76,7 @@ parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--verbose",action="store_true")
 parser.add_argument("--load",action="store_true")
 parser.add_argument("--load_hf",action="store_true")
+parser.add_argument("--max_grad_norm",type=float,default=1.0)
 
 
 def image_to_patches(img, patch_size):
@@ -525,6 +526,8 @@ def main(args):
                             print(f"Found {len(corrupted_params)} corrupted parameters!")
 
                     accelerator.backward(loss)
+                    if accelerator.sync_gradients:
+                        accelerator.clip_grad_norm_(params, args.max_grad_norm)
                     # Only step optimizer after accumulation steps
                     #if accelerator.sync_gradients:
                     optimizer.step()

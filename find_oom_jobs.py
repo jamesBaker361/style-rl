@@ -13,7 +13,7 @@ slurm_folder={
 }[cluster]
 
 dataset_list={
-    "amarel":["pers2_league_captioned_splash","scale"],
+    "amarel":["pers2_league_captioned_splash",],
     "chip":["pers_art_coco_captioned"]
 }[cluster]
 

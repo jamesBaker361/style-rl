@@ -64,8 +64,10 @@ parser.add_argument("--disable_projection_adapter",action="store_true",help="whe
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
 parser.add_argument("--train_split",type=float,default=0.5)
+parser.add_argument("--retain_fraction",type=float,default=1.0,help="what fraction of patches to retain before splitting")
 parser.add_argument("--epochs",type=int,default=4)
 parser.add_argument("--use_lora",action="store_true")
+parser.add_argument("--use_adapter",action="store_true")
 parser.add_argument("--patch_scale",type=int,default=8)
 parser.add_argument("--validation_interval",type=int,default=2,help= "how often to do validation -1 if constantly")
 parser.add_argument("--num_inference_steps",type=int,default=2)
@@ -77,6 +79,7 @@ parser.add_argument("--verbose",action="store_true")
 parser.add_argument("--load",action="store_true")
 parser.add_argument("--load_hf",action="store_true")
 parser.add_argument("--max_grad_norm",type=float,default=1.0)
+parser.add_argument("--training_method",type=str,default="adapter",help="adapter or lora")
 
 
 def image_to_patches(img, patch_size):
@@ -253,36 +256,38 @@ def main(args):
                                     unet.conv_out.stride,
                                     unet.conv_out.padding)
         unet.conv_out.requires_grad_(True)
-        pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
+        params=list(set([p for p in unet.parameters() if p.requires_grad]))
+        if args.use_adapter:
+            pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin",low_cpu_mem_usage=False,ignore_mismatched_sizes=True)
 
-        fake_image=torch.rand((1,3,args.image_size,args.image_size))
-        fake_embedding=embedding_util.embed_img_tensor(fake_image)
-        embedding_dim=fake_embedding.size()[-1]
+            fake_image=torch.rand((1,3,args.image_size,args.image_size))
+            fake_embedding=embedding_util.embed_img_tensor(fake_image)
+            embedding_dim=fake_embedding.size()[-1]
 
-        if args.disable_projection_adapter:
-            use_projection=False
-        else:
-            use_projection=True
+            if args.disable_projection_adapter:
+                use_projection=False
+            else:
+                use_projection=True
 
-        cross_attention_dim=args.cross_attention_dim
-        if args.identity_adapter:
-            cross_attention_dim=embedding_dim//args.num_image_text_embeds
-        intermediate_embedding_dim=args.intermediate_embedding_dim
-        
-        accelerator.print("embedding_dim",embedding_dim)
-        accelerator.print("cross_attention_dim",cross_attention_dim)
-        accelerator.print("intermediate",intermediate_embedding_dim)
+            cross_attention_dim=args.cross_attention_dim
+            if args.identity_adapter:
+                cross_attention_dim=embedding_dim//args.num_image_text_embeds
+            intermediate_embedding_dim=args.intermediate_embedding_dim
+            
+            accelerator.print("embedding_dim",embedding_dim)
+            accelerator.print("cross_attention_dim",cross_attention_dim)
+            accelerator.print("intermediate",intermediate_embedding_dim)
 
-        if use_projection and args.identity_adapter:
-            accelerator.print("use_projection and args.identity_adapter are both true")
+            if use_projection and args.identity_adapter:
+                accelerator.print("use_projection and args.identity_adapter are both true")
 
-        replace_ip_attn(unet,
-                        embedding_dim,
-                        intermediate_embedding_dim,
-                        cross_attention_dim,
-                        args.num_image_text_embeds,
-                        use_projection,args.identity_adapter,args.deep_to_ip_layers)
-        params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+            replace_ip_attn(unet,
+                            embedding_dim,
+                            intermediate_embedding_dim,
+                            cross_attention_dim,
+                            args.num_image_text_embeds,
+                            use_projection,args.identity_adapter,args.deep_to_ip_layers)
+            params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
         accelerator.print("len params before",len(params))
         start_epoch=1
         if args.load:
@@ -315,16 +320,14 @@ def main(args):
         for name, param in unet.named_parameters():
             if "lora" in name:
                 param.requires_grad = True
-        attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
-        attn_layer_list.append( unet.encoder_hid_proj)
-        accelerator.print("len attn_layers",len(attn_layer_list))
-        for layer in attn_layer_list:
-            layer.requires_grad_(True)
+        if args.use_adapter:
+            attn_layer_list=[p for (name,p ) in get_modules_of_types(unet,IPAdapterAttnProcessor2_0)]
+            attn_layer_list.append( unet.encoder_hid_proj)
+            accelerator.print("len attn_layers",len(attn_layer_list))
+            for layer in attn_layer_list:
+                layer.requires_grad_(True)
         params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
         accelerator.print("len params after",len(params))
-
-
-        
 
         ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)
         accelerator.print('train/test/val',ratios)
@@ -336,19 +339,20 @@ def main(args):
         patch_size=args.image_size//args.patch_scale
         print(f"args.image_size {args.image_size} // args.patch_scale {args.patch_scale} ={patch_size}; args.patch_scale **2 ={args.patch_scale**2}")
 
-        def patchify_lists(old_image_list,old_embedding_list):
+        def patchify_lists(old_image_list,old_embedding_list,retain_fraction):
             new_image_list=[]
             new_embedding_list=[]
             for old_image,old_embedding in zip(old_image_list,old_embedding_list):
                 patches=image_to_patches(old_image,patch_size)
                 for p in patches:
-                    new_image_list.append(p)
-                    new_embedding_list.append(old_embedding.clone())
+                    if random.random() < retain_fraction:
+                        new_image_list.append(p)
+                        new_embedding_list.append(old_embedding.clone())
             return new_image_list,new_embedding_list
 
-        image_list,embedding_list=patchify_lists(image_list,embedding_list)
-        val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list)
-        test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
+        image_list,embedding_list=patchify_lists(image_list,embedding_list,args.retain_fraction)
+        val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list,args.retain_fraction)
+        test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list,args.retain_fraction)
 
         pipeline.text_encoder.to(device)
         pipeline.text_encoder.requires_grad_(False)

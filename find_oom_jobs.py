@@ -23,10 +23,21 @@ for dataset in dataset_list:
     for root, dirs, files in os.walk(os.path.join(slurm_folder,dataset)):
         for name in files:
             if name.endswith("out"):
+                found=False
                 with open(os.path.join(root,name),"r") as read_file:
                     for line in read_file:
                         if line.startswith("OOM"):
                             target_job_list.append(name)
+                            found=True
+                if found==False:
+                    err_file=name.replace("out","err")
+                    no_error=True
+                    with open(os.path.join(root,err_file),"r") as read_file:
+                        for line in read_file:
+                            if line.find("error")!=-1:
+                                no_error=False
+                    if no_error:
+                        target_job_list.append(name)
 
 command_list=[]
 

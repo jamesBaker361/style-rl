@@ -31,12 +31,15 @@ for dataset in dataset_list:
                             found=True
                 if found==False:
                     err_file=name.replace("out","err")
+                    nvidia_count=0
                     no_error=True
                     with open(os.path.join(root,err_file),"r") as read_file:
                         for line in read_file:
+                            if line.find("NVIDIA-SMI")!=-1:
+                                nvidia_count+=1
                             if line.find("error")!=-1:
                                 no_error=False
-                    if no_error:
+                    if no_error and nvidia_count==2:
                         target_job_list.append(name)
 
 command_list=[]

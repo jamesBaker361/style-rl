@@ -351,8 +351,8 @@ def main(args):
             return new_image_list,new_embedding_list
 
         image_list,embedding_list=patchify_lists(image_list,embedding_list,args.retain_fraction)
-        val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list,args.retain_fraction)
-        test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list,args.retain_fraction)
+        val_image_list,val_embedding_list=patchify_lists(val_image_list,val_embedding_list,)
+        test_image_list,test_embedding_list=patchify_lists(test_image_list,test_embedding_list)
 
         pipeline.text_encoder.to(device)
         pipeline.text_encoder.requires_grad_(False)

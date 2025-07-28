@@ -725,12 +725,10 @@ def main(args):
         val_metrics=logging(val_loader,pipeline,clip_model=clip_model)
         clip_model=clip_model.cpu()
         end=time.time()
-        accelerator.print(f"\t validation epoch {e} elapsed {end-start}")
         persistent_fid_list.append(val_metrics["fid"])
         persistent_text_alignment_list.append(val_metrics["text_alignment"])
     after_objects=find_cuda_objects()
     delete_unique_objects(after_objects,before_objects)
-    print("validation interval ",e, f" elapsed {time.time()-val_start}")
     
 
     training_end=time.time()

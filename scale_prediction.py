@@ -326,7 +326,9 @@ def main(args):
             accelerator.print("len attn_layers",len(attn_layer_list))
             for layer in attn_layer_list:
                 layer.requires_grad_(True)
-        params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+            params=list(set([p for p in unet.parameters() if p.requires_grad]+[p for p in unet.encoder_hid_proj.parameters() if p.requires_grad]))
+        else:
+            params=list(set([p for p in unet.parameters() if p.requires_grad]))
         accelerator.print("len params after",len(params))
 
         ratios=(args.train_split,(1.0-args.train_split)/2.0,(1.0-args.train_split)/2.0)

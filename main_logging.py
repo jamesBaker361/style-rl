@@ -717,7 +717,6 @@ def main(args):
     training_start=time.time()
     
     val_start=time.time()
-    print("validation interval ",e)
     before_objects=find_cuda_objects()
     with torch.no_grad():
 
@@ -732,76 +731,50 @@ def main(args):
     after_objects=find_cuda_objects()
     delete_unique_objects(after_objects,before_objects)
     print("validation interval ",e, f" elapsed {time.time()-val_start}")
-    if accelerator.is_main_process or state.num_processes==1:
-        accelerator.wait_for_everyone()
-        before_objects=find_cuda_objects()
-        state_dict={name: param for name, param in denoising_model.named_parameters() if param.requires_grad}
-        print("state dict len",len(state_dict))
-        torch.save(state_dict,save_path)
-        with open(config_path,"w+") as config_file:
-            data={"start_epoch":e,
-                "persistent_grad_norm_list":persistent_grad_norm_list,
-                "persistent_loss_list":persistent_loss_list,
-                "persistent_text_alignment_list":persistent_text_alignment_list,
-                "persistent_fid_list":persistent_fid_list}
-            json.dump(data,config_file, indent=4)
-            pad = " " * 1024  # ~1KB of padding
-            config_file.write(pad)
-        accelerator.print(f"saved {save_path}")
+    
+
+    training_end=time.time()
+    accelerator.print(f"total trainign time = {training_end-training_start}")
+    accelerator.free_memory()
+    clip_model=clip_model.to(denoising_model.device)
+    metrics=logging(test_loader,pipeline,auto_log=False)
+    new_metrics={}
+    for k,v in metrics.items():
+        new_metrics["test_"+k]=v
+        accelerator.print("\tTEST",k,v)
+    accelerator.log(new_metrics)
+
+    if args.pipeline!="sana":
+        if args.pipeline=="lcm":
+            baseline_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
+        else:
+            baseline_pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device,torch_dtype=torch_dtype)
+            
+            baseline_pipeline.load_lora_weights(adapter_id)
+            baseline_pipeline.fuse_lora()
+        baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
         try:
-            api.upload_file(path_or_fileobj=save_path,
-                            path_in_repo=WEIGHTS_NAME,
-                            repo_id=args.name)
-            api.upload_file(path_or_fileobj=config_path,path_in_repo=CONFIG_NAME,
-                            repo_id=args.name)
-            accelerator.print(f"uploaded {args.name} to hub")
-        except:
-            accelerator.print("failed to upload")
-        after_objects=find_cuda_objects()
-        delete_unique_objects(before_objects,after_objects)
+            baseline_pipeline.safety_checker=None
+        except Exception as err:
+            accelerator.print("tried to set safety checker to None",err)
+        b_unet=baseline_pipeline.unet.to(device,torch_dtype)
+        b_text_encoder=baseline_pipeline.text_encoder.to(device,torch_dtype)
+        b_vae=baseline_pipeline.vae.to(device,torch_dtype)
+        b_image_encoder=baseline_pipeline.image_encoder.to(device,torch_dtype)
 
-        training_end=time.time()
-        accelerator.print(f"total trainign time = {training_end-training_start}")
-        accelerator.free_memory()
-        clip_model=clip_model.to(denoising_model.device)
-        metrics=logging(test_loader,pipeline,auto_log=False)
+        b_unet,b_text_encoder,b_vae,b_image_encoder=accelerator.prepare(b_unet,b_text_encoder,b_vae,b_image_encoder)
+        baseline_pipeline.unet=b_unet
+        baseline_pipeline.text_encoder=b_text_encoder
+        baseline_pipeline.vae=b_vae
+        baseline_pipeline.image_encoder=b_image_encoder
+        baseline_metrics=logging(test_loader,baseline_pipeline,baseline=True)
         new_metrics={}
-        for k,v in metrics.items():
-            new_metrics["test_"+k]=v
-            accelerator.print("\tTEST",k,v)
+        for k,v in baseline_metrics.items():
+            new_metrics["baseline_"+k]=v
+            accelerator.print("\tBASELINE",k,v)
         accelerator.log(new_metrics)
-
-        if args.pipeline!="sana":
-            if args.pipeline=="lcm":
-                baseline_pipeline=DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",device=accelerator.device,torch_dtype=torch_dtype)
-            else:
-                baseline_pipeline=DiffusionPipeline.from_pretrained("Lykon/dreamshaper-7",device=accelerator.device,torch_dtype=torch_dtype)
-                
-                baseline_pipeline.load_lora_weights(adapter_id)
-                baseline_pipeline.fuse_lora()
-            baseline_pipeline.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-            try:
-                baseline_pipeline.safety_checker=None
-            except Exception as err:
-                accelerator.print("tried to set safety checker to None",err)
-            b_unet=baseline_pipeline.unet.to(device,torch_dtype)
-            b_text_encoder=baseline_pipeline.text_encoder.to(device,torch_dtype)
-            b_vae=baseline_pipeline.vae.to(device,torch_dtype)
-            b_image_encoder=baseline_pipeline.image_encoder.to(device,torch_dtype)
-
-            b_unet,b_text_encoder,b_vae,b_image_encoder=accelerator.prepare(b_unet,b_text_encoder,b_vae,b_image_encoder)
-            baseline_pipeline.unet=b_unet
-            baseline_pipeline.text_encoder=b_text_encoder
-            baseline_pipeline.vae=b_vae
-            baseline_pipeline.image_encoder=b_image_encoder
-            baseline_metrics=logging(test_loader,baseline_pipeline,baseline=True)
-            new_metrics={}
-            for k,v in baseline_metrics.items():
-                new_metrics["baseline_"+k]=v
-                accelerator.print("\tBASELINE",k,v)
-            accelerator.log(new_metrics)
-        accelerator.wait_for_everyone()
-        accelerator.log({"finished":True})
+    accelerator.wait_for_everyone()
+    accelerator.log({"finished":True})
         
 
 if __name__=='__main__':

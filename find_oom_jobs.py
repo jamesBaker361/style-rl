@@ -34,7 +34,7 @@ for dataset in dataset_list:
                 if found==False:
                     err_file=name.replace("out","err")
                     srun_error=False
-                    with open(os.path.join(root,err_file),"r") as read_file:
+                    with open(os.path.join(root,err_file),"r",errors="ignore") as read_file:
                         for line in read_file:
                             if line.find("srun: error")!=-1:
                                 srun_error=True

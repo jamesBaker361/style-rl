@@ -31,7 +31,7 @@ for dataset in dataset_list:
                             found=True
                 if found:
                     target_job_list.append(name)
-                if found==False:
+                '''if found==False:
                     err_file=name.replace("out","err")
                     srun_error=False
                     with open(os.path.join(root,err_file),"r",errors="ignore") as read_file:
@@ -39,7 +39,7 @@ for dataset in dataset_list:
                             if line.find("srun: error")!=-1:
                                 srun_error=True
                     if srun_error:
-                        target_job_list.append(name)
+                        target_job_list.append(name)'''
 
 command_list=[]
 

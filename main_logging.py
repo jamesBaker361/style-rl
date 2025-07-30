@@ -474,6 +474,31 @@ def main(args):
 
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
+    if args.real_test_prompts:
+        real_test_prompt_list=[
+            "eating coffee",
+            "in paris",
+            "dancing"
+        ]
+        test_real_text_embedding_list=[
+            pipeline.encode_prompt(
+                                       prompt= test_prompt,
+                                        device="cpu", #accelerator.device,
+                                       num_images_per_prompt= 1,
+                                       do_classifier_free_guidance= do_classifier_free_guidance,
+                                        negative_prompt="blurry, low quality",
+                                        prompt_embeds=None,
+                                        negative_prompt_embeds=None,
+                                        #lora_scale=lora_scale,
+                                )[0] for test_prompt in real_test_prompt_list
+        ]
+
+        indices=[random.randint(0,len(real_test_prompt_list)-1) for _ in test_prompt_list]
+
+        test_prompt_list=[real_test_prompt_list[i] for i in indices]
+        test_text_list=[test_real_text_embedding_list[i] for i in indices]
+
+
     accelerator.print("prompt list",len(prompt_list))
     accelerator.print("image_list",len(image_list))
     accelerator.print("text_list",len(text_list))

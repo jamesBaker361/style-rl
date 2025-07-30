@@ -128,6 +128,7 @@ parser.add_argument("--initial_scale",type=float,default=1.0)
 parser.add_argument("--final_scale",type=float,default=1.0)
 parser.add_argument("--sigma_data",type=float,default=-0.8)
 parser.add_argument("--real_test_prompts",action="store_true")
+parser.add_argument("--zeros",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -639,6 +640,8 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
+            if args.zero:
+                embeds_batch=torch.zeros(embeds_batch.size())
             prompt_batch=batch["prompt"]
             
             if len(image_batch.size())==3:

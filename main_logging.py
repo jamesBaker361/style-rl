@@ -518,6 +518,9 @@ def main(args):
             #test_prompt_list[k]=generic_str_list[k%len(generic_str_list)]
             test_text_list[k]=generic_tensor_list[k%len(generic_str_list)]
 
+    if args.zeros:
+        pipeline.set_ip_adapter_scale(0.0)
+
     for name, data_list in zip(["train","test","val"],[image_list,test_image_list,val_image_list]):
         accelerator.print(f"{name} has {len(data_list)} samples ")
         if len(data_list):

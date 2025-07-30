@@ -725,11 +725,12 @@ def main(args):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image_unnorm,pil_image])
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
-        if args.fid:
-            metrics["difference"]=np.mean(difference_list)
-            metrics["embedding_difference"]=np.mean(embedding_difference_list)
-            metrics["text_alignment"]=np.mean(clip_alignment_list)
+        
+        metrics["difference"]=np.mean(difference_list)
+        metrics["embedding_difference"]=np.mean(embedding_difference_list)
+        metrics["text_alignment"]=np.mean(clip_alignment_list)
             #print("size",torch.cat(image_list).size())
+        if args.fid:
             start=time.time()
             fid_dtype=next(fid.inception.parameters()).dtype
             fid_device=next(fid.inception.parameters()).device
@@ -738,6 +739,8 @@ def main(args):
             metrics["fid"]=fid.compute().cpu().detach().item()
             end=time.time()
             print("fid elapsed ",end-start)
+        else:
+            metrics["fid"]=0.0
         if auto_log:
             accelerator.log(metrics)
         if args.pipeline=="lcm_post_lora":

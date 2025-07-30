@@ -312,6 +312,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
         do_classifier_free_guidance:Optional[bool]=False,
+        decreasing_scale: Optional[bool]=False,
         **kwargs,
     ):
 
@@ -440,6 +441,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             for i, t in enumerate(timesteps):
                 #print(f"step {i}/num_inference_steps")
                 latents = latents.to(prompt_embeds.dtype)
+
+                if decreasing_scale:
+                    self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

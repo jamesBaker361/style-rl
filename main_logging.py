@@ -641,7 +641,7 @@ def main(args):
             image_batch=batch["image"]
             text_batch=batch["text"]
             embeds_batch=batch["embeds"]
-            if args.zero:
+            if args.zeros:
                 embeds_batch=torch.zeros(embeds_batch.size())
             prompt_batch=batch["prompt"]
             

@@ -29,8 +29,6 @@ for dataset in dataset_list:
                         if line.startswith("OOM"):
                             target_job_list.append(name)
                             found=True
-                if found:
-                    target_job_list.append(name)
                 '''if found==False:
                     err_file=name.replace("out","err")
                     srun_error=False

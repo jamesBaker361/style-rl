@@ -663,6 +663,7 @@ def main(args):
                 accelerator.print("testing","images",image_batch.size(),"text",text_batch.size(),"embeds",embeds_batch.size())
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)
                 accelerator.print("testing","images",image_batch.dtype,"text",text_batch.dtype,"embeds",embeds_batch.dtype)
+                accelerator.print("prompt",prompt_batch)
                 if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
                     accelerator.print("testing","negstive",batched_negative_prompt_embeds.size(),batched_negative_prompt_embeds.device)
             #image_batch=torch.clamp(image_batch, 0, 1)

@@ -635,6 +635,8 @@ def main(args):
                 pipeline.unet.time_embedding.cond_proj.weight=pipeline.unet.time_embedding.cond_proj.weight.to(accelerator.device)
         
         for b,batch in enumerate(data_loader):
+            if batch==None:
+                continue
             
             for k,v in batch.items():
                 if type(v)==torch.Tensor:

@@ -311,6 +311,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
+        do_classifier_free_guidance:Optional[bool]=False,
         **kwargs,
     ):
 

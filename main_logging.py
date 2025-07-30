@@ -127,6 +127,7 @@ parser.add_argument("--reward_switch_epoch",type=int,default=-1)
 parser.add_argument("--initial_scale",type=float,default=1.0)
 parser.add_argument("--final_scale",type=float,default=1.0)
 parser.add_argument("--sigma_data",type=float,default=-0.8)
+parser.add_argument("--real_test_prompts",action="store_true")
 
 import torch
 import torch.nn.functional as F

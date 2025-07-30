@@ -518,6 +518,11 @@ def main(args):
             #test_prompt_list[k]=generic_str_list[k%len(generic_str_list)]
             test_text_list[k]=generic_tensor_list[k%len(generic_str_list)]
 
+    for name, data_list in zip(["train","test","val"],[image_list,test_image_list,val_image_list]):
+        accelerator.print(f"{name} has {len(data_list)} samples ")
+        if len(data_list):
+            accelerator.print("ZERO LEN data partition- this will cause errors")
+    
     train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)
     val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)
     test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list,test_prompt_list)
@@ -536,9 +541,12 @@ def main(args):
         break
     for val_batch in val_loader:
         break
+    for test_batch in test_loader:
+        break
 
     accelerator.print("train batch",type(train_batch))
     accelerator.print("val batch",type(val_batch))
+    accelerator.print("test batch",type(test_batch))
 
     params=list(set([p for p in denoising_model.parameters() if p.requires_grad]+[p for p in denoising_model.encoder_hid_proj.parameters() if p.requires_grad]))
 

@@ -132,6 +132,7 @@ parser.add_argument("--zeros",action="store_true")
 parser.add_argument("--decreasing_scale",action="store_true")
 parser.add_argument("--increasing_scale",action="store_true")
 parser.add_argument("--fid",action="store_true")
+parser.add_argument("--constant_scale",action="store_true")
 
 import torch
 import torch.nn.functional as F

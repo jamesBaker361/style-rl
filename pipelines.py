@@ -313,8 +313,12 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         negative_prompt_embeds:Optional[torch.Tensor]=None, #this does not get used but is only here for compatiabiltiy
         do_classifier_free_guidance:Optional[bool]=False,
         decreasing_scale: Optional[bool]=False,
+        increasing_scale: Optional[bool]=False,
         **kwargs,
     ):
+        
+        if increasing_scale and decreasing_scale:
+            print("increasing_scale and decreasing_scale this makes no sense! Defaulting to increasing scale")
 
         callback = kwargs.pop("callback", None)
         callback_steps = kwargs.pop("callback_steps", None)
@@ -444,6 +448,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                 if decreasing_scale:
                     self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))
+                elif increasing_scale:
+                    self.set_ip_adapter_scale(float(i)/len(timesteps))
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

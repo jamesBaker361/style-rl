@@ -480,9 +480,26 @@ def main(args):
 
     if args.real_test_prompts:
         real_test_prompt_list=[
-            "eating coffee",
-            "in paris",
-            "dancing"
+           ' in the jungle',
+            ' in the snow',
+            ' on the beach',
+            ' on a cobblestone street',
+            ' on top of pink fabric',
+            ' on top of a wooden floor',
+            ' with a city in the background',
+            ' with a mountain in the background',
+            ' with a blue house in the background',
+            ' on top of a purple rug in a forest',
+            ' with a wheat field in the background',
+            ' with a tree and autumn leaves in the background',
+            ' with the Eiffel Tower in the background',
+            ' floating on top of water',
+            ' floating in an ocean of milk',
+            ' on top of green grass with sunflowers around it',
+            ' on top of a mirror',
+            ' on top of the sidewalk in a crowded street',
+            ' on top of a dirt road',
+            ' on top of a white rug',
         ]
         test_real_text_embedding_list=[
             pipeline.encode_prompt(

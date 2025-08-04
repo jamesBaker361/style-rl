@@ -3,7 +3,7 @@ port=29650
 for training_type in  ["denoise"]: #,"reward","latents_reward"]:
     for frac in [1.0]:
         for prediction_type in ["epsilon"]:
-            for embedding in ["siglip2"]:
+            for embedding in ["clip","dino","ssl","siglip2"]:
                 for data in ["league_captioned_splash"]:
                     for suffix in ["_identity"]:
                         for lr in [0.001]:

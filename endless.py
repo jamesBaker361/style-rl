@@ -30,6 +30,11 @@ def run_job():
         # Step 1: Run find_oom_jobs.py and save output to oom.sh
         with open("oom.sh", "w") as f:
             subprocess.run(["python", "find_oom_jobs.py"], stdout=f, check=True)
+
+        with open('oom.sh', 'r') as f:
+            num_lines = sum(1 for _ in f)
+
+        print(f"Number of jobs: {num_lines}")
         
         # Step 2: Run the generated oom.sh script
         subprocess.run(["bash", "oom.sh"], check=True)

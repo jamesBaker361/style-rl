@@ -426,7 +426,7 @@ def main(args):
             denoising_model.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
             with open(config_path,"r") as f:
                 data=json.load(f)
-            start_epoch=data["start_epoch"]+1
+            start_epoch=data["start_epoch"]
             persistent_loss_list=data["persistent_loss_list"]
             persistent_text_alignment_list=data["persistent_text_alignment_list"]
             persistent_fid_list=data["persistent_fid_list"]
@@ -435,6 +435,7 @@ def main(args):
             except KeyError:
                 print("key error persistent_grad_norm_list list")
             accelerator.print("loaded from ",save_path)
+            accelerator.print("start epoch",start_epoch)
         except Exception as e:
             accelerator.print("couldnt load locally")
             accelerator.print(e)

@@ -311,7 +311,7 @@ if __name__=="__main__":
     target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")
     target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
 
-    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.device, "clip",4)
+    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.device, "clip","key",4)
     target=embedding_model.embed_img_tensor(target_tensor)
 
     steps=4

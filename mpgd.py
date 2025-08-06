@@ -236,18 +236,19 @@ def call_with_grad_and_guidance(
             latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
             guidance_scale=10.0
-            with torch.enable_grad():
-                decoded=self.vae.decode(denoised.clone().detach()).sample
-                diff=torch.nn.functional.mse_loss(decoded,target)
+            if target is not None:
+                with torch.enable_grad():
+                    decoded=self.vae.decode(denoised.clone().detach()).sample
+                    diff=torch.nn.functional.mse_loss(decoded,target)
 
-                diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
+                    diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
 
-                print(diff_gradient.size(),decoded.size())
+                    print(diff_gradient.size(),decoded.size())
 
-            new_denoised=self.vae.encode(decoded-diff_gradient.detach()).latent_dist.sample()
+                new_denoised=self.vae.encode(decoded-diff_gradient.detach()).latent_dist.sample()
 
-            new_latents=self.scheduler.add_noise(new_denoised,model_pred,t)
-            latents, denoised = self.scheduler.step(model_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
+                new_latents=self.scheduler.add_noise(new_denoised,model_pred,t)
+                latents, denoised = self.scheduler.step(model_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 
   
             if callback_on_step_end is not None:

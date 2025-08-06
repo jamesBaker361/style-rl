@@ -240,7 +240,7 @@ def call_with_grad_and_guidance(
                 decoded=self.vae.decode(denoised).sample
                 diff=torch.nn.functional.mse_loss(decoded,target)
 
-                diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)
+                diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
 
                 print(diff_gradient.size(),decoded.size())
 

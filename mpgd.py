@@ -308,6 +308,12 @@ if __name__=="__main__":
     target=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
 
     print('target size',target.size())
+    generator=torch.Generator(pipeline.unet.device)
+    generator.manual_seed(123)
+    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target,generator=generator).images[0]
+    image.save("grad_cat.png")
 
-    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target).images[0]
-    image.save("generated_cat.png")
+    generator=torch.Generator(pipeline.unet.device)
+    generator.manual_seed(123)
+    image=call_with_grad_and_guidance(pipeline,"cat",256,256,generator=generator).images[0]
+    image.save("cat.png")

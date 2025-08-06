@@ -317,7 +317,7 @@ if __name__=="__main__":
     target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())
 
-    for steps in [4,32,64,100]:
+    for steps in [4,32,49]:
 
         
         generator=torch.Generator(pipeline.unet.device)
@@ -330,5 +330,7 @@ if __name__=="__main__":
         image=call_with_grad_and_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
         
         concat_image=concat_images_horizontally([image,grad_image])
+
+        concat_image.save(f"concat.png")
 
         print(f"all done {steps} ")

@@ -314,7 +314,7 @@ if __name__=="__main__":
     embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.device, "clip",4)
     target=embedding_model.embed_img_tensor(target_tensor)
 
-    steps=32
+    steps=4
 
     print('target size',target.size())
     generator=torch.Generator(pipeline.unet.device)

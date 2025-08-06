@@ -5,6 +5,7 @@ from torch.autograd import grad
 import torch
 from functools import partial
 from pipelines import *
+from diffusers.utils.loading_utils import load_image
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -297,3 +298,13 @@ def call_with_grad_and_guidance(
 
     #print("called with grad",len(find_cuda_objects()))
     return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)
+
+
+if __name__=="__main__":
+    pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7").to("cuda")
+    dim=256
+    target_image=load_image("https://i.guim.co.uk/img/media/327aa3f0c3b8e40ab03b4ae80319064e401c6fbc/377_133_3542_2834/master/3542.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=34d32522f47e4a67286f9894fc81c863")
+    target=pipeline.image_processor.preprocess(target_image,dim,dim)
+
+    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target).images[0]
+    image.save("generated_cat.png")

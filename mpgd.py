@@ -8,6 +8,7 @@ from pipelines import *
 from diffusers.utils.loading_utils import load_image
 from embedding_helpers import EmbeddingUtil
 from main_pers import concat_images_horizontally
+from gpu_helpers import get_gpu_memory_usage
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -183,17 +184,8 @@ def call_with_grad_and_guidance(
     self._num_timesteps = len(timesteps)
     latents_copy=latents.clone()
 
-    #print("latents",latents.size())
-    #print("t",timesteps.size())
-    #print("prompt_embeds",prompt_embeds.size())
-    #print("image embeds",image_embeds[0].size(),image_embeds[0].device)
-    #print("latents befor eloop",latents.requires_grad)
     with self.progress_bar(total=num_inference_steps) as progress_bar:
         for i, t in enumerate(timesteps):
-            #print(f"step {i}/num_inference_steps")
-            #latents = latents.to(prompt_embeds.dtype)
-            #print("latents size",latents.size())
-            # model prediction (v-prediction, eps, x)
             if gradient_checkpoint:
                 #print("516 added condkwagrs",added_cond_kwargs)
                 model_pred = checkpoint.checkpoint(
@@ -249,8 +241,9 @@ def call_with_grad_and_guidance(
 
                     diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
                     diff_gradient=guidance_strength*diff_gradient
-
-                    print(diff_gradient.size(),decoded.size())
+                    
+                    usage=get_gpu_memory_usage()
+                    print(usage["allocated_mb"])
 
                 new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 

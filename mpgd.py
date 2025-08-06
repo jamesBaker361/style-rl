@@ -242,6 +242,7 @@ def call_with_grad_and_guidance(
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     decoded=self.vae.decode(denoised.clone().detach()).sample
+                    decoded.requires_grad_(True)
                     decoded_embedding=embedding_model.embed_img_tensor(decoded)
 
                     diff=torch.nn.functional.mse_loss(decoded_embedding,target)

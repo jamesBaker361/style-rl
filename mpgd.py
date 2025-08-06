@@ -7,6 +7,7 @@ from functools import partial
 from pipelines import *
 from diffusers.utils.loading_utils import load_image
 from embedding_helpers import EmbeddingUtil
+from main_pers import concat_images_horizontally
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -237,7 +238,7 @@ def call_with_grad_and_guidance(
             #latents=latents.to(model_pred.device)
             latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            guidance_scale=10.0
+            guidance_strength=0.1
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     decoded=self.vae.decode(denoised.clone().detach()).sample
@@ -246,6 +247,7 @@ def call_with_grad_and_guidance(
                     diff=torch.nn.functional.mse_loss(decoded_embedding,target)
 
                     diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
+                    diff_gradient=guidance_strength*diff_gradient
 
                     print(diff_gradient.size(),decoded.size())
 
@@ -307,24 +309,26 @@ def call_with_grad_and_guidance(
 
 if __name__=="__main__":
     pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7").to("cuda")
-    dim=256
+    dim=128
     target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")
     target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
 
     embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
     target=embedding_model.embed_img_tensor(target_tensor)
-
-    steps=4
-
     print('target size',target.size())
-    generator=torch.Generator(pipeline.unet.device)
-    generator.manual_seed(123)
-    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
-    image.save("grad_cat.png")
 
-    generator=torch.Generator(pipeline.unet.device)
-    generator.manual_seed(123)
-    image=call_with_grad_and_guidance(pipeline,"cat",256,256,generator=generator,num_inference_steps=steps).images[0]
-    image.save("cat.png")
+    for steps in [4,32,64,100]:
 
-    print("all done :)")
+        
+        generator=torch.Generator(pipeline.unet.device)
+        generator.manual_seed(123)
+        grad_image=call_with_grad_and_guidance(pipeline,"cat",dim,dim,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
+        
+
+        generator=torch.Generator(pipeline.unet.device)
+        generator.manual_seed(123)
+        image=call_with_grad_and_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+        
+        concat_image=concat_images_horizontally([image,grad_image])
+
+        print("all done :)")

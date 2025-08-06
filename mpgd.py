@@ -319,10 +319,12 @@ if __name__=="__main__":
     print('target size',target.size())
     generator=torch.Generator(pipeline.unet.device)
     generator.manual_seed(123)
-    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target,generator=generator,num_inference_steps=steps).images[0]
+    image=call_with_grad_and_guidance(pipeline,"cat",256,256,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
     image.save("grad_cat.png")
 
     generator=torch.Generator(pipeline.unet.device)
     generator.manual_seed(123)
     image=call_with_grad_and_guidance(pipeline,"cat",256,256,generator=generator,num_inference_steps=steps).images[0]
     image.save("cat.png")
+
+    print("all done :)")

@@ -331,4 +331,4 @@ if __name__=="__main__":
         
         concat_image=concat_images_horizontally([image,grad_image])
 
-        print("all done :)")
+        print(f"all done {steps} ")

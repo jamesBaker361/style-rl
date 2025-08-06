@@ -796,6 +796,11 @@ def main(args):
         start=time.time()
         clip_model=clip_model.to(denoising_model.device)
         val_metrics=logging(val_loader,pipeline,clip_model=clip_model)
+        new_metrics={}
+        for k,v in val_metrics.items():
+            new_metrics["val_"+k]=v
+            accelerator.print("\tTEST",k,v)
+        accelerator.log(new_metrics)
         clip_model=clip_model.cpu()
         end=time.time()
         persistent_fid_list.append(val_metrics["fid"])

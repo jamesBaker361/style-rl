@@ -308,7 +308,7 @@ def call_with_grad_and_guidance(
 if __name__=="__main__":
     pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7").to("cuda")
     dim=256
-    target_image=load_image("https://cdn.britannica.com/78/43678-050-F4DC8D93/Starry-Night-canvas-Vincent-van-Gogh-New-1889.jpg")
+    target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")
     target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
 
     embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.device, "clip",4)

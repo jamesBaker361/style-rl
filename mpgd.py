@@ -230,7 +230,7 @@ def call_with_grad_and_guidance(
             #latents=latents.to(model_pred.device)
             latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            guidance_strength=0.00001
+            guidance_strength=0.0000001
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     decoded=self.vae.decode(denoised.clone().detach()).sample
@@ -243,6 +243,7 @@ def call_with_grad_and_guidance(
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()
+                    torch.cuda.empty_cache()
                     print(usage["allocated_mb"])
 
                 new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()

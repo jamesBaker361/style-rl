@@ -6,6 +6,7 @@ import torch
 from functools import partial
 from pipelines import *
 from diffusers.utils.loading_utils import load_image
+from embedding_helpers import EmbeddingUtil
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -39,6 +40,7 @@ def call_with_grad_and_guidance(
     use_resolution_binning:bool=False,
     denormalize_option:bool=True,
     target=None,
+    embedding_model: EmbeddingUtil=None,
     **kwargs,
 ):
     
@@ -236,10 +238,12 @@ def call_with_grad_and_guidance(
             latents, denoised = self.scheduler.step(model_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
             guidance_scale=10.0
-            if target is not None:
+            if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     decoded=self.vae.decode(denoised.clone().detach()).sample
-                    diff=torch.nn.functional.mse_loss(decoded,target)
+                    decoded_embedding=embedding_model.embed_img_tensor(decoded)
+
+                    diff=torch.nn.functional.mse_loss(decoded_embedding,target)
 
                     diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
 
@@ -304,8 +308,11 @@ def call_with_grad_and_guidance(
 if __name__=="__main__":
     pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7").to("cuda")
     dim=256
-    target_image=load_image("https://i.guim.co.uk/img/media/327aa3f0c3b8e40ab03b4ae80319064e401c6fbc/377_133_3542_2834/master/3542.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=34d32522f47e4a67286f9894fc81c863")
-    target=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
+    target_image=load_image("https://cdn.britannica.com/78/43678-050-F4DC8D93/Starry-Night-canvas-Vincent-van-Gogh-New-1889.jpg")
+    target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
+
+    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.device, "clip",4)
+    target=embedding_model.embed_img_tensor(target_tensor)
 
     steps=32
 

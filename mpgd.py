@@ -665,8 +665,8 @@ if __name__=="__main__":
     target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())
 
-    for guidance_strength in [20,50,100]:
-        for steps in [10,30]:
+    for guidance_strength in [-100,-200,100,100]:
+        for steps in [30,50,100]:
 
             
             generator=torch.Generator(pipeline.unet.device)
@@ -682,11 +682,11 @@ if __name__=="__main__":
             image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
                                           guidance_strength=guidance_strength).images[0]
 
-            generator=torch.Generator(pipeline.unet.device)
+            '''generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
-            normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+            normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
             
-            concat_image=concat_images_horizontally([normal_image,image,grad_image])
+            concat_image=concat_images_horizontally([image,grad_image])
 
             concat_image.save(f"concat_{guidance_strength}_{steps}.png")
 

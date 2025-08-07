@@ -9,6 +9,7 @@ from diffusers.utils.loading_utils import load_image
 from embedding_helpers import EmbeddingUtil
 from main_pers import concat_images_horizontally
 from gpu_helpers import get_gpu_memory_usage
+from custom_scheduler import CompatibleDDIMScheduler
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -304,6 +305,7 @@ def call_with_grad_and_guidance(
 
 if __name__=="__main__":
     pipeline=CompatibleLatentConsistencyModelPipeline.from_pretrained("stabilityai/stable-diffusion-2-1").to("cuda")
+    pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=256
     target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")

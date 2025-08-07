@@ -646,12 +646,12 @@ def ddim_call_with_guidance(
 
 
 if __name__=="__main__":
-    pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1").to("cuda")
+    pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",dtype=torch.float16).to("cuda")
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=128
     target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")
-    target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda")
+    target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
     embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
     target=embedding_model.embed_img_tensor(target_tensor)

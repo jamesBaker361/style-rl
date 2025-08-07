@@ -606,7 +606,7 @@ def ddim_call_with_guidance(
 
                 #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
-                latents=latents+diff_gradient
+                latents=denoised+diff_gradient
                 new_latents=self.scheduler.add_noise(latents,noise_pred,t)
                 latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 

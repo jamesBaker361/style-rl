@@ -647,7 +647,7 @@ def ddim_call_with_guidance(
 
 
 if __name__=="__main__":
-    pipeline=StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4",torch_dtype=torch.float16).to("cuda")
+    pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16).to("cuda")
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=128

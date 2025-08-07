@@ -634,7 +634,7 @@ def ddim_call_with_guidance(
     has_nsfw_concept=None
 
     do_denormalize = [True] * image.shape[0]
-    image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
+    image = self.image_processor.postprocess(image.detach(), output_type=output_type, do_denormalize=do_denormalize)
 
     # Offload all models
     self.maybe_free_model_hooks()

@@ -586,7 +586,7 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            guidance_strength=0.000000
+            guidance_strength=0.001
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()

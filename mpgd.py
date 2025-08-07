@@ -606,7 +606,7 @@ def ddim_call_with_guidance(
 
                 #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
-                latents=denoised+diff_gradient
+                latents=denoised-diff_gradient
                 new_latents=self.scheduler.add_noise(latents,noise_pred,t)
                 latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 
@@ -665,7 +665,7 @@ if __name__=="__main__":
     target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())
 
-    for guidance_strength in [0.01,0.1,1,10]:
+    for guidance_strength in [20,50,100]:
         for steps in [10,30]:
 
             

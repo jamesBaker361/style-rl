@@ -1,8 +1,13 @@
 from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
 from diffusers.schedulers.scheduling_scm import SCMScheduler
 from diffusers.schedulers.scheduling_deis_multistep import DEISMultistepScheduler
+from diffusers.schedulers.scheduling_ddim import DDIMScheduler
 import torch
 import numpy as np
+
+class CompatibleDDIMScheduler(DDIMScheduler):
+    def set_timesteps(self, num_inference_steps, device = None,**kwargs):
+        return super().set_timesteps(num_inference_steps, device)
 
 class CompatibleDEISMultistepScheduler(DEISMultistepScheduler):
     def get_velocity(

@@ -332,6 +332,7 @@ def ddim_call_with_guidance(
     callback_on_step_end_tensor_inputs: List[str] = ["latents"],
     target=None,
     embedding_model: EmbeddingUtil=None,
+    guidance_strength:float=1.0,
     **kwargs,
 ):
     r"""
@@ -586,7 +587,6 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            guidance_strength=0.001
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
@@ -665,24 +665,29 @@ if __name__=="__main__":
     target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())
 
-    for steps in [10,20]:
+    for guidance_strength in [0.01,0.1,1,10]:
+        for steps in [10,30]:
 
-        
-        generator=torch.Generator(pipeline.unet.device)
-        generator.manual_seed(123)
-        grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
-        
+            
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,target=target,
+                                               generator=generator,num_inference_steps=steps,
+                                               embedding_model=embedding_model,
+                                               guidance_strength=guidance_strength).images[0]
+            
 
-        generator=torch.Generator(pipeline.unet.device)
-        generator.manual_seed(123)
-        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                          guidance_strength=guidance_strength).images[0]
 
-        generator=torch.Generator(pipeline.unet.device)
-        generator.manual_seed(123)
-        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
-        
-        concat_image=concat_images_horizontally([normal_image,image,grad_image])
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+            
+            concat_image=concat_images_horizontally([normal_image,image,grad_image])
 
-        concat_image.save(f"concat_{steps}.png")
+            concat_image.save(f"concat_{guidance_strength}_{steps}.png")
 
-        print(f"all done {steps} ")
+            print(f"all done {steps} ")

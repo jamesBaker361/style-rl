@@ -589,22 +589,25 @@ def ddim_call_with_guidance(
             guidance_strength=0.000000
             if target is not None and embedding_model is not None:
                 with torch.enable_grad():
-                    decoded=self.vae.decode(denoised.clone().detach()).sample
-                    decoded.requires_grad_(True)
+                    new_denoised=denoised.clone().detach()
+                    new_denoised.requires_grad_(True)
+                    decoded=self.vae.decode(new_denoised).sample
+                    
                     decoded_embedding=embedding_model.embed_img_tensor(decoded)
 
                     diff=torch.nn.functional.mse_loss(decoded_embedding,target)
 
-                    diff_gradient=torch.autograd.grad(outputs=diff,inputs=decoded)[0]
+                    diff_gradient=torch.autograd.grad(outputs=diff,inputs=new_denoised)[0]
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()
                     torch.cuda.empty_cache()
                     print(usage["allocated_mb"])
 
-                new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
+                #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
-                new_latents=self.scheduler.add_noise(new_denoised,noise_pred,t)
+                latents=latents+diff_gradient
+                new_latents=self.scheduler.add_noise(latents,noise_pred,t)
                 latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 
             if callback_on_step_end is not None:

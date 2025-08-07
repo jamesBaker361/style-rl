@@ -669,8 +669,12 @@ if __name__=="__main__":
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
         image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+
+        generator=torch.Generator(pipeline.unet.device)
+        generator.manual_seed(123)
+        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
         
-        concat_image=concat_images_horizontally([image,grad_image])
+        concat_image=concat_images_horizontally([normal_image,image,grad_image])
 
         concat_image.save(f"concat_{steps}.png")
 

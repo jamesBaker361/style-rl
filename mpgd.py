@@ -12,6 +12,7 @@ from gpu_helpers import get_gpu_memory_usage
 from custom_scheduler import CompatibleDDIMScheduler
 from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion import StableDiffusionPipeline
 from diffusers.pipelines.stable_diffusion.pipeline_output import StableDiffusionPipelineOutput
+from diffusers import DDIMScheduler
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -647,7 +648,10 @@ def ddim_call_with_guidance(
 
 
 if __name__=="__main__":
-    pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,force_download=True).to("cuda")
+    ddim = DDIMScheduler.from_config("stable-diffusion-v1-5/stable-diffusion-v1-5", subfolder="scheduler")
+    pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,
+                                                     #force_download=True,
+                                                     scheduler=ddim).to("cuda")
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=128

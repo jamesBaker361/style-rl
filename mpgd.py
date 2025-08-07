@@ -13,6 +13,14 @@ from custom_scheduler import CompatibleDDIMScheduler
 from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion import StableDiffusionPipeline
 from diffusers.pipelines.stable_diffusion.pipeline_output import StableDiffusionPipelineOutput
 from diffusers import DDIMScheduler
+import torch
+from PIL import Image
+import torch.nn as nn
+from transformers import CLIPModel, AutoTokenizer, AutoProcessor
+import torchvision.transforms.functional as F
+from torchvision.transforms import Normalize, ToTensor, Compose, Resize
+
+
 
 def call_with_grad_and_guidance(
     self:LatentConsistencyModelPipeline,
@@ -305,6 +313,67 @@ def call_with_grad_and_guidance(
     #print("called with grad",len(find_cuda_objects()))
     return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)
 
+
+class StyleCLIP(torch.nn.Module):
+
+    def __init__(self, network, device, target=None):
+        super(StyleCLIP, self).__init__()
+
+        self.model = CLIPModel.from_pretrained(network)
+        
+        processor = AutoProcessor.from_pretrained(network).image_processor
+
+        self.image_size = [processor.crop_size['height'], processor.crop_size['width']]
+
+        self.transforms = Compose([
+            Normalize(
+                mean=processor.image_mean,
+                std=processor.image_std
+            ),
+        ])
+        self.tokenizer = AutoTokenizer.from_pretrained(network)
+
+        self.device = device
+        self.model.to(self.device)
+        self.model.eval()
+
+        if target is not None:
+            self.target_embedding = self.get_target_embedding(target)
+
+    @torch.no_grad()
+    def get_target_embedding(self, target:Union[str, Image.Image, torch.Tensor]):
+        if type(target)==torch.Tensor:
+            return self.get_gram_matrix(image)
+        if type(target)==str:
+            img = Image.open(target).convert('RGB')
+        elif type(target)==Image.Image:
+            img=target
+        image = img.resize(self.image_size, Image.Resampling.BILINEAR)
+        image = self.transforms(ToTensor()(image)).unsqueeze(0)
+        return self.get_gram_matrix(image)
+
+    def get_gram_matrix(self, img:torch.Tensor):
+        img = img.to(self.device)
+        img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
+        img = self.transforms(img)
+        # following mpgd
+        feats = self.model.vision_model(img, output_hidden_states=True, return_dict=True).hidden_states[2]        
+        feats = feats[:, 1:, :]  # [bsz, seq_len, h_dim]
+        gram = torch.bmm(feats.transpose(1, 2), feats)
+        return gram
+
+    def to_tensor(self, img):
+        img = img.resize((224, 224), Image.Resampling.BILINEAR)
+        return self.transforms(ToTensor()(img)).unsqueeze(0)
+
+    def forward(self, x):
+
+        embed = self.get_gram_matrix(x)
+        diff = (embed - self.target_embedding).reshape(embed.shape[0], -1)
+        similarity = -(diff ** 2).sum(dim=1).sqrt() / 100
+
+        return similarity
+
 def ddim_call_with_guidance(
     self:StableDiffusionPipeline,
     prompt: Union[str, List[str]] = None,
@@ -330,96 +399,9 @@ def ddim_call_with_guidance(
     clip_skip: Optional[int] = None,
     callback_on_step_end= None,
     callback_on_step_end_tensor_inputs: List[str] = ["latents"],
-    target=None,
-    embedding_model: EmbeddingUtil=None,
-    guidance_strength:float=1.0,
+    style_clip:StyleCLIP=None,
     **kwargs,
 ):
-    r"""
-    The call function to the pipeline for generation.
-
-    Args:
-        prompt (`str` or `List[str]`, *optional*):
-            The prompt or prompts to guide image generation. If not defined, you need to pass `prompt_embeds`.
-        height (`int`, *optional*, defaults to `self.unet.config.sample_size * self.vae_scale_factor`):
-            The height in pixels of the generated image.
-        width (`int`, *optional*, defaults to `self.unet.config.sample_size * self.vae_scale_factor`):
-            The width in pixels of the generated image.
-        num_inference_steps (`int`, *optional*, defaults to 50):
-            The number of denoising steps. More denoising steps usually lead to a higher quality image at the
-            expense of slower inference.
-        timesteps (`List[int]`, *optional*):
-            Custom timesteps to use for the denoising process with schedulers which support a `timesteps` argument
-            in their `set_timesteps` method. If not defined, the default behavior when `num_inference_steps` is
-            passed will be used. Must be in descending order.
-        sigmas (`List[float]`, *optional*):
-            Custom sigmas to use for the denoising process with schedulers which support a `sigmas` argument in
-            their `set_timesteps` method. If not defined, the default behavior when `num_inference_steps` is passed
-            will be used.
-        guidance_scale (`float`, *optional*, defaults to 7.5):
-            A higher guidance scale value encourages the model to generate images closely linked to the text
-            `prompt` at the expense of lower image quality. Guidance scale is enabled when `guidance_scale > 1`.
-        negative_prompt (`str` or `List[str]`, *optional*):
-            The prompt or prompts to guide what to not include in image generation. If not defined, you need to
-            pass `negative_prompt_embeds` instead. Ignored when not using guidance (`guidance_scale < 1`).
-        num_images_per_prompt (`int`, *optional*, defaults to 1):
-            The number of images to generate per prompt.
-        eta (`float`, *optional*, defaults to 0.0):
-            Corresponds to parameter eta (η) from the [DDIM](https://arxiv.org/abs/2010.02502) paper. Only applies
-            to the [`~schedulers.DDIMScheduler`], and is ignored in other schedulers.
-        generator (`torch.Generator` or `List[torch.Generator]`, *optional*):
-            A [`torch.Generator`](https://pytorch.org/docs/stable/generated/torch.Generator.html) to make
-            generation deterministic.
-        latents (`torch.Tensor`, *optional*):
-            Pre-generated noisy latents sampled from a Gaussian distribution, to be used as inputs for image
-            generation. Can be used to tweak the same generation with different prompts. If not provided, a latents
-            tensor is generated by sampling using the supplied random `generator`.
-        prompt_embeds (`torch.Tensor`, *optional*):
-            Pre-generated text embeddings. Can be used to easily tweak text inputs (prompt weighting). If not
-            provided, text embeddings are generated from the `prompt` input argument.
-        negative_prompt_embeds (`torch.Tensor`, *optional*):
-            Pre-generated negative text embeddings. Can be used to easily tweak text inputs (prompt weighting). If
-            not provided, `negative_prompt_embeds` are generated from the `negative_prompt` input argument.
-        ip_adapter_image: (`PipelineImageInput`, *optional*): Optional image input to work with IP Adapters.
-        ip_adapter_image_embeds (`List[torch.Tensor]`, *optional*):
-            Pre-generated image embeddings for IP-Adapter. It should be a list of length same as number of
-            IP-adapters. Each element should be a tensor of shape `(batch_size, num_images, emb_dim)`. It should
-            contain the negative image embedding if `do_classifier_free_guidance` is set to `True`. If not
-            provided, embeddings are computed from the `ip_adapter_image` input argument.
-        output_type (`str`, *optional*, defaults to `"pil"`):
-            The output format of the generated image. Choose between `PIL.Image` or `np.array`.
-        return_dict (`bool`, *optional*, defaults to `True`):
-            Whether or not to return a [`~pipelines.stable_diffusion.StableDiffusionPipelineOutput`] instead of a
-            plain tuple.
-        cross_attention_kwargs (`dict`, *optional*):
-            A kwargs dictionary that if specified is passed along to the [`AttentionProcessor`] as defined in
-            [`self.processor`](https://github.com/huggingface/diffusers/blob/main/src/diffusers/models/attention_processor.py).
-        guidance_rescale (`float`, *optional*, defaults to 0.0):
-            Guidance rescale factor from [Common Diffusion Noise Schedules and Sample Steps are
-            Flawed](https://arxiv.org/pdf/2305.08891.pdf). Guidance rescale factor should fix overexposure when
-            using zero terminal SNR.
-        clip_skip (`int`, *optional*):
-            Number of layers to be skipped from CLIP while computing the prompt embeddings. A value of 1 means that
-            the output of the pre-final layer will be used for computing the prompt embeddings.
-        callback_on_step_end (`Callable`, `PipelineCallback`, `MultiPipelineCallbacks`, *optional*):
-            A function or a subclass of `PipelineCallback` or `MultiPipelineCallbacks` that is called at the end of
-            each denoising step during the inference. with the following arguments: `callback_on_step_end(self:
-            DiffusionPipeline, step: int, timestep: int, callback_kwargs: Dict)`. `callback_kwargs` will include a
-            list of all tensors as specified by `callback_on_step_end_tensor_inputs`.
-        callback_on_step_end_tensor_inputs (`List`, *optional*):
-            The list of tensor inputs for the `callback_on_step_end` function. The tensors specified in the list
-            will be passed as `callback_kwargs` argument. You will only be able to include variables listed in the
-            `._callback_tensor_inputs` attribute of your pipeline class.
-
-    Examples:
-
-    Returns:
-        [`~pipelines.stable_diffusion.StableDiffusionPipelineOutput`] or `tuple`:
-            If `return_dict` is `True`, [`~pipelines.stable_diffusion.StableDiffusionPipelineOutput`] is returned,
-            otherwise a `tuple` is returned where the first element is a list with the generated images and the
-            second element is a list of `bool`s indicating whether the corresponding generated image contains
-            "not-safe-for-work" (nsfw) content.
-    """
     with torch.no_grad():
         callback = kwargs.pop("callback", None)
         callback_steps = kwargs.pop("callback_steps", None)
@@ -587,17 +569,15 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            if target is not None and embedding_model is not None:
+            if style_clip is not None:
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
                     new_denoised.requires_grad_(True)
                     decoded=self.vae.decode(new_denoised).sample
                     
-                    decoded_embedding=embedding_model.embed_img_tensor(decoded)
+                    log_probs=style_clip(decoded)
 
-                    diff=torch.nn.functional.mse_loss(decoded_embedding,target)
-
-                    diff_gradient=torch.autograd.grad(outputs=diff,inputs=new_denoised)[0]
+                    diff_gradient=torch.autograd.grad(outputs=log_probs,inputs=new_denoised)[0]
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()
@@ -649,6 +629,7 @@ def ddim_call_with_guidance(
 
     return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
 
+    
 
 if __name__=="__main__":
     ddim = DDIMScheduler.from_config("stable-diffusion-v1-5/stable-diffusion-v1-5", subfolder="scheduler")
@@ -662,8 +643,9 @@ if __name__=="__main__":
     target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
     embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-    target=embedding_model.embed_img_tensor(target_tensor)
-    print('target size',target.size())
+    style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_tensor)
+    '''target=embedding_model.embed_img_tensor(target_tensor)
+    print('target size',target.size())'''
 
     for guidance_strength in [-100,-200,100,100]:
         for steps in [30,50,100]:
@@ -671,23 +653,27 @@ if __name__=="__main__":
             
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
-            grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,target=target,
+            grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,
+                                               style_clip=style_clip,
+                                               #target=target,
                                                generator=generator,num_inference_steps=steps,
-                                               embedding_model=embedding_model,
+                                               #embedding_model=embedding_model,
                                                guidance_strength=guidance_strength).images[0]
             
 
-            generator=torch.Generator(pipeline.unet.device)
+            '''generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
-                                          guidance_strength=guidance_strength).images[0]
+                                          guidance_strength=guidance_strength).images[0]'''
 
             '''generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
             
-            concat_image=concat_images_horizontally([image,grad_image])
+            '''concat_image=concat_images_horizontally([image,grad_image])
 
-            concat_image.save(f"concat_{guidance_strength}_{steps}.png")
+            concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+
+            grad_image.save(f"mpgd_{guidance_strength}_{steps}.png")
 
             print(f"all done {steps} ")

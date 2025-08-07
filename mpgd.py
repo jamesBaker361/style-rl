@@ -662,12 +662,12 @@ if __name__=="__main__":
         
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
-        grad_image=call_with_grad_and_guidance(pipeline,"cat",dim,dim,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
+        grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,target=target,generator=generator,num_inference_steps=steps,embedding_model=embedding_model).images[0]
         
 
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
-        image=call_with_grad_and_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
+        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]
         
         concat_image=concat_images_horizontally([image,grad_image])
 

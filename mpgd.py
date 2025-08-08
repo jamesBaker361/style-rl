@@ -539,6 +539,7 @@ def ddim_call_with_guidance(
     self._num_timesteps = len(timesteps)
     start=int(0.3*self._num_timesteps)
     end=int(0.7 * self._num_timesteps)
+    denoised_list=[]
     with self.progress_bar(total=num_inference_steps) as progress_bar:
         for i, t in enumerate(timesteps):
             with torch.no_grad():
@@ -596,6 +597,8 @@ def ddim_call_with_guidance(
                 new_latents=self.scheduler.add_noise(latents,noise_pred,t)
                 latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 
+                denoised_list.append(denoised)
+
             if callback_on_step_end is not None:
                 callback_kwargs = {}
                 for k in callback_on_step_end_tensor_inputs:
@@ -632,8 +635,10 @@ def ddim_call_with_guidance(
 
     if not return_dict:
         return (image, has_nsfw_concept)
+    
+    denoised_list=self.image_processor.postprocess(denoised_list,output_type=output_type,do_denormalize=[True] * len(denoised_list))
 
-    return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+    return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),denoised_list
 
     
 
@@ -677,12 +682,12 @@ if __name__=="__main__":
                 
                 generator=torch.Generator(pipeline.unet.device)
                 generator.manual_seed(123)
-                grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,
+                output,denoised_list=ddim_call_with_guidance(pipeline,"cat",dim,dim,
                                                 style_clip=style_clip,
                                                 #target=target,
                                                 generator=generator,num_inference_steps=steps,
                                                 #embedding_model=embedding_model,
-                                                guidance_strength=guidance_strength).images[0]
+                                                guidance_strength=guidance_strength)
                 
 
                 '''generator=torch.Generator(pipeline.unet.device)
@@ -697,7 +702,7 @@ if __name__=="__main__":
                 '''concat_image=concat_images_horizontally([image,grad_image])
 
                 concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
-
+                grad_image=concat_images_horizontally(denoised_list)
                 grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")
 
                 print(f"all done {steps} ")

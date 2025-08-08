@@ -669,42 +669,44 @@ if __name__=="__main__":
     print('target size',target.size())'''
 
     for guidance_strength in [-5,5]:
-        for steps in [50,10]:
-            for k,v in url_dict.items():
+        for steps in [30,10]:
+            for stage in ["early","mid","late"]:
+                for k,v in url_dict.items():
 
-                target_image=load_image(v)
-                #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                    target_image=load_image(v)
+                    #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
-                embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-                style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
+                    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                    style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
-                print(k)
-                #print("\t",style_clip.target_embedding)
+                    print(k)
+                    #print("\t",style_clip.target_embedding)
 
-                
-                generator=torch.Generator(pipeline.unet.device)
-                generator.manual_seed(123)
-                output,denoised_list=ddim_call_with_guidance(pipeline,"man",dim,dim,
-                                                style_clip=style_clip,
-                                                #target=target,
-                                                generator=generator,num_inference_steps=steps,
-                                                #embedding_model=embedding_model,
-                                                guidance_strength=guidance_strength)
-                
+                    
+                    generator=torch.Generator(pipeline.unet.device)
+                    generator.manual_seed(123)
+                    output,denoised_list=ddim_call_with_guidance(pipeline,"man",dim,dim,
+                                                    style_clip=style_clip,
+                                                    #target=target,
+                                                    generator=generator,num_inference_steps=steps,
+                                                    #embedding_model=embedding_model,
+                                                    guidance_strength=guidance_strength,
+                                                    stage=stage)
+                    
 
-                '''generator=torch.Generator(pipeline.unet.device)
-                generator.manual_seed(123)
-                image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
-                                            guidance_strength=guidance_strength).images[0]'''
+                    '''generator=torch.Generator(pipeline.unet.device)
+                    generator.manual_seed(123)
+                    image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                                guidance_strength=guidance_strength).images[0]'''
 
-                '''generator=torch.Generator(pipeline.unet.device)
-                generator.manual_seed(123)
-                normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
-                
-                '''concat_image=concat_images_horizontally([image,grad_image])
+                    '''generator=torch.Generator(pipeline.unet.device)
+                    generator.manual_seed(123)
+                    normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                    
+                    '''concat_image=concat_images_horizontally([image,grad_image])
 
-                concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
-                grad_image=concat_images_horizontally(denoised_list)
-                grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")
+                    concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                    grad_image=concat_images_horizontally(denoised_list)
+                    grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
 
-                print(f"all done {steps} ")
+            print(f"all done {steps} ")

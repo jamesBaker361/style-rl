@@ -648,6 +648,10 @@ if __name__=="__main__":
         "cubism":"https://www.canvas-museum.com/wp-content/uploads/2024/05/Front-of-the-canvas-wall-decoration-Faces-of-the-Future-Canvas-Wall-Art-by-CaMU.jpg"
     }
 
+    for k,v in url_dict.items():
+        print("trying to load ",k)
+        load_image(v)
+
     '''target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())'''
 

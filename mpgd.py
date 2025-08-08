@@ -638,7 +638,7 @@ def ddim_call_with_guidance(
     
     print(denoised_list[0].size())
     
-    denoised_list=self.image_processor.postprocess(torch.stack(denoised_list),output_type=output_type,do_denormalize=[True] * len(denoised_list))
+    denoised_list=self.image_processor.postprocess(torch.cat(denoised_list),output_type=output_type,do_denormalize=[True] * len(denoised_list))
 
     return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),denoised_list
 

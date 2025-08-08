@@ -536,6 +536,8 @@ def ddim_call_with_guidance(
     # 7. Denoising loop
     num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
     self._num_timesteps = len(timesteps)
+    start=int(0.3*self._num_timesteps)
+    end=int(0.7 * self._num_timesteps)
     with self.progress_bar(total=num_inference_steps) as progress_bar:
         for i, t in enumerate(timesteps):
             with torch.no_grad():
@@ -569,7 +571,7 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            if style_clip is not None:
+            if style_clip is not None and i>=start and i<=end:
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
                     new_denoised.requires_grad_(True)
@@ -647,7 +649,7 @@ if __name__=="__main__":
     '''target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())'''
 
-    for guidance_strength in [-10,-20,-50]:
+    for guidance_strength in [-1,-10,-50,-100]:
         for steps in [50,100]:
 
             

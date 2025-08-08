@@ -668,6 +668,9 @@ if __name__=="__main__":
                 embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                 style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
+                print(k)
+                print("\t",style_clip.target_embedding)
+
                 
                 generator=torch.Generator(pipeline.unet.device)
                 generator.manual_seed(123)

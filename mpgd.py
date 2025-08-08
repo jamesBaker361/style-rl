@@ -343,7 +343,7 @@ class StyleCLIP(torch.nn.Module):
     @torch.no_grad()
     def get_target_embedding(self, target:Union[str, Image.Image, torch.Tensor]):
         if type(target)==torch.Tensor:
-            return self.get_gram_matrix(image)
+            return self.get_gram_matrix(target)
         if type(target)==str:
             img = Image.open(target).convert('RGB')
         elif type(target)==Image.Image:

@@ -649,9 +649,8 @@ def ddim_call_with_guidance(
     if not return_dict:
         return (image, has_nsfw_concept)
     
-    print(denoised_list[0].size())
-    
-    denoised_list=self.image_processor.postprocess(torch.cat(denoised_list),output_type=output_type,do_denormalize=[True] * len(denoised_list))
+    if len(denoised_list)>0:
+        denoised_list=self.image_processor.postprocess(torch.cat(denoised_list),output_type=output_type,do_denormalize=[True] * len(denoised_list))
 
     return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),denoised_list
 

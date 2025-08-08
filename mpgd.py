@@ -313,6 +313,19 @@ def call_with_grad_and_guidance(
     #print("called with grad",len(find_cuda_objects()))
     return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_copy)
 
+def rescale_grad(
+    grad: torch.Tensor, clip_scale, **kwargs
+):  # [B, N, 3+5]
+    node_mask = kwargs.get('node_mask', None)
+
+    scale = (grad ** 2).mean(dim=-1)
+    if node_mask is not None:  # [B, N, 1]
+        scale: torch.Tensor = scale.sum(dim=-1) / node_mask.float().squeeze(-1).sum(dim=-1)  # [B]
+        clipped_scale = torch.clamp(scale, max=clip_scale)
+        co_ef = clipped_scale / scale  # [B]
+        grad = grad * co_ef.view(-1, 1, 1)
+
+    return grad
 
 class StyleCLIP(torch.nn.Module):
 
@@ -581,10 +594,10 @@ def ddim_call_with_guidance(
                     
                     log_probs=style_clip(decoded)
 
-                    diff_gradient=torch.autograd.grad(outputs=log_probs,inputs=new_denoised)[0]
-                    if i == 15:
-                        print(i)
-                        print("\t",i,diff_gradient)
+                    diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
+
+                    diff_gradient=rescale_grad(diff_gradient,1.0)
+                    
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()
@@ -656,9 +669,9 @@ if __name__=="__main__":
     url_dict={
         "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
         "anime":"anime.jpg",
-        "cubism":"cubism.jpg",
-        "ghibli":"ghibli.jpg",
-        "renn":"rennaissance.jpg"
+      #  "cubism":"cubism.jpg",
+      #  "ghibli":"ghibli.jpg",
+       # "renn":"rennaissance.jpg"
     }
 
     for k,v in url_dict.items():

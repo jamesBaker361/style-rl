@@ -581,6 +581,9 @@ def ddim_call_with_guidance(
                     log_probs=style_clip(decoded)
 
                     diff_gradient=torch.autograd.grad(outputs=log_probs,inputs=new_denoised)[0]
+                    if i == 0 or i==len(timesteps)-1:
+                        print(i)
+                        print("\t",diff_gradient)
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()
@@ -669,7 +672,7 @@ if __name__=="__main__":
                 style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
                 print(k)
-                print("\t",style_clip.target_embedding)
+                #print("\t",style_clip.target_embedding)
 
                 
                 generator=torch.Generator(pipeline.unet.device)

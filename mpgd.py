@@ -641,41 +641,50 @@ if __name__=="__main__":
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=512
-    target_image=load_image("https://media.vogue.fr/photos/5c8a55363d44a0083ccbef54/2:3/w_2560%2Cc_limit/GettyImages-625257378.jpg")
-    target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+    
+    url_dict={
+        "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+        "anime":"https://i.pinimg.com/736x/bb/bf/c2/bbbfc27847b027ab937d110beac84600.jpg",
+        "cubism":"https://www.canvas-museum.com/wp-content/uploads/2024/05/Front-of-the-canvas-wall-decoration-Faces-of-the-Future-Canvas-Wall-Art-by-CaMU.jpg"
+    }
 
-    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-    style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_tensor)
     '''target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())'''
 
-    for guidance_strength in [-1,-10,-50,-100]:
+    for guidance_strength in [-5]:
         for steps in [50,100]:
+            for k,v in url_dict.items():
 
-            
-            generator=torch.Generator(pipeline.unet.device)
-            generator.manual_seed(123)
-            grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,
-                                               style_clip=style_clip,
-                                               #target=target,
-                                               generator=generator,num_inference_steps=steps,
-                                               #embedding_model=embedding_model,
-                                               guidance_strength=guidance_strength).images[0]
-            
+                target_image=load_image(v)
+                target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
-            '''generator=torch.Generator(pipeline.unet.device)
-            generator.manual_seed(123)
-            image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
-                                          guidance_strength=guidance_strength).images[0]'''
+                embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_tensor)
 
-            '''generator=torch.Generator(pipeline.unet.device)
-            generator.manual_seed(123)
-            normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
-            
-            '''concat_image=concat_images_horizontally([image,grad_image])
+                
+                generator=torch.Generator(pipeline.unet.device)
+                generator.manual_seed(123)
+                grad_image=ddim_call_with_guidance(pipeline,"cat",dim,dim,
+                                                style_clip=style_clip,
+                                                #target=target,
+                                                generator=generator,num_inference_steps=steps,
+                                                #embedding_model=embedding_model,
+                                                guidance_strength=guidance_strength).images[0]
+                
 
-            concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                '''generator=torch.Generator(pipeline.unet.device)
+                generator.manual_seed(123)
+                image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                            guidance_strength=guidance_strength).images[0]'''
 
-            grad_image.save(f"mpgd_{guidance_strength}_{steps}.png")
+                '''generator=torch.Generator(pipeline.unet.device)
+                generator.manual_seed(123)
+                normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                
+                '''concat_image=concat_images_horizontally([image,grad_image])
 
-            print(f"all done {steps} ")
+                concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+
+                grad_image.save(f"mpgd_{guidance_strength}_{steps}_{k}.png")
+
+                print(f"all done {steps} ")

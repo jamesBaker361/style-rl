@@ -668,8 +668,8 @@ if __name__=="__main__":
     '''target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())'''
 
-    for guidance_strength in [-5]:
-        for steps in [50,100]:
+    for guidance_strength in [-5,5]:
+        for steps in [50,10]:
             for k,v in url_dict.items():
 
                 target_image=load_image(v)
@@ -684,7 +684,7 @@ if __name__=="__main__":
                 
                 generator=torch.Generator(pipeline.unet.device)
                 generator.manual_seed(123)
-                output,denoised_list=ddim_call_with_guidance(pipeline,"cat",dim,dim,
+                output,denoised_list=ddim_call_with_guidance(pipeline,"man",dim,dim,
                                                 style_clip=style_clip,
                                                 #target=target,
                                                 generator=generator,num_inference_steps=steps,

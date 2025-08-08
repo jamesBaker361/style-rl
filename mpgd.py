@@ -583,7 +583,7 @@ def ddim_call_with_guidance(
                     diff_gradient=torch.autograd.grad(outputs=log_probs,inputs=new_denoised)[0]
                     '''if i == 0 or i==len(timesteps)-1 or i==start or i==end:
                         print(i)'''
-                    print("\t",diff_gradient)
+                    print("\t",i,diff_gradient)
                     diff_gradient=guidance_strength*diff_gradient
                     
                     usage=get_gpu_memory_usage()

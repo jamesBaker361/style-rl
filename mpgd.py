@@ -400,6 +400,7 @@ def ddim_call_with_guidance(
     callback_on_step_end= None,
     callback_on_step_end_tensor_inputs: List[str] = ["latents"],
     style_clip:StyleCLIP=None,
+    stage:str="mid",
     **kwargs,
 ):
     with torch.no_grad():
@@ -571,7 +572,7 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            if style_clip is not None and i>=start and i<=end:
+            if style_clip is not None and ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
                     new_denoised.requires_grad_(True)
@@ -644,8 +645,10 @@ if __name__=="__main__":
     
     url_dict={
         "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
-        "anime":"https://i.pinimg.com/736x/bb/bf/c2/bbbfc27847b027ab937d110beac84600.jpg",
-        "cubism":"https://www.canvas-museum.com/wp-content/uploads/2024/05/Front-of-the-canvas-wall-decoration-Faces-of-the-Future-Canvas-Wall-Art-by-CaMU.jpg"
+        "anime":"anime.jpg",
+        "cubism":"cubism.jpg",
+        "ghibli":"ghibli.jpg",
+        "renn":"rennaissance.jpg"
     }
 
     for k,v in url_dict.items():
@@ -689,6 +692,6 @@ if __name__=="__main__":
 
                 concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
 
-                grad_image.save(f"mpgd_{guidance_strength}_{steps}_{k}.png")
+                grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")
 
                 print(f"all done {steps} ")

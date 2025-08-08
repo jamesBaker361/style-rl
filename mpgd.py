@@ -647,8 +647,8 @@ if __name__=="__main__":
     '''target=embedding_model.embed_img_tensor(target_tensor)
     print('target size',target.size())'''
 
-    for guidance_strength in [-100,-200,100,100]:
-        for steps in [30,50,100]:
+    for guidance_strength in [-2,-1,-0.1,0.1,1,2]:
+        for steps in [10,50,100]:
 
             
             generator=torch.Generator(pipeline.unet.device)

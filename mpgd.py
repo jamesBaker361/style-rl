@@ -663,10 +663,10 @@ if __name__=="__main__":
             for k,v in url_dict.items():
 
                 target_image=load_image(v)
-                target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
                 embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-                style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_tensor)
+                style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
                 
                 generator=torch.Generator(pipeline.unet.device)

@@ -610,7 +610,7 @@ def ddim_call_with_guidance(
                 new_latents=self.scheduler.add_noise(latents,noise_pred,t)
                 latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
 
-                denoised_list.append(denoised)
+            denoised_list.append(denoised)
 
             if callback_on_step_end is not None:
                 callback_kwargs = {}
@@ -661,6 +661,7 @@ if __name__=="__main__":
     pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,
                                                      #force_download=True,
                                                      scheduler=ddim).to("cuda")
+    pipeline.do_classifier_free_guidance=False
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=512
@@ -691,6 +692,8 @@ if __name__=="__main__":
                                         )
         base_image=output.images[0]
         base_image.save(f"images/base_{steps}.png")
+        base_denoised_list=concat_images_horizontally(denoised_list)
+        base_denoised_list.save(f"images/base_concat_{steps}.png")
         for guidance_strength in [-5,5]:
             
             for k,v in url_dict.items():

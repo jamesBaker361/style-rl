@@ -682,7 +682,7 @@ if __name__=="__main__":
     print('target size',target.size())'''
 
     
-    for steps in [30]:
+    for steps in [100]:
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
         output,denoised_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,

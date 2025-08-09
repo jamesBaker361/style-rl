@@ -661,7 +661,7 @@ if __name__=="__main__":
     pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,
                                                      #force_download=True,
                                                      scheduler=ddim).to("cuda")
-    pipeline.do_classifier_free_guidance=False
+    #pipeline.do_classifier_free_guidance=False
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=512
@@ -682,7 +682,7 @@ if __name__=="__main__":
     print('target size',target.size())'''
 
     
-    for steps in [30,10]:
+    for steps in [30]:
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
         output,denoised_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
@@ -694,7 +694,7 @@ if __name__=="__main__":
         base_image.save(f"images/base_{steps}.png")
         base_denoised_list=concat_images_horizontally(denoised_list)
         base_denoised_list.save(f"images/base_concat_{steps}.png")
-        for guidance_strength in [-5,5]:
+        for guidance_strength in [-10,10]:
             
             for k,v in url_dict.items():
                 for stage in ["early","mid","late"]:

@@ -684,7 +684,7 @@ if __name__=="__main__":
     for steps in [30,10]:
         generator=torch.Generator(pipeline.unet.device)
         generator.manual_seed(123)
-        output,denoised_list=ddim_call_with_guidance(pipeline,"man",dim,dim,
+        output,denoised_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
                                         #target=target,
                                         generator=generator,num_inference_steps=steps,
                                         #embedding_model=embedding_mode
@@ -692,9 +692,9 @@ if __name__=="__main__":
         base_image=output.images[0]
         base_image.save(f"images/base_{steps}.png")
         for guidance_strength in [-5,5]:
-            for stage in ["early","mid","late"]:
-                for k,v in url_dict.items():
-
+            
+            for k,v in url_dict.items():
+                for stage in ["early","mid","late"]:
                     target_image=load_image(v)
                     #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
@@ -728,8 +728,8 @@ if __name__=="__main__":
                     '''concat_image=concat_images_horizontally([image,grad_image])
 
                     concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
-                    grad_image=concat_images_horizontally(denoised_list)
+                    grad_image=output.images[0]
                     grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
-                final_image=output.images[0]
-                final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")
+                '''final_image=output.images[0]
+                final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")

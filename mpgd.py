@@ -707,7 +707,7 @@ if __name__=="__main__":
                     
                     generator=torch.Generator(pipeline.unet.device)
                     generator.manual_seed(123)
-                    output,denoised_list=ddim_call_with_guidance(pipeline,"man",dim,dim,
+                    output,denoised_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
                                                     style_clip=style_clip,
                                                     #target=target,
                                                     generator=generator,num_inference_steps=steps,
@@ -730,5 +730,6 @@ if __name__=="__main__":
                     concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
                     grad_image=concat_images_horizontally(denoised_list)
                     grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
-
+                final_image=output.images[0]
+                final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")
             print(f"all done {steps} ")

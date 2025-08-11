@@ -554,6 +554,8 @@ def ddim_call_with_guidance(
     start=int(0.3*self._num_timesteps)
     end=int(0.7 * self._num_timesteps)
     denoised_list=[]
+    log_probs_list=[]
+    latents_list=[]
     with self.progress_bar(total=num_inference_steps) as progress_bar:
         for i, t in enumerate(timesteps):
             with torch.no_grad():
@@ -595,6 +597,8 @@ def ddim_call_with_guidance(
                     
                     log_probs=style_clip(decoded)
 
+                    log_probs_list.append(log_probs.sum())
+
                     diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
 
                     diff_gradient=rescale_grad(diff_gradient,1.0)
@@ -612,6 +616,7 @@ def ddim_call_with_guidance(
                 new_noise= randn_tensor(latents.size(),generator, latents.device, latents.dtype)
                 new_latents=self.scheduler.add_noise(latents,new_noise,t)
                 latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
+                latents_list.append(latents.detach())
 
             denoised_list.append(denoised)
 
@@ -655,7 +660,7 @@ def ddim_call_with_guidance(
     if len(denoised_list)>0:
         denoised_list=self.image_processor.postprocess(torch.cat(denoised_list),output_type=output_type,do_denormalize=[True] * len(denoised_list))
 
-    return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),denoised_list
+    return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),denoised_list,log_probs_list,latents_list
 
     
 
@@ -707,19 +712,21 @@ if __name__=="__main__":
                     #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                     style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
-                    print(k)
+                    print(k,stage)
                     #print("\t",style_clip.target_embedding)
 
                     
                     generator=torch.Generator(pipeline.unet.device)
                     generator.manual_seed(123)
-                    output,denoised_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                    output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
                                                     style_clip=style_clip,
                                                     #target=target,
                                                     generator=generator,num_inference_steps=steps,
                                                     #embedding_model=embedding_model,
                                                     guidance_strength=guidance_strength,
                                                     stage=stage)
+                    
+                    print(k,stage,log_probs_list)
                     
 
                     '''generator=torch.Generator(pipeline.unet.device)

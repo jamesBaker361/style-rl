@@ -229,7 +229,8 @@ with accelerator.autocast():
             delete_unique_objects(after_objects,before_objects)
             #print("grads",len(find_cuda_tensors_with_grads()))
             
-
+        pipeline.to(torch.float16)
+        embedding=embedding.to(torch.float16)
         output=pipeline("going for a walk",256,256,num_inference_steps=10, ip_adapter_image_embeds=[embedding.unsqueeze(0)])
         stacked=torch.stack(output.denoised_list)
         accelerator.print("stacked size",stacked.size())

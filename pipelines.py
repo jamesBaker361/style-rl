@@ -315,6 +315,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         do_classifier_free_guidance:Optional[bool]=False,
         decreasing_scale: Optional[bool]=False,
         increasing_scale: Optional[bool]=False,
+        start:float=0.0,
+        end:float=1.0,
         **kwargs,
     ):
         
@@ -453,6 +455,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))
                 elif increasing_scale:
                     self.set_ip_adapter_scale(float(i)/len(timesteps))
+
+                if i < start*len(timesteps) or i > end *len(timesteps):
+                    self.set_ip_adapter_scale(0.0)
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

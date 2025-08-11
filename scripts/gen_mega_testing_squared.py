@@ -10,7 +10,7 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
                             for n in [1000]:
                                 #for scheduler in ["LCMScheduler"]:
                                 for pipeline in ["lcm"]:
-                                    for reward_switch_epoch in [400]:
+                                    for reward_switch_epoch in [-1]:
                         
                                         name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}_{reward_switch_epoch}"
                                         port+=1

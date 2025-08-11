@@ -789,7 +789,7 @@ def main(args):
 
     training_start=time.time()
     
-    val_start=time.time()
+    '''val_start=time.time()
     before_objects=find_cuda_objects()
     with torch.no_grad():
 
@@ -806,7 +806,7 @@ def main(args):
         persistent_fid_list.append(val_metrics["fid"])
         persistent_text_alignment_list.append(val_metrics["text_alignment"])
     after_objects=find_cuda_objects()
-    delete_unique_objects(after_objects,before_objects)
+    delete_unique_objects(after_objects,before_objects)'''
     
 
     training_end=time.time()

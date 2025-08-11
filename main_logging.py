@@ -133,6 +133,8 @@ parser.add_argument("--decreasing_scale",action="store_true")
 parser.add_argument("--increasing_scale",action="store_true")
 parser.add_argument("--fid",action="store_true")
 parser.add_argument("--constant_scale",action="store_true")
+parser.add_argument("--ip_start",type=float,default=0.0)
+parser.add_argument("--ip_end",type=float,default=1.0)
 
 import torch
 import torch.nn.functional as F
@@ -719,7 +721,8 @@ def main(args):
                                     num_inference_steps=args.num_inference_steps,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
-                                    output_type="pt",height=args.image_size,width=args.image_size,decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale).images
+                                    output_type="pt",height=args.image_size,width=args.image_size,decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale
+                                    ,start=args.ip_start,end=args.ip_end).images
             
             #normal_image_set=pipeline(prompt_embeds=text_batch,output_type="pil").images
             image_batch=F_v2.resize(image_batch, (args.image_size,args.image_size))

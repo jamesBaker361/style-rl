@@ -76,6 +76,41 @@ def concat_images_horizontally(images):
 
     return new_img
 
+def concat_images_vertically(images):
+    """
+    Concatenate a list of PIL.Image objects vertically.
+
+    Args:
+        images (List[PIL.Image]): List of PIL images.
+
+    Returns:
+        PIL.Image: A new image composed of the input images stacked top-to-bottom.
+    """
+    # Resize all images to the same width (optional)
+    widths = [img.width for img in images]
+    min_width = min(widths)
+    resized_images = [
+        img if img.width == min_width else img.resize(
+            (min_width, int(img.height * min_width / img.width)),
+            Image.LANCZOS
+        ) for img in images
+    ]
+
+    # Compute total height and max width
+    total_height = sum(img.height for img in resized_images)
+    width = min_width
+
+    # Create new blank image
+    new_img = Image.new('RGB', (width, total_height))
+
+    # Paste images one below the other
+    y_offset = 0
+    for img in resized_images:
+        new_img.paste(img, (0, y_offset))
+        y_offset += img.height
+
+    return new_img
+
 
 name="jlbaker361/denoise_epsilon_ssl_1.0_0.001_1000_identity_lcm_-1"
 
@@ -200,16 +235,15 @@ with accelerator.autocast():
         accelerator.print("stacked size",stacked.size())
         pil_image_list=pipeline.image_processor.postprocess(stacked)
 
-        concat=concat_images_horizontally(pil_image_list)
+        concat1=concat_images_horizontally(pil_image_list)
 
-        concat.save("denoised_ip.png")
+        #concat.save("denoised_ip.png")
 
         output=pipeline("going for a walk",256,256,num_inference_steps=10, ip_adapter_image_embeds=None)
         stacked=torch.stack(output.denoised_list)
         accelerator.print("stacked size",stacked.size())
         pil_image_list=pipeline.image_processor.postprocess(stacked)
 
-        concat=concat_images_horizontally(pil_image_list)
+        concat2=concat_images_horizontally(pil_image_list)
 
-        concat.save("denoised.png")
-
+        concat=concat_images_vertically(concat1,concat2)

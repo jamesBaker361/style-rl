@@ -610,7 +610,7 @@ def ddim_call_with_guidance(
                 latents=denoised-diff_gradient
 
                 new_noise= randn_tensor(latents.size(),generator, latents.device, latents.dtype)
-                new_latents=self.scheduler.add_noise(new_latents,new_noise,t)
+                new_latents=self.scheduler.add_noise(latents,new_noise,t)
                 latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
 
             denoised_list.append(denoised)

@@ -362,13 +362,14 @@ class StyleCLIP(torch.nn.Module):
         elif type(target)==Image.Image:
             img=target
         image = img.resize(self.image_size, Image.Resampling.BILINEAR)
+        #image=ToTensor()(image)
         image = self.transforms(ToTensor()(image)).unsqueeze(0)
         return self.get_gram_matrix(image)
 
     def get_gram_matrix(self, img:torch.Tensor):
         img = img.to(self.device)
         img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
-        img = self.transforms(img)
+        #img = self.transforms(img)
         # following mpgd
         feats = self.model.vision_model(img, output_hidden_states=True, return_dict=True).hidden_states[2]        
         feats = feats[:, 1:, :]  # [bsz, seq_len, h_dim]
@@ -701,7 +702,7 @@ if __name__=="__main__":
                     target_image=load_image(v)
                     #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
-                    embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                    #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                     style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
                     print(k)

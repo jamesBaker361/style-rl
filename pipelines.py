@@ -273,6 +273,7 @@ class CustomStableDiffusionPipelineOutput(BaseOutput):
     images: Union[List[PIL.Image.Image], np.ndarray]
     nsfw_content_detected: Optional[List[bool]]
     latents: Optional[torch.Tensor]
+    denoised_list: Optional[torch.Tensor]
     
 
 class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
@@ -437,6 +438,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
+        denoised_list=[]
+
         # 8. LCM MultiStep Sampling Loop:
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
@@ -483,7 +486,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     if callback is not None and i % callback_steps == 0:
                         step_idx = i // getattr(self.scheduler, "order", 1)
                         callback(step_idx, t, latents)
-
+                denoised_list.append(denoised)
                 
 
         denoised = denoised.to(prompt_embeds.dtype)
@@ -507,7 +510,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         if not return_dict:
             return (image, has_nsfw_concept)
 
-        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_clone)
+        return CustomStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept,latents=latents_clone,denoised_list=denoised_list)
     
 
     def call_with_grad(

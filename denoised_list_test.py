@@ -195,7 +195,7 @@ with accelerator.autocast():
             #print("grads",len(find_cuda_tensors_with_grads()))
             
 
-        output=pipeline("going for a walk",256,256,num_inference_steps=10, ip_adapter_image_embeds=embedding)
+        output=pipeline("going for a walk",256,256,num_inference_steps=10, ip_adapter_image_embeds=[embedding])
         stacked=torch.stack(output.denoised_list)
         accelerator.print("stacked size",stacked.size())
         pil_image_list=pipeline.image_processor.postprocess(stacked)

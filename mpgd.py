@@ -419,13 +419,11 @@ class TextCLIP(torch.nn.Module):
         if type(target)==torch.Tensor:
             return target
         if type(target)==str:
-            img = Image.open(target).convert('RGB')
-        elif type(target)==Image.Image:
-            img=target
-        image = img.resize(self.image_size, Image.Resampling.BILINEAR)
-        #image=ToTensor()(image)
-        image = self.transforms(ToTensor()(image)).unsqueeze(0)
-        return self.get_gram_matrix(image)
+            inputs = self.tokenizer(target, return_tensors="pt", padding=True, truncation=True)
+
+        text_features= self.model.get_text_features(**inputs)
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        return text_features
 
     def get_gram_matrix(self, img:torch.Tensor):
         img = img.to(self.device)
@@ -441,11 +439,16 @@ class TextCLIP(torch.nn.Module):
         img = img.resize((224, 224), Image.Resampling.BILINEAR)
         return self.transforms(ToTensor()(img)).unsqueeze(0)
 
-    def forward(self, x):
+    def forward(self, img):
 
-        embed = self.get_gram_matrix(x)
-        diff = (embed - self.target_embedding).reshape(embed.shape[0], -1)
-        similarity = -(diff ** 2).sum(dim=1).sqrt() / 100
+        img = img.to(self.device)
+        img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
+
+        image_features = self.model.vision_model(img, output_hidden_states=True, return_dict=True).last_hidden_state
+
+        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+
+        similarity = (self.target_embedding @ image_features.T).item()
 
         return similarity
     
@@ -477,6 +480,8 @@ def ddim_call_with_guidance(
     callback_on_step_end= None,
     callback_on_step_end_tensor_inputs: List[str] = ["latents"],
     style_clip:StyleCLIP=None,
+    text_clip:TextCLIP=None,
+    task:str="style", #could also be text
     stage:str="mid",
     **kwargs,
 ):
@@ -652,13 +657,17 @@ def ddim_call_with_guidance(
                 # compute the previous noisy sample x_t -> x_t-1
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
-            if style_clip is not None and ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
+            if  ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
+                if style_clip is not None and task=="style":
+                    task_model=style_clip
+                elif text_clip is not None and task=="text":
+                    task_model=text_clip 
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
                     new_denoised.requires_grad_(True)
                     decoded=self.vae.decode(new_denoised).sample
                     
-                    log_probs=style_clip(decoded)
+                    log_probs=task_model(decoded)
 
                     log_probs_list.append(log_probs.sum())
 
@@ -736,76 +745,142 @@ if __name__=="__main__":
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
     dim=512
+
+    def style_grad():
     
-    url_dict={
-        "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
-        "anime":"anime.jpg",
-      #  "cubism":"cubism.jpg",
-      #  "ghibli":"ghibli.jpg",
-       # "renn":"rennaissance.jpg"
-    }
+        url_dict={
+            "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+            "anime":"anime.jpg",
+        #  "cubism":"cubism.jpg",
+        #  "ghibli":"ghibli.jpg",
+        # "renn":"rennaissance.jpg"
+        }
 
-    for k,v in url_dict.items():
-        print("trying to load ",k)
-        load_image(v)
+        for k,v in url_dict.items():
+            print("trying to load ",k)
+            load_image(v)
 
-    '''target=embedding_model.embed_img_tensor(target_tensor)
-    print('target size',target.size())'''
+        '''target=embedding_model.embed_img_tensor(target_tensor)
+        print('target size',target.size())'''
 
-    
-    for steps in [10,30,50]:
-        generator=torch.Generator(pipeline.unet.device)
-        generator.manual_seed(123)
-        output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
-                                        #target=target,
-                                        generator=generator,num_inference_steps=steps,
-                                        #embedding_model=embedding_mode
-                                        )
-        base_image=output.images[0]
-        base_image.save(f"images/base_{steps}.png")
-        base_denoised_list=concat_images_horizontally(denoised_list)
-        base_denoised_list.save(f"images/base_concat_{steps}.png")
-        for guidance_strength in [-10,-5,-1,1,5,10]:
-            
-            for k,v in url_dict.items():
-                for stage in ["early","mid","late"]:
-                    target_image=load_image(v)
-                    #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+        
+        for steps in [10,30,50]:
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                            #target=target,
+                                            generator=generator,num_inference_steps=steps,
+                                            #embedding_model=embedding_mode
+                                            )
+            base_image=output.images[0]
+            base_image.save(f"images/base_{steps}.png")
+            base_denoised_list=concat_images_horizontally(denoised_list)
+            base_denoised_list.save(f"images/base_concat_{steps}.png")
+            for guidance_strength in [-10,-5,-1,1,5,10]:
+                
+                for k,v in url_dict.items():
+                    for stage in ["early","mid","late"]:
+                        target_image=load_image(v)
+                        #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
-                    #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-                    style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
+                        #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                        style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
 
-                    print(k,stage)
-                    #print("\t",style_clip.target_embedding)
+                        print(k,stage)
+                        #print("\t",style_clip.target_embedding)
 
-                    
-                    generator=torch.Generator(pipeline.unet.device)
-                    generator.manual_seed(123)
-                    output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
-                                                    style_clip=style_clip,
-                                                    #target=target,
-                                                    generator=generator,num_inference_steps=steps,
-                                                    #embedding_model=embedding_model,
-                                                    guidance_strength=guidance_strength,
-                                                    stage=stage)
-                    
-                    print(k,stage,log_probs_list)
-                    
+                        
+                        generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                                        style_clip=style_clip,
+                                                        #target=target,
+                                                        generator=generator,num_inference_steps=steps,
+                                                        #embedding_model=embedding_model,
+                                                        guidance_strength=guidance_strength,
+                                                        stage=stage)
+                        
+                        print(k,stage,log_probs_list)
+                        
 
-                    '''generator=torch.Generator(pipeline.unet.device)
-                    generator.manual_seed(123)
-                    image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
-                                                guidance_strength=guidance_strength).images[0]'''
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                                    guidance_strength=guidance_strength).images[0]'''
 
-                    '''generator=torch.Generator(pipeline.unet.device)
-                    generator.manual_seed(123)
-                    normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
-                    
-                    '''concat_image=concat_images_horizontally([image,grad_image])
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                        
+                        '''concat_image=concat_images_horizontally([image,grad_image])
 
-                    concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
-                    grad_image=output.images[0]
-                    grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
-                '''final_image=output.images[0]
-                final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
+                        concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                        grad_image=output.images[0]
+                        grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
+                    '''final_image=output.images[0]
+                    final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")
+
+    def text_grad():
+        prompt_dict={
+            "anime-singleton":"anime",
+            "anime-medium":"anime, studio ghibli, cartoon, beautiful",
+            "anime-descriptive":"anime  boy walking through the park, studio ghibli, cartoon, beautiful"
+        }
+
+        for steps in [10,30,50]:
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                            #target=target,
+                                            generator=generator,num_inference_steps=steps,
+                                            #embedding_model=embedding_mode
+                                            )
+            base_image=output.images[0]
+            base_image.save(f"images/base_{steps}.png")
+            base_denoised_list=concat_images_horizontally(denoised_list)
+            base_denoised_list.save(f"images/base_concat_{steps}.png")
+            for guidance_strength in [-10,-5,-1,1,5,10]:
+                
+                for k,v in prompt_dict.items():
+                    for stage in ["early","mid","late"]:
+                        #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+
+                        #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                        style_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
+
+                        print(k,stage)
+                        #print("\t",style_clip.target_embedding)
+
+                        
+                        generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                                        style_clip=style_clip,
+                                                        #target=target,
+                                                        generator=generator,num_inference_steps=steps,
+                                                        #embedding_model=embedding_model,
+                                                        guidance_strength=guidance_strength,
+                                                        stage=stage)
+                        
+                        print(k,stage,log_probs_list)
+                        
+
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                                    guidance_strength=guidance_strength).images[0]'''
+
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                        
+                        '''concat_image=concat_images_horizontally([image,grad_image])
+
+                        concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                        grad_image=output.images[0]
+                        grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
+                    '''final_image=output.images[0]
+                    final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
+            print(f"all done {steps} ")
+

@@ -663,6 +663,10 @@ def ddim_call_with_guidance(
                     task_model=style_clip
                 elif text_clip is not None and task=="text":
                     task_model=text_clip 
+                else:
+                    print("style clip",style_clip)
+                    print("text clip", text_clip)
+                    print("task",task)
                 with torch.enable_grad():
                     new_denoised=denoised.clone().detach()
                     new_denoised.requires_grad_(True)

@@ -458,6 +458,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                 if i < start*len(timesteps) or i > end *len(timesteps):
                     self.set_ip_adapter_scale(0.0)
+                else:
+                    self.set_ip_adapter_scale(1.0)
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

@@ -848,7 +848,7 @@ if __name__=="__main__":
                         #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
                         #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-                        style_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
+                        text_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
 
                         print(k,stage)
                         #print("\t",style_clip.target_embedding)
@@ -857,7 +857,8 @@ if __name__=="__main__":
                         generator=torch.Generator(pipeline.unet.device)
                         generator.manual_seed(123)
                         output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
-                                                        style_clip=style_clip,
+                                                        text_clip=text_clip,
+                                                        task="text",
                                                         #target=target,
                                                         generator=generator,num_inference_steps=steps,
                                                         #embedding_model=embedding_model,

@@ -659,42 +659,39 @@ def ddim_call_with_guidance(
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
             if  ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
+                task_model=None
                 if style_clip is not None and task=="style":
                     task_model=style_clip
                 elif text_clip is not None and task=="text":
                     task_model=text_clip 
-                else:
-                    print("style clip",style_clip)
-                    print("text clip", text_clip)
-                    print("task",task)
-                with torch.enable_grad():
-                    new_denoised=denoised.clone().detach()
-                    new_denoised.requires_grad_(True)
-                    decoded=self.vae.decode(new_denoised).sample
-                    
-                    log_probs=task_model(decoded)
+                if task_model is not None:
+                    with torch.enable_grad():
+                        new_denoised=denoised.clone().detach()
+                        new_denoised.requires_grad_(True)
+                        decoded=self.vae.decode(new_denoised).sample
+                        
+                        log_probs=task_model(decoded)
 
-                    log_probs_list.append(log_probs.sum())
+                        log_probs_list.append(log_probs.sum())
 
-                    diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
+                        diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
 
-                    diff_gradient=rescale_grad(diff_gradient,1.0)
-                    
-                    diff_gradient=guidance_strength*diff_gradient
-                    
-                    usage=get_gpu_memory_usage()
-                    torch.cuda.empty_cache()
-                    print(usage["allocated_mb"])
+                        diff_gradient=rescale_grad(diff_gradient,1.0)
+                        
+                        diff_gradient=guidance_strength*diff_gradient
+                        
+                        usage=get_gpu_memory_usage()
+                        torch.cuda.empty_cache()
+                        print(usage["allocated_mb"])
 
-                #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
+                    #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
-                latents=denoised-diff_gradient
+                    latents=denoised-diff_gradient
 
-                new_noise= randn_tensor(latents.size(),generator, latents.device, latents.dtype)
-                new_latents=self.scheduler.add_noise(latents,new_noise,t)
-                latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
-                latents_list.append(latents.detach())
-
+                    new_noise= randn_tensor(latents.size(),generator, latents.device, latents.dtype)
+                    new_latents=self.scheduler.add_noise(latents,new_noise,t)
+                    latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
+            latents_list.append(latents.detach())
             denoised_list.append(denoised)
 
             if callback_on_step_end is not None:

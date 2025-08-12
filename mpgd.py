@@ -483,6 +483,7 @@ def ddim_call_with_guidance(
     text_clip:TextCLIP=None,
     task:str="style", #could also be text
     stage:str="mid",
+    guidance_strength:float=1.0,
     **kwargs,
 ):
     with torch.no_grad():

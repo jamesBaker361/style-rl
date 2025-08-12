@@ -885,3 +885,4 @@ if __name__=="__main__":
                     final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")
 
+    text_grad()

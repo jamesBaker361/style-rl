@@ -912,7 +912,7 @@ if __name__=="__main__":
                                                         guidance_strength=guidance_strength,
                                                         stage=stage)
                         
-                        print(k,stage,log_probs_list)
+                        print(k,guidance_strength ,stage,log_probs_list)
                         
 
                         '''generator=torch.Generator(pipeline.unet.device)

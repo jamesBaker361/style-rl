@@ -888,7 +888,7 @@ if __name__=="__main__":
                         target_image=load_image(v).resize((dim,dim))
                         #target=pip
                         target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
-                        target_tensor=pipeline.vae.encode(target_tensor).latent_dist.sample()
+                        #target_tensor=pipeline.vae.encode(target_tensor).latent_dist.sample()
 
                         #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                         mse_model=MSEDiff(target_tensor)

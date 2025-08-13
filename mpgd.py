@@ -447,7 +447,7 @@ class TextCLIP(torch.nn.Module):
         img = img.to(self.device)
         img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
 
-        image_features = self.model.vision_model(img, output_hidden_states=True, return_dict=True).last_hidden_state
+        image_features = self.model.get_image_features(pixel_values=img)
 
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
 

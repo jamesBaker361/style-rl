@@ -717,8 +717,8 @@ def ddim_call_with_guidance(
 
                         new_noise= original_latents
                         
-                        new_latents=self.scheduler.add_noise(new_latents,new_noise,t)
-                        latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
+                        new_latents=self.scheduler.add_noise(new_latents,noise_pred,t)
+                        latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
             latents_list.append(latents.detach())
             denoised_list.append(denoised)
 

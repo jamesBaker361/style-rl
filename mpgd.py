@@ -602,6 +602,8 @@ def ddim_call_with_guidance(
             latents,
         )
 
+        original_latents=latents.clone()
+
         # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
 
@@ -691,7 +693,8 @@ def ddim_call_with_guidance(
 
                     latents=denoised-diff_gradient
 
-                    new_noise= randn_tensor(latents.size(),generator, latents.device, latents.dtype)
+                    new_noise= original_latents
+                    
                     new_latents=self.scheduler.add_noise(latents,new_noise,t)
                     latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
             latents_list.append(latents.detach())

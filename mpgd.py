@@ -467,7 +467,7 @@ class MSEDiff(torch.nn.Module):
         self.target=target
 
     def forward(self,img):
-        return 10* F.mse_loss(self.target,img)
+        return 1000* F.mse_loss(self.target,img)
     
 def velocity_to_noise(self:DDIMScheduler,velocity_pred: torch.Tensor,
         timestep: int,

@@ -135,6 +135,7 @@ parser.add_argument("--fid",action="store_true")
 parser.add_argument("--constant_scale",action="store_true")
 parser.add_argument("--ip_start",type=float,default=0.0)
 parser.add_argument("--ip_end",type=float,default=1.0)
+parser.add_argument("--do_classifier_free_guidance",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -341,7 +342,7 @@ def main(args):
     accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
 
-    do_classifier_free_guidance=False
+    do_classifier_free_guidance=args.do_classifier_free_guidance
     if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
         do_classifier_free_guidance=True
 
@@ -719,6 +720,7 @@ def main(args):
             else:
                 fake_image=pipeline(prompt_batch,
                                     num_inference_steps=args.num_inference_steps,
+                                    do_classifier_free_guidance=do_classifier_free_guidance,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale

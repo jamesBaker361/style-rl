@@ -713,11 +713,11 @@ def ddim_call_with_guidance(
 
                         #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
-                        latents=denoised-diff_gradient
+                        new_latents=denoised-diff_gradient
 
                         new_noise= original_latents
                         
-                        new_latents=self.scheduler.add_noise(latents,new_noise,t)
+                        new_latents=self.scheduler.add_noise(new_latents,new_noise,t)
                         latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
             latents_list.append(latents.detach())
             denoised_list.append(denoised)
@@ -771,6 +771,8 @@ if __name__=="__main__":
     pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,
                                                      #force_download=True,
                                                      scheduler=ddim).to("cuda")
+    
+    print(ddim.config)
     #pipeline.do_classifier_free_guidance=False
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)

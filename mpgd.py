@@ -421,7 +421,8 @@ class TextCLIP(torch.nn.Module):
         if type(target)==str:
             inputs = self.tokenizer(target, return_tensors="pt", padding=True, truncation=True)
 
-        inputs["input_ids"]=inputs["input_ids"].to(self.device)
+        for k,v in inputs.items():
+            inputs[k]=v.to(self.device)
 
         text_features= self.model.get_text_features(**inputs)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)

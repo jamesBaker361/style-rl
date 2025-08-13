@@ -439,9 +439,12 @@ class TextCLIP(torch.nn.Module):
 
     def forward(self, img):
 
+        print('max min',img.max(),img.min())
+
         img = img.to(self.device)
         img = (img + 1) * 0.5
         img = torch.clamp(img, 0, 1)
+        img=self.transforms(img)
         img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
 
         image_features = self.model.get_image_features(pixel_values=img)

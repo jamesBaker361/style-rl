@@ -441,6 +441,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             device=device, dtype=latents.dtype
         )
 
+        w_embedding = torch.cat([w_embedding]*2) if do_classifier_free_guidance else w_embedding
+
         # 7. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, None)
 
@@ -457,8 +459,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                 latents = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
-                print(t)
-                t = torch.cat([t]*2) if do_classifier_free_guidance else t
+                #print(t)
+                #t = torch.cat([t]*2) if do_classifier_free_guidance else t
 
                 if decreasing_scale:
                     self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))

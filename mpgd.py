@@ -492,6 +492,7 @@ def ddim_call_with_guidance(
     task:str="style", #could also be text
     stage:str="mid",
     guidance_strength:float=1.0,
+    guidance_steps:int=1,
     **kwargs,
 ):
     with torch.no_grad():
@@ -669,40 +670,41 @@ def ddim_call_with_guidance(
                 latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
             if  ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
-                task_model=None
-                if style_clip is not None and task=="style":
-                    task_model=style_clip
-                elif text_clip is not None and task=="text":
-                    task_model=text_clip 
-                if task_model is not None:
-                    with torch.enable_grad():
-                        new_denoised=denoised.clone().detach()
-                        new_denoised.requires_grad_(True)
-                        decoded=self.vae.decode(new_denoised).sample
+                for _ in range(guidance_steps):
+                    task_model=None
+                    if style_clip is not None and task=="style":
+                        task_model=style_clip
+                    elif text_clip is not None and task=="text":
+                        task_model=text_clip 
+                    if task_model is not None:
+                        with torch.enable_grad():
+                            new_denoised=denoised.clone().detach()
+                            new_denoised.requires_grad_(True)
+                            decoded=self.vae.decode(new_denoised).sample
+                            
+                            log_probs=task_model(decoded)
+
+                            log_probs_list.append(log_probs.sum())
+
+                            diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
+
+                            diff_gradient=rescale_grad(diff_gradient,1.0)
+                            
+                            diff_gradient=guidance_strength*diff_gradient
+                            
+                            usage=get_gpu_memory_usage()
+                            torch.cuda.empty_cache()
+
+
+
+                        #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
+
+                        latents=denoised-diff_gradient
+
+                        new_noise= original_latents
                         
-                        log_probs=task_model(decoded)
-
-                        log_probs_list.append(log_probs.sum())
-
-                        diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
-
-                        diff_gradient=rescale_grad(diff_gradient,1.0)
-                        
-                        diff_gradient=guidance_strength*diff_gradient
-                        
-                        usage=get_gpu_memory_usage()
-                        torch.cuda.empty_cache()
-
-
-
-                    #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
-
-                    latents=denoised-diff_gradient
-
-                    new_noise= original_latents
-                    
-                    new_latents=self.scheduler.add_noise(latents,new_noise,t)
-                    latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
+                        new_latents=self.scheduler.add_noise(latents,new_noise,t)
+                        latents, denoised = self.scheduler.step(new_noise, t, new_latents, **extra_step_kwargs, return_dict=False)
             latents_list.append(latents.detach())
             denoised_list.append(denoised)
 
@@ -838,13 +840,15 @@ if __name__=="__main__":
 
     def text_grad():
         prompt_dict={
-            "anime-singleton":"anime",
-            "picasso":"picasso",
-            "cubism":"cubism",
-            "renn":"rennaissance painting"
+            "anime":"anime style",
+            "picasso":"picasso painting style",
+            "horse":"horse",
+            "wizard":"wizard",
+            "ocean":"photograph of the ocean",
+            "magic": "magic the gathering"
         }
 
-        for steps in [50]:
+        for steps in [10]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,

@@ -327,6 +327,16 @@ def rescale_grad(
 
     return grad
 
+def get_vector_norm(tensor: torch.Tensor) -> torch.Tensor:
+    """
+    This method is equivalent to tensor.norm(p=2, dim=-1, keepdim=True) and used to make
+    model `executorch` exportable. See issue https://github.com/pytorch/executorch/issues/3566
+    """
+    square_tensor = torch.pow(tensor, 2)
+    sum_tensor = torch.sum(square_tensor, dim=-1, keepdim=True)
+    normed_tensor = torch.pow(sum_tensor, 0.5)
+    return normed_tensor
+
 class StyleCLIP(torch.nn.Module):
 
     def __init__(self, network, device, target=None):
@@ -385,6 +395,7 @@ class StyleCLIP(torch.nn.Module):
         return similarity
     
 
+
 class TextCLIP(torch.nn.Module):
     def __init__(self, network, device, target=None):
         super(TextCLIP, self).__init__()
@@ -421,7 +432,7 @@ class TextCLIP(torch.nn.Module):
             inputs[k]=v.to(self.device)
 
         text_features= self.model.get_text_features(**inputs)
-        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        text_features = text_features / get_vector_norm(text_features)
         return text_features
 
 
@@ -435,11 +446,16 @@ class TextCLIP(torch.nn.Module):
 
         image_features = self.model.get_image_features(pixel_values=img)
 
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        image_features = image_features / get_vector_norm(image_features)
 
-        similarity = torch.nn.functional.cosine_similarity(image_features,self.target_embedding)
+        print('self.target_embedding, image_features.t()',self.target_embedding.size(), image_features.t().size())
 
-        return similarity
+        logits_per_text = torch.matmul(self.target_embedding, image_features.t())
+        logits_per_text = logits_per_text * self.model.logit_scale.exp()
+
+        print('logits_per_text.size()',logits_per_text.size())
+
+        return logits_per_text
     
 
 

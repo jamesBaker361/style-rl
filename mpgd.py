@@ -700,6 +700,8 @@ def ddim_call_with_guidance(
 
                             diff_gradient=torch.autograd.grad(outputs=log_probs.mean(),inputs=new_denoised)[0]
 
+                            print(f"\tGradient mean: {diff_gradient.mean().item()}, std: {diff_gradient.std().item()}")
+
                             #diff_gradient=rescale_grad(diff_gradient,1.0)
                             
                             diff_gradient=guidance_strength*diff_gradient

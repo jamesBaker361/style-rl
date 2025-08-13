@@ -885,7 +885,7 @@ if __name__=="__main__":
                 for k,v in url_dict.items():
                     for stage in ["early","mid"]:
                                   #,"mid","late"]:
-                        target_image=load_image(v)
+                        target_image=load_image(v).resize((dim,dim))
                         #target=pip
                         target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
                         target_tensor=pipeline.vae.encode(target_tensor).latent_dist.sample()

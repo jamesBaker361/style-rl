@@ -787,7 +787,7 @@ if __name__=="__main__":
             base_image.save(f"images/base_{steps}.png")
             base_denoised_list=concat_images_horizontally(denoised_list)
             base_denoised_list.save(f"images/base_concat_{steps}.png")
-            for guidance_strength in [-10,-5,-1,1,5,10]:
+            for guidance_strength in [-10,10]:
                 
                 for k,v in url_dict.items():
                     for stage in ["early"]:

@@ -469,7 +469,19 @@ class MSEDiff(torch.nn.Module):
     def forward(self,img):
         return 10* F.mse_loss(self.target,img)
     
+def velocity_to_noise(self:DDIMScheduler,velocity_pred: torch.Tensor,
+        timestep: int,
+        sample: torch.Tensor,)-> torch.Tensor:
+    prev_timestep = timestep - self.config.num_train_timesteps // self.num_inference_steps
 
+    # 2. compute alphas, betas
+    alpha_prod_t = self.alphas_cumprod[timestep]
+    alpha_prod_t_prev = self.alphas_cumprod[prev_timestep] if prev_timestep >= 0 else self.final_alpha_cumprod
+
+    beta_prod_t = 1 - alpha_prod_t
+
+    pred_epsilon = (alpha_prod_t**0.5) * velocity_pred + (beta_prod_t**0.5) * sample
+    return pred_epsilon
 
 def ddim_call_with_guidance(
     self:StableDiffusionPipeline,
@@ -657,7 +669,7 @@ def ddim_call_with_guidance(
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
 
                 # predict the noise residual
-                noise_pred = self.unet(
+                velocity_pred = self.unet(
                     latent_model_input,
                     t,
                     encoder_hidden_states=prompt_embeds,
@@ -669,15 +681,16 @@ def ddim_call_with_guidance(
 
                 # perform guidance
                 if self.do_classifier_free_guidance:
-                    noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                    noise_pred = noise_pred_uncond + self.guidance_scale * (noise_pred_text - noise_pred_uncond)
+                    noise_pred_uncond, noise_pred_text = velocity_pred.chunk(2)
+                    velocity_pred = noise_pred_uncond + self.guidance_scale * (noise_pred_text - noise_pred_uncond)
 
                 if self.do_classifier_free_guidance and self.guidance_rescale > 0.0:
                     # Based on 3.4. in https://arxiv.org/pdf/2305.08891.pdf
-                    noise_pred = rescale_noise_cfg(noise_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
+                    velocity_pred = rescale_noise_cfg(velocity_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
 
+                pred_epsilon=velocity_to_noise(self.scheduler,velocity_pred,t,latents)
                 # compute the previous noisy sample x_t -> x_t-1
-                latents,denoised = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)
+                latents,denoised = self.scheduler.step(velocity_pred, t, latents, **extra_step_kwargs, return_dict=False)
 
             if  ((stage=="early" and i < start) or (stage=="mid" and i >= start and i <= end) or (stage=="late" and i >= end)):
                 for _ in range(guidance_steps):
@@ -716,9 +729,11 @@ def ddim_call_with_guidance(
                         new_latents=denoised-diff_gradient
 
                         new_noise= original_latents
+
                         
-                        new_latents=self.scheduler.add_noise(new_latents,noise_pred,t)
-                        latents, denoised = self.scheduler.step(noise_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
+                        
+                        new_latents=self.scheduler.add_noise(new_latents,pred_epsilon,t)
+                        latents, denoised = self.scheduler.step(velocity_pred, t, new_latents, **extra_step_kwargs, return_dict=False)
             latents_list.append(latents.detach())
             denoised_list.append(denoised)
 

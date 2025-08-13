@@ -853,10 +853,10 @@ if __name__=="__main__":
             base_image.save(f"images/base_{steps}.png")
             base_denoised_list=concat_images_horizontally(denoised_list)
             base_denoised_list.save(f"images/base_concat_{steps}.png")
-            for guidance_strength in [-10,-5,-1,1,5,10]:
+            for guidance_strength in [-10,10]:
                 
                 for k,v in prompt_dict.items():
-                    for stage in ["early","mid","late"]:
+                    for stage in ["early"]: #,"mid","late"]:
                         #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
                         #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)

@@ -840,15 +840,12 @@ if __name__=="__main__":
 
     def text_grad():
         prompt_dict={
-            "anime":"anime style",
-            "picasso":"picasso painting style",
-            "horse":"horse",
-            "wizard":"wizard",
-            "ocean":"photograph of the ocean",
-            "magic": "magic the gathering"
+            "anime":"boy in the style of anime, studi ghibli",
+            "ocean":"boy made of water",
+            "magic": "boy in the style of magic the gathering"
         }
 
-        for steps in [10]:
+        for steps in [20]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
@@ -860,49 +857,51 @@ if __name__=="__main__":
             base_image.save(f"images/base_{steps}.png")
             base_denoised_list=concat_images_horizontally(denoised_list)
             base_denoised_list.save(f"images/base_concat_{steps}.png")
-            for guidance_strength in [-10,10]:
+            for guidance_strength in [-0.1,0.1]:
+                for guidance_steps in [1,5,10]:
                 
-                for k,v in prompt_dict.items():
-                    for stage in ["early"]: #,"mid","late"]:
-                        #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                    for k,v in prompt_dict.items():
+                        for stage in ["mid"]: #,"mid","late"]:
+                            #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 
-                        #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
-                        text_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
+                            #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                            text_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
 
-                        print(k,stage)
-                        #print("\t",style_clip.target_embedding)
+                            print(k,stage)
+                            #print("\t",style_clip.target_embedding)
 
-                        
-                        generator=torch.Generator(pipeline.unet.device)
-                        generator.manual_seed(123)
-                        output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
-                                                        text_clip=text_clip,
-                                                        task="text",
-                                                        #target=target,
-                                                        generator=generator,num_inference_steps=steps,
-                                                        #embedding_model=embedding_model,
-                                                        guidance_strength=guidance_strength,
-                                                        stage=stage)
-                        
-                        print(k,stage,log_probs_list)
-                        
+                            
+                            generator=torch.Generator(pipeline.unet.device)
+                            generator.manual_seed(123)
+                            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                                            text_clip=text_clip,
+                                                            task="text",
+                                                            #target=target,
+                                                            generator=generator,num_inference_steps=steps,
+                                                            #embedding_model=embedding_model,
+                                                            guidance_strength=guidance_strength,
+                                                            guidance_steps=guidance_steps,
+                                                            stage=stage)
+                            
+                            print(k,stage,log_probs_list)
+                            
 
-                        '''generator=torch.Generator(pipeline.unet.device)
-                        generator.manual_seed(123)
-                        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
-                                                    guidance_strength=guidance_strength).images[0]'''
+                            '''generator=torch.Generator(pipeline.unet.device)
+                            generator.manual_seed(123)
+                            image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                                        guidance_strength=guidance_strength).images[0]'''
 
-                        '''generator=torch.Generator(pipeline.unet.device)
-                        generator.manual_seed(123)
-                        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
-                        
-                        '''concat_image=concat_images_horizontally([image,grad_image])
+                            '''generator=torch.Generator(pipeline.unet.device)
+                            generator.manual_seed(123)
+                            normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                            
+                            '''concat_image=concat_images_horizontally([image,grad_image])
 
-                        concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
-                        grad_image=output.images[0]
-                        grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
-                    '''final_image=output.images[0]
-                    final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
+                            concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                            grad_image=output.images[0]
+                            grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}_{guidance_steps}.png")
+                        '''final_image=output.images[0]
+                        final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")
 
     text_grad()

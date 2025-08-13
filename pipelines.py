@@ -368,7 +368,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     ip_adapter_image_embeds,
                     device,
                     batch_size * num_images_per_prompt,
-                    self.do_classifier_free_guidance,
+                    do_classifier_free_guidance,
                 )
             else:
                 image_embeds = self.prepare_ip_adapter_image_embeds(
@@ -376,7 +376,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     ip_adapter_image_embeds,
                     device,
                     batch_size * num_images_per_prompt,
-                    self.do_classifier_free_guidance,
+                    do_classifier_free_guidance,
                 )
             added_cond_kwargs={"image_embeds":image_embeds}
         else:
@@ -390,17 +390,21 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         # NOTE: when a LCM is distilled from an LDM via latent consistency distillation (Algorithm 1) with guided
         # distillation, the forward pass of the LCM learns to approximate sampling from the LDM using CFG with the
         # unconditional prompt "" (the empty string). Due to this, LCMs currently do not support negative prompts.
-        prompt_embeds, _ = self.encode_prompt(
+        # BUT we can try...
+        prompt_embeds, negative_prompt_embeds = self.encode_prompt(
             prompt,
             device,
             num_images_per_prompt,
             self.do_classifier_free_guidance,
-            negative_prompt=None,
+            negative_prompt=" ",
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=None,
             lora_scale=lora_scale,
             clip_skip=self.clip_skip,
         )
+
+        if do_classifier_free_guidance:
+            prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds])
         try:
             # 4. Prepare timesteps
             timesteps, num_inference_steps = retrieve_timesteps(
@@ -451,6 +455,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 #print(f"step {i}/num_inference_steps")
                 latents = latents.to(prompt_embeds.dtype)
 
+                latents = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+
                 if decreasing_scale:
                     self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))
                 elif increasing_scale:
@@ -471,6 +477,10 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     added_cond_kwargs=added_cond_kwargs,
                     return_dict=False,
                 )[0]
+
+                if do_classifier_free_guidance:
+                    noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
+                    noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
                 # compute the previous noisy sample x_t -> x_t-1
                 #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)

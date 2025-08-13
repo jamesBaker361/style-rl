@@ -899,6 +899,7 @@ if __name__=="__main__":
                         generator=torch.Generator(pipeline.unet.device)
                         generator.manual_seed(123)
                         output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                                                                                 task="mse",
                                                         mse_model=mse_model,
                                                         #target=target,
                                                         generator=generator,num_inference_steps=steps,

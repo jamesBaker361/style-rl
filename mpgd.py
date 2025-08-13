@@ -17,7 +17,7 @@ import torch
 from PIL import Image
 import torch.nn as nn
 from transformers import CLIPModel, AutoTokenizer, AutoProcessor
-import torchvision.transforms.functional as F
+import torch.nn.functional as F
 from torchvision.transforms import Normalize, ToTensor, Compose, Resize
 
 
@@ -461,6 +461,14 @@ class TextCLIP(torch.nn.Module):
         return logits_per_text
     
 
+class MSEDiff(torch.nn.Module):
+    def __init__(self, target: torch.Tensor):
+        self.target=target
+
+    def forward(self,img):
+        return F.mse_loss(self.target,img)
+    
+
 
 def ddim_call_with_guidance(
     self:StableDiffusionPipeline,
@@ -489,7 +497,8 @@ def ddim_call_with_guidance(
     callback_on_step_end_tensor_inputs: List[str] = ["latents"],
     style_clip:StyleCLIP=None,
     text_clip:TextCLIP=None,
-    task:str="style", #could also be text
+    mse_model: MSEDiff=None,
+    task:str="style", #could also be text or mse
     stage:str="mid",
     guidance_strength:float=1.0,
     guidance_steps:int=1,
@@ -676,6 +685,8 @@ def ddim_call_with_guidance(
                         task_model=style_clip
                     elif text_clip is not None and task=="text":
                         task_model=text_clip 
+                    elif mse_model is not None and task=="mse":
+                        task_model=mse_model
                     if task_model is not None:
                         with torch.enable_grad():
                             new_denoised=denoised.clone().detach()
@@ -838,6 +849,85 @@ if __name__=="__main__":
                     final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")
 
+    
+    def mse_grad():
+        url_dict={
+            "starry":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+            "anime":"anime.jpg",
+        #  "cubism":"cubism.jpg",
+        #  "ghibli":"ghibli.jpg",
+        # "renn":"rennaissance.jpg"
+        }
+
+        for k,v in url_dict.items():
+            print("trying to load ",k)
+            load_image(v)
+
+        '''target=embedding_model.embed_img_tensor(target_tensor)
+        print('target size',target.size())'''
+
+        
+        for steps in [10]:
+            generator=torch.Generator(pipeline.unet.device)
+            generator.manual_seed(123)
+            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",height=dim,width=dim,
+                                            #target=target,
+                                            generator=generator,num_inference_steps=steps,
+                                            #embedding_model=embedding_mode
+                                            )
+            base_image=output.images[0]
+            base_image.save(f"images/base_{steps}.png")
+            base_denoised_list=concat_images_horizontally(denoised_list)
+            base_denoised_list.save(f"images/base_concat_{steps}.png")
+            for guidance_strength in [-10,10]:
+                
+                for k,v in url_dict.items():
+                    for stage in ["early","mid"]:
+                                  #,"mid","late"]:
+                        target_image=load_image(v)
+                        #target=pip
+                        target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                        target_tensor=pipeline.vae.encode(target_tensor).latent_dist.sample()
+
+                        #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
+                        mse_model=MSEDiff(target_tensor)
+
+                        print(k,stage)
+                        #print("\t",style_clip.target_embedding)
+
+                        
+                        generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+                                                        mse_model=mse_model,
+                                                        #target=target,
+                                                        generator=generator,num_inference_steps=steps,
+                                                        #embedding_model=embedding_model,
+                                                        guidance_strength=guidance_strength,
+                                                        stage=stage)
+                        
+                        print(k,stage,log_probs_list)
+                        
+
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        image=ddim_call_with_guidance(pipeline,"cat",dim,dim,generator=generator,num_inference_steps=steps,
+                                                    guidance_strength=guidance_strength).images[0]'''
+
+                        '''generator=torch.Generator(pipeline.unet.device)
+                        generator.manual_seed(123)
+                        normal_image=pipeline("cat",dim,dim,generator=generator,num_inference_steps=steps).images[0]'''
+                        
+                        '''concat_image=concat_images_horizontally([image,grad_image])
+
+                        concat_image.save(f"concat_{guidance_strength}_{steps}.png")'''
+                        grad_image=output.images[0]
+                        grad_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}_{stage}.png")
+                    '''final_image=output.images[0]
+                    final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
+            print(f"all done {steps} ")
+
+    
     def text_grad():
         prompt_dict={
             "anime":"boy in the style of anime, studi ghibli",
@@ -904,4 +994,5 @@ if __name__=="__main__":
                         final_image.save(f"images/mpgd_{guidance_strength}_{steps}_{k}.png")'''
             print(f"all done {steps} ")
 
-    text_grad()
+    #text_grad()
+    mse_grad()

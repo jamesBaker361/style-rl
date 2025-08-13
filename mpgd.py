@@ -767,8 +767,8 @@ def ddim_call_with_guidance(
     
 
 if __name__=="__main__":
-    ddim = DDIMScheduler.from_config("stable-diffusion-v1-5/stable-diffusion-v1-5", subfolder="scheduler")
-    pipeline=StableDiffusionPipeline.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5",torch_dtype=torch.float16,
+    ddim = DDIMScheduler.from_config("stabilityai/stable-diffusion-2-1", subfolder="scheduler")
+    pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",torch_dtype=torch.float16,
                                                      #force_download=True,
                                                      scheduler=ddim).to("cuda")
     

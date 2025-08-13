@@ -391,7 +391,7 @@ class StyleCLIP(torch.nn.Module):
 
 class TextCLIP(torch.nn.Module):
     def __init__(self, network, device, target=None):
-        super(StyleCLIP, self).__init__()
+        super(TextCLIP, self).__init__()
 
         self.model = CLIPModel.from_pretrained(network)
         

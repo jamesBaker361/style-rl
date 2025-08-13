@@ -448,12 +448,12 @@ class TextCLIP(torch.nn.Module):
 
         image_features = image_features / get_vector_norm(image_features)
 
-        print('self.target_embedding, image_features.t()',self.target_embedding.size(), image_features.t().size())
+        #print('self.target_embedding, image_features.t()',self.target_embedding.size(), image_features.t().size())
 
         logits_per_text = torch.matmul(self.target_embedding, image_features.t())
         logits_per_text = logits_per_text * self.model.logit_scale.exp()
 
-        print('logits_per_text.size()',logits_per_text.size())
+        #print('logits_per_text.size()',logits_per_text.size())
 
         return logits_per_text
     

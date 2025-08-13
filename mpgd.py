@@ -775,7 +775,7 @@ if __name__=="__main__":
         print('target size',target.size())'''
 
         
-        for steps in [10,30,50]:
+        for steps in [10]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",height=dim,width=dim,
@@ -790,7 +790,8 @@ if __name__=="__main__":
             for guidance_strength in [-10,-5,-1,1,5,10]:
                 
                 for k,v in url_dict.items():
-                    for stage in ["early","mid","late"]:
+                    for stage in ["early"]:
+                                  #,"mid","late"]:
                         target_image=load_image(v)
                         #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
 

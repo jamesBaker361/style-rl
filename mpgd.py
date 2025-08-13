@@ -439,6 +439,9 @@ class TextCLIP(torch.nn.Module):
         return gram
 
     def to_tensor(self, img):
+        img = (img + 1) * 0.5
+        img = torch.clamp(img, 0, 1)
+        #try denormalizing????
         img = img.resize((224, 224), Image.Resampling.BILINEAR)
         return self.transforms(ToTensor()(img)).unsqueeze(0)
 

@@ -451,7 +451,7 @@ class TextCLIP(torch.nn.Module):
 
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
 
-        similarity = (self.target_embedding @ image_features.T).item()
+        similarity = torch.nn.functional.cosine_similarity(image_features,self.target_embedding)
 
         return similarity
     

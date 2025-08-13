@@ -376,10 +376,6 @@ class StyleCLIP(torch.nn.Module):
         gram = torch.bmm(feats.transpose(1, 2), feats)
         return gram
 
-    def to_tensor(self, img):
-        img = img.resize((224, 224), Image.Resampling.BILINEAR)
-        return self.transforms(ToTensor()(img)).unsqueeze(0)
-
     def forward(self, x):
 
         embed = self.get_gram_matrix(x)
@@ -428,26 +424,13 @@ class TextCLIP(torch.nn.Module):
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         return text_features
 
-    def get_gram_matrix(self, img:torch.Tensor):
-        img = img.to(self.device)
-        img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
-        #img = self.transforms(img)
-        # following mpgd
-        feats = self.model.vision_model(img, output_hidden_states=True, return_dict=True).hidden_states[2]        
-        feats = feats[:, 1:, :]  # [bsz, seq_len, h_dim]
-        gram = torch.bmm(feats.transpose(1, 2), feats)
-        return gram
 
-    def to_tensor(self, img):
-        img = (img + 1) * 0.5
-        img = torch.clamp(img, 0, 1)
-        #try denormalizing????
-        img = img.resize((224, 224), Image.Resampling.BILINEAR)
-        return self.transforms(ToTensor()(img)).unsqueeze(0)
 
     def forward(self, img):
 
         img = img.to(self.device)
+        img = (img + 1) * 0.5
+        img = torch.clamp(img, 0, 1)
         img = torch.nn.functional.interpolate(img, size=self.image_size, mode='bicubic')
 
         image_features = self.model.get_image_features(pixel_values=img)

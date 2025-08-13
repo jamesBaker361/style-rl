@@ -457,6 +457,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
 
                 latents = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
+                print(t)
                 t = torch.cat([t]*2) if do_classifier_free_guidance else t
 
                 if decreasing_scale:

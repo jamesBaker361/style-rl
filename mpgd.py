@@ -687,7 +687,8 @@ def ddim_call_with_guidance(
                         
                         usage=get_gpu_memory_usage()
                         torch.cuda.empty_cache()
-                        print(usage["allocated_mb"])
+
+
 
                     #new_denoised=self.vae.encode(decoded+diff_gradient.detach()).latent_dist.sample()
 
@@ -834,10 +835,11 @@ if __name__=="__main__":
         prompt_dict={
             "anime-singleton":"anime",
             "anime-medium":"anime, studio ghibli, cartoon, beautiful",
-            "anime-descriptive":"anime  boy walking through the park, studio ghibli, cartoon, beautiful"
+            "anime-descriptive":"anime  boy walking through the park, studio ghibli, cartoon, beautiful",
+            "picasso":"picasso"
         }
 
-        for steps in [10,30,50]:
+        for steps in [50]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,

@@ -467,7 +467,7 @@ class MSEDiff(torch.nn.Module):
         self.target=target
 
     def forward(self,img):
-        return F.mse_loss(self.target,img)
+        return 100* F.mse_loss(self.target,img)
     
 
 
@@ -768,7 +768,7 @@ def ddim_call_with_guidance(
 
 if __name__=="__main__":
     ddim = DDIMScheduler.from_config("stabilityai/stable-diffusion-2-1", subfolder="scheduler")
-    pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",torch_dtype=torch.float16,
+    pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",torch_dtype=torch.float32,
                                                      #force_download=True,
                                                      scheduler=ddim).to("cuda")
     
@@ -814,7 +814,7 @@ if __name__=="__main__":
                     for stage in ["early"]:
                                   #,"mid","late"]:
                         target_image=load_image(v)
-                        #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                        #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float32,)
 
                         #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                         style_clip=StyleCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,target_image)
@@ -884,14 +884,14 @@ if __name__=="__main__":
             base_image.save(f"images/base_{steps}.png")
             base_denoised_list=concat_images_horizontally(denoised_list)
             base_denoised_list.save(f"images/base_concat_{steps}.png")
-            for guidance_strength in [0]:
+            for guidance_strength in [-1,1]:
                 
                 for k,v in url_dict.items():
                     for stage in ["early","mid"]:
                                   #,"mid","late"]:
                         target_image=load_image(v).resize((dim,dim))
                         #target=pip
-                        target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                        target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float32,)
                         #target_tensor=pipeline.vae.encode(target_tensor).latent_dist.sample()
 
                         #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
@@ -958,7 +958,7 @@ if __name__=="__main__":
                 
                     for k,v in prompt_dict.items():
                         for stage in ["mid"]: #,"mid","late"]:
-                            #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float16,)
+                            #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float32,)
 
                             #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                             text_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)

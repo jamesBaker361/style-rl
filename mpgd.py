@@ -776,7 +776,7 @@ if __name__=="__main__":
         for steps in [10,30,50]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
-            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
+            output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",height=dim,width=dim,
                                             #target=target,
                                             generator=generator,num_inference_steps=steps,
                                             #embedding_model=embedding_mode
@@ -802,7 +802,6 @@ if __name__=="__main__":
                         generator=torch.Generator(pipeline.unet.device)
                         generator.manual_seed(123)
                         output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
-                                                                                                 num_inference_steps=steps,
                                                         style_clip=style_clip,
                                                         #target=target,
                                                         generator=generator,num_inference_steps=steps,

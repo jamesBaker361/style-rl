@@ -463,6 +463,7 @@ class TextCLIP(torch.nn.Module):
 
 class MSEDiff(torch.nn.Module):
     def __init__(self, target: torch.Tensor):
+        super(MSEDiff, self).__init__()
         self.target=target
 
     def forward(self,img):

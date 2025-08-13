@@ -696,11 +696,11 @@ def ddim_call_with_guidance(
                             
                             log_probs=task_model(decoded)
 
-                            log_probs_list.append(log_probs.sum())
+                            log_probs_list.append(log_probs.mean())
 
-                            diff_gradient=torch.autograd.grad(outputs=log_probs.sum(),inputs=new_denoised)[0]
+                            diff_gradient=torch.autograd.grad(outputs=log_probs.mean(),inputs=new_denoised)[0]
 
-                            diff_gradient=rescale_grad(diff_gradient,1.0)
+                            #diff_gradient=rescale_grad(diff_gradient,1.0)
                             
                             diff_gradient=guidance_strength*diff_gradient
                             

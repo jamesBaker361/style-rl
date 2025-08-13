@@ -834,9 +834,9 @@ if __name__=="__main__":
     def text_grad():
         prompt_dict={
             "anime-singleton":"anime",
-            "anime-medium":"anime, studio ghibli, cartoon, beautiful",
-            "anime-descriptive":"anime  boy walking through the park, studio ghibli, cartoon, beautiful",
-            "picasso":"picasso"
+            "picasso":"picasso",
+            "cubism":"cubism",
+            "renn":"rennaissance painting"
         }
 
         for steps in [50]:

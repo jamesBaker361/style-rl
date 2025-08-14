@@ -439,7 +439,6 @@ class TextCLIP(torch.nn.Module):
 
     def forward(self, img):
 
-        print('max min',img.max(),img.min())
 
         img = img.to(self.device)
         img = (img + 1) * 0.5

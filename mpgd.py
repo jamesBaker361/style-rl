@@ -258,7 +258,7 @@ def call_with_grad_and_guidance(
                     torch.cuda.empty_cache()
                     print(usage["allocated_mb"])
 
-                new_denoised=decoded+diff_gradient.detach()
+                new_denoised=latents+diff_gradient.detach()
 
                 new_latents=self.scheduler.add_noise(new_denoised,model_pred,t)
                 latents, denoised = self.scheduler.step(model_pred, t, new_latents, **extra_step_kwargs, return_dict=False)

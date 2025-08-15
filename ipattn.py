@@ -310,7 +310,7 @@ for layer_index in range(len(attn_list)):
     if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
         processor_kv=module.processor.kv
         vertical_image_list=[]
-        for token in range(8):
+        for token in range(10):
             horiz_image_list=[]
             for step in range(num_inference_steps):
                 size=processor_kv[step].size()

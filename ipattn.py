@@ -301,7 +301,9 @@ for name,module in attn_list:
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8
-gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen)
+gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+
+from PIL import Image, ImageOps
 
 for layer_index in range(len(attn_list)):
     [name,module]=attn_list[layer_index]
@@ -316,8 +318,15 @@ for layer_index in range(len(attn_list)):
                 avg=processor_kv[step].mean(dim=1).squeeze(0)
                 avg=avg.view([dim,dim,-1])
                 avg=avg[:,:,token]
-                img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                horiz_image_list.append(img)
+                avg=F.interpolate(avg, size=(256, 256), mode="nearest")
+                bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                mask = ImageOps.invert(bw_img)
+                color_rgba = gen_image.convert("RGBA")
+                mask = mask.convert("L")  # must be single channel for alpha
+
+                # Apply as alpha (translucent mask)
+                color_rgba.putalpha(mask)
+                horiz_image_list.append(color_rgba)
             horiz_image=concat_images_horizontally(horiz_image_list)
             vertical_image_list.append(horiz_image)
         vertical_image=concat_images_vertically(vertical_image_list)

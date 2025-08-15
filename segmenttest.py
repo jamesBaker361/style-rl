@@ -1,7 +1,8 @@
 import requests
+import random
 
 import torch
-from PIL import Image
+from PIL import Image,ImageDraw
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
 
 model_id = "IDEA-Research/grounding-dino-tiny"
@@ -27,7 +28,37 @@ results = processor.post_process_grounded_object_detection(
     target_sizes=[image.size[::-1]]
 )
 
+def white_copy_with_rectangles(image: Image.Image, box_list, rect_color_list):
+    """
+    Make a white copy of an image with rectangles drawn at given coordinates.
+
+    Args:
+        image (PIL.Image): The input image.
+        boxes (list of tuples): Each tuple is (x1, y1, x2, y2) for rectangle corners.
+        rect_color (str or tuple): Color for rectangles (default "black").
+
+    Returns:
+        PIL.Image: The new image.
+    """
+    # Create a white copy
+    new_img = Image.new("RGB", image.size, "white")
+    draw = ImageDraw.Draw(new_img)
+
+    # Draw rectangles
+    for (x1, y1, x2, y2),rect_color in zip(box_list,rect_color_list):
+        draw.rectangle([x1, y1, x2, y2], outline=rect_color, fill=rect_color)
+
+    return new_img
+
 result = results[0]
-for box, score, labels in zip(result["boxes"], result["scores"], result["labels"]):
-    box = [round(x, 2) for x in box.tolist()]
+box_list=[]
+rect_color_list=[]
+for k,(box, score, labels) in enumerate(zip(result["boxes"], result["scores"], result["labels"])):
+    box = [round(x, 2) for x in box.tolist()] #(top_left_x, top_left_y, bottom_right_x, bottom_right_y)
     print(f"Detected {labels} with confidence {round(score.item(), 3)} at location {box}")
+    box_list.append(box)
+    rect_color_list.append(["red","blue","green","purple","orange"][k%4])
+
+white_copy=white_copy_with_rectangles(image,box_list,rect_color_list)
+new_img=Image.blend(image,white_copy, 0.5)
+new_img.save("segmented.png")

@@ -310,7 +310,7 @@ for layer_index in range(len(attn_list)):
         vertical_image_list=[]
         for token in range(8):
             horiz_image_list=[]
-            for step in [2,4,6]:
+            for step in range(num_inference_steps):
                 size=processor_kv[step].size()
                 dim=int(math.sqrt(size[2]))
                 avg=processor_kv[step].mean(dim=1).squeeze(0)

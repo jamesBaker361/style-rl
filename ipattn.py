@@ -59,9 +59,48 @@ from typing import Callable, List, Optional, Tuple, Union
 import torch
 import torch.nn.functional as F
 from main_pers import concat_images_horizontally,concat_images_vertically
+from PIL import Image, ImageDraw, ImageFont
 
 big_global_dict={}
 big_global_ip_dict={}
+
+def add_padding_with_text(img: Image.Image, text: str, pad_width: int = 100, font_path=None, font_size=24):
+    """
+    Add white padding to the left of an image and draw text in that space.
+
+    Args:
+        img (PIL.Image): Input image.
+        text (str): Text to write in the padding area.
+        pad_width (int): Width of the white padding to add on the left.
+        font_path (str): Optional path to a .ttf font file.
+        font_size (int): Font size for the text.
+    """
+    w, h = img.size
+    
+    # Create new white canvas with extra width
+    new_img = Image.new("RGB", (w + pad_width, h), "white")
+
+    # Paste original image on the right
+    new_img.paste(img, (pad_width, 0))
+
+    # Prepare to draw
+    draw = ImageDraw.Draw(new_img)
+    
+    # Load font (default to PIL built-in if no path given)
+    if font_path:
+        font = ImageFont.truetype(font_path, font_size)
+    else:
+        font = ImageFont.load_default()
+
+    # Compute vertical center
+    text_w, text_h = draw.textsize(text, font=font)
+    text_x = (pad_width - text_w) // 2
+    text_y = (h - text_h) // 2
+
+    # Draw text in black
+    draw.text((text_x, text_y), text, fill="black", font=font)
+
+    return new_img
 
 class MonkeyIPAttnProcessor(torch.nn.Module):
     def __init__(self,processor:IPAdapterAttnProcessor2_0,dict_name:str, *args, **kwargs) -> None:
@@ -301,9 +340,19 @@ dim=512
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8
-gen_image=pipe("man in paris",height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+prompt="man in eating ice cream"
+gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
 from PIL import Image, ImageOps
+
+text_inputs = pipe.tokenizer(
+                prompt,
+                padding="max_length",
+                max_length=pipe.tokenizer.model_max_length,
+                truncation=True,
+                return_tensors="pt",
+            )
+text_input_ids = text_inputs.input_ids[0]
 
 for layer_index in range(len(attn_list)):
     [name,module]=attn_list[layer_index]
@@ -311,6 +360,8 @@ for layer_index in range(len(attn_list)):
         processor_kv=module.processor.kv
         vertical_image_list=[]
         for token in range(10):
+            token_id=text_input_ids[token]
+            decoded=pipe.tokenizer.decode(token_id)
             horiz_image_list=[]
             for step in range(num_inference_steps):
                 size=processor_kv[step].size()
@@ -333,6 +384,7 @@ for layer_index in range(len(attn_list)):
                 new_img=Image.blend(color_rgba, mask, 0.5)
                 horiz_image_list.append(new_img)
             horiz_image=concat_images_horizontally(horiz_image_list)
+            horiz_image=add_padding_with_text(horiz_image, decoded)
             vertical_image_list.append(horiz_image)
         vertical_image=concat_images_vertically(vertical_image_list)
         vertical_image.save(f"ip_images/layer_{layer_index}.png")

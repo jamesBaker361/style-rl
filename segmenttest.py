@@ -11,10 +11,10 @@ device = "cuda"
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 
-image_url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+image_url = "https://www.maids.com/wp-content/uploads/2022/12/bigstock-Handsome-Young-Man-Cleaning-Wi-276105073.jpg"
 image = Image.open(requests.get(image_url, stream=True).raw)
 # Check for cats and remote controls
-text_labels = [["a cat", "a remote control"]]
+text_labels = [["head", "arm", "torso","leg","arm","neck"]]
 
 inputs = processor(images=image, text=text_labels, return_tensors="pt").to(device)
 with torch.no_grad():

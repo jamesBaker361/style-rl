@@ -324,8 +324,8 @@ for layer_index in range(len(attn_list)):
                 avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(256, 256), mode="nearest").squeeze(0).squeeze(0)
                 bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
                 mask = ImageOps.invert(bw_img)
-                color_rgba = gen_image.convert("RGBA")
-                mask = mask.convert("L")  # must be single channel for alpha
+                color_rgba = gen_image.convert("RGB")
+                mask = mask.convert("RGB")  # must be single channel for alpha
 
                 # Apply as alpha (translucent mask)
                 new_img=Image.blend(color_rgba, mask, 0.5)

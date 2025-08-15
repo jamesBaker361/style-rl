@@ -328,7 +328,8 @@ for layer_index in range(len(attn_list)):
                 mask = mask.convert("L")  # must be single channel for alpha
 
                 # Apply as alpha (translucent mask)
-                Image.blend(color_rgba, mask, 0.5)
+                new_img=Image.blend(color_rgba, mask, 0.5)
+                horiz_image_list.append(new_img)
             horiz_image=concat_images_horizontally(horiz_image_list)
             vertical_image_list.append(horiz_image)
         vertical_image=concat_images_vertically(vertical_image_list)

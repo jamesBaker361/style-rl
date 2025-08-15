@@ -27,7 +27,7 @@ pipe.set_ip_adapter_scale(0)
 
 '''gen=torch.Generator()
 gen.manual_seed(123)
-gen_image=pipe("cat",height=256,width=256,num_inference_steps=4,ip_adapter_image=ip_adapter_image,generator=gen)
+gen_image=pipe("cat",height=dim,width=dim,num_inference_steps=4,ip_adapter_image=ip_adapter_image,generator=gen)
 
 gen_image.images[0]
 
@@ -296,12 +296,12 @@ attn_list=get_modules_of_types(pipe.unet,Attention)
 for name,module in attn_list:
     if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
         setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
-
+dim=512
 
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8
-gen_image=pipe("cat and dog and bird",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+gen_image=pipe("cat and dog and bird",height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
 from PIL import Image, ImageOps
 
@@ -321,7 +321,7 @@ for layer_index in range(len(attn_list)):
                 avg_min,avg_max=avg.min(),avg.max()
                 x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
                 avg = (x_norm * 255).byte()
-                avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(256, 256), mode="nearest").squeeze(0).squeeze(0)
+                avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
                 bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
                 mask = ImageOps.invert(bw_img)
                 color_rgba = gen_image.convert("RGB")

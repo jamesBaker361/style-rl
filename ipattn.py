@@ -327,7 +327,7 @@ for layer_index in range(len(attn_list)):
                 color_rgba = gen_image.convert("RGB")
                 mask = mask.convert("RGB")  # must be single channel for alpha
 
-                print(mask.shape,color_rgba.shape)
+                print(mask.size,color_rgba.size)
 
                 # Apply as alpha (translucent mask)
                 new_img=Image.blend(color_rgba, mask, 0.5)

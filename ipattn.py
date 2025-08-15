@@ -318,7 +318,7 @@ for layer_index in range(len(attn_list)):
                 avg=processor_kv[step].mean(dim=1).squeeze(0)
                 avg=avg.view([dim,dim,-1])
                 avg=avg[:,:,token]
-                avg=F.interpolate(avg, size=(256, 256), mode="nearest")
+                avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(256, 256), mode="nearest").squeeze(0).squeeze(0)
                 bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
                 mask = ImageOps.invert(bw_img)
                 color_rgba = gen_image.convert("RGBA")

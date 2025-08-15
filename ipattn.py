@@ -301,7 +301,7 @@ dim=512
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8
-gen_image=pipe("cat and dog and bird",height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+gen_image=pipe("man in paris",height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
 from PIL import Image, ImageOps
 

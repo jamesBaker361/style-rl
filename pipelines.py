@@ -484,8 +484,8 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 )[0]
 
                 if do_classifier_free_guidance:
-                    noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                    noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
+                    model_pred_uncond, model_pred_text = model_pred.chunk(2)
+                    model_pred = model_pred_uncond + guidance_scale * (model_pred_text - model_pred_uncond)
                 # compute the previous noisy sample x_t -> x_t-1
                 #print('model_pred.device',model_pred.device,'t device',t.device,'latents',latents.device)
                 t=t.to(model_pred.device)

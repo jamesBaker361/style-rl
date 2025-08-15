@@ -303,7 +303,7 @@ gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num
 
 for layer_index in range(len(attn_list)):
     [name,module]=attn_list[layer_index]
-    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
         processor_kv=module.processor.kv_list
         image_list=[]
         for token in range(10):

@@ -15,7 +15,7 @@ model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 image_url="https://cdn.britannica.com/68/145968-050-01768DAD/Vitruvian-Man-Leonardo-da-Vinci-Gallerie-dellAccademia.jpg"
 image = Image.open(requests.get(image_url, stream=True).raw)
 # Check for cats and remote controls
-text_labels = [["head", "arm", "torso","leg","arm","neck"]]
+text_labels = [["head", "arm", "torso","leg","neck","foot"]]
 
 inputs = processor(images=image, text=text_labels, return_tensors="pt").to(device)
 with torch.no_grad():

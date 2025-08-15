@@ -334,6 +334,8 @@ for name,module in attn_list:
         setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
 dim=512
 
+setattr(pipe,"safety_checker",None)
+
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8

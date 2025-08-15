@@ -95,7 +95,7 @@ def add_padding_with_text(img: Image.Image, text: str, pad_width: int = 100, fon
     
 
     # Draw text in black
-    draw.text((h//2, h//2), text, fill="black", font=font)
+    draw.text((h//2, h//2), text, fill="black", font_size=font_size)
 
     return new_img
 

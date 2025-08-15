@@ -79,7 +79,7 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
         scale: float = 1.0,
         ip_adapter_masks: Optional[torch.Tensor] = None,
     ):
-        print("h")
+        #print("h")
         residual = hidden_states
 
         # separate ip_hidden_states from encoder_hidden_states
@@ -159,7 +159,7 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
         self.kv.append(attn_weight)
 
         hidden_states = hidden_states.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
-        print("\t hidden states shape after transpose",hidden_states.size())
+        #print("\t hidden states shape after transpose",hidden_states.size())
         hidden_states = hidden_states.to(query.dtype)
 
         if ip_adapter_masks is not None:
@@ -302,12 +302,13 @@ num_inference_steps=8
 gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen)
 
 for layer_index in range(len(attn_list)):
-    [name,module]=attn_list[0]
-    processor_kv=module.processor.kv_list
-    image_list=[]
-    for token in range(10):
-        for step in range(num_inference_steps):
-            print(processor_kv[step].size())
+    [name,module]=attn_list[layer_index]
+    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+        processor_kv=module.processor.kv_list
+        image_list=[]
+        for token in range(10):
+            for step in range(num_inference_steps):
+                print(processor_kv[step].size())
 
 
 

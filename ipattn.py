@@ -11,6 +11,7 @@ import torch
 from diffusers import StableDiffusionPipeline, AutoencoderKL
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import matplotlib.pyplot as plt
+from PIL import Image
 
 from diffusers.utils.loading_utils import load_image
 ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")
@@ -57,6 +58,7 @@ from typing import Callable, List, Optional, Tuple, Union
 
 import torch
 import torch.nn.functional as F
+from main_pers import concat_images_horizontally,concat_images_vertically
 
 big_global_dict={}
 big_global_ip_dict={}
@@ -304,29 +306,19 @@ gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num
 for layer_index in range(len(attn_list)):
     [name,module]=attn_list[layer_index]
     if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-        processor_kv=module.processor.kv_list
-        image_list=[]
-        for token in range(10):
-            for step in range(num_inference_steps):
-                print(processor_kv[step].size())
-
-
-
-'''gen_image.images[0]
-
-[(k,len(v)) for k,v in big_global_dict.items()]
-
-big_global_dict['down_blocks.0.attentions.0.transformer_blocks.0.attn2'][-1].size()
-
-avg=big_global_dict['down_blocks.0.attentions.0.transformer_blocks.0.attn2'][-1].mean(dim=1)
-
-avg.size()
-
-avg.view(1,32,32,77).size()
-
-avg.view(1,32,32,77).squeeze(0)[:,:,0]
-
-plt.imshow(avg.view(1,32,32,77).squeeze(0)[:,:,0].cpu().numpy(), cmap="gray")
-plt.colorbar()
-plt.show()'''
-
+        processor_kv=module.processor.kv
+        vertical_image_list=[]
+        for token in range(8):
+            horiz_image_list=[]
+            for step in [2,4,6]:
+                size=processor_kv[step].size()
+                dim=int(math.sqrt(size[2]))
+                avg=processor_kv[step].mean(dim=1).squeeze(0)
+                avg=avg.view([dim,dim,-1])
+                avg=avg[:,:,token]
+                img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                horiz_image_list.append(img)
+            horiz_image=concat_images_horizontally(horiz_image_list)
+            vertical_image_list.append(horiz_image)
+        vertical_image=concat_images_vertically(vertical_image_list)
+        vertical_image.save(f"ip_images/layer_{layer_index}.png")

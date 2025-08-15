@@ -76,6 +76,41 @@ def concat_images_horizontally(images):
 
     return new_img
 
+def concat_images_vertically(images):
+    """
+    Concatenate a list of PIL.Image objects vertically.
+
+    Args:
+        images (List[PIL.Image]): List of PIL images.
+
+    Returns:
+        PIL.Image: A new image composed of the input images stacked top-to-bottom.
+    """
+    # Resize all images to the same width (optional)
+    widths = [img.width for img in images]
+    min_width = min(widths)
+    resized_images = [
+        img if img.width == min_width else img.resize(
+            (min_width, int(img.height * min_width / img.width)),
+            Image.LANCZOS
+        ) for img in images
+    ]
+
+    # Compute total height and width
+    total_height = sum(img.height for img in resized_images)
+    width = min_width
+
+    # Create new blank image
+    new_img = Image.new('RGB', (width, total_height))
+
+    # Paste images one below another
+    y_offset = 0
+    for img in resized_images:
+        new_img.paste(img, (0, y_offset))
+        y_offset += img.height
+
+    return new_img
+
 
 seed=1234
 random.seed(seed)                      # Python

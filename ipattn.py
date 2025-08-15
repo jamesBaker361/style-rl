@@ -92,13 +92,10 @@ def add_padding_with_text(img: Image.Image, text: str, pad_width: int = 100, fon
     else:
         font = ImageFont.load_default()
 
-    # Compute vertical center
-    text_w, text_h = draw.textbbox(text, font=font)
-    text_x = (pad_width - text_w) // 2
-    text_y = (h - text_h) // 2
+    
 
     # Draw text in black
-    draw.text((text_x, text_y), text, fill="black", font=font)
+    draw.text((h//2, h//2), text, fill="black", font=font)
 
     return new_img
 

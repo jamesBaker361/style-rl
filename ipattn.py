@@ -301,7 +301,7 @@ for name,module in attn_list:
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=8
-gen_image=pipe("cat, eating burger",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+gen_image=pipe("cat and dog and bird",height=256,width=256,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
 from PIL import Image, ImageOps
 

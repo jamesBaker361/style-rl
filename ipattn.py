@@ -12,8 +12,7 @@ from diffusers import StableDiffusionPipeline, AutoencoderKL
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import matplotlib.pyplot as plt
 from PIL import Image
-
-from PIL import Image
+import gc
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
 
@@ -130,8 +129,10 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
         self.kv_ip=[]
 
     def reset(self):
-        self.kv=[]
-        self.kv_ip=[]
+        self.kv.clear()
+        self.kv_ip.clear()
+        gc.collect()
+        torch.cuda.empty_cache()
 
     def __call__(self,
         attn: Attention,

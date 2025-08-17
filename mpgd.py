@@ -781,6 +781,8 @@ def ddim_call_with_guidance(
     
 
 if __name__=="__main__":
+    import os
+    os.makedirs("images",exist_ok=True)
     ddim = DDIMScheduler.from_config("stabilityai/stable-diffusion-2-1", subfolder="scheduler")
     pipeline=StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1",torch_dtype=torch.float32,
                                                      #force_download=True,

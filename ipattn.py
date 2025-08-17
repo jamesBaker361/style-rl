@@ -344,7 +344,6 @@ setattr(pipe,"safety_checker",None)
 gen=torch.Generator()
 gen.manual_seed(123)
 num_inference_steps=4
-prompt="eating ice cream"
 for n,ip_adapter_image in enumerate([
     load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg"),
     load_image("https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg"),
@@ -356,80 +355,82 @@ for n,ip_adapter_image in enumerate([
     load_image("elf.jpg"),
     load_image("ghibli.jpg")
 ]):
-    gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+    for m,prompt in enumerate(["eating ice cream","in paris","in the style of cubism","on a walk"]):
 
-    from PIL import Image, ImageOps
+        gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
-    text_inputs = pipe.tokenizer(
-                    prompt,
-                    padding="max_length",
-                    max_length=pipe.tokenizer.model_max_length,
-                    truncation=True,
-                    return_tensors="pt",
-                )
-    text_input_ids = text_inputs.input_ids[0]
+        from PIL import Image, ImageOps
 
-    for layer_index in [15]:
-        [name,module]=attn_list[layer_index]
-        if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-            processor_kv=module.processor.kv
-            vertical_image_list=[]
-            for token in range(6):
-                token_id=text_input_ids[token]
-                decoded=pipe.tokenizer.decode(token_id)
-                horiz_image_list=[]
-                for step in range(num_inference_steps):
-                    size=processor_kv[step].size()
-                    latent_dim=int(math.sqrt(size[2]))
-                    avg=processor_kv[step].mean(dim=1).squeeze(0)
-                    avg=avg.view([latent_dim,latent_dim,-1])
-                    avg=avg[:,:,token]
-                    avg_min,avg_max=avg.min(),avg.max()
-                    x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
-                    avg = (x_norm * 255).byte()
-                    avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
-                    bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                    mask = ImageOps.invert(bw_img)
-                    color_rgba = gen_image.convert("RGB")
-                    mask = mask.convert("RGB")  # must be single channel for alpha
+        text_inputs = pipe.tokenizer(
+                        prompt,
+                        padding="max_length",
+                        max_length=pipe.tokenizer.model_max_length,
+                        truncation=True,
+                        return_tensors="pt",
+                    )
+        text_input_ids = text_inputs.input_ids[0]
 
-                    #print(mask.size,color_rgba.size)
+        for layer_index in [15]:
+            [name,module]=attn_list[layer_index]
+            if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
+                processor_kv=module.processor.kv
+                vertical_image_list=[]
+                for token in range(6):
+                    token_id=text_input_ids[token]
+                    decoded=pipe.tokenizer.decode(token_id)
+                    horiz_image_list=[]
+                    for step in range(num_inference_steps):
+                        size=processor_kv[step].size()
+                        latent_dim=int(math.sqrt(size[2]))
+                        avg=processor_kv[step].mean(dim=1).squeeze(0)
+                        avg=avg.view([latent_dim,latent_dim,-1])
+                        avg=avg[:,:,token]
+                        avg_min,avg_max=avg.min(),avg.max()
+                        x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
+                        avg = (x_norm * 255).byte()
+                        avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
+                        bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                        mask = ImageOps.invert(bw_img)
+                        color_rgba = gen_image.convert("RGB")
+                        mask = mask.convert("RGB")  # must be single channel for alpha
 
-                    # Apply as alpha (translucent mask)
-                    new_img=Image.blend(color_rgba, mask, 0.5)
-                    horiz_image_list.append(new_img)
-                horiz_image=concat_images_horizontally(horiz_image_list)
-                horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
-                vertical_image_list.append(horiz_image)
-            processor_kv=module.processor.kv_ip
-            for token in range(4):
-                token_id=text_input_ids[token]
-                decoded=f"ip_{token}"
-                horiz_image_list=[]
-                for step in range(num_inference_steps):
-                    size=processor_kv[step].size()
-                    latent_dim=int(math.sqrt(size[2]))
-                    avg=processor_kv[step].mean(dim=1).squeeze(0)
-                    avg=avg.view([latent_dim,latent_dim,-1])
-                    avg=avg[:,:,token]
-                    avg_min,avg_max=avg.min(),avg.max()
-                    x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
-                    avg = (x_norm * 255).byte()
-                    avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
-                    bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                    mask = ImageOps.invert(bw_img)
-                    color_rgba = gen_image.convert("RGB")
-                    mask = mask.convert("RGB")  # must be single channel for alpha
+                        #print(mask.size,color_rgba.size)
 
-                    print(mask.size,color_rgba.size)
+                        # Apply as alpha (translucent mask)
+                        new_img=Image.blend(color_rgba, mask, 0.5)
+                        horiz_image_list.append(new_img)
+                    horiz_image=concat_images_horizontally(horiz_image_list)
+                    horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
+                    vertical_image_list.append(horiz_image)
+                processor_kv=module.processor.kv_ip
+                for token in range(4):
+                    token_id=text_input_ids[token]
+                    decoded=f"ip_{token}"
+                    horiz_image_list=[]
+                    for step in range(num_inference_steps):
+                        size=processor_kv[step].size()
+                        latent_dim=int(math.sqrt(size[2]))
+                        avg=processor_kv[step].mean(dim=1).squeeze(0)
+                        avg=avg.view([latent_dim,latent_dim,-1])
+                        avg=avg[:,:,token]
+                        avg_min,avg_max=avg.min(),avg.max()
+                        x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
+                        avg = (x_norm * 255).byte()
+                        avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
+                        bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                        mask = ImageOps.invert(bw_img)
+                        color_rgba = gen_image.convert("RGB")
+                        mask = mask.convert("RGB")  # must be single channel for alpha
 
-                    # Apply as alpha (translucent mask)
-                    new_img=Image.blend(color_rgba, mask, 0.5)
-                    horiz_image_list.append(new_img)
-                horiz_image=concat_images_horizontally(horiz_image_list)
-                horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
-                vertical_image_list.append(horiz_image)
-            vertical_image=concat_images_vertically(vertical_image_list)
-            vertical_image.save(f"ip_images/{n}_layer_{layer_index}.png")
+                        print(mask.size,color_rgba.size)
 
-    print("all done!")
+                        # Apply as alpha (translucent mask)
+                        new_img=Image.blend(color_rgba, mask, 0.5)
+                        horiz_image_list.append(new_img)
+                    horiz_image=concat_images_horizontally(horiz_image_list)
+                    horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
+                    vertical_image_list.append(horiz_image)
+                vertical_image=concat_images_vertically(vertical_image_list)
+                vertical_image.save(f"ip_images/{m}_{n}_layer_{layer_index}.png")
+
+print("all done!")

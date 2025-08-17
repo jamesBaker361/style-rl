@@ -13,6 +13,23 @@ from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import matplotlib.pyplot as plt
 from PIL import Image
 
+from PIL import Image
+from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
+from custom_sam_detector import CustomSamDetector
+
+import os
+import warnings
+from typing import Union
+
+import cv2
+import numpy as np
+import torch
+from huggingface_hub import hf_hub_download
+from PIL import Image
+
+# Load human segmentation preprocessor
+sam =  SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
+
 from diffusers.utils.loading_utils import load_image
 ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")
 
@@ -64,8 +81,18 @@ import os
 
 os.makedirs("ip_images",exist_ok=True)
 
+sam =  SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
+
 big_global_dict={}
 big_global_ip_dict={}
+
+def add_margin(pil_img, top, right, bottom, left, color):
+    width, height = pil_img.size
+    new_width = width + right + left
+    new_height = height + top + bottom
+    result = Image.new(pil_img.mode, (new_width, new_height), color)
+    result.paste(pil_img, (left, top))
+    return result
 
 def add_padding_with_text(img: Image.Image, text: str, pad_width: int = 100, font_path=None, font_size=24):
     """
@@ -359,6 +386,10 @@ for n,ip_adapter_image in enumerate([
 
         gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
+        segmented=sam(gen_image,dim,dim)
+
+        left=concat_images_vertically([ip_adapter_image,gen_image,segmented])
+
         from PIL import Image, ImageOps
 
         text_inputs = pipe.tokenizer(
@@ -431,6 +462,10 @@ for n,ip_adapter_image in enumerate([
                     horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
                     vertical_image_list.append(horiz_image)
                 vertical_image=concat_images_vertically(vertical_image_list)
+                vertical_height=vertical_image.size[0]
+                left_height=left.size[0]
+                new_left=add_margin(left,0,0,vertical_height-left_height,0)
+                vertical_image=concat_images_horizontally([new_left,vertical_image])
                 vertical_image.save(f"ip_images/{m}_{n}_layer_{layer_index}.png")
 
 print("all done!")

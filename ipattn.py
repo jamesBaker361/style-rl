@@ -343,6 +343,17 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
         hidden_states = hidden_states / attn.rescale_output_factor
 
         return hidden_states
+    
+
+def get_modules_of_types(model, target_classes):
+        return [(name, module) for name, module in model.named_modules()
+                if isinstance(module, target_classes)]
+
+def reset_monkey(pipe):
+    attn_list=get_modules_of_types(pipe.unet,Attention)
+    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+        module.processor.kv=[]
+        module.processor.kv_ip=[]
 
 if __name__ =="__main__":
     ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")
@@ -356,9 +367,7 @@ if __name__ =="__main__":
     pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     pipe.set_ip_adapter_scale(0.5)
 
-    def get_modules_of_types(model, target_classes):
-        return [(name, module) for name, module in model.named_modules()
-                if isinstance(module, target_classes)]
+    
 
     attn_list=get_modules_of_types(pipe.unet,Attention)
 
@@ -388,7 +397,7 @@ if __name__ =="__main__":
         load_image("ghibli.jpg")
     ]):
         for m,prompt in enumerate(["eating ice cream","in paris","in the style of cubism","on a walk"]):
-
+            reset_monkey(pipe)
             gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
             segmented=sam(gen_image,dim,dim)

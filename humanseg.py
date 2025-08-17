@@ -20,7 +20,7 @@ custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfo
 # Load image
 image = Image.open("lebrun.jpg")
 
-shape=image.shape
+shape=image.size
 
 masks=custom_sam.get_masks(image)
 for ann in masks:

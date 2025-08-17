@@ -60,6 +60,9 @@ import torch
 import torch.nn.functional as F
 from main_pers import concat_images_horizontally,concat_images_vertically
 from PIL import Image, ImageDraw, ImageFont
+import os
+
+os.makedirs("ip_images",exist_ok=True)
 
 big_global_dict={}
 big_global_ip_dict={}
@@ -335,6 +338,8 @@ for name,module in attn_list:
 dim=512
 
 setattr(pipe,"safety_checker",None)
+
+
 
 gen=torch.Generator()
 gen.manual_seed(123)

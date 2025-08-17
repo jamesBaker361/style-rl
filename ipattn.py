@@ -399,6 +399,9 @@ if __name__ =="__main__":
         for m,prompt in enumerate(["eating ice cream","in paris","in the style of cubism","on a walk"]):
             reset_monkey(pipe)
             gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+            attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
+            print("kv",len(attn_list[0].kv))
+            print("kv ip",len(attn_list[0].kv_ip))
 
             segmented=sam(gen_image,dim,dim)
 
@@ -467,8 +470,6 @@ if __name__ =="__main__":
                             mask = ImageOps.invert(bw_img)
                             color_rgba = gen_image.convert("RGB")
                             mask = mask.convert("RGB")  # must be single channel for alpha
-
-                            print(mask.size,color_rgba.size)
 
                             # Apply as alpha (translucent mask)
                             new_img=Image.blend(color_rgba, mask, 0.5)

@@ -1,8 +1,10 @@
 from controlnet_aux import UniformerDetector
 from PIL import Image
+from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
+
 
 # Load human segmentation preprocessor
-seg = UniformerDetector.from_pretrained("lllyasviel/Annotators")
+seg = sam = SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
 
 # Load image
 image = Image.open("lebrun.jpg")

@@ -428,9 +428,9 @@ if __name__ =="__main__":
             setattr(pipe,"safety_checker",None)
 
             gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
-            '''attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
-            print("kv",len(attn_list[0][1].kv))
-            print("kv ip",len(attn_list[0][1].kv_ip))'''
+            '''monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
+            print("kv",len(monkey_attn_list[0][1].kv))
+            print("kv ip",len(monkey_attn_list[0][1].kv_ip))'''
 
             segmented=sam(gen_image,dim,dim)
 

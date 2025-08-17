@@ -351,9 +351,10 @@ def get_modules_of_types(model, target_classes):
 
 def reset_monkey(pipe):
     attn_list=get_modules_of_types(pipe.unet,Attention)
-    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
-        module.processor.kv=[]
-        module.processor.kv_ip=[]
+    for name,module in attn_list:
+        if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+            module.processor.kv=[]
+            module.processor.kv_ip=[]
 
 if __name__ =="__main__":
     ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")

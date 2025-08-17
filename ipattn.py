@@ -343,7 +343,7 @@ setattr(pipe,"safety_checker",None)
 
 gen=torch.Generator()
 gen.manual_seed(123)
-num_inference_steps=8
+num_inference_steps=4
 prompt="eating ice cream"
 for n,ip_adapter_image in enumerate([
     load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg"),

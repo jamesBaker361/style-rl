@@ -387,3 +387,5 @@ for layer_index in range(len(attn_list)):
             vertical_image_list.append(horiz_image)
         vertical_image=concat_images_vertically(vertical_image_list)
         vertical_image.save(f"ip_images/layer_{layer_index}.png")
+
+print("all done!")

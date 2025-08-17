@@ -16,3 +16,4 @@ mask = seg(image)
 mask.save("body_mask.png")
 
 
+print("all done!")

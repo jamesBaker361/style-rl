@@ -64,3 +64,5 @@ for k,(box, score, labels) in enumerate(zip(result["boxes"], result["scores"], r
 white_copy=white_copy_with_rectangles(image,box_list,rect_color_list)
 new_img=Image.blend(image,white_copy, 0.5)
 new_img.save("segmented.png")
+
+print("all done!")

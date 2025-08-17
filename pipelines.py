@@ -308,6 +308,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         output_type: Optional[str] = "pil",
         return_dict: bool = True,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None,
+        ip_adapter_masks: Optional[List[torch.Tensor]]=None,
         clip_skip: Optional[int] = None,
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],

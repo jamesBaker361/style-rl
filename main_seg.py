@@ -42,7 +42,7 @@ def get_mask(layer_index:int,
              token:int,dim:int,
              threshold:float,
              kv_type:str="ip"):
-    processor=attn_list[layer_index]
+    processor=attn_list[layer_index][1] #get the module no name
     if kv_type=="ip":
         processor_kv=processor.kv_ip
     elif kv_type=="str":

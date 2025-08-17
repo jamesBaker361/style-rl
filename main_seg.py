@@ -55,7 +55,7 @@ def get_mask(layer_index:int,
     avg_min,avg_max=avg.min(),avg.max()
     x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
     x_norm[x_norm < threshold]=0.
-    avg = (x_norm * 255).byte()
+    avg = (x_norm * 255)
     avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
 
     return avg

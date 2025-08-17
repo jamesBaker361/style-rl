@@ -419,6 +419,6 @@ for n,ip_adapter_image in enumerate([
                 horiz_image=add_padding_with_text(horiz_image, decoded,pad_width=dim,font_size=dim//4)
                 vertical_image_list.append(horiz_image)
             vertical_image=concat_images_vertically(vertical_image_list)
-            vertical_image.save(f"ip_images/layer_{layer_index}.png")
+            vertical_image.save(f"ip_images/{n}_layer_{layer_index}.png")
 
     print("all done!")

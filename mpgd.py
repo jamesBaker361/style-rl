@@ -979,7 +979,7 @@ if __name__=="__main__":
                             #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)
                             text_clip=TextCLIP('openai/clip-vit-base-patch16',pipeline.unet.device,v)
 
-                            print(k,stage)
+                            print(k,stage,guidance_strength,steps,guidance_steps)
                             #print("\t",style_clip.target_embedding)
 
                             

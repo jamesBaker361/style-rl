@@ -349,7 +349,12 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
 
         return hidden_states
     
-def get_mask(processor_kv:list,step:int,token:int):
+def get_mask(layer_index:int, attn_list:list,step:int,token:int,kv_type:str="ip"):
+    processor=attn_list[layer_index]
+    if kv_type=="ip":
+        processor_kv=processor.kv_ip
+    elif kv_type=="str":
+        processor_kv=processor.kv
     size=processor_kv[step].size()
     latent_dim=int(math.sqrt(size[2]))
     avg=processor_kv[step].mean(dim=1).squeeze(0)

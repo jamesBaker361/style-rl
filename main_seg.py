@@ -124,7 +124,7 @@ def main(args):
             "ip_adapter_masks":mask
         }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
-        concat=concat_images_horizontally([initial_image,final_image])
+        concat=concat_images_horizontally([ip_adapter_image,masked_img, initial_image,final_image])
         accelerator.log({
             "image": wandb.Image(concat)
         })

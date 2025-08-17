@@ -319,6 +319,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         start:float=0.0,
         end:float=1.0,
         scale_step_dict:dict={},
+        mask_step_list:list=[],
         **kwargs,
     ):
         
@@ -477,13 +478,20 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 if len(scale_step_dict)==num_inference_steps:
                     self.set_ip_adapter_scale(scale_step_dict[i])
 
+                temp_cross_attention_kwargs=self.cross_attention_kwargs
+
+                if len(mask_step_list)!=0:
+                    if i not in mask_step_list:
+                        temp_cross_attention_kwargs=temp_cross_attention_kwargs.copy()
+                        temp_cross_attention_kwargs.pop( "ip_adapter_masks")
+
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(
                     latents,
                     t,
                     timestep_cond=w_embedding,
                     encoder_hidden_states=prompt_embeds,
-                    cross_attention_kwargs=self.cross_attention_kwargs,
+                    cross_attention_kwargs=temp_cross_attention_kwargs,
                     added_cond_kwargs=added_cond_kwargs,
                     return_dict=False,
                 )[0]

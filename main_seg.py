@@ -112,7 +112,7 @@ def main(args):
         mask[mask>1]=1.
         mask_processor = IPAdapterMaskProcessor()
         mask = mask_processor.preprocess(mask)
-        print("mask size",mask.size())
+        #print("mask size",mask.size())
 
         generator=torch.Generator()
         generator.manual_seed(123)

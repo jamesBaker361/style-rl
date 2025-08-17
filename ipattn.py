@@ -351,8 +351,10 @@ for n,ip_adapter_image in enumerate([
     load_image("https://images.ctfassets.net/qx5k8y1u9drj/d0vHplNVGw8cRbFsHlMHY/fda93fe8b54c67d4dae79aca19f8beb2/VIDEO_CAROUSEL_IMAGE_-_SEE_FIGURE_IN_ACTION.jpg"),
     load_image("https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/4238fe90dd74b08a6e8172c31e3b1ae609afb3cd-496x560.jpg"),
     load_image("https://draftsim.com/wp-content/uploads/2020/06/Oath-of-Teferi-MTG-card-art-by-Wesley-Burt-1024x752.jpg"),
-    load_image("https://theitem.com/uploads/original/20250624-153008-49b-2024LizardManStomp1_25752.jpg"),
-    load_image("https://images.saymedia-content.com/.image/ar_16:9%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:eco%2Cw_1200/MTc0NjQ2NjMyODQ1OTQ0MTg2/rick-sanchez-character-analysis-not-a-nihilist-but-a-cynic.jpg")
+    load_image("lizard.jpg"),
+    load_image("rick.jpg"),
+    load_image("elf.jpg"),
+    load_image("ghibli.jpg")
 ]):
     gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
 
@@ -391,7 +393,7 @@ for n,ip_adapter_image in enumerate([
                     color_rgba = gen_image.convert("RGB")
                     mask = mask.convert("RGB")  # must be single channel for alpha
 
-                    print(mask.size,color_rgba.size)
+                    #print(mask.size,color_rgba.size)
 
                     # Apply as alpha (translucent mask)
                     new_img=Image.blend(color_rgba, mask, 0.5)

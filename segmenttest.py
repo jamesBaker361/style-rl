@@ -4,6 +4,7 @@ import random
 import torch
 from PIL import Image,ImageDraw
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
+from diffusers.utils.loading_utils import load_image
 
 model_id = "IDEA-Research/grounding-dino-tiny"
 device = "cuda"
@@ -13,7 +14,7 @@ model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 
 #image_url = "https://www.maids.com/wp-content/uploads/2022/12/bigstock-Handsome-Young-Man-Cleaning-Wi-276105073.jpg"
 image_url="https://cdn.britannica.com/68/145968-050-01768DAD/Vitruvian-Man-Leonardo-da-Vinci-Gallerie-dellAccademia.jpg"
-image = Image.open(requests.get(image_url, stream=True).raw)
+image = load_image(image_url)
 # Check for cats and remote controls
 text_labels = [["head", "arm", "torso","leg","neck","foot"]]
 

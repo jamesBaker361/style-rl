@@ -465,7 +465,7 @@ for n,ip_adapter_image in enumerate([
                 vertical_image=concat_images_vertically(vertical_image_list)
                 vertical_height=vertical_image.size[0]
                 left_height=left.size[0]
-                new_left=add_margin(left,0,0,vertical_height-left_height,0)
+                new_left=add_margin(left,0,0,vertical_height-left_height,0,"white")
                 vertical_image=concat_images_horizontally([new_left,vertical_image])
                 vertical_image.save(f"ip_images/{m}_{n}_layer_{layer_index}.png")
 

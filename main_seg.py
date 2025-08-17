@@ -84,6 +84,8 @@ def main(args):
         if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
             setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
 
+    monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
+
     data=datasets.load_dataset(args.dataset)
     data=data["train"]
 
@@ -95,7 +97,7 @@ def main(args):
         generator.manual_seed(123)
         initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
-        mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+        mask=sum([get_mask(args.layer_index,monkey_attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
 
         bw_img = Image.fromarray(mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
         mask_pil = ImageOps.invert(bw_img)

@@ -827,8 +827,8 @@ if __name__=="__main__":
             for guidance_strength in [-10,10]:
                 
                 for k,v in url_dict.items():
-                    for stage in ["early"]:
-                                  #,"mid","late"]:
+                    for stage in ["early"
+                                  ,"mid","late"]:
                         target_image=load_image(v)
                         #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float32,)
 

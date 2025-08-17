@@ -59,7 +59,7 @@ echo "Allocated GPUs:"
 nvidia-smi
 echo "version"
 nvcc --version
-srun CUDA_LAUNCH_BLOCKING=1 python   $@
+srun python   $@
 echo "Running on: $(hostname)"
 echo "Allocated GPUs:"
 nvidia-smi

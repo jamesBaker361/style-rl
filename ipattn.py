@@ -406,6 +406,27 @@ if __name__ =="__main__":
     ]):
         for m,prompt in enumerate(["eating ice cream","in paris","in the style of cubism","on a walk"]):
             #reset_monkey(pipe)
+
+            pipe = StableDiffusionPipeline.from_pretrained(
+                "SimianLuo/LCM_Dreamshaper_v7",
+                torch_dtype=torch.float16,
+            ).to("cuda")
+
+            # Load IP-Adapter
+            pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+            pipe.set_ip_adapter_scale(0.5)
+
+            
+
+            attn_list=get_modules_of_types(pipe.unet,Attention)
+
+            for name,module in attn_list:
+                if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+                    setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
+            dim=512
+
+            setattr(pipe,"safety_checker",None)
+
             gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
             attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
             print("kv",len(attn_list[0][1].kv))
@@ -491,6 +512,6 @@ if __name__ =="__main__":
                     new_left=add_margin(left,0,0,vertical_height-left_height,0,"white")
                     vertical_image=concat_images_horizontally([new_left,vertical_image])
                     vertical_image.save(f"ip_images/{m}_{n}_layer_{layer_index}.png")
-            count+=n_tokens
-            count+=n_tokens_ip
+            '''count+=n_tokens
+            count+=n_tokens_ip'''
     print("all done!")

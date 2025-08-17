@@ -407,7 +407,7 @@ if __name__ =="__main__":
         for m,prompt in enumerate(["eating ice cream","in paris","in the style of cubism","on a walk"]):
             #reset_monkey(pipe)
 
-            pipe = StableDiffusionPipeline.from_pretrained(
+            '''pipe = StableDiffusionPipeline.from_pretrained(
                 "SimianLuo/LCM_Dreamshaper_v7",
                 torch_dtype=torch.float16,
             ).to("cuda")
@@ -425,9 +425,10 @@ if __name__ =="__main__":
                     setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
             dim=512
 
-            setattr(pipe,"safety_checker",None)
+            setattr(pipe,"safety_checker",None)'''
 
             gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
+            reset_monkey(pipe)
             '''monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
             print("kv",len(monkey_attn_list[0][1].kv))
             print("kv ip",len(monkey_attn_list[0][1].kv_ip))'''

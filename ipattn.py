@@ -23,7 +23,7 @@ pipe = StableDiffusionPipeline.from_pretrained(
 
 # Load IP-Adapter
 pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-pipe.set_ip_adapter_scale(0)
+pipe.set_ip_adapter_scale(0.5)
 
 '''gen=torch.Generator()
 gen.manual_seed(123)
@@ -356,9 +356,9 @@ text_input_ids = text_inputs.input_ids[0]
 for layer_index in range(len(attn_list)):
     [name,module]=attn_list[layer_index]
     if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-        processor_kv=module.processor.kv
+        processor_kv=module.processor.kv_ip
         vertical_image_list=[]
-        for token in range(10):
+        for token in range(4):
             token_id=text_input_ids[token]
             decoded=pipe.tokenizer.decode(token_id)
             horiz_image_list=[]

@@ -13,6 +13,7 @@ from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
 import torch
 from main_pers import concat_images_horizontally
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 import datasets
 import wandb
 
@@ -95,6 +96,17 @@ def main(args):
         initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
         mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+
+        bw_img = Image.fromarray(mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+        mask_pil = ImageOps.invert(bw_img)
+        color_rgba = initial_image.convert("RGB")
+        mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
+
+        #print(mask.size,color_rgba.size)
+
+        # Apply as alpha (translucent mask)
+        masked_img=Image.blend(color_rgba, mask_pil, 0.5)
+
         mask[mask>1]=1.
         mask_processor = IPAdapterMaskProcessor()
         mask = mask_processor.preprocess(mask)

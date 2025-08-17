@@ -13,7 +13,7 @@ processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 
 #image_url = "https://www.maids.com/wp-content/uploads/2022/12/bigstock-Handsome-Young-Man-Cleaning-Wi-276105073.jpg"
-image_url="https://cdn.britannica.com/68/145968-050-01768DAD/Vitruvian-Man-Leonardo-da-Vinci-Gallerie-dellAccademia.jpg"
+image_url="lebrun.jpg"
 image = load_image(image_url)
 # Check for cats and remote controls
 text_labels = [["head", "arm", "torso","leg","neck","foot"]]

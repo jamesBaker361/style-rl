@@ -318,6 +318,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
         increasing_scale: Optional[bool]=False,
         start:float=0.0,
         end:float=1.0,
+        scale_step_dict:dict={},
         **kwargs,
     ):
         
@@ -472,6 +473,9 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     self.set_ip_adapter_scale(0.0)
                 else:
                     self.set_ip_adapter_scale(1.0)
+
+                if len(scale_step_dict)==num_inference_steps:
+                    self.set_ip_adapter_scale(scale_step_dict[i])
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

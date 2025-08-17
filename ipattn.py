@@ -366,7 +366,7 @@ dim=512
 
 setattr(pipe,"safety_checker",None)
 
-
+threshold=0.5
 
 gen=torch.Generator()
 gen.manual_seed(123)
@@ -446,6 +446,7 @@ for n,ip_adapter_image in enumerate([
                         avg=avg[:,:,token]
                         avg_min,avg_max=avg.min(),avg.max()
                         x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
+                        x_norm[x_norm < threshold]=0.
                         avg = (x_norm * 255).byte()
                         avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
                         bw_img = Image.fromarray(avg.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale

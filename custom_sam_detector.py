@@ -19,7 +19,7 @@ from controlnet_aux.segment_anything.automatic_mask_generator import SamAutomati
 from controlnet_aux.segment_anything.build_sam import sam_model_registry
 
 
-class SamDetector:
+class CustomSamDetector:
     def __init__(self, mask_generator: SamAutomaticMaskGenerator):
         self.mask_generator = mask_generator
     

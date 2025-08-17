@@ -1,19 +1,40 @@
 
 from PIL import Image
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
+from custom_sam_detector import CustomSamDetector
 
+import os
+import warnings
+from typing import Union
+
+import cv2
+import numpy as np
+import torch
+from huggingface_hub import hf_hub_download
+from PIL import Image
 
 # Load human segmentation preprocessor
-seg = sam = SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
+sam =  SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
+custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
 
 # Load image
 image = Image.open("lebrun.jpg")
 
+shape=image.shape
+
+masks=custom_sam.get_masks(image)
+for ann in masks:
+    m = ann['segmentation']
+    print(shape,m.shape)
+    break
+
+    
+
 # Run segmentation
-mask = seg(image)
+masked_image = sam(image)
 
 # Save result
-mask.save("body_mask.png")
+masked_image.save("body_mask.png")
 
 
 print("all done!")

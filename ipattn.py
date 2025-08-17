@@ -348,6 +348,17 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
 
         return hidden_states
     
+def get_mask(processor_kv:list,step:int,token:int):
+    size=processor_kv[step].size()
+    latent_dim=int(math.sqrt(size[2]))
+    avg=processor_kv[step].mean(dim=1).squeeze(0)
+    avg=avg.view([latent_dim,latent_dim,-1])
+    avg=avg[:,:,token]
+    avg_min,avg_max=avg.min(),avg.max()
+    x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
+    x_norm[x_norm < threshold]=0.
+    avg = (x_norm * 255).byte()
+    avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
 
 def get_modules_of_types(model, target_classes):
         return [(name, module) for name, module in model.named_modules()

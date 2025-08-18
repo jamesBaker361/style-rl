@@ -42,11 +42,12 @@ def get_mask(layer_index:int,
              token:int,dim:int,
              threshold:float,
              kv_type:str="ip"):
-    processor=attn_list[layer_index][1] #get the module no name
+    module=attn_list[layer_index][1] #get the module no name
+    #module.processor.kv_ip
     if kv_type=="ip":
-        processor_kv=processor.kv_ip
+        processor_kv=module.processor.kv_ip
     elif kv_type=="str":
-        processor_kv=processor.kv
+        processor_kv=module.processor.kv
     size=processor_kv[step].size()
     latent_dim=int(math.sqrt(size[2]))
     avg=processor_kv[step].mean(dim=1).squeeze(0)
@@ -86,7 +87,7 @@ def main(args):
         if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
             setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
 
-    monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
+    #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
 
     data=datasets.load_dataset(args.dataset)
     data=data["train"]
@@ -99,9 +100,10 @@ def main(args):
         prompt="riding a bicycle"
         generator=torch.Generator()
         generator.manual_seed(123)
+        pipe.set_ip_adapter_scale(0.5)
         initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
-        mask=sum([get_mask(args.layer_index,monkey_attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+        mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
 
         mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
 

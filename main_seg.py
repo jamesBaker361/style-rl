@@ -56,7 +56,7 @@ def get_mask(layer_index:int,
     x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
     x_norm[x_norm < threshold]=0.
     avg = (x_norm * 255)
-    avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
+    #avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
 
     return avg
 
@@ -99,6 +99,10 @@ def main(args):
 
         mask=sum([get_mask(args.layer_index,monkey_attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
 
+        mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
+
+        mask[mask>1]=1.
+
         bw_img = Image.fromarray(mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
         mask_pil = ImageOps.invert(bw_img)
         color_rgba = initial_image.convert("RGB")
@@ -109,7 +113,7 @@ def main(args):
         # Apply as alpha (translucent mask)
         masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
-        mask[mask>1]=1.
+        
         mask_processor = IPAdapterMaskProcessor()
         mask = mask_processor.preprocess(mask)
         #print("mask size",mask.size())

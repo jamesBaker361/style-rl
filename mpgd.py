@@ -957,7 +957,7 @@ if __name__=="__main__":
             "magic": "boy in the style of magic the gathering"
         }
 
-        for steps in [10,50]:
+        for steps in [100,50]:
             generator=torch.Generator(pipeline.unet.device)
             generator.manual_seed(123)
             output,denoised_list,log_probs_list,latents_list=ddim_call_with_guidance(pipeline,"smiling boy",dim,dim,
@@ -969,11 +969,11 @@ if __name__=="__main__":
             base_image.save(f"images/base_{steps}.png")
             base_denoised_list=concat_images_horizontally(denoised_list)
             base_denoised_list.save(f"images/base_concat_{steps}.png")
-            for guidance_strength in [-1,1,-10,10]:
-                for guidance_steps in [1,5,10]:
+            for guidance_strength in [-5,5,]:
+                for guidance_steps in [1,5]:
                 
                     for k,v in prompt_dict.items():
-                        for stage in ["mid","mid","late"]:
+                        for stage in ["mid","early","late"]:
                             #target_tensor=pipeline.image_processor.preprocess(target_image,dim,dim).to("cuda",dtype=torch.float32,)
 
                             #embedding_model=EmbeddingUtil(pipeline.unet.device,pipeline.unet.dtype, "clip","key",4)

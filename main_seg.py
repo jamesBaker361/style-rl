@@ -73,6 +73,8 @@ def main(args):
     pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
     pipe.set_ip_adapter_scale(0.5)
 
+    setattr(pipe,"safety_checker",None)
+
     #if args.load_hf:
         
 

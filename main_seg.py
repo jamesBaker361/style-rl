@@ -83,9 +83,14 @@ def main(args):
 
     attn_list=get_modules_of_types(pipe.unet,Attention)
 
+    for [name,_] in attn_list:
+        print(name)
+
     for name,module in attn_list:
         if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
             setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
+
+
 
     #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
 
@@ -107,7 +112,7 @@ def main(args):
 
         mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
 
-        mask[mask>1]=1.
+        
 
         bw_img = Image.fromarray(mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
         mask_pil = ImageOps.invert(bw_img)
@@ -119,8 +124,9 @@ def main(args):
         # Apply as alpha (translucent mask)
         masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
-        
+        mask[mask>1]=1.
         mask_processor = IPAdapterMaskProcessor()
+        print(mask_processor.config)
         mask = mask_processor.preprocess(mask)
         #print("mask size",mask.size())
 

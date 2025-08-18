@@ -99,6 +99,9 @@ def main(args):
 
     for k,row in enumerate(data):
         if k==args.limit:
+            for index,[name,module] in enumerate(attn_list):
+                mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+                print(index,name,mask.size())
             break
         reset_monkey(pipe)
         ip_adapter_image=row["image"]
@@ -131,6 +134,31 @@ def main(args):
         mask = mask_processor.preprocess(mask)
         #print("mask size",mask.size())
 
+        masked_list=[]
+        for index,[name,module] in enumerate(attn_list):
+            _mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+            _mask=F.interpolate(_mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
+
+        
+
+            bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+            mask_pil = ImageOps.invert(bw_img)
+            color_rgba = initial_image.convert("RGB")
+            mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
+
+            #print(mask.size,color_rgba.size)
+
+            # Apply as alpha (translucent mask)
+            masked_img=Image.blend(color_rgba, mask_pil, 0.5)
+
+            masked_list.concat(masked_img)
+
+        first_concat=concat_images_horizontally(masked_list)
+
+        accelerator.log({
+            "first_concat":wandb.Image(first_concat)
+        })
+
         generator=torch.Generator()
         generator.manual_seed(123)
         mask_step_list=args.final_mask_steps_list        
@@ -145,6 +173,11 @@ def main(args):
         accelerator.log({
             "image": wandb.Image(concat)
         })
+
+        
+
+        
+
 
 
 

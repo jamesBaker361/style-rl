@@ -89,7 +89,9 @@ def main(args):
     data=datasets.load_dataset(args.dataset)
     data=data["train"]
 
-    for row in data:
+    for k,row in enumerate(data):
+        if k==args.limit:
+            break
         reset_monkey(pipe)
         ip_adapter_image=row["image"]
         prompt="riding a bicycle"

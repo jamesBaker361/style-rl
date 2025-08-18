@@ -100,7 +100,9 @@ def main(args):
     for k,row in enumerate(data):
         if k==args.limit:
             for index,[name,module] in enumerate(attn_list):
+                
                 if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
+                    print(index,name,type(module),type(module.processor))
                     mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
                     print(index,name,mask.size())
             break

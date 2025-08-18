@@ -377,6 +377,8 @@ if __name__ =="__main__":
     
 
     attn_list=get_modules_of_types(pipe.unet,Attention)
+    for [name,_] in attn_list:
+        print(name)
 
     for name,module in attn_list:
         if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:

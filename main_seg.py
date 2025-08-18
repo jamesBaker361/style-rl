@@ -100,8 +100,9 @@ def main(args):
     for k,row in enumerate(data):
         if k==args.limit:
             for index,[name,module] in enumerate(attn_list):
-                mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
-                print(index,name,mask.size())
+                if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
+                    mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+                    print(index,name,mask.size())
             break
         reset_monkey(pipe)
         ip_adapter_image=row["image"]
@@ -174,7 +175,7 @@ def main(args):
             "image": wandb.Image(concat)
         })
 
-        
+
 
         
 

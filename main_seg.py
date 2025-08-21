@@ -43,6 +43,7 @@ def get_mask(layer_index:int,
              threshold:float,
              kv_type:str="ip",
              vae_scale:int=8):
+    print("layer",layer_index)
     module=attn_list[layer_index][1] #get the module no name
     #module.processor.kv_ip
     if kv_type=="ip":

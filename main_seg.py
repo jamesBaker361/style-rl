@@ -14,6 +14,7 @@ from diffusers.image_processor import IPAdapterMaskProcessor
 import torch
 from main_pers import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from torchvision.transforms.functional import to_pil_image
 import datasets
 import wandb
 
@@ -124,16 +125,14 @@ def main(args):
 
         mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
         tiny_mask=mask.clone()
-        tiny_mask_pil=Image.fromarray(tiny_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-        tiny_mask_pil=ImageOps.invert(tiny_mask_pil).convert("RGB")
+        tiny_mask_pil=to_pil_image(1-tiny_mask)
         #print("mask size",mask.size())
 
         mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
 
         
 
-        bw_img = Image.fromarray(mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-        mask_pil = ImageOps.invert(bw_img)
+        mask_pil=to_pil_image(1-mask)
         color_rgba = initial_image.convert("RGB")
         mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
 
@@ -156,10 +155,10 @@ def main(args):
 
             
 
-                bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                _mask_pil = ImageOps.invert(bw_img)
+                ''''bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                _mask_pil = ImageOps.invert(bw_img)'''
                 color_rgba = initial_image.convert("RGB")
-                _mask_pil = _mask_pil.convert("RGB")  # must be single channel for alpha
+                _mask_pil = to_pil_image(1-_mask)  # must be single channel for alpha
 
                 #print(_mask.size(),_mask_pil.size,color_rgba.size)
 

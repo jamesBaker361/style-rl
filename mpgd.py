@@ -792,7 +792,7 @@ if __name__=="__main__":
     #pipeline.do_classifier_free_guidance=False
     #pipeline.scheduler=CompatibleDDIMScheduler.from_config(pipeline.scheduler.config)
     pipeline.vae.requires_grad_(False)
-    dim=512
+    dim=256
 
     def style_grad():
     

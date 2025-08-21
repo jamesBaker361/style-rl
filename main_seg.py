@@ -51,10 +51,11 @@ def get_mask(layer_index:int,
         processor_kv=module.processor.kv
     size=processor_kv[step].size()
     print('\tprocessor_kv[step].size()',processor_kv[step].size())
-    latent_dim=size[-1]//vae_scale
-    print("\tlatent",latent_dim)
+    
     avg=processor_kv[step].mean(dim=1).squeeze(0)
     print("\t avg ", avg.size())
+    latent_dim=int (math.sqrt(size[0]))
+    print("\tlatent",latent_dim)
     avg=avg.view([latent_dim,latent_dim,-1])
     print("\t avg ", avg.size())
     avg=avg[:,:,token]

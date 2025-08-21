@@ -102,7 +102,7 @@ def main(args):
             for index,[name,module] in enumerate(attn_list):
                 
                 if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-                    print(index,name,type(module),type(module.processor))
+                    #print(index,name,type(module),type(module.processor))
                     mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
                     print(index,name,mask.size())
             break
@@ -153,9 +153,9 @@ def main(args):
                 #print(mask.size,color_rgba.size)
 
                 # Apply as alpha (translucent mask)
-                masked_img=Image.blend(color_rgba, mask_pil, 0.5)
+                _masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
-                masked_list.append(masked_img)
+                masked_list.append(_masked_img)
 
         first_concat=concat_images_horizontally(masked_list)
 

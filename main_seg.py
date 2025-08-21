@@ -183,7 +183,7 @@ def main(args):
         generator.manual_seed(123)
         final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
-        concat=concat_images_horizontally([ip_adapter_image,masked_img, initial_image,final_image,final_image_unmasked])
+        concat=concat_images_horizontally([ip_adapter_image.resize(args.dim,args.dim,),masked_img, initial_image,final_image,final_image_unmasked])
         accelerator.log({
             "image": wandb.Image(concat)
         })

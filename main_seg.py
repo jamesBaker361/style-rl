@@ -158,7 +158,7 @@ def main(args):
                 ''''bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
                 _mask_pil = ImageOps.invert(bw_img)'''
                 color_rgba = initial_image.convert("RGB")
-                _mask_pil = to_pil_image(1-_mask)  # must be single channel for alpha
+                _mask_pil = to_pil_image(1-_mask).convert("RGB")  # must be single channel for alpha
 
                 #print(_mask.size(),_mask_pil.size,color_rgba.size)
 

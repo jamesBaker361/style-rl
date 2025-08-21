@@ -158,7 +158,7 @@ def main(args):
                 color_rgba = initial_image.convert("RGB")
                 mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
 
-                #print(mask.size,color_rgba.size)
+                print(mask.size,color_rgba.size)
 
                 # Apply as alpha (translucent mask)
                 _masked_img=Image.blend(color_rgba, mask_pil, 0.5)

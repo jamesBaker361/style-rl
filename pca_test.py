@@ -9,7 +9,7 @@ for row in data:
     break
 
 
-X_data=[np.array(row["embedding"]) for row in data]
+X_data=[np.array(row["embedding"])[0][0] for row in data]
 print(X_data[0].shape)
 
 pca_object=PCA(n_components=100)

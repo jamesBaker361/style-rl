@@ -15,6 +15,9 @@ import torch
 from main_pers import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
+
+from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
+from custom_sam_detector import CustomSamDetector
 import datasets
 import wandb
 

@@ -154,14 +154,14 @@ def main(args):
             
 
                 bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                mask_pil = ImageOps.invert(bw_img)
+                _mask_pil = ImageOps.invert(bw_img)
                 color_rgba = initial_image.convert("RGB")
-                mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
+                _mask_pil = _mask_pil.convert("RGB")  # must be single channel for alpha
 
-                print(_mask.size(),mask_pil.size,color_rgba.size)
+                #print(_mask.size(),_mask_pil.size,color_rgba.size)
 
                 # Apply as alpha (translucent mask)
-                _masked_img=Image.blend(color_rgba, mask_pil, 0.5)
+                _masked_img=Image.blend(color_rgba, _mask_pil, 0.5)
 
                 masked_list.append(_masked_img)
 
@@ -185,7 +185,7 @@ def main(args):
         generator.manual_seed(123)
         final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
-        concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),masked_img, initial_image,final_image,final_image_unmasked])
+        concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,masked_img, initial_image,final_image,final_image_unmasked])
         accelerator.log({
             "image": wandb.Image(concat)
         })

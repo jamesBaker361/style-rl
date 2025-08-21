@@ -142,9 +142,12 @@ def main(args):
         masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
         mask[mask>1]=1.
+        mask=1-mask
+        print(mask.size())
         mask_processor = IPAdapterMaskProcessor()
         #print(mask_processor.config)
         mask = mask_processor.preprocess(mask)
+        print(mask.size())
         #print("mask size",mask.size())
 
         masked_list=[]

@@ -92,6 +92,8 @@ def main(args):
         torch_dtype=torch_dtype,
     ).to("cuda")
 
+    setattr(pipe,"safety_checker",None)
+
     data_dict={"prompt":[]}
     for k in range(args.images_per_prompt):
         data_dict[f"{k}_null"]=[]
@@ -102,8 +104,8 @@ def main(args):
         for k in range(args.images_per_prompt):
             generator=torch.Generator()
             generator.manual_seed(k)
-            prompt_image=pipe(prompt,height=args.dim,width=args.dim,num_inference_steps=args.num_inference_steps,generator=generator).images[0]
-            null_image=pipe(" ",height=args.dim,width=args.dim,num_inference_steps=args.num_inference_steps,generator=generator).images[0]
+            prompt_image=pipe("person "+prompt,height=args.dim,width=args.dim,num_inference_steps=args.num_inference_steps,generator=generator).images[0]
+            null_image=pipe("person",height=args.dim,width=args.dim,num_inference_steps=args.num_inference_steps,generator=generator).images[0]
             data_dict[f"{k}_null"].append(null_image)
             data_dict[f"{k}_prompt"].append(prompt_image)
 

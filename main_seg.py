@@ -116,7 +116,7 @@ def main(args):
             break
         reset_monkey(pipe)
         ip_adapter_image=row["image"]
-        prompt="riding a bicycle"
+        prompt="eating ice cream"
         generator=torch.Generator()
         generator.manual_seed(123)
         pipe.set_ip_adapter_scale(0.5)

@@ -5,7 +5,11 @@ import time
 
 start=time.time()
 data=load_dataset("jlbaker361/clip-league_captioned_splash-1000",split="train")
-X_data=[np.ndarray(row["embedding"]) for row in data]
+for row in data:
+    break
+
+
+X_data=[np.array(row["embedding"]) for row in data]
 print(X_data[0].shape)
 
 pca_object=PCA(n_components=100)

@@ -55,7 +55,7 @@ def get_mask(layer_index:int,
     
     avg=processor_kv[step].mean(dim=1).squeeze(0)
     print("\t avg ", avg.size())
-    latent_dim=int (math.sqrt(size[0]))
+    latent_dim=int (math.sqrt(avg.size[0]))
     print("\tlatent",latent_dim)
     avg=avg.view([latent_dim,latent_dim,-1])
     print("\t avg ", avg.size())

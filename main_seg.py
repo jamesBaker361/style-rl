@@ -123,6 +123,9 @@ def main(args):
         initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
         mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+        tiny_mask=mask.clone()
+        tiny_mask_pil=Image.fromarray(tiny_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+        tiny_mask_pil=ImageOps.invert(tiny_mask_pil).convert("RGB")
         #print("mask size",mask.size())
 
         mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
@@ -189,6 +192,7 @@ def main(args):
         accelerator.log({
             "image": wandb.Image(concat)
         })
+        accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
 
 
 

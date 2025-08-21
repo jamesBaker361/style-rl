@@ -155,7 +155,7 @@ def main(args):
                 # Apply as alpha (translucent mask)
                 masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
-                masked_list.concat(masked_img)
+                masked_list.append(masked_img)
 
         first_concat=concat_images_horizontally(masked_list)
 

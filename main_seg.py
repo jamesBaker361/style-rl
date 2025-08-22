@@ -40,6 +40,8 @@ parser.add_argument("--limit",type=int,default=-1,help="limit of samples")
 parser.add_argument("--layer_index",type=int,default=15)
 parser.add_argument("--dim",type=int,default=256)
 parser.add_argument("--token",type=int,default=1, help="which IP token is attention")
+parser.add_argument("--overlap_frac",type=int,default=0.8)
+parser.add_argument("--segmentation_attention_method",type=str,default="overlap or exclusive")
 
 def get_mask(layer_index:int, 
              attn_list:list,step:int,
@@ -197,9 +199,26 @@ def main(args):
             final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
             torch.cuda.empty_cache()
             
-            segmented_image=custom_sam(initial_image)
+            segmented_image,map_list=custom_sam(initial_image)
+
+            if args.segmentation_attention_method=="exclusive":
+                map_mask=torch.ones((args.dim,args.dim))
+                for map_ in map_list:
+                    merged=map_*mask
+                    map_mask=merged*map_mask
+
+            elif args.segmentation_attention_method=="overlap":
+                map_mask=torch.zeros((args.dim,args.dim))
+                for map_ in map_list:
+                    n_ones=map_.sum()
+                    merged=map_*mask
+                    if merged.sum()>= args.overlap_frac * n_ones:
+                        map_mask=torch.max(map_,map_mask)
+
+            map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
+
             
-            concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_unmasked])
+            concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_unmasked])
             accelerator.log({
                 "image": wandb.Image(concat)
             })

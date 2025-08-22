@@ -6,7 +6,7 @@
 
 import os
 import warnings
-from typing import Union
+from typing import Union,Tuple
 
 import cv2
 import numpy as np
@@ -81,7 +81,7 @@ class CustomSamDetector:
         masks = self.mask_generator.generate(input_image)
         return masks
     
-    def __call__(self, input_image: Union[np.ndarray, Image.Image]=None, detect_resolution=512, image_resolution=512, output_type="pil", **kwargs) -> Image.Image:
+    def __call__(self, input_image: Union[np.ndarray, Image.Image]=None, detect_resolution=512, image_resolution=512, output_type="pil", **kwargs) -> Tuple[Image.Image, list]:
         if "image" in kwargs:
             warnings.warn("image is deprecated, please use `input_image=...` instead.", DeprecationWarning)
             input_image = kwargs.pop("image")
@@ -111,4 +111,4 @@ class CustomSamDetector:
         if output_type == "pil":
             detected_map = Image.fromarray(detected_map)
 
-        return detected_map
+        return detected_map,map

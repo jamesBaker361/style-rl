@@ -204,7 +204,7 @@ def main(args):
             if args.segmentation_attention_method=="exclusive":
                 map_mask=torch.ones((args.dim,args.dim))
                 for map_ in map_list:
-                    merged=map_*mask
+                    merged=torch.Tensor(map_)*mask
                     map_mask=merged*map_mask
 
             elif args.segmentation_attention_method=="overlap":

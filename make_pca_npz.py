@@ -10,4 +10,7 @@ for embedding in ["clip","dino","ssl","siglip2"]:
     X_data=X_data[:cutoff]
     pca_object=PCA(n_components=100)
     pca_object.fit(X_data)
-    np.savez(f"{embedding}_pca_{frac}.npz",components_=pca_object.components_, explained_variance_=pca_object.explained_variance_)
+    np.savez(f"{embedding}_pca_{frac}.npz",
+             components_=pca_object.components_, 
+             explained_variance_=pca_object.explained_variance_,
+             mean_=pca_object.mean_)

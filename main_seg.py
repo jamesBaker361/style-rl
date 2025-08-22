@@ -77,13 +77,6 @@ def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-    if args.initial_mask_step_list==None:
-        args.initial_mask_step_list = [n for n in range(args.initial_steps)]
-    if args.final_mask_steps_list==None:
-        args.final_mask_steps_list=[m for m in range(args.final_steps)]
-    if args.final_adapter_steps_list==None:
-        args.final_adapter_steps_list=[m for m in range(args.final_steps)]
-
     custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device,dtype=torch.float16)
 
     pipe = StableDiffusionPipeline.from_pretrained(

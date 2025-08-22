@@ -6,7 +6,7 @@ from datasets import load_dataset
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import json
-
+from sklearn.decomposition import PCA
 import torch
 import accelerate
 from accelerate import Accelerator
@@ -138,6 +138,7 @@ parser.add_argument("--ip_end",type=float,default=1.0)
 parser.add_argument("--do_classifier_free_guidance",action="store_true")
 parser.add_argument("--cfg_embedding",action="store_true")
 parser.add_argument("--cfg_weight",type=float,default="3.0")
+parser.add_argument("--npz_file",type=str,default="clip_pca_0.95.npz")
 
 import torch
 import torch.nn.functional as F
@@ -184,6 +185,11 @@ def main(args):
         "fp16":torch.float16,
         "bf16":torch.bfloat16
     }[args.mixed_precision]
+
+    pca_object=PCA(n_components=100)
+    with np.load(args.npz_file) as np_dict:
+        pca_object.components_=np_dict["components_"]
+        pca_object.explained_variance_=np_dict["explained_variance_"]
 
 
 

@@ -195,7 +195,7 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
-
+            torch.cuda.empty_cache()
             
             segmented_image=custom_sam(initial_image)
             

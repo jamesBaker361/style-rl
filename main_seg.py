@@ -200,18 +200,22 @@ def main(args):
             torch.cuda.empty_cache()
             
             segmented_image,map_list=custom_sam(initial_image)
+            
 
             if args.segmentation_attention_method=="exclusive":
                 map_mask=torch.ones((args.dim,args.dim))
                 for map_ in map_list:
+                    print(torch.Tensor(map_).size())
                     merged=torch.Tensor(map_)*mask
+
                     map_mask=merged*map_mask
 
             elif args.segmentation_attention_method=="overlap":
                 map_mask=torch.zeros((args.dim,args.dim))
                 for map_ in map_list:
                     n_ones=map_.sum()
-                    merged=map_*mask
+                    print(torch.Tensor(map_).size())
+                    merged=torch.Tensor(map_)*mask
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)
 

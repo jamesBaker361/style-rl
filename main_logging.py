@@ -728,7 +728,8 @@ def main(args):
                                     do_classifier_free_guidance=False,
                                     generator=generator,
                                     #prompt_embeds=text_batch,
-                                    ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    ip_adapter_image_embeds=image_embeds,
+                                    negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
@@ -744,7 +745,8 @@ def main(args):
                                     num_inference_steps=args.num_inference_steps,
                                     do_classifier_free_guidance=do_classifier_free_guidance,
                                     #prompt_embeds=text_batch,
-                                    ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    ip_adapter_image_embeds=image_embeds,
+                                    negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale
                                     ,start=args.ip_start,end=args.ip_end).images
             

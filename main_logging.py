@@ -295,7 +295,10 @@ def main(args):
             accelerator.free_memory()
             torch.cuda.empty_cache()
 
-            text=row["text"]
+            try:
+                text=row["text"]
+            except:
+                text=row["label"]
             if type(text)==str:
                 prompt=text
                 text, _ = pipeline.encode_prompt(

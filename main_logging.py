@@ -725,8 +725,8 @@ def main(args):
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
                     
-                    null_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(null_prompt_image))
-                    prompted_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(prompt_image))
+                    null_embedding=embedding_util.embed_img_tensor(null_prompt_image)
+                    prompted_embedding=embedding_util.embed_img_tensor(prompt_image)
 
                     cfg_embedding=prompted_embedding-null_embedding
                     image_embeds=args.cfg_weight*cfg_embedding

@@ -290,7 +290,7 @@ def main(args):
 
             if args.pca_project:
                 projection=pca_object.transform(embedding.cpu())
-                embedding=pca_object.inverse_transform(projection)
+                embedding=torch.Tensor(pca_object.inverse_transform(projection))
 
             image=pipeline.image_processor.preprocess(image)[0]
             

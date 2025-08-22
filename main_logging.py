@@ -129,6 +129,7 @@ parser.add_argument("--do_classifier_free_guidance",action="store_true")
 parser.add_argument("--cfg_embedding",action="store_true")
 parser.add_argument("--cfg_weight",type=float,default="3.0")
 parser.add_argument("--npz_file",type=str,default="clip_pca_0.95.npz")
+parser.add_argument("--pca_project",action="store_true")
 
 import torch
 import torch.nn.functional as F
@@ -285,6 +286,10 @@ def main(args):
             else:
                 #this should NOT be normalized or transformed
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
+
+            if args.pca_project:
+                projection=pca_object.transform(embedding)
+                embedding=pca_object.inverse_transform(projection)
 
             image=pipeline.image_processor.preprocess(image)[0]
             

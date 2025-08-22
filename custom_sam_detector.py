@@ -22,6 +22,10 @@ from controlnet_aux.segment_anything.build_sam import sam_model_registry
 class CustomSamDetector:
     def __init__(self, mask_generator: SamAutomaticMaskGenerator):
         self.mask_generator = mask_generator
+
+    def to(self,*args,**kwargs):
+        self.mask_generator.predictor.model.to(*args,**kwargs)
+        return self
     
     @classmethod
     def from_pretrained(cls, pretrained_model_or_path, model_type="vit_h", filename="sam_vit_h_4b8939.pth", subfolder=None, cache_dir=None):

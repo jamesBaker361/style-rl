@@ -77,10 +77,12 @@ def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
+    custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device,torch_dtype=torch.float16)
+
     pipe = StableDiffusionPipeline.from_pretrained(
         "SimianLuo/LCM_Dreamshaper_v7",
         torch_dtype=torch.float16,
-    ).to("cuda")
+    ).to(accelerator.device)
 
     # Load IP-Adapter
     pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")

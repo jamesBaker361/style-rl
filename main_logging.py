@@ -92,7 +92,6 @@ parser=argparse.ArgumentParser()
 parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="person")
-parser.add_argument("--gradient_accumulation_steps",type=int,default=4)
 parser.add_argument("--image_size",type=int,default=256)
 parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or siglip2")
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
@@ -145,7 +144,7 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
 
 
 def main(args):
-    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     print("accelerator device",accelerator.device)
     device=accelerator.device
     state = PartialState()

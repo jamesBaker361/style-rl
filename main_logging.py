@@ -720,7 +720,7 @@ def main(args):
                                     generator=generator,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
-                                    output_type="pt",height=args.image_size,width=args.image_size,
+                                    output_type="pil",height=args.image_size,width=args.image_size,
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
                     generator=torch.Generator(accelerator.device)
@@ -731,7 +731,7 @@ def main(args):
                                     generator=generator,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
-                                    output_type="pt",height=args.image_size,width=args.image_size,
+                                    output_type="pil",height=args.image_size,width=args.image_size,
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
                     

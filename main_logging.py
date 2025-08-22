@@ -262,7 +262,6 @@ def main(args):
     embedding_list=[]
     text_list=[]
     image_list=[]
-    posterior_list=[]
     prompt_list=[]
     shuffled_row_list=[row for row in raw_data]
 
@@ -288,13 +287,7 @@ def main(args):
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))[-1]
 
             image=pipeline.image_processor.preprocess(image)[0]
-            if "posterior" not in row:
-                posterior=public_encode(vae,image).squeeze(0)
-            else:
-                np_posterior=np.array(row["posterior"])
-                posterior=torch.from_numpy(np_posterior)
-            posterior=posterior.to("cpu")
-            posterior_list.append(posterior)
+            
             image_list.append(image.squeeze(0))
             #print(embedding.size())
             embedding=embedding.to("cpu") #.squeeze()
@@ -321,7 +314,7 @@ def main(args):
                 prompt=row["prompt"]
             text=text.to("cpu").squeeze(0)
             if i ==1:
-                accelerator.print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size",posterior.size())
+                accelerator.print("text size",text.size(),"embedding size",embedding.size(),"img size",image.size(),"latent size")
             text_list.append(text)
             prompt_list.append(prompt)
             #print(get_gpu_memory_usage())
@@ -333,7 +326,6 @@ def main(args):
     accelerator.print("prompt list",len(prompt_list))
     accelerator.print("image_list",len(image_list))
     accelerator.print("text_list",len(text_list))
-    accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
 
     do_classifier_free_guidance=args.do_classifier_free_guidance
@@ -474,7 +466,6 @@ def main(args):
     image_list,test_image_list,val_image_list=split_list_by_ratio(image_list,ratios)
     text_list,test_text_list,val_text_list=split_list_by_ratio(text_list,ratios)
 
-    posterior_list,test_posterior_list,val_posterior_list=split_list_by_ratio(posterior_list,ratios)
 
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
@@ -523,7 +514,6 @@ def main(args):
     accelerator.print("prompt list",len(prompt_list))
     accelerator.print("image_list",len(image_list))
     accelerator.print("text_list",len(text_list))
-    accelerator.print("posterior list",len(posterior_list))
     accelerator.print("embedding list",len(embedding_list))
 
     if args.generic_test_prompts:
@@ -543,9 +533,9 @@ def main(args):
         if len(data_list):
             accelerator.print("ZERO LEN data partition- this will cause errors")
     
-    train_dataset=CustomDataset(image_list,embedding_list,text_list,posterior_list,prompt_list)
-    val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,val_posterior_list,val_prompt_list)
-    test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,test_posterior_list,test_prompt_list)
+    train_dataset=CustomDataset(image_list,embedding_list,text_list,prompt_list=prompt_list)
+    val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,prompt_list=val_prompt_list)
+    test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,prompt_list=test_prompt_list)
 
     for dataset_batch in train_dataset:
         break

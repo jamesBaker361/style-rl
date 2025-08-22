@@ -5,7 +5,7 @@ from torchvision.transforms import ToTensor
 from torchvision import transforms
 
 class CustomDataset(Dataset):
-    def __init__(self,image_list,embeds_list,text_list,posterior_list,prompt_list=None):
+    def __init__(self,image_list,embeds_list,text_list,posterior_list=None,prompt_list=None):
         super().__init__()
         self.image_list=image_list
         self.embeds_list=embeds_list
@@ -24,21 +24,18 @@ class CustomDataset(Dataset):
                 "text":type(self.text_list[index]),
                 "posterior":type(self.posterior_list[index])
             })'''
+        item={
+                "image":self.image_list[index],
+                "embeds":self.embeds_list[index],
+                "text":self.text_list[index],
+            }
+        if self.posterior_list is not None:
+            item["posterior"]=self.posterior_list[index]
         if self.prompt_list is not None:
-            return {
-                "image":self.image_list[index],
-                "embeds":self.embeds_list[index],
-                "text":self.text_list[index],
-                "posterior":self.posterior_list[index],
-                "prompt":self.prompt_list[index]
-            }
-        else:
-            return {
-                "image":self.image_list[index],
-                "embeds":self.embeds_list[index],
-                "text":self.text_list[index],
-                "posterior":self.posterior_list[index]
-            }
+            item["prompt"]=self.prompt_list[index]
+
+        return item
+        
         
 
 class ScaleDataset(Dataset):

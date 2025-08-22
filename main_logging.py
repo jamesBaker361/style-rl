@@ -130,6 +130,7 @@ parser.add_argument("--cfg_embedding",action="store_true")
 parser.add_argument("--cfg_weight",type=float,default="3.0")
 parser.add_argument("--npz_file",type=str,default="clip_pca_0.95.npz")
 parser.add_argument("--pca_project",action="store_true")
+parser.add_argument("--baseline_prompt",type=str,default=" ,league of legends style")
 
 import torch
 import torch.nn.functional as F
@@ -703,8 +704,9 @@ def main(args):
             real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
             
             if baseline:
+                baseline_prompt_batch=[p + args.baseline_prompt for p in prompt_batch]
                 #ip_adapter_image=F_v2.resize(image_batch, (224,224))
-                fake_image=torch.stack([pipeline( prompt_batch,
+                fake_image=torch.stack([pipeline( baseline_prompt_batch,
                                                     num_inference_steps=args.num_inference_steps,
                                                  #prompt_embeds=text_batch,
                                                  ip_adapter_image=ip_adapter_image, negative_prompt_embeds=batched_negative_prompt_embeds,

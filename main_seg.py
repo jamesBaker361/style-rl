@@ -74,134 +74,136 @@ def get_mask(layer_index:int,
     return avg
 
 def main(args):
-    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
-    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+    with torch.no_grad():
+        accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
+        accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-    custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device)
+        custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device)
 
-    pipe = StableDiffusionPipeline.from_pretrained(
-        "SimianLuo/LCM_Dreamshaper_v7",
-        torch_dtype=torch.float16,
-    ).to(accelerator.device)
+        pipe = StableDiffusionPipeline.from_pretrained(
+            "SimianLuo/LCM_Dreamshaper_v7",
+            torch_dtype=torch.float16,
+        ).to(accelerator.device)
 
-    # Load IP-Adapter
-    pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-    pipe.set_ip_adapter_scale(0.5)
-
-    setattr(pipe,"safety_checker",None)
-
-    #if args.load_hf:
-        
-
-    
-
-    attn_list=get_modules_of_types(pipe.unet,Attention)
-
-    for [name,_] in attn_list:
-        print(name)
-
-    for name,module in attn_list:
-        if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
-            setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
-
-
-
-    #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
-
-    data=datasets.load_dataset(args.dataset)
-    data=data["train"]
-
-    for k,row in enumerate(data):
-        if k==args.limit:
-            for index,[name,module] in enumerate(attn_list):
-                
-                if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-                    #print(index,name,type(module),type(module.processor))
-                    mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
-                    print(index,name,mask.size())
-            break
-        reset_monkey(pipe)
-        ip_adapter_image=row["image"]
-        prompt="eating ice cream"
-        generator=torch.Generator()
-        generator.manual_seed(123)
+        # Load IP-Adapter
+        pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
         pipe.set_ip_adapter_scale(0.5)
-        initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
-        mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
-        tiny_mask=mask.clone()
-        tiny_mask_pil=to_pil_image(1-tiny_mask)
-        #print("mask size",mask.size())
+        setattr(pipe,"safety_checker",None)
 
-        mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
+        #if args.load_hf:
+            
 
         
 
-        mask_pil=to_pil_image(1-mask)
-        color_rgba = initial_image.convert("RGB")
-        mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
+        attn_list=get_modules_of_types(pipe.unet,Attention)
 
-        #print(mask.size,color_rgba.size)
+        for [name,_] in attn_list:
+            print(name)
 
-        # Apply as alpha (translucent mask)
-        masked_img=Image.blend(color_rgba, mask_pil, 0.5)
+        for name,module in attn_list:
+            if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
+                setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
 
-        mask[mask>1]=1.
-        #mask=1-mask
-        #print(mask.size())
-        mask_processor = IPAdapterMaskProcessor()
-        #print(mask_processor.config)
-        mask = mask_processor.preprocess(mask)
-        #print(mask.size())
-        #print("mask size",mask.size())
 
-        masked_list=[]
-        for index,[name,module] in enumerate(attn_list):
-            if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-                _mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
-                _mask=F.interpolate(_mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
+
+        #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
+
+        data=datasets.load_dataset(args.dataset)
+        data=data["train"]
+
+        for k,row in enumerate(data):
+            if k==args.limit:
+                for index,[name,module] in enumerate(attn_list):
+                    
+                    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
+                        #print(index,name,type(module),type(module.processor))
+                        mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+                        print(index,name,mask.size())
+                break
+            reset_monkey(pipe)
+            ip_adapter_image=row["image"]
+            prompt="eating ice cream"
+            generator=torch.Generator()
+            generator.manual_seed(123)
+            pipe.set_ip_adapter_scale(0.5)
+            initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
+
+            mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+            tiny_mask=mask.clone()
+            tiny_mask_pil=to_pil_image(1-tiny_mask)
+            #print("mask size",mask.size())
+
+            mask=F.interpolate(mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
 
             
 
-                ''''bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
-                _mask_pil = ImageOps.invert(bw_img)'''
-                color_rgba = initial_image.convert("RGB")
-                _mask_pil = to_pil_image(1-_mask).convert("RGB")  # must be single channel for alpha
+            mask_pil=to_pil_image(1-mask)
+            color_rgba = initial_image.convert("RGB")
+            mask_pil = mask_pil.convert("RGB")  # must be single channel for alpha
 
-                #print(_mask.size(),_mask_pil.size,color_rgba.size)
+            #print(mask.size,color_rgba.size)
 
-                # Apply as alpha (translucent mask)
-                _masked_img=Image.blend(color_rgba, _mask_pil, 0.5)
+            # Apply as alpha (translucent mask)
+            masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
-                masked_list.append(_masked_img)
+            mask[mask>1]=1.
+            #mask=1-mask
+            #print(mask.size())
+            mask_processor = IPAdapterMaskProcessor()
+            #print(mask_processor.config)
+            mask = mask_processor.preprocess(mask)
+            #print(mask.size())
+            #print("mask size",mask.size())
 
-        first_concat=concat_images_horizontally(masked_list)
+            masked_list=[]
+            for index,[name,module] in enumerate(attn_list):
+                if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
+                    _mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+                    _mask=F.interpolate(_mask.unsqueeze(0).unsqueeze(0), size=(args.dim, args.dim), mode="nearest").squeeze(0).squeeze(0)
 
-        accelerator.log({
-            "first_concat":wandb.Image(first_concat)
-        })
+                
 
-        generator=torch.Generator()
-        generator.manual_seed(123)
-        mask_step_list=args.final_mask_steps_list        
-        scale_step_dict={i:0  for i in range(args.final_steps) }
-        for k in args.final_adapter_steps_list:
-            scale_step_dict[k]=1.0
-        final_image=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
-            "ip_adapter_masks":mask
-        }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
+                    ''''bw_img = Image.fromarray(_mask.cpu().numpy(), mode="L")  # "L" = 8-bit grayscale
+                    _mask_pil = ImageOps.invert(bw_img)'''
+                    color_rgba = initial_image.convert("RGB")
+                    _mask_pil = to_pil_image(1-_mask).convert("RGB")  # must be single channel for alpha
 
-        generator=torch.Generator()
-        generator.manual_seed(123)
-        final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
+                    #print(_mask.size(),_mask_pil.size,color_rgba.size)
 
-        segmented_image=custom_sam(initial_image)
-        
-        concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_unmasked])
-        accelerator.log({
-            "image": wandb.Image(concat)
-        })
-        accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
+                    # Apply as alpha (translucent mask)
+                    _masked_img=Image.blend(color_rgba, _mask_pil, 0.5)
+
+                    masked_list.append(_masked_img)
+
+            first_concat=concat_images_horizontally(masked_list)
+
+            accelerator.log({
+                "first_concat":wandb.Image(first_concat)
+            })
+
+            generator=torch.Generator()
+            generator.manual_seed(123)
+            mask_step_list=args.final_mask_steps_list        
+            scale_step_dict={i:0  for i in range(args.final_steps) }
+            for k in args.final_adapter_steps_list:
+                scale_step_dict[k]=1.0
+            final_image=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
+                "ip_adapter_masks":mask
+            }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
+
+            generator=torch.Generator()
+            generator.manual_seed(123)
+            final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
+
+            
+            segmented_image=custom_sam(initial_image)
+            
+            concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_unmasked])
+            accelerator.log({
+                "image": wandb.Image(concat)
+            })
+            accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
 
 
 

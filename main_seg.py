@@ -77,7 +77,7 @@ def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
-    custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device,torch_dtype=torch.float16)
+    custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device,dtype=torch.float16)
 
     pipe = StableDiffusionPipeline.from_pretrained(
         "SimianLuo/LCM_Dreamshaper_v7",

@@ -717,7 +717,7 @@ def main(args):
                     generator.manual_seed(123)
                     null_prompt_image=pipeline([" " for _ in range(batch_size)],
                                     num_inference_steps=args.num_inference_steps,
-                                    do_classifier_free_guidance=do_classifier_free_guidance,
+                                    do_classifier_free_guidance=False,
                                     generator=generator,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
@@ -728,7 +728,7 @@ def main(args):
                     generator.manual_seed(123)
                     prompt_image=pipeline(prompt_batch,
                                     num_inference_steps=args.num_inference_steps,
-                                    do_classifier_free_guidance=do_classifier_free_guidance,
+                                    do_classifier_free_guidance=False,
                                     generator=generator,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,

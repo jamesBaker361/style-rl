@@ -284,7 +284,7 @@ def main(args):
                 #print("real embedding",real_embedding.size())
             else:
                 #this should NOT be normalized or transformed
-                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))[-1]
+                embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
 
             image=pipeline.image_processor.preprocess(image)[0]
             

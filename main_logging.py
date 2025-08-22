@@ -136,6 +136,8 @@ parser.add_argument("--constant_scale",action="store_true")
 parser.add_argument("--ip_start",type=float,default=0.0)
 parser.add_argument("--ip_end",type=float,default=1.0)
 parser.add_argument("--do_classifier_free_guidance",action="store_true")
+parser.add_argument("--cfg_embedding",action="store_true")
+parser.add_argument("--cfg_weight",type=float,default="3.0")
 
 import torch
 import torch.nn.functional as F
@@ -718,6 +720,37 @@ def main(args):
                                                  ip_adapter_image=ip_adapter_image, negative_prompt_embeds=batched_negative_prompt_embeds,
                                                  output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
+                if args.cfg_embedding:
+                    generator=torch.Generator(accelerator.device)
+                    generator.manual_seed(123)
+                    null_prompt_image=pipeline([" " for _ in range(batch_size)],
+                                    num_inference_steps=args.num_inference_steps,
+                                    do_classifier_free_guidance=do_classifier_free_guidance,
+                                    generator=generator,
+                                    #prompt_embeds=text_batch,
+                                    ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    output_type="pt",height=args.image_size,width=args.image_size,
+                                    #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
+                                    ).images
+                    generator=torch.Generator(accelerator.device)
+                    generator.manual_seed(123)
+                    prompt_image=pipeline(prompt_batch,
+                                    num_inference_steps=args.num_inference_steps,
+                                    do_classifier_free_guidance=do_classifier_free_guidance,
+                                    generator=generator,
+                                    #prompt_embeds=text_batch,
+                                    ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    output_type="pt",height=args.image_size,width=args.image_size,
+                                    #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
+                                    ).images
+                    
+                    null_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(null_prompt_image))
+                    prompted_embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(prompt_image))
+
+                    cfg_embedding=prompted_embedding-null_embedding
+                    image_embeds=args.cfg_weight*cfg_embedding
+                    
+                    
                 fake_image=pipeline(prompt_batch,
                                     num_inference_steps=args.num_inference_steps,
                                     do_classifier_free_guidance=do_classifier_free_guidance,

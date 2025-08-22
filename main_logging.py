@@ -177,6 +177,7 @@ def main(args):
     with np.load(args.npz_file) as np_dict:
         pca_object.components_=np_dict["components_"]
         pca_object.explained_variance_=np_dict["explained_variance_"]
+        pca_object.mean_=np_dict["mean_"]
 
 
 

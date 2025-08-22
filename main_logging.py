@@ -288,7 +288,7 @@ def main(args):
                 embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(image))
 
             if args.pca_project:
-                projection=pca_object.transform(embedding)
+                projection=pca_object.transform(embedding.cpu())
                 embedding=pca_object.inverse_transform(projection)
 
             image=pipeline.image_processor.preprocess(image)[0]

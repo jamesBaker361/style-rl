@@ -47,7 +47,7 @@ def get_mask(layer_index:int,
              threshold:float,
              kv_type:str="ip",
              vae_scale:int=8):
-    print("layer",layer_index)
+    #print("layer",layer_index)
     module=attn_list[layer_index][1] #get the module no name
     #module.processor.kv_ip
     if kv_type=="ip":
@@ -55,16 +55,16 @@ def get_mask(layer_index:int,
     elif kv_type=="str":
         processor_kv=module.processor.kv
     size=processor_kv[step].size()
-    print('\tprocessor_kv[step].size()',processor_kv[step].size())
+    #print('\tprocessor_kv[step].size()',processor_kv[step].size())
     
     avg=processor_kv[step].mean(dim=1).squeeze(0)
-    print("\t avg ", avg.size())
+    #print("\t avg ", avg.size())
     latent_dim=int (math.sqrt(avg.size()[0]))
-    print("\tlatent",latent_dim)
+    #print("\tlatent",latent_dim)
     avg=avg.view([latent_dim,latent_dim,-1])
-    print("\t avg ", avg.size())
+    #print("\t avg ", avg.size())
     avg=avg[:,:,token]
-    print("\t avg ", avg.size())
+    #print("\t avg ", avg.size())
     avg_min,avg_max=avg.min(),avg.max()
     x_norm = (avg - avg_min) / (avg_max - avg_min)  # [0,1]
     x_norm[x_norm < threshold]=0.

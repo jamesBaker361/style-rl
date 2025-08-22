@@ -98,11 +98,7 @@ parser.add_argument("--embedding",type=str,default="dino",help="dino ssl or sigl
 parser.add_argument("--facet",type=str,default="query",help="dino vit facet to extract. One of the following options: ['key' | 'query' | 'value' | 'token']")
 parser.add_argument("--pipeline",type=str,default="lcm")
 parser.add_argument("--batch_size",type=int,default=1)
-parser.add_argument("--epochs",type=int,default=10)
-parser.add_argument("--training_type",help="denoise or reward",default="denoise",type=str)
-parser.add_argument("--prediction_type",type=str,default="epsilon",help="epsilon or v_prediction")
 parser.add_argument("--train_split",type=float,default=0.5)
-parser.add_argument("--validation_interval",type=int,default=40)
 parser.add_argument("--uncaptioned_frac",type=float,default=0.75)
 parser.add_argument("--intermediate_embedding_dim",type=int,default=1024)
 parser.add_argument("--cross_attention_dim",type=int,default=768)
@@ -110,20 +106,15 @@ parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--dino_pooling_stride",default=4,type=int)
 parser.add_argument("--num_image_text_embeds",type=int,default=4)
-parser.add_argument("--deepspeed",action="store_true",help="whether to use deepspeed")
 parser.add_argument("--fsdp",action="store_true",help=" whether to use fsdp training")
 parser.add_argument("--vanilla",action="store_true",help="no distribution")
 parser.add_argument("--name",type=str,default="jlbaker361/model",help="name on hf")
 parser.add_argument("--load",action="store_true",help="whether to load saved version")
 parser.add_argument("--load_hf",action="store_true",help="whether to load saved version from hf")
-parser.add_argument("--upload_interval",type=int,default=50,help="how often to upload during training")
 parser.add_argument("--generic_test_prompts",action="store_true")
-parser.add_argument("--lr",type=float,default=0.0001)
 parser.add_argument("--disable_projection_adapter",action="store_true",help="whether to use projection for ip adapter ")
 parser.add_argument("--identity_adapter",action="store_true",help="whether to use identity mapping for IP adapter layers")
 parser.add_argument("--deep_to_ip_layers",action="store_true",help="use deeper ip layers")
-parser.add_argument("--scheduler_type",type=str,default="LCMScheduler")
-parser.add_argument("--reward_switch_epoch",type=int,default=-1)
 parser.add_argument("--initial_scale",type=float,default=1.0)
 parser.add_argument("--final_scale",type=float,default=1.0)
 parser.add_argument("--sigma_data",type=float,default=-0.8)
@@ -154,11 +145,7 @@ def split_list_by_ratio(lst, ratios=(0.8, 0.1, 0.1)):
 
 
 def main(args):
-    if args.deepspeed:
-        accelerator=Accelerator(log_with="wandb")
-        print("using deepspeed")
-    else:
-        accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
+    accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision,gradient_accumulation_steps=args.gradient_accumulation_steps)
     print("accelerator device",accelerator.device)
     device=accelerator.device
     state = PartialState()
@@ -591,7 +578,6 @@ def main(args):
             torch.cuda.synchronize()
         accelerator.wait_for_everyone()
 
-    optimizer=torch.optim.AdamW(params,lr=args.lr)
 
     if args.vanilla:
         denoising_model=denoising_model.to(device)
@@ -606,7 +592,7 @@ def main(args):
     clip_processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     fid = FrechetInceptionDistance(feature=2048,normalize=True)
     accelerator.wait_for_everyone()
-    clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,scheduler,optimizer)
+    clip_model,clip_processor,fid,denoising_model,vae,scheduler=accelerator.prepare(clip_model,clip_processor,fid,denoising_model,vae,scheduler)
     if hasattr(denoising_model,"post_quant_conv"):
         post_quant_conv=denoising_model.post_quant_conv.to(denoising_model.device)
         post_quant_conv=accelerator.prepare(post_quant_conv)

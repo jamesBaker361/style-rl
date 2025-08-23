@@ -64,8 +64,7 @@ if response.status_code == 200:
                 except PIL.UnidentifiedImageError:
                     print("bad url!", url_skin)
                     failures+=1
-                count+=1
-        break        
+                count+=1 
     Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
     end=time.time()
     print(f"all done! failures: {failures} successes: {successes} elpased {end-start}")

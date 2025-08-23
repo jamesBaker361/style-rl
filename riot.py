@@ -19,37 +19,40 @@ if response.status_code == 200:
         "champion":[]
     }
     data = response.json()
-    names=[k for k in data["data"].keys()] 
+    names=[k for k in data["data"].keys()]
     for n,name in enumerate(names):
+        champion_id=data["data"][name]["id"]
         if n % 5==0:
-            Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
+            #Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
             time.sleep(10)
-        url_champion=f"https://ddragon.leagueoflegends.com/cdn/15.16.1/data/en_US/champion/{name}.json"
+        url_champion=f"https://ddragon.leagueoflegends.com/cdn/15.16.1/data/en_US/champion/{champion_id}.json"
+        print(url_champion)
         response_champion = requests.get(url_champion)
         if response_champion.status_code==200:
             data_champion=response_champion.json()
-            skin_list=data_champion["data"][name]["skins"]
+            skin_list=data_champion["data"][champion_id]["skins"]
             for skin in skin_list:
                 skin_num=skin["num"]
-                url_skin=f"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{name}_{skin_num}.jpg"
+                url_skin=f"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{champion_id}_{skin_num}.jpg"
+                print(url_skin)
                 skin_name=skin["name"]
                 if skin_name=="default":
                     tag=""
                 else:
-                    index=skin_name.find(name)
+                    index=skin_name.find(champion_id)
                     tag=skin_name[:index-1]
 
                 try:
                     output_dict["image"].append(load_image(url_skin))
-                    output_dict["champion"].append(name)
+                    output_dict["champion"].append(champion_id)
                     output_dict["tag"].append(tag)
                     output_dict["url"].append(url_skin)
                     successes+=1
                 except PIL.UnidentifiedImageError:
                     print("bad url!", url_skin)
                     failures+=1
-                
-    Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
+        break        
+    #Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
     end=time.time()
     print(f"all done! failures: {failures} successes: {successes} elpased {end-start}")
 else:

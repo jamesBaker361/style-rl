@@ -742,7 +742,8 @@ def main(args):
 
                     cfg_embedding=prompted_embedding-null_embedding
                     image_embeds=args.cfg_weight*cfg_embedding
-                    print("embeds size",image_embeds.size())
+                    image_embeds=[image_embeds.unsqueeze(1)]
+                    #print("embeds size",image_embeds.size())
                     
                     
                 fake_image=pipeline(prompt_batch,

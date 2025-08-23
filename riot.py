@@ -10,6 +10,7 @@ response = requests.get(url)
 
 failures=0
 successes=0
+count=0
 
 if response.status_code == 200:
     output_dict={
@@ -29,23 +30,24 @@ if response.status_code == 200:
     data = response.json()
     names=[k for k in data["data"].keys()]
     for n,name in enumerate(names):
-        if n < start:
-            continue
+        
 
         champion_id=data["data"][name]["id"]
         if n % 5==0:
             Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
             time.sleep(10)
         url_champion=f"https://ddragon.leagueoflegends.com/cdn/15.16.1/data/en_US/champion/{champion_id}.json"
-        print(url_champion)
+        #print(url_champion)
         response_champion = requests.get(url_champion)
         if response_champion.status_code==200:
             data_champion=response_champion.json()
             skin_list=data_champion["data"][champion_id]["skins"]
             for skin in skin_list:
+                if count < start:
+                    continue
                 skin_num=skin["num"]
                 url_skin=f"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{champion_id}_{skin_num}.jpg"
-                print(url_skin)
+                #print(url_skin)
                 skin_name=skin["name"]
                 if skin_name=="default":
                     tag=""
@@ -62,6 +64,7 @@ if response.status_code == 200:
                 except PIL.UnidentifiedImageError:
                     print("bad url!", url_skin)
                     failures+=1
+                count+=1
         break        
     Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
     end=time.time()

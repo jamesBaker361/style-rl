@@ -29,6 +29,7 @@ if response.status_code == 200:
         print("colu,ndt load from hf")
     data = response.json()
     names=[k for k in data["data"].keys()]
+    print("n names",len(names))
     for n,name in enumerate(names):
         
 

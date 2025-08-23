@@ -741,8 +741,9 @@ def main(args):
                     prompted_embedding=embedding_util.embed_img_tensor(prompt_image)
 
                     cfg_embedding=prompted_embedding-null_embedding
-                    image_embeds=args.cfg_weight*cfg_embedding
-                    image_embeds=[image_embeds.unsqueeze(1)]
+                    image_embeds=args.cfg_weight*cfg_embedding 
+                    image_embeds=image_embeds.unsqueeze(1)+embeds_batch
+                    image_embeds=[image_embeds]
                     #print("embeds size",image_embeds.size())
                     
                     

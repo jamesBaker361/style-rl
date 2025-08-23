@@ -1,6 +1,6 @@
 import requests
 from diffusers.utils.loading_utils import load_image
-from datasets import Dataset
+from datasets import Dataset,load_dataset
 import time
 import PIL
 
@@ -18,12 +18,23 @@ if response.status_code == 200:
         "tag":[],
         "champion":[]
     }
+    start=0
+    try:
+        old_dataset=load_dataset("jlbaker361/league-splash-tagged",split="train")
+        output_dict=old_dataset.to_dict()
+        start=len(output_dict["image"])
+        print(f"skipping {start}")
+    except:
+        print("colu,ndt load from hf")
     data = response.json()
     names=[k for k in data["data"].keys()]
     for n,name in enumerate(names):
+        if n < start:
+            continue
+
         champion_id=data["data"][name]["id"]
         if n % 5==0:
-            #Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
+            Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
             time.sleep(10)
         url_champion=f"https://ddragon.leagueoflegends.com/cdn/15.16.1/data/en_US/champion/{champion_id}.json"
         print(url_champion)
@@ -52,7 +63,7 @@ if response.status_code == 200:
                     print("bad url!", url_skin)
                     failures+=1
         break        
-    #Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
+    Dataset.from_dict(output_dict).push_to_hub("jlbaker361/league-splash-tagged")
     end=time.time()
     print(f"all done! failures: {failures} successes: {successes} elpased {end-start}")
 else:

@@ -1,3 +1,3 @@
 for embedding in ["clip","ssl","siglip2","dino"]:
-    command=f"sbatch -J riot --err=slurm_chip/riot/{embedding}.err --out=slurm_chip/riot/{embedding}.out riot_embedding.py --embedding {embedding} --dest_dataset jlbaker361/league-tagged-{embedding} "
+    command=f"sbatch -J riot --err=slurm_chip/riot/{embedding}.err --out=slurm_chip/riot/{embedding}.out runpygpu_chip.sh riot_embedding.py --embedding {embedding} --dest_dataset jlbaker361/league-tagged-{embedding} "
     print(command)

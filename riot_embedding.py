@@ -3,9 +3,13 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 from embedding_helpers import EmbeddingUtil
-from datasets import load_dataset
+from datasets import load_dataset,Dataset
+import datasets
 from torchvision.transforms import ToTensor
 import torch
+from PIL import Image
+import base64
+from io import BytesIO
 
 import time
 
@@ -39,17 +43,32 @@ def main(args):
         "champion":[],
         "embedding":[]
     }
+    start=0
+    try:
+        old_dataset=load_dataset(args.dest_dataset,split="train")
+        output_dict=old_dataset.to_dict()
+        start=len(output_dict["image"])
+        print(f"skipping {start}")
+    except:
+        print("colu,ndt load from hf")
     
     src_data=load_dataset(args.src_dataset,split="train")
+    src_data=src_data.cast_column("image",datasets.Image())
     for k,row in enumerate(src_data):
-        print(row)
+        if k< start:
+            continue
         embedding=embedding_util.embed_img_tensor(embedding_util.transform_image(row["image"]))
-        for key in ["image","url","tag","champion"]:
+        print(type(embedding),embedding.size())
+        for key in ["url","tag","champion","image"]:
             output_dict[key].append(row[key])
         output_dict["embedding"].append(embedding)
 
-        if k >2:
-            break
+        if k % 50==0:
+            Dataset.from_dict(output_dict).push_to_hub(args.dest_dataset)
+
+
+    
+    Dataset.from_dict(output_dict).push_to_hub(args.dest_dataset)
 
 
 if __name__=='__main__':

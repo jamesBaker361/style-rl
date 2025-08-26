@@ -206,6 +206,7 @@ def main(args):
                 map_mask=torch.ones((args.dim,args.dim))
                 for ann in map_list:
                     map_=ann["segmentation"]
+                    map_=F.interpolate(map_, (args.dim,args.dim))
                     print(torch.Tensor(map_).size())
                     merged=torch.Tensor(map_)*mask
 
@@ -215,7 +216,9 @@ def main(args):
                 map_mask=torch.zeros((args.dim,args.dim))
                 for ann in map_list:
                     map_=ann["segmentation"]
-                    n_ones=ann.sum()
+                    map_=ann["segmentation"]
+                    map_=F.interpolate(map_, (args.dim,args.dim))
+                    n_ones=map_.sum()
                     print(torch.Tensor(map_).size())
                     merged=torch.Tensor(map_)*mask
                     if merged.sum()>= args.overlap_frac * n_ones:

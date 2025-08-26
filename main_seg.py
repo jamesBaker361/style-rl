@@ -202,24 +202,18 @@ def main(args):
             segmented_image,map_list=custom_sam(initial_image)
             
 
-            if args.segmentation_attention_method=="exclusive":
-                map_mask=torch.ones((args.dim,args.dim))
-                for ann in map_list:
-                    map_=ann["segmentation"]
-                    map_=F.interpolate(map_, (args.dim,args.dim))
-                    print(torch.Tensor(map_).size())
+            map_mask=torch.ones((args.dim,args.dim))
+            for ann in map_list:
+                map_=ann["segmentation"]
+                map_=F.interpolate(map_, (args.dim,args.dim))
+
+                if args.segmentation_attention_method=="exclusive":
                     merged=torch.Tensor(map_)*mask
 
                     map_mask=merged*map_mask
 
-            elif args.segmentation_attention_method=="overlap":
-                map_mask=torch.zeros((args.dim,args.dim))
-                for ann in map_list:
-                    map_=ann["segmentation"]
-                    map_=ann["segmentation"]
-                    map_=F.interpolate(map_, (args.dim,args.dim))
+                elif args.segmentation_attention_method=="overlap":
                     n_ones=map_.sum()
-                    print(torch.Tensor(map_).size())
                     merged=torch.Tensor(map_)*mask
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)

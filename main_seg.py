@@ -202,7 +202,10 @@ def main(args):
             segmented_image,map_list=custom_sam(initial_image)
             
 
-            map_mask=torch.ones((args.dim,args.dim))
+            if args.segmentation_attention_method=="exclusive":
+                map_mask=torch.ones((args.dim,args.dim))
+            elif args.segmentation_attention_method=="overlap":
+                map_mask=torch.zeros((args.dim,args.dim))
             for ann in map_list:
                 map_=ann["segmentation"]
                 map_=F.interpolate(map_, (args.dim,args.dim))

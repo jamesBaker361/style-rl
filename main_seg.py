@@ -208,6 +208,7 @@ def main(args):
                 map_mask=torch.zeros((args.dim,args.dim))
             for ann in map_list:
                 map_=ann["segmentation"]
+                map_=torch.from_numpy(map_)
                 map_=F.interpolate(map_, (args.dim,args.dim))
 
                 if args.segmentation_attention_method=="exclusive":

@@ -5,8 +5,10 @@ from accelerate import Accelerator
 import time
 import numpy as np
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import SGDClassifier
 from sklearn.utils.class_weight import compute_class_weight
 from datasets import load_dataset,Dataset
+from sklearn.preprocessing import StandardScaler
 import joblib  # for saving
 
 parser=argparse.ArgumentParser()
@@ -25,13 +27,22 @@ def main(args):
     all_champions=set(data["champion"])
 
     plane_dict={
-        "weight":[],
-        "bias":[],
+        "weight_SVC":[],
+        "bias_SVC":[],
+        "weight_SGD":[],
+        "bias_SGD":[],
         "type":[], #tag or character
         "label":[], #the tag or character in question
         "positives":[] #how many positive examples there were
     }
     X=[row["embedding"][0] for row in data]
+
+    scaler =StandardScaler()
+    X=scaler.fit_transform(X)
+    model_dict={
+            "SVC":LinearSVC,
+            "SGD":SGDClassifier
+        }
     for tag in all_tags:
 
         
@@ -41,15 +52,17 @@ def main(args):
         weights = compute_class_weight(class_weight="balanced", classes=classes, y=y)
         class_weight = {c: w for c, w in zip(classes, weights)}
 
-        # Train linear SVM
-        clf = LinearSVC(class_weight=class_weight, max_iter=20000,verbose=1)
-        clf.fit(X, y)
+        
+        for key,model in model_dict.items():
+            # Train linear SVM
+            clf = model(class_weight=class_weight, max_iter=20000,verbose=1)
+            clf.fit(X, y)
 
-        w = clf.coef_[0]   # normal vector to hyperplane
-        b = clf.intercept_[0]   # bias term
+            w = clf.coef_[0]   # normal vector to hyperplane
+            b = clf.intercept_[0]   # bias term
 
-        plane_dict["weight"].append(w)
-        plane_dict["bias"].append(b)
+            plane_dict[f"weight_{key}"].append(w)
+            plane_dict[f"bias_{key}"].append(b)
         plane_dict["type"].append("tag")
         plane_dict["label"].append(tag)
         plane_dict["positives"].append(sum(y))
@@ -63,15 +76,16 @@ def main(args):
         weights = compute_class_weight(class_weight="balanced", classes=classes, y=y)
         class_weight = {c: w for c, w in zip(classes, weights)}
 
-        # Train linear SVM
-        clf = LinearSVC(class_weight=class_weight, max_iter=20000,verbose=1)
-        clf.fit(X, y)
+        for key,model in model_dict.items():
+            # Train linear SVM
+            clf = model(class_weight=class_weight, max_iter=20000,verbose=1)
+            clf.fit(X, y)
 
-        w = clf.coef_[0]   # normal vector to hyperplane
-        b = clf.intercept_[0]   # bias term
+            w = clf.coef_[0]   # normal vector to hyperplane
+            b = clf.intercept_[0]   # bias term
 
-        plane_dict["weight"].append(w)
-        plane_dict["bias"].append(b)
+            plane_dict[f"weight_{key}"].append(w)
+            plane_dict[f"bias_{key}"].append(b)
         plane_dict["type"].append("champion")
         plane_dict["label"].append(champion)
         plane_dict["positives"].append(sum(y))

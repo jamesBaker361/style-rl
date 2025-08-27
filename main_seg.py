@@ -199,7 +199,7 @@ def main(args):
             final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
             torch.cuda.empty_cache()
             
-            segmented_image,map_list=custom_sam(initial_image)
+            segmented_image,map_list=custom_sam(initial_image,detect_resolution=args.dim)
             accelerator.log({
                 "segmented":wandb.Image(segmented_image)
             })
@@ -211,6 +211,8 @@ def main(args):
                 map_mask=torch.zeros((args.dim,args.dim))
             for ann in map_list:
                 map_=ann["segmentation"]
+                print("map size", map_.size)
+                
                 map_=torch.from_numpy(map_)
                 map_=F.interpolate(map_, (args.dim,args.dim))
 

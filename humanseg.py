@@ -26,7 +26,6 @@ masks=custom_sam.get_masks(image)
 for ann in masks:
     m = ann['segmentation']
     print(shape,m.shape)
-    break
 
     
 

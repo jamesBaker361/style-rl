@@ -203,7 +203,7 @@ def main(args):
             accelerator.log({
                 "segmented":wandb.Image(segmented_image)
             })
-            
+            mask=mask.cpu()
 
             if args.segmentation_attention_method=="exclusive":
                 map_mask=torch.ones((args.dim,args.dim))
@@ -217,13 +217,13 @@ def main(args):
                 #map_=F.interpolate(map_.unsqueeze(0).unsqueeze(0), (args.dim,args.dim)).squeeze(0).squeeze(0)
 
                 if args.segmentation_attention_method=="exclusive":
-                    merged=torch.Tensor(map_)*mask
+                    merged=map_*mask
 
                     map_mask=merged*map_mask
 
                 elif args.segmentation_attention_method=="overlap":
                     n_ones=map_.sum()
-                    merged=torch.Tensor(map_)*mask
+                    merged=map_*mask
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)
 

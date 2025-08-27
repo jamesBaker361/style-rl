@@ -55,7 +55,7 @@ def main(args):
         
         for key,model in model_dict.items():
             # Train linear SVM
-            clf = model(class_weight=class_weight, max_iter=20000,verbose=1)
+            clf = model(class_weight=class_weight, max_iter=20000,verbose=0)
             clf.fit(X, y)
 
             w = clf.coef_[0]   # normal vector to hyperplane
@@ -78,7 +78,7 @@ def main(args):
 
         for key,model in model_dict.items():
             # Train linear SVM
-            clf = model(class_weight=class_weight, max_iter=20000,verbose=1)
+            clf = model(class_weight=class_weight, max_iter=20000,verbose=0)
             clf.fit(X, y)
 
             w = clf.coef_[0]   # normal vector to hyperplane

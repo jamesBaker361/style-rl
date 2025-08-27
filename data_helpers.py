@@ -5,13 +5,15 @@ from torchvision.transforms import ToTensor
 from torchvision import transforms
 
 class CustomDataset(Dataset):
-    def __init__(self,image_list,embeds_list,text_list,posterior_list=None,prompt_list=None):
+    def __init__(self,image_list,embeds_list,text_list,posterior_list=None,prompt_list=None,tag_list=None,tag_plane_list=None):
         super().__init__()
         self.image_list=image_list
         self.embeds_list=embeds_list
         self.text_list=text_list
         self.posterior_list=posterior_list
         self.prompt_list=prompt_list
+        self.tag_list=tag_list
+        self.tag_plane_list=tag_plane_list
 
     def __len__(self):
         return len(self.image_list)

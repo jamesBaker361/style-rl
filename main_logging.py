@@ -139,6 +139,7 @@ parser.add_argument("--tagged_data",type=str,default="jlbaker361/league-tagged-c
 parser.add_argument("--hyperplane",action="store_true",help="whether to use the hyperplane for alignment with tags")
 parser.add_argument("--classifier_type",default="SGD",type=str,help="SGD or SVC classifier")
 parser.add_argument("--positive_threshold",type=int,default=5,help="how many positives must exist in the dataset to use the tag")
+parser.add_argument("--hyperplane_coefficient",type=float,default=0.1)
 
 import torch
 import torch.nn.functional as F
@@ -187,6 +188,24 @@ def main(args):
         pca_object.components_=np_dict["components_"]
         pca_object.explained_variance_=np_dict["explained_variance_"]
         pca_object.mean_=np_dict["mean_"]
+
+    if args.hyperplane:
+        classification_data=load_dataset(args.classification_data,split="train")
+        classification_data.filter(lambda row: row["positives"]>=args.positive_threshold)
+        accelerator.print([row["label"] for row in classification_data])
+        tagged_data=load_dataset(args.tagged_data,split="train")
+        X=[row["embedding"][0] for row in tagged_data]
+
+        scaler =StandardScaler()
+        scaler.fit(X)
+        model_dict={
+            "SVC":LinearSVC,
+            "SGD":SGDClassifier
+        }
+        classifier_model_constructor=model_dict[args.classifier_type]
+
+
+
 
 
 

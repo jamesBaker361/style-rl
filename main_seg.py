@@ -200,6 +200,9 @@ def main(args):
             torch.cuda.empty_cache()
             
             segmented_image,map_list=custom_sam(initial_image)
+            accelerator.log({
+                "segmented":wandb.Image(segmented_image)
+            })
             
 
             if args.segmentation_attention_method=="exclusive":

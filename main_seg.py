@@ -229,7 +229,7 @@ def main(args):
                         map_mask=torch.max(map_,map_mask)
                 
             for _ in range(2):
-                if map_mask.size()>2:
+                if len(map_mask.size())>2:
                     map_mask=map_mask.squeeze(0)
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
 

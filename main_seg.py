@@ -204,6 +204,7 @@ def main(args):
                 "segmented":wandb.Image(segmented_image)
             })
             mask=mask.cpu()
+            print("mask size",mask.size())
 
             if args.segmentation_attention_method=="exclusive":
                 map_mask=torch.ones((args.dim,args.dim))
@@ -214,19 +215,19 @@ def main(args):
 
                 map_=torch.from_numpy(map_).cpu()
                 #map_=F.interpolate(map_.unsqueeze(0).unsqueeze(0), (args.dim,args.dim)).squeeze(0).squeeze(0)
-
+                print("\tmap mask size", map_mask.size())
                 if args.segmentation_attention_method=="exclusive":
                     merged=map_*mask
 
                     map_mask=merged*map_mask
 
                 elif args.segmentation_attention_method=="overlap":
-                    print("\tmap mask size", map_mask.size())
+                    
                     n_ones=map_.sum()
                     merged=map_*mask
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)
-
+                print("\t merged size",merged.size())
             print("map mask size", map_mask.size())
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
 

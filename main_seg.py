@@ -215,7 +215,7 @@ def main(args):
 
                 map_=torch.from_numpy(map_).cpu()
                 #map_=F.interpolate(map_.unsqueeze(0).unsqueeze(0), (args.dim,args.dim)).squeeze(0).squeeze(0)
-                print("\tmap mask size", map_mask.size())
+                
                 if args.segmentation_attention_method=="exclusive":
                     merged=map_*mask
 
@@ -227,8 +227,10 @@ def main(args):
                     merged=map_*mask
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)
-                print("\t merged size",merged.size())
-            print("map mask size", map_mask.size())
+                
+            for _ in range(2):
+                if map_mask.size()>2:
+                    map_mask=map_mask.squeeze(0)
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
 
             

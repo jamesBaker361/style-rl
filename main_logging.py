@@ -189,20 +189,7 @@ def main(args):
         pca_object.explained_variance_=np_dict["explained_variance_"]
         pca_object.mean_=np_dict["mean_"]
 
-    if args.hyperplane:
-        classification_data=load_dataset(args.classification_data,split="train")
-        classification_data.filter(lambda row: row["positives"]>=args.positive_threshold)
-        accelerator.print([row["label"] for row in classification_data])
-        tagged_data=load_dataset(args.tagged_data,split="train")
-        X=[row["embedding"][0] for row in tagged_data]
-
-        scaler =StandardScaler()
-        scaler.fit(X)
-        model_dict={
-            "SVC":LinearSVC,
-            "SGD":SGDClassifier
-        }
-        classifier_model_constructor=model_dict[args.classifier_type]
+    
 
 
 
@@ -365,6 +352,30 @@ def main(args):
     accelerator.print("text_list",len(text_list))
     accelerator.print("embedding list",len(embedding_list))
 
+
+    if args.hyperplane:
+        classification_data=load_dataset(args.classification_data,split="train")
+        classification_data=classification_data.filter(lambda row: row["positives"]>=args.positive_threshold)
+        classification_data=list(classification_data)
+        accelerator.print([row["label"] for row in classification_data])
+        tagged_data=load_dataset(args.tagged_data,split="train")
+        X=[row["embedding"][0] for row in tagged_data]
+
+        scaler =StandardScaler()
+        scaler.fit(X)
+        model_dict={
+            "SVC":LinearSVC,
+            "SGD":SGDClassifier
+        }
+        classifier_model_constructor=model_dict[args.classifier_type]
+
+        label_list=[]
+        label_plane_list=[]
+
+        for i, _e in enumerate(embedding_list):
+            label_list.append(classification_data[i%len(classification_data)]["label"])
+            label_plane_list.append(torch.from_numpy( classification_data[i%len(classification_data)][f"weight_{args.classifier_type}"]/scaler.scale_).unsqueeze(0))
+
     do_classifier_free_guidance=args.do_classifier_free_guidance
     if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
         do_classifier_free_guidance=True
@@ -506,6 +517,10 @@ def main(args):
 
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
+    if args.hyperplane:
+        _,test_label_list,_=split_list_by_ratio(test_label_list)
+        _,test_label_plane_list,_=split_list_by_ratio(label_plane_list)
+
     if args.real_test_prompts:
         real_test_prompt_list=[
            ' in the jungle',
@@ -573,6 +588,10 @@ def main(args):
     train_dataset=CustomDataset(image_list,embedding_list,text_list,prompt_list=prompt_list)
     val_dataset=CustomDataset(val_image_list,val_embedding_list,val_text_list,prompt_list=val_prompt_list)
     test_dataset=CustomDataset(test_image_list,test_embedding_list,test_text_list,prompt_list=test_prompt_list)
+    if args.hyperplane:
+        test_dataset=CustomDataset(test_image_list,test_embedding_list,
+                                   test_text_list,prompt_list=test_prompt_list,
+                                   label_list=test_label_list, label_plane_list=test_label_plane_list)
 
     for dataset_batch in train_dataset:
         break
@@ -709,13 +728,13 @@ def main(args):
             batch_size=image_batch.size()[0]
             image_embeds=embeds_batch #.unsqueeze(0)
             do_denormalize= [True] * batch_size
-            if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
+            '''if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
                 batched_negative_prompt_embeds=negative_text_embeds.expand((batch_size, -1,-1)).to(text_batch.device)
                 negative_image_embeds=torch.zeros(image_embeds.size(),device=image_embeds.device)
                 image_embeds=[torch.cat([negative_image_embeds,image_embeds],dim=0)]
             else:
                 batched_negative_prompt_embeds=None
-                image_embeds=[image_embeds]
+                image_embeds=[image_embeds]'''
             
             if b==0:
                 if hasattr(pipeline,"unet"):
@@ -725,8 +744,8 @@ def main(args):
                 accelerator.print("testing","images",image_batch.device,"text",text_batch.device,"embeds",embeds_batch.device)
                 accelerator.print("testing","images",image_batch.dtype,"text",text_batch.dtype,"embeds",embeds_batch.dtype)
                 accelerator.print("prompt",prompt_batch)
-                if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
-                    accelerator.print("testing","negstive",batched_negative_prompt_embeds.size(),batched_negative_prompt_embeds.device)
+                '''if args.pipeline=="lcm_post_lora" or args.pipeline=="lcm_pre_lora":
+                    accelerator.print("testing","negstive",batched_negative_prompt_embeds.size(),batched_negative_prompt_embeds.device)'''
             #image_batch=torch.clamp(image_batch, 0, 1)
             real_pil_image_set=pipeline.image_processor.postprocess(image_batch,"pil",do_denormalize)
             
@@ -736,7 +755,8 @@ def main(args):
                 fake_image=torch.stack([pipeline( baseline_prompt_batch,
                                                     num_inference_steps=args.num_inference_steps,
                                                  #prompt_embeds=text_batch,
-                                                 ip_adapter_image=ip_adapter_image, negative_prompt_embeds=batched_negative_prompt_embeds,
+                                                 ip_adapter_image=ip_adapter_image, 
+                                                 #negative_prompt_embeds=batched_negative_prompt_embeds,
                                                  output_type="pt",height=args.image_size,width=args.image_size).images[0] for ip_adapter_image in real_pil_image_set])
             else:
                 if args.cfg_embedding:
@@ -747,7 +767,8 @@ def main(args):
                                     do_classifier_free_guidance=False,
                                     generator=generator,
                                     #prompt_embeds=text_batch,
-                                    ip_adapter_image_embeds=image_embeds,negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    ip_adapter_image_embeds=image_embeds,
+                                    #negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
@@ -759,7 +780,7 @@ def main(args):
                                     generator=generator,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,
-                                    negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    #negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,
                                     #decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale,start=args.ip_start,end=args.ip_end
                                     ).images
@@ -769,17 +790,23 @@ def main(args):
 
                     cfg_embedding=prompted_embedding-null_embedding
                     image_embeds=args.cfg_weight*cfg_embedding 
-                    image_embeds=image_embeds.unsqueeze(1)+embeds_batch
-                    image_embeds=[image_embeds]
+                    image_embeds=image_embeds+embeds_batch
+                    
                     #print("embeds size",image_embeds.size())
                     
-                    
+                if args.hyperplane:
+                    label=batch["label"]
+                    label_plane=batch["label_plane"].to(image_embeds.device)
+                    image_embeds=image_embeds+args.hyperplane_coefficient * label_plane
+
+                image_embeds=[image_embeds]
+                
                 fake_image=pipeline(prompt_batch,
                                     num_inference_steps=args.num_inference_steps,
                                     do_classifier_free_guidance=do_classifier_free_guidance,
                                     #prompt_embeds=text_batch,
                                     ip_adapter_image_embeds=image_embeds,
-                                    negative_prompt_embeds=batched_negative_prompt_embeds,
+                                    #negative_prompt_embeds=batched_negative_prompt_embeds,
                                     output_type="pt",height=args.image_size,width=args.image_size,decreasing_scale=args.decreasing_scale,increasing_scale=args.increasing_scale
                                     ,start=args.ip_start,end=args.ip_end).images
             
@@ -822,6 +849,8 @@ def main(args):
 
             for pil_image,real_pil_image,pil_image_unnorm,prompt in zip(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image_unnorm,pil_image])
+                if args.hyperplane:
+                    prompt+=f" {label} "
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         

@@ -1,3 +1,3 @@
-for threshold in [0.25,0.5,0.75]:
-    command=f"sbatch --exclude=gpu[005,006,008,010,011,013,014,018],cuda[001-008],pascal[006-010],gpuk[001-012] --err=slurm/overlap/_{threshold}.err --out=slurm/overlap/_{threshold}.out runpygpu.sh main_seg.py --segmentation_attention_method overlap --initial_mask_step_list 1 2 --final_mask_steps_list 2 3 4 5 --final_adapter_steps_list 2 3 4 5 --limit 16 --threshold {threshold}"
+for overlap_frac in [0.25,0.5,0.75,0.8,0.9]:
+    command=f"sbatch --exclude=gpu[005,006,008,010,011,013,014,018],cuda[001-008],pascal[006-010],gpuk[001-012] --err=slurm/overlap/_{overlap_frac}.err --out=slurm/overlap/_{overlap_frac}.out runpygpu.sh main_seg.py --segmentation_attention_method overlap --initial_mask_step_list 1 2 --final_mask_steps_list 2 3 4 5 --final_adapter_steps_list 2 3 4 5 --limit 16 --overlap_frac {overlap_frac} "
     print(command)

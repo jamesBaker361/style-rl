@@ -214,7 +214,7 @@ def main(args):
                 print("map size", map_.size, map_.shape)
 
                 map_=torch.from_numpy(map_)
-                map_=F.interpolate(map_, (args.dim,args.dim))
+                map_=F.interpolate(map_.unsqueeze(0).unsqueeze(0), (args.dim,args.dim)).squeeze(0).squeeze(0)
 
                 if args.segmentation_attention_method=="exclusive":
                     merged=torch.Tensor(map_)*mask

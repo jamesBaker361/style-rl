@@ -40,7 +40,7 @@ parser.add_argument("--limit",type=int,default=-1,help="limit of samples")
 parser.add_argument("--layer_index",type=int,default=15)
 parser.add_argument("--dim",type=int,default=256)
 parser.add_argument("--token",type=int,default=1, help="which IP token is attention")
-parser.add_argument("--overlap_frac",type=int,default=0.8)
+parser.add_argument("--overlap_frac",type=float,default=0.8)
 parser.add_argument("--segmentation_attention_method",type=str,default="overlap or exclusive")
 
 def get_mask(layer_index:int, 

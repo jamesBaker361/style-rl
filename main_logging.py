@@ -40,6 +40,9 @@ from huggingface_hub import create_repo,HfApi
 from PIL import Image
 from sana_pipelines import CompatibleSanaSprintPipeline, prepare_ip_adapter,compatible_forward_sana_transformer_model
 from custom_scheduler import *
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import SGDClassifier
+from sklearn.preprocessing import StandardScaler
 
 def concat_images_horizontally(images):
     """
@@ -89,7 +92,7 @@ except:
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images")
+parser.add_argument("--dataset",type=str,default="jlbaker361/captioned-images",help="src images to test on")
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="person")
 parser.add_argument("--image_size",type=int,default=256)
@@ -131,6 +134,11 @@ parser.add_argument("--cfg_weight",type=float,default="3.0")
 parser.add_argument("--npz_file",type=str,default="clip_pca_0.95.npz")
 parser.add_argument("--pca_project",action="store_true")
 parser.add_argument("--baseline_prompt",type=str,default=" ,league of legends style")
+parser.add_argument("--classification_data",type=str,default="jlbaker361/league-clip-classification",help="dataset with all of the hyperplane weights")
+parser.add_argument("--tagged_data",type=str,default="jlbaker361/league-tagged-clip",help="data to use for normalization stuff")
+parser.add_argument("--hyperplane",action="store_true",help="whether to use the hyperplane for alignment with tags")
+parser.add_argument("--classifier_type",default="SGD",type=str,help="SGD or SVC classifier")
+parser.add_argument("--positive_threshold",type=int,default=5,help="how many positives must exist in the dataset to use the tag")
 
 import torch
 import torch.nn.functional as F

@@ -252,14 +252,7 @@ def main(args):
             print(f"scheduler {attribute} exists")
         else:
             print(f"scheduler {attribute} does not exist ")
-    '''scheduler_class={
-            "LCMScheduler":LCMScheduler,
-            "DDIMScheduler":DDIMScheduler,
-            "DEISMultistepScheduler":DEISMultistepScheduler,
-            "CompatibleFlowMatchEulerDiscreteScheduler":CompatibleFlowMatchEulerDiscreteScheduler
-    }[args.scheduler_type]
-    pipeline.scheduler = scheduler_class.from_config(pipeline.scheduler.config)
-    accelerator.print(pipeline.scheduler)'''
+
 
     vae=pipeline.vae
     if args.pipeline=="sana":
@@ -416,9 +409,6 @@ def main(args):
         if random.random()<=args.uncaptioned_frac:
             text_list[i]=unconditioned_text.squeeze(0).clone().detach()
 
-    def loss_fn(pred_embedding_batch:torch.Tensor, src_embedding_batch:torch.Tensor)->torch.Tensor:
-        #pred_embedding_batch=embedding_util.embed_img_tensor(img_tensor_batch)
-        return F.mse_loss(pred_embedding_batch.float(),src_embedding_batch.float(),reduce="mean")
     
     fake_image=torch.rand((1,3,args.image_size,args.image_size))
     fake_embedding=embedding_util.embed_img_tensor(fake_image)
@@ -454,25 +444,14 @@ def main(args):
                     use_projection,args.identity_adapter,args.deep_to_ip_layers)
     #print("image projection",unet.encoder_hid_proj.multi_ip_adapter.image_projection_layers[0])
     start_epoch=1
-    persistent_loss_list=[]
-    persistent_grad_norm_list=[]
-    persistent_text_alignment_list=[]
-    persistent_fid_list=[]
     if args.load:
         try:
             denoising_model.load_state_dict(torch.load(save_path,weights_only=True),strict=False)
             with open(config_path,"r") as f:
                 data=json.load(f)
             start_epoch=data["start_epoch"]
-            persistent_loss_list=data["persistent_loss_list"]
-            persistent_text_alignment_list=data["persistent_text_alignment_list"]
-            persistent_fid_list=data["persistent_fid_list"]
-            try:
-                persistent_grad_norm_list=data["persistent_grad_norm_list"]
-            except KeyError:
-                print("key error persistent_grad_norm_list list")
+
             accelerator.print("loaded from ",save_path)
-            accelerator.print("start epoch",start_epoch)
         except Exception as e:
             accelerator.print("couldnt load locally")
             accelerator.print(e)
@@ -483,14 +462,7 @@ def main(args):
             denoising_model.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
             with open(pretrained_config_path,"r") as f:
                 data=json.load(f)
-            start_epoch=data["start_epoch"]+1
-            persistent_loss_list=data["persistent_loss_list"]
-            persistent_text_alignment_list=data["persistent_text_alignment_list"]
-            persistent_fid_list=data["persistent_fid_list"]
-            try:
-                persistent_grad_norm_list=data["persistent_grad_norm_list"]
-            except KeyError:
-                print("key error persistent_grad_norm_list list")
+
             accelerator.print("loaded from  ",pretrained_weights_path)
         except Exception as e:
             accelerator.print("couldnt load from hf")

@@ -351,7 +351,13 @@ def main(args):
         classification_data=classification_data.filter(lambda row: row["positives"]>=args.positive_threshold)
         classification_data=list(classification_data)
         accelerator.print([row["label"] for row in classification_data])
+        label_real_image_dict={row["label"]:[] for row in classification_data}
+        label_fake_image_dict={row["label"]:[] for row in classification_data}
+
         tagged_data=load_dataset(args.tagged_data,split="train")
+        for row in tagged_data:
+            if row["label"] in label_real_image_dict:
+                label_real_image_dict[row["label"]].append( pipeline.image_processor.preprocess( row["image"]))
         X=[row["embedding"][0] for row in tagged_data]
 
         scaler =StandardScaler()
@@ -767,7 +773,7 @@ def main(args):
                     #print("embeds size",image_embeds.size())
                     
                 if args.hyperplane:
-                    label=batch["label"]
+                    label_batch=batch["label"]
                     label_plane=batch["label_plane"].to(image_embeds.device)
                     image_embeds=image_embeds+args.hyperplane_coefficient * label_plane
 
@@ -819,10 +825,14 @@ def main(args):
             
             clip_alignment_list.append(clip_difference.cpu().detach().item())
 
+            if args.hyperplane:
+                for l,img in zip(label_batch,fake_image):
+                    label_fake_image_dict[l].append(fake_image)
+
             for pil_image,real_pil_image,pil_image_unnorm,prompt in zip(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image_unnorm,pil_image])
                 if args.hyperplane:
-                    prompt+=f" {label} "
+                    prompt+=f" {label_batch} "
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         

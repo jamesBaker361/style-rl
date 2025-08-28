@@ -15,6 +15,7 @@ import torch
 from main_pers import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
+import random
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
@@ -114,6 +115,29 @@ def main(args):
         data=datasets.load_dataset(args.dataset)
         data=data["train"]
 
+        real_test_prompt_list=[
+           ' in the jungle',
+            ' in the snow',
+            ' on the beach',
+            ' on a cobblestone street',
+            ' on top of pink fabric',
+            ' on top of a wooden floor',
+            ' with a city in the background',
+            ' with a mountain in the background',
+            ' with a blue house in the background',
+            ' on top of a purple rug in a forest',
+            ' with a wheat field in the background',
+            ' with a tree and autumn leaves in the background',
+            ' with the Eiffel Tower in the background',
+            ' floating on top of water',
+            ' floating in an ocean of milk',
+            ' on top of green grass with sunflowers around it',
+            ' on top of a mirror',
+            ' on top of the sidewalk in a crowded street',
+            ' on top of a dirt road',
+            ' on top of a white rug',
+        ]
+
         for k,row in enumerate(data):
             if k==args.limit:
                 for index,[name,module] in enumerate(attn_list):
@@ -125,7 +149,7 @@ def main(args):
                 break
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
-            prompt="eating ice cream"
+            prompt=random.choice(real_test_prompt_list)
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(0.5)

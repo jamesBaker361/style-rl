@@ -829,10 +829,10 @@ def main(args):
                 for l,img in zip(label_batch,fake_image):
                     label_fake_image_dict[l].append(fake_image)
 
-            for pil_image,real_pil_image,pil_image_unnorm,prompt in zip(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
+            for k,(pil_image,real_pil_image,pil_image_unnorm,prompt) in enumerate(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image_unnorm,pil_image])
                 if args.hyperplane:
-                    prompt+=f" {label_batch} "
+                    prompt+=f" {label_batch[k]} "
                 metrics[prompt.replace(",","").replace(" ","_").strip()]=wandb.Image(concat_image)
         #pipeline.scheduler =  DEISMultistepScheduler.from_config(pipeline.scheduler.config)
         

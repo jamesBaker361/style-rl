@@ -256,8 +256,9 @@ def main(args):
                 if len(map_mask.size())>2:
                     map_mask=map_mask.squeeze(0)
 
-            map_mask=mask_processor.preprocess(map_mask)
+            
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
+            map_mask=mask_processor.preprocess(map_mask)
 
             generator=torch.Generator()
             generator.manual_seed(123)

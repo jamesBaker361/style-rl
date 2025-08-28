@@ -255,7 +255,15 @@ def main(args):
             for _ in range(2):
                 if len(map_mask.size())>2:
                     map_mask=map_mask.squeeze(0)
+
+            map_mask=mask_processor.preprocess(map_mask)
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
+
+            generator=torch.Generator()
+            generator.manual_seed(123)
+            final_image=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
+                "ip_adapter_masks":map_mask
+            }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
             
             concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_unmasked])

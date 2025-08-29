@@ -827,7 +827,7 @@ def main(args):
 
             if args.hyperplane:
                 for l,img in zip(label_batch,fake_image):
-                    label_fake_image_dict[l].append(fake_image)
+                    label_fake_image_dict[l].append(pipeline.image_processor.preprocess(img))
 
             for k,(pil_image,real_pil_image,pil_image_unnorm,prompt) in enumerate(pil_image_set,real_pil_image_set,pil_image_set_unnorm,prompt_batch):
                 concat_image=concat_images_horizontally([real_pil_image,pil_image_unnorm,pil_image])
@@ -851,6 +851,22 @@ def main(args):
             print("fid elapsed ",end-start)
         else:
             metrics["fid"]=0.0
+
+        if args.hyperplane:
+            label_fid_list=[]
+            for k in label_fake_image_dict.keys():
+                if k in label_real_image_dict:
+                    label_real_image_tensor_list=label_real_image_dict[k]
+                    label_fake_image_tensor_list= label_fake_image_dict[k]
+                    fid.update(label_real_image_tensor_list, real=True)
+                    fid.update(label_fake_image_tensor_list, real = False)
+                    difference=fid.compute().cpu().detach().item()
+                    label_fid_list.append(difference)
+                    accelerator.print(k,difference )
+            metrics["label_fid"]=np.mean(label_fid_list)
+
+
+
         if auto_log:
             accelerator.log(metrics)
         if args.pipeline=="lcm_post_lora":

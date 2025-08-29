@@ -496,7 +496,7 @@ def main(args):
     prompt_list,test_prompt_list,val_prompt_list=split_list_by_ratio(prompt_list,ratios)
 
     if args.hyperplane:
-        _,test_label_list,_=split_list_by_ratio(test_label_list)
+        _,test_label_list,_=split_list_by_ratio(label_list)
         _,test_label_plane_list,_=split_list_by_ratio(label_plane_list)
 
     if args.real_test_prompts:

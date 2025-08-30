@@ -11,18 +11,19 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
                                 #for scheduler in ["LCMScheduler"]:
                                 for pipeline in ["lcm"]:
                                     for reward_switch_epoch in [-1]:
+                                        for hyperplane_coefficient in [-1.0,-0.1, -0.01,0.01,0.1,1]:
                         
-                                        name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}_{reward_switch_epoch}"
-                                        port+=1
-                                        command=f"sbatch  -J perstest  --err=slurm/perstesting_{data}_hyper/_{name}.err --out=slurm/perstesting_{data}_hyper/_{name}.out --gres=gpu:1 "
-                                        command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_logging.py  --limit -1 --batch_size 2 --project_name {data}-{n}-testing "
-                                        command+=f" --mixed_precision fp16   --uncaptioned_frac {frac} --train_split 0.5  --load --generic_test_prompts "
-                                        command+=f" --embedding {embedding}  --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name}  "
-                                        command+=f" --pipeline {pipeline}   --num_inference_steps 8 --hyperplane"
-                                        if suffix=="_no_proj":
-                                            command+=" --disable_projection_adapter "
-                                        elif suffix=="_identity":
-                                            command+=" --identity_adapter "
-                                        elif suffix=="_deep_identity":
-                                            command+=" --identity_adapter  --deep_to_ip_layers "
-                                        print(command)
+                                            name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}_{reward_switch_epoch}"
+                                            port+=1
+                                            command=f"sbatch  -J perstest  --err=slurm/perstesting_{data}_hyper/{hyperplane_coefficient}_{name}.err --out=slurm/perstesting_{data}_hyper/{hyperplane_coefficient}_{name}.out --gres=gpu:1 "
+                                            command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_logging.py  --limit -1 --batch_size 2 --project_name {data}-{n}-testing "
+                                            command+=f" --mixed_precision fp16   --uncaptioned_frac {frac} --train_split 0.5  --load --generic_test_prompts "
+                                            command+=f" --embedding {embedding}  --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name}  "
+                                            command+=f" --pipeline {pipeline}   --num_inference_steps 8 --hyperplane --hyperplane_coefficient {hyperplane_coefficient} "
+                                            if suffix=="_no_proj":
+                                                command+=" --disable_projection_adapter "
+                                            elif suffix=="_identity":
+                                                command+=" --identity_adapter "
+                                            elif suffix=="_deep_identity":
+                                                command+=" --identity_adapter  --deep_to_ip_layers "
+                                            print(command)

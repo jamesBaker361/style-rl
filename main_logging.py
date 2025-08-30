@@ -356,8 +356,8 @@ def main(args):
 
         tagged_data=load_dataset(args.tagged_data,split="train")
         for row in tagged_data:
-            if row["label"] in label_real_image_dict:
-                label_real_image_dict[row["label"]].append( pipeline.image_processor.preprocess( row["image"]))
+            if row["tag"] in label_real_image_dict:
+                label_real_image_dict[row["tag"]].append( pipeline.image_processor.preprocess( row["tag"]))
         X=[row["embedding"][0] for row in tagged_data]
 
         scaler =StandardScaler()

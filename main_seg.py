@@ -43,6 +43,8 @@ parser.add_argument("--dim",type=int,default=256)
 parser.add_argument("--token",type=int,default=1, help="which IP token is attention")
 parser.add_argument("--overlap_frac",type=float,default=0.8)
 parser.add_argument("--segmentation_attention_method",type=str,default="overlap or exclusive")
+parser.add_argument("--kv_type",type=str,default="ip")
+parser.add_argument("--initial_ip_adapter_scale",type=float,default=0.75)
 
 def get_mask(layer_index:int, 
              attn_list:list,step:int,
@@ -90,7 +92,7 @@ def main(args):
 
         # Load IP-Adapter
         pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-        pipe.set_ip_adapter_scale(0.5)
+        pipe.set_ip_adapter_scale(args.initial_ip_adapter_scale)
 
         setattr(pipe,"safety_checker",None)
 
@@ -144,12 +146,12 @@ def main(args):
                     
                     if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
                         #print(index,name,type(module),type(module.processor))
-                        mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+                        mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold,args.kv_type) for step in args.initial_mask_step_list])
                         print(index,name,mask.size())
                 break
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
-            prompt=random.choice(real_test_prompt_list)
+            prompt="person "+random.choice(real_test_prompt_list)
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(0.5)

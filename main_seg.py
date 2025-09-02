@@ -269,7 +269,8 @@ def main(args):
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
             
-            concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,initial_image,final_image,final_image_seg,final_image_unmasked])
+            concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,
+                                               initial_image,final_image,final_image_seg,final_image_unmasked])
             accelerator.log({
                 "image": wandb.Image(concat)
             })

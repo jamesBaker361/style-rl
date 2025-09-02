@@ -19,6 +19,7 @@ import random
 from worse_peft import apply_lora
 import wandb
 import numpy as np
+import datasets
 import random
 from gpu_helpers import *
 from adapter_helpers import replace_ip_attn,get_modules_of_types
@@ -355,6 +356,7 @@ def main(args):
         label_fake_image_dict={row["label"]:[] for row in classification_data}
 
         tagged_data=load_dataset(args.tagged_data,split="train")
+        tagged_data.cast_column("image",datasets.Image())
         for row in tagged_data:
             if row["tag"] in label_real_image_dict:
                 label_real_image_dict[row["tag"]].append( pipeline.image_processor.preprocess( row["image"]))

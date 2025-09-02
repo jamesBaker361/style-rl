@@ -68,6 +68,7 @@ import torch.nn.functional as F
 from main_pers import concat_images_horizontally,concat_images_vertically
 from PIL import Image, ImageDraw, ImageFont
 import os
+import sys
 
 os.makedirs("ip_images",exist_ok=True)
 
@@ -361,6 +362,8 @@ def reset_monkey(pipe):
         module.reset()
 
 if __name__ =="__main__":
+    use_embedding=False
+    clargs=sys.argv
     count=0
     count_ip=0
     ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")

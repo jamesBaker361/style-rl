@@ -395,7 +395,7 @@ if __name__ =="__main__":
         n =1000
         pipeline_name="lcm"
         reward_switch_epoch =-1
-        hf_path=f"denoise_epsilon_{embedding_type}_1.0_{lr}_{n}{suffix}_{pipeline_name}_{reward_switch_epoch}"
+        hf_path=f"jlbaker361/denoise_epsilon_{embedding_type}_1.0_{lr}_{n}{suffix}_{pipeline_name}_{reward_switch_epoch}"
 
         embedding_dim={
             "clip":768,

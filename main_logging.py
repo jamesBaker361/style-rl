@@ -356,7 +356,7 @@ def main(args):
         label_fake_image_dict={row["label"]:[] for row in classification_data}
 
         tagged_data=load_dataset(args.tagged_data,split="train")
-        tagged_data.cast_column("image",datasets.Image())
+        tagged_data=tagged_data.cast_column("image",datasets.Image())
         for row in tagged_data:
             if row["tag"] in label_real_image_dict:
                 label_real_image_dict[row["tag"]].append( pipeline.image_processor.preprocess( row["image"]))

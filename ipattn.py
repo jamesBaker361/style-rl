@@ -11,6 +11,7 @@ import torch
 from diffusers import StableDiffusionPipeline, AutoencoderKL
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import matplotlib.pyplot as plt
+from embedding_helpers import EmbeddingUtil
 from PIL import Image
 import gc
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
@@ -30,6 +31,7 @@ from PIL import Image
 sam =  SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
 
 from diffusers.utils.loading_utils import load_image
+from huggingface_hub import create_repo,HfApi
 
 
 '''gen=torch.Generator()
@@ -60,6 +62,7 @@ from diffusers.image_processor import IPAdapterMaskProcessor
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import inspect
+from adapter_helpers import replace_ip_attn,get_modules_of_types
 import math
 from typing import Callable, List, Optional, Tuple, Union
 
@@ -364,6 +367,13 @@ def reset_monkey(pipe):
 if __name__ =="__main__":
     use_embedding=False
     clargs=sys.argv
+    print("clargs",clargs)
+    if len(clargs) > 1:
+        embedding_type=clargs[1]
+        if embedding_type in ["clip","ssl","dino","siglip2"]:
+            use_embedding=True
+
+
     count=0
     count_ip=0
     ip_adapter_image=load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg")
@@ -375,6 +385,46 @@ if __name__ =="__main__":
 
     # Load IP-Adapter
     pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
+
+    if use_embedding:
+        facet=""
+        dino_pooling_stride=4
+        embedding_util=EmbeddingUtil(pipe.unet.device,torch.float16,embedding_type,facet,dino_pooling_stride)
+        lr=0.001
+        suffix="_identity"
+        n =1000
+        pipeline_name="lcm"
+        reward_switch_epoch =-1
+        hf_path=f"denoise_epsilon_{embedding_type}_1.0_{lr}_{n}{suffix}_{pipeline_name}_{reward_switch_epoch}"
+
+        embedding_dim={
+            "clip":768,
+            "siglip2":1024,
+            "ssl":1024,
+            "dino":1024
+        }[embedding_type]
+
+        num_image_text_embeds=4
+        intermediate_embedding_dim=1024
+
+        cross_attention_dim=embedding_dim//num_image_text_embeds
+        use_projection=True
+        identity_adapter=True
+        deep_to_ip_layers=False
+        WEIGHTS_NAME="unet_model.bin"
+        api=HfApi()
+        replace_ip_attn(pipe.unet,
+                    embedding_dim,
+                    intermediate_embedding_dim,
+                    cross_attention_dim,
+                    num_image_text_embeds,
+                    use_projection,identity_adapter,deep_to_ip_layers)
+        pretrained_weights_path=api.hf_hub_download(hf_path,WEIGHTS_NAME,force_download=True)
+        pipe.unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
+        
+        print("loaded from  ",pretrained_weights_path)
+
+
     pipe.set_ip_adapter_scale(0.5)
 
     

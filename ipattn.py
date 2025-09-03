@@ -399,9 +399,9 @@ if __name__ =="__main__":
 
         embedding_dim={
             "clip":768,
-            "siglip2":1024,
-            "ssl":1024,
-            "dino":1024
+            "siglip2":768,
+            "ssl":1536,
+            "dino":3456
         }[embedding_type]
 
         num_image_text_embeds=4

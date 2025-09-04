@@ -493,7 +493,7 @@ if __name__ =="__main__":
             reset_monkey(pipe)
             if use_embedding:
                 image_embeds=embedding_util.embed_img_tensor(pipe.image_processor.preprocess(image=ip_adapter_image)).unsqueeze(0).unsqueeze(0)
-                gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image_embds=[image_embeds],generator=gen).images[0]
+                gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image_embeds=[image_embeds],generator=gen).images[0]
             else:
                 gen_image=pipe(prompt,height=dim,width=dim,num_inference_steps=num_inference_steps,ip_adapter_image=ip_adapter_image,generator=gen).images[0]
             

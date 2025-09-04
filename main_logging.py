@@ -860,8 +860,8 @@ def main(args):
                 if k in label_real_image_dict:
                     label_real_image_tensor_list=label_real_image_dict[k]
                     label_fake_image_tensor_list= label_fake_image_dict[k]
-                    fid.update(label_real_image_tensor_list, real=True)
-                    fid.update(label_fake_image_tensor_list, real = False)
+                    fid.update(torch.cat(label_real_image_tensor_list), real=True)
+                    fid.update(torch.cat(label_fake_image_tensor_list), real = False)
                     difference=fid.compute().cpu().detach().item()
                     label_fid_list.append(difference)
                     accelerator.print(k,difference )

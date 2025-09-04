@@ -22,6 +22,7 @@ from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDet
 from custom_sam_detector import CustomSamDetector
 import datasets
 import wandb
+import numpy as np
 
 parser=argparse.ArgumentParser()
 
@@ -294,11 +295,22 @@ def main(args):
                 "score_seg_mask":score_seg_mask,
                 "score_raw_mask":score_raw_mask
             }
+            accelerator.print(score_dict)
             accelerator.log(score_dict)
 
             score_raw_mask_list.append(score_raw_mask)
             score_seg_mask_list.append(score_seg_mask)
             score_unmasked_list.append(score_unmasked)
+
+        avg_score_dict={
+                "score_unmasked":np.mean(score_unmasked_list),
+                "score_seg_mask":np.mean(score_seg_mask_list),
+                "score_raw_mask":np.mean(score_raw_mask_list)
+        }
+
+        accelerator.print(avg_score_dict)
+        accelerator.log(avg_score_dict)
+
 
 
 

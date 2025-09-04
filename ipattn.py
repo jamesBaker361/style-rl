@@ -397,7 +397,7 @@ if __name__ =="__main__":
 
         # Load IP-Adapter
         pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-        facet=""
+        facet="query"
         dino_pooling_stride=4
         embedding_util=EmbeddingUtil(pipe.unet.device,torch.float16,embedding_type,facet,dino_pooling_stride)
         lr=0.001

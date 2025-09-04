@@ -858,10 +858,12 @@ def main(args):
             label_fid_list=[]
             for k in label_fake_image_dict.keys():
                 if k in label_real_image_dict:
+                    fid_dtype=next(fid.inception.parameters()).dtype
+                    fid_device=next(fid.inception.parameters()).device
                     label_real_image_tensor_list=label_real_image_dict[k]
                     label_fake_image_tensor_list= label_fake_image_dict[k]
-                    fid.update(torch.cat(label_real_image_tensor_list), real=True)
-                    fid.update(torch.cat(label_fake_image_tensor_list), real = False)
+                    fid.update(torch.cat(label_real_image_tensor_list).to(fid_device,fid_dtype), real=True)
+                    fid.update(torch.cat(label_fake_image_tensor_list).to(fid_device,fid_dtype), real = False)
                     difference=fid.compute().cpu().detach().item()
                     label_fid_list.append(difference)
                     accelerator.print(k,difference )

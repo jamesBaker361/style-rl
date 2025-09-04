@@ -74,7 +74,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import sys
 
-os.makedirs("ip_images",exist_ok=True)
+
 
 sam =  SamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints")
 
@@ -366,6 +366,8 @@ def reset_monkey(pipe):
         module.reset()
 
 if __name__ =="__main__":
+    folder="ip_images"
+    
     use_embedding=False
     clargs=sys.argv
     print("clargs",clargs)
@@ -431,9 +433,11 @@ if __name__ =="__main__":
         pipe.unet.load_state_dict(torch.load(pretrained_weights_path,weights_only=True),strict=False)
         
         print("loaded from  ",pretrained_weights_path)
+        folder=folder+"_"+embedding_type
 
 
     pipe.set_ip_adapter_scale(0.5)
+    os.makedirs(folder,exist_ok=True)
 
     
 
@@ -580,7 +584,7 @@ if __name__ =="__main__":
                     left_height=left.size[0]
                     new_left=add_margin(left,0,0,vertical_height-left_height,0,"white")
                     vertical_image=concat_images_horizontally([new_left,vertical_image])
-                    vertical_image.save(f"ip_images/{m}_{n}_layer_{layer_index}.png")
+                    vertical_image.save(f"{folder}/{m}_{n}_layer_{layer_index}.png")
             '''count+=n_tokens
             count+=n_tokens_ip'''
     print("all done!")

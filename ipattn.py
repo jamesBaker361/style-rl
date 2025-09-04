@@ -12,6 +12,7 @@ from diffusers import StableDiffusionPipeline, AutoencoderKL
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import matplotlib.pyplot as plt
 from embedding_helpers import EmbeddingUtil
+from pipelines import CompatibleLatentConsistencyModelPipeline
 from PIL import Image
 import gc
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
@@ -387,6 +388,13 @@ if __name__ =="__main__":
     pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
 
     if use_embedding:
+        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained(
+            "SimianLuo/LCM_Dreamshaper_v7",
+            torch_dtype=torch.float16,
+        ).to("cuda")
+
+        # Load IP-Adapter
+        pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
         facet=""
         dino_pooling_stride=4
         embedding_util=EmbeddingUtil(pipe.unet.device,torch.float16,embedding_type,facet,dino_pooling_stride)

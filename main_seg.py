@@ -16,6 +16,7 @@ from main_pers import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
 import random
+from transformers import AutoProcessor, CLIPModel
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
@@ -80,6 +81,8 @@ def get_mask(layer_index:int,
 
 def main(args):
     with torch.no_grad():
+        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
         accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 
@@ -140,14 +143,12 @@ def main(args):
             ' on top of a white rug',
         ]
 
+        score_unmasked_list=[]
+        score_seg_mask_list=[]
+        score_raw_mask_list=[]
+
         for k,row in enumerate(data):
             if k==args.limit:
-                for index,[name,module] in enumerate(attn_list):
-                    
-                    if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
-                        #print(index,name,type(module),type(module.processor))
-                        mask=sum([get_mask(index,attn_list,step,args.token,args.dim,args.threshold,args.kv_type) for step in args.initial_mask_step_list])
-                        print(index,name,mask.size())
                 break
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
@@ -216,7 +217,7 @@ def main(args):
             scale_step_dict={i:0  for i in range(args.final_steps) }
             for k in args.final_adapter_steps_list:
                 scale_step_dict[k]=1.0
-            final_image=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
+            final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
@@ -264,17 +265,40 @@ def main(args):
 
             generator=torch.Generator()
             generator.manual_seed(123)
-            final_image_seg=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
+            final_image_seg_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":map_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
             
             concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,
-                                               initial_image,final_image,final_image_seg,final_image_unmasked])
+                                               initial_image,final_image_raw_mask,final_image_seg_mask,final_image_unmasked])
             accelerator.log({
                 "image": wandb.Image(concat)
             })
+
+            
+
             accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
+
+            inputs = processor(
+                text=[prompt], images=[final_image_unmasked,final_image_seg_mask,final_image_raw_mask], return_tensors="pt", padding=True
+            )
+
+            outputs = clip_model(**inputs)
+            logits_per_text = outputs.logits_per_text.numpy()[0]  # this is the image-text similarity score
+            accelerator.print("logits per image", logits_per_text)
+            [score_unmasked, score_seg_mask, score_raw_mask]=logits_per_text
+
+            score_dict={
+                "score_unmasked":score_unmasked,
+                "score_seg_mask":score_seg_mask,
+                "score_raw_mask":score_raw_mask
+            }
+            accelerator.log(score_dict)
+
+            score_raw_mask_list.append(score_raw_mask)
+            score_seg_mask_list.append(score_seg_mask)
+            score_unmasked_list.append(score_unmasked)
 
 
 

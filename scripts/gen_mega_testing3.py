@@ -14,9 +14,9 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
                         
                                         name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}_{reward_switch_epoch}"
                                         port+=1
-                                        for [start,end] in [[0.25,0.75], [0.3,0.7]]:
+                                        for [start,end] in [[0.25,0.75], [0.3,0.7], [0.5,0.5], [1.0,1.0]]:
                                             command=f"sbatch  -J perstest  --err=slurm/perstesting_{data}/{start}_{name}.err --out=slurm/perstesting_{data}/{start}_{name}.out --gres=gpu:1 "
-                                            command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_logging.py  --limit -1 --batch_size 2 --project_name {data}-{n}-testing-start "
+                                            command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_logging.py  --limit -1 --batch_size 2 --project_name {data}-{n}-testing-{start} "
                                             command+=f" --mixed_precision fp16   --uncaptioned_frac {frac} --train_split 0.95  --load --generic_test_prompts "
                                             command+=f" --embedding {embedding}  --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name}   "
                                             command+=f" --pipeline {pipeline}    --real_test_prompts  --num_inference_steps 16 "

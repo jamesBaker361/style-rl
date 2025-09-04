@@ -862,11 +862,12 @@ def main(args):
                     fid_device=next(fid.inception.parameters()).device
                     label_real_image_tensor_list=label_real_image_dict[k]
                     label_fake_image_tensor_list= label_fake_image_dict[k]
-                    fid.update(torch.cat(label_real_image_tensor_list).to(fid_device,fid_dtype), real=True)
-                    fid.update(torch.cat(label_fake_image_tensor_list).to(fid_device,fid_dtype), real = False)
-                    difference=fid.compute().cpu().detach().item()
-                    label_fid_list.append(difference)
-                    accelerator.print(k,difference )
+                    if len(label_fake_image_tensor_list) >1 and len(label_real_image_tensor_list)>1:
+                        fid.update(torch.cat(label_real_image_tensor_list).to(fid_device,fid_dtype), real=True)
+                        fid.update(torch.cat(label_fake_image_tensor_list).to(fid_device,fid_dtype), real = False)
+                        difference=fid.compute().cpu().detach().item()
+                        label_fid_list.append(difference)
+                        accelerator.print(k,difference )
             metrics["label_fid"]=np.mean(label_fid_list)
 
 

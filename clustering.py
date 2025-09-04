@@ -39,7 +39,7 @@ def main(args):
 
         
         tag_data=data.filter(lambda row: row["tag"]==tag)
-        cluster_embedding=np.mean(tag_data["embedding"])
+        cluster_embedding=np.mean(tag_data["embedding"],axis=0)
         plane_dict["cluster_embedding"].append(cluster_embedding)
         plane_dict["type"].append("tag")
         plane_dict["label"].append(tag)

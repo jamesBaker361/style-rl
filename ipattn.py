@@ -462,12 +462,12 @@ if __name__ =="__main__":
     num_inference_steps=4
     for n,ip_adapter_image in enumerate([
         load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg"),
-        load_image("https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg"),
-        load_image("https://images.ctfassets.net/qx5k8y1u9drj/d0vHplNVGw8cRbFsHlMHY/fda93fe8b54c67d4dae79aca19f8beb2/VIDEO_CAROUSEL_IMAGE_-_SEE_FIGURE_IN_ACTION.jpg"),
-        load_image("https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/4238fe90dd74b08a6e8172c31e3b1ae609afb3cd-496x560.jpg"),
+        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_1.jpg"),
+        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Braum_2.jpg"),
+        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_2.jpg"),
         load_image("https://draftsim.com/wp-content/uploads/2020/06/Oath-of-Teferi-MTG-card-art-by-Wesley-Burt-1024x752.jpg"),
-        load_image("lizard.jpg"),
-        load_image("rick.jpg"),
+        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Hwei_1.jpg"),
+        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Leblanc_1.jpg"),
         load_image("elf.jpg"),
         load_image("ghibli.jpg")
     ]):

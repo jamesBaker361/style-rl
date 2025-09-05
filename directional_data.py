@@ -6,6 +6,7 @@ import time
 import torch
 from diffusers import StableDiffusionPipeline
 from datasets import Dataset,load_dataset
+import time
 
 parser=argparse.ArgumentParser()
 
@@ -101,7 +102,7 @@ def main(args):
                             k+=1
                         if k<=start:
                             continue
-                        
+
                         gen=torch.Generator()
                         gen.manual_seed(seed)
                         prompt=" ".join([noun,location,action,style])
@@ -118,7 +119,12 @@ def main(args):
                         data_dict["style"].append(style)
 
                         if k%args.upload_interval==0:
-                            Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
+                            try:
+                                Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
+                            except:
+                                time.sleep(10)
+                                Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
+
 
 
 

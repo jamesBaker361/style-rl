@@ -52,7 +52,7 @@ def main(args):
     for prompt in real_test_prompt_list:
         gen=torch.Generator()
         gen.manual_seed(10101)
-        p=prompt.replace("with a"," ").replace("floating on top of", " ").replace("floating in", " ").replace("on top of"," ")
+        p=prompt.replace("with a"," ").replace("floating on top of", " ").replace("floating in", " ").replace("on top of"," ").replace("with the"," ").replace("in the background", " ")
         image=pipe(p, size,size,steps,generator=gen).images[0]
         data_dict['image'].append(image)
         data_dict['prompt'].append(prompt)

@@ -118,8 +118,10 @@ def main(args):
 
 
         #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
-
-        data=datasets.load_dataset(args.dataset,download_mode="force_redownload")
+        try:
+            data=datasets.load_dataset(args.dataset)
+        except:
+            data=datasets.load_dataset(args.dataset,download_mode="force_redownload")
         data=data["train"]
 
         real_test_prompt_list=[

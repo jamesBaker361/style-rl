@@ -5,7 +5,7 @@ from accelerate import Accelerator
 import time
 import torch
 from diffusers import StableDiffusionPipeline
-from datasets import Dataset
+from datasets import Dataset,load_dataset
 
 parser=argparse.ArgumentParser()
 
@@ -33,7 +33,13 @@ def main(args):
         torch_dtype=torch.float16,
     ).to(device)
 
-    data_dict={
+    
+
+    try:
+        data_dict=load_dataset(args.dest_dataset,split="train").to_dict()
+        start=len(data_dict["image"])
+    except:
+        data_dict={
         "image":[],
         "noun":[],
         "location":[],
@@ -41,7 +47,8 @@ def main(args):
         "style":[],
         "seed":[],
         "prompt":[]
-    }
+        }
+        start=0
 
     noun_list = [
     "robot",     # machine
@@ -92,6 +99,9 @@ def main(args):
                             break
                         else:
                             k+=1
+                        if k<=start:
+                            continue
+                        
                         gen=torch.Generator()
                         gen.manual_seed(seed)
                         prompt=" ".join([noun,location,action,style])

@@ -19,7 +19,7 @@ for n in range(20):
     time.sleep(10)
     url = f"https://api.scryfall.com/cards/search?q=t:planeswalker loy={n}"
     req = requests.get(url).json()
-    if req["status"]!=404:
+    if "data" in req:
         data=req["data"]
 
         for k,obj in enumerate(data):

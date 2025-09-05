@@ -18,7 +18,7 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
                                                 port+=1
                                                 command=f"sbatch  -J perstest  --err=slurm/perstesting_{data}_hyper/{hyperplane_coefficient}_{classifier_type}_{name}.err --out=slurm/perstesting_{data}_hyper/{hyperplane_coefficient}_{classifier_type}_{name}.out --gres=gpu:1 "
                                                 command+=f" runaccgpu.sh  --mixed_precision fp16 --num_processes 1 --main_process_port {port} main_logging.py  --limit -1 --batch_size 2 --project_name hyper "
-                                                command+=f" --mixed_precision fp16   --uncaptioned_frac {frac} --train_split 0.5  --load --generic_test_prompts "
+                                                command+=f" --mixed_precision fp16   --uncaptioned_frac {frac} --train_split 0.5  --generic_test_prompts "
                                                 command+=f" --embedding {embedding}  --dataset jlbaker361/{embedding}-{data}-{n} --vanilla --name jlbaker361/{name}  "
                                                 command+=f" --pipeline {pipeline}   --num_inference_steps 8 --hyperplane --hyperplane_coefficient {hyperplane_coefficient} "
                                                 command+=f" --classifier_type {classifier_type} "

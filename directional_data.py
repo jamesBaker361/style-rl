@@ -16,7 +16,7 @@ parser.add_argument("--dim",type=int,default=256)
 parser.add_argument("--seed_offset",type=int,default=1)
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--upload_interval",type=int,default=10)
-parser.add_argument("--dest_datast",type=str,default="jlbaker361/directional")
+parser.add_argument("--dest_dataset",type=str,default="jlbaker361/directional")
 
 
 

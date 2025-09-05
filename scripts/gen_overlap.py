@@ -1,4 +1,4 @@
-for overlap_frac in [0.5,0.75]:
+for overlap_frac in [0.5,0.75,0.25]:
     for kv_type in ["str","ip"]:
         for initial_ip_adapter_scale in [0.5,0.75]:
             for step_set in ["mid","late","early"]:
@@ -19,4 +19,5 @@ for overlap_frac in [0.5,0.75]:
                     if kv_type=="str":
                         command+=f" --token 0 "
                     command+=f" --initial_ip_adapter_scale {initial_ip_adapter_scale} "
+                    command+=f"  --dataset jlbaker361/mtg "
                     print(command)

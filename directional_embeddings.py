@@ -54,6 +54,7 @@ def main(args):
         }
         start=0
     src_data=load_dataset(args.src_dataset,split="train")
+    accelerator.print("starting at ",start)
     for k,row in enumerate(src_data):
         if k==args.limit:
             break

@@ -124,7 +124,8 @@ def main(args):
                             except:
                                 time.sleep(10)
                                 Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
-
+    time.sleep(10)
+    Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
 
 
 

@@ -10,7 +10,6 @@ from datasets import Dataset
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--mixed_precision",type=str,default="no")
-parser.add_argument("--project_name",type=str,default="evaluation-creative")
 parser.add_argument("--num_inference_steps",type=int,default=16)
 parser.add_argument("--dim",type=int,default=256)
 parser.add_argument("--seed_offset",type=int,default=1)
@@ -22,7 +21,6 @@ parser.add_argument("--dest_dataset",type=str,default="jlbaker361/directional")
 
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
-    accelerator.init_trackers(project_name=args.project_name,config=vars(args))
     torch_dtype={
         "no":torch.float32,
         "fp16":torch.float16,

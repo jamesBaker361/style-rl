@@ -90,7 +90,7 @@ def main(args):
     seed_list=[x+args.seed_offset for x in range(2)]
 
     k=0
-
+    accelerator.print("starting at ",start)
     for noun in noun_list:
         for location in location_list:
             for action in action_list:

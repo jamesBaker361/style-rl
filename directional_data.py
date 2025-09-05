@@ -18,7 +18,41 @@ parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--upload_interval",type=int,default=10)
 parser.add_argument("--dest_dataset",type=str,default="jlbaker361/directional")
 
+noun_list = [
+"robot",     # machine
+"child",  # machine
+"woman",    # machine
+"adult",    # person
+"man"    # person
+]
 
+location_list = [
+" in a park",
+"in a school",
+"in a city",
+"in the jungle",
+"at the beach",
+" "
+]
+
+action_list=[
+        "running",
+    "writing",
+    "dancing",
+    "eating",
+    "driving",
+    " "
+]
+
+style_list = [
+",watercolor style",
+",pixel art style",
+",photorealistic style",
+",impressionist style",
+",anime style",
+",cubist style",
+" "
+]
 
 def main(args):
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
@@ -51,41 +85,7 @@ def main(args):
         }
         start=0
 
-    noun_list = [
-    "robot",     # machine
-    "child",  # machine
-    "woman",    # machine
-    "adult",    # person
-    "man"    # person
-    ]
 
-    location_list = [
-    " in a park",
-    "in a school",
-    "in a city",
-    "in the jungle",
-    "at the beach",
-    " "
-    ]
-
-    action_list=[
-            "running",
-        "writing",
-        "dancing",
-        "eating",
-        "driving",
-        " "
-    ]
-
-    style_list = [
-    ",watercolor style",
-    ",pixel art style",
-    ",photorealistic style",
-    ",impressionist style",
-    ",anime style",
-    ",cubist style",
-    " "
-    ]
 
     seed_list=[x+args.seed_offset for x in range(2)]
 

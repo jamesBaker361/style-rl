@@ -17,6 +17,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
 import random
 from transformers import AutoProcessor, CLIPModel
+from pipelines import CompatibleLatentConsistencyModelPipeline
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
@@ -89,7 +90,7 @@ def main(args):
 
         custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device)
 
-        pipe = StableDiffusionPipeline.from_pretrained(
+        pipe = CompatibleLatentConsistencyModelPipeline.from_pretrained(
             "SimianLuo/LCM_Dreamshaper_v7",
             torch_dtype=torch.float16,
         ).to(accelerator.device)

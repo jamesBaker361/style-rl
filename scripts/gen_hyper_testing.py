@@ -11,8 +11,8 @@ for training_type in  ["denoise"]: #,"reward","latents_reward"]:
                                 #for scheduler in ["LCMScheduler"]:
                                 for pipeline in ["lcm"]:
                                     for reward_switch_epoch in [-1]:
-                                        for hyperplane_coefficient in [-1.0,-0.1, -0.01,0.01,0.1,1]:
-                                            for classifier_type in ["SVD","SVC"]:
+                                        for hyperplane_coefficient in [-10.0,10]:
+                                            for classifier_type in ["SGD","SVC"]:
                         
                                                 name=f"{training_type}_{prediction_type}_{embedding}_{frac}_{lr}_{n}{suffix}_{pipeline}_{reward_switch_epoch}"
                                                 port+=1

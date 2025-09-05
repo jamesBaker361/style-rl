@@ -1,9 +1,9 @@
 for overlap_frac in [0.5,0.75,0.25]:
-    for kv_type in ["str","ip"]:
+    for kv_type in ["ip"]:
         for initial_ip_adapter_scale in [0.5,0.75]:
             for step_set in ["mid","late","early"]:
                 for limited in ["yes","no"]:
-                    for data in ["sshq-100"]:
+                    for data in ["sshq-100","mtg"]:
                         name=f"{kv_type}_{overlap_frac}_{initial_ip_adapter_scale}_{step_set}_{limited}_{data}"
                         step_dict={
                             "early": " 0 1 2 3",

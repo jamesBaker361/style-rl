@@ -48,6 +48,7 @@ parser.add_argument("--overlap_frac",type=float,default=0.8)
 parser.add_argument("--segmentation_attention_method",type=str,default="overlap or exclusive")
 parser.add_argument("--kv_type",type=str,default="ip")
 parser.add_argument("--initial_ip_adapter_scale",type=float,default=0.75)
+parser.add_argument("--background",action="store_true")
 
 def get_mask(layer_index:int, 
              attn_list:list,step:int,
@@ -147,6 +148,10 @@ def main(args):
             ' on top of a white rug',
         ]
 
+        if args.background:
+            background_data=datasets.load_dataset("jlbaker361/real_test_prompt_list",split="train")
+            background_dict={row["prompt"]:row["image"] for row in background_data}
+
         score_unmasked_list=[]
         score_seg_mask_list=[]
         score_raw_mask_list=[]
@@ -181,11 +186,13 @@ def main(args):
             masked_img=Image.blend(color_rgba, mask_pil, 0.5)
 
             mask[mask>1]=1.
+            inverted_mask=1.0-mask
             #mask=1-mask
             #print(mask.size())
             mask_processor = IPAdapterMaskProcessor()
             #print(mask_processor.config)
             mask = mask_processor.preprocess(mask)
+            inverted_mask=mask_processor.preprocess(inverted_mask)
             #print(mask.size())
             #print("mask size",mask.size())
 
@@ -221,14 +228,19 @@ def main(args):
             scale_step_dict={i:0  for i in range(args.final_steps) }
             for k in args.final_adapter_steps_list:
                 scale_step_dict[k]=1.0
-            final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
-                "ip_adapter_masks":mask
+            ip_adapter_image_list=ip_adapter_image
+            ip_mask=mask
+            if args.background:
+                ip_adapter_image_list=[ip_adapter_image, background_dict[prompt]]
+                ip_mask=[mask,inverted_mask]
+            final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
+                "ip_adapter_masks":ip_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(1.0)
-            final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
+            final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
             torch.cuda.empty_cache()
             
             segmented_image,map_list=custom_sam(initial_image,detect_resolution=args.dim)
@@ -265,13 +277,17 @@ def main(args):
                     map_mask=map_mask.squeeze(0)
 
             
+            inverted_map_mask=1.0-map_mask
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
             map_mask=mask_processor.preprocess(map_mask)
 
             generator=torch.Generator()
             generator.manual_seed(123)
+            ip_map_mask=map_mask
+            if args.background:
+                ip_map_mask=[map_mask, inverted_map_mask]
             final_image_seg_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
-                "ip_adapter_masks":map_mask
+                "ip_adapter_masks":ip_map_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
 
             

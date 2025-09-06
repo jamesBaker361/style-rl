@@ -7,6 +7,7 @@ import torch
 from diffusers import StableDiffusionPipeline
 from datasets import Dataset,load_dataset
 import time
+import random
 
 parser=argparse.ArgumentParser()
 
@@ -120,9 +121,10 @@ def main(args):
 
                         if k%args.upload_interval==0:
                             try:
+                                time.sleep(10+random.randint(1,30))
                                 Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
                             except:
-                                time.sleep(10)
+                                time.sleep(10+random.randint(1,30))
                                 Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
     time.sleep(10)
     Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)

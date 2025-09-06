@@ -84,6 +84,12 @@ def get_mask(layer_index:int,
 
 def main(args):
     with torch.no_grad():
+        if args.initial_mask_step_list is None:
+            args.initial_mask_step_list=[1,2]
+        if args.final_mask_steps_list is None:
+            args.final_mask_steps_list=[3,4,5,6]
+        if args.final_adapter_steps_list is None:
+            args.final_adapter_steps_list=[3,4,5,6]
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)

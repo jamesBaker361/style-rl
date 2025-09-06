@@ -157,6 +157,7 @@ def main(args):
         if args.background:
             background_data=datasets.load_dataset("jlbaker361/real_test_prompt_list",split="train")
             background_dict={row["prompt"]:row["image"] for row in background_data}
+            accelerator.print("background dict", background_dict)
 
         score_unmasked_list=[]
         score_seg_mask_list=[]
@@ -238,7 +239,7 @@ def main(args):
             ip_adapter_image_list=ip_adapter_image
             ip_mask=mask
             if args.background:
-                ip_adapter_image_list=[ip_adapter_image, background_dict[prompt]]
+                ip_adapter_image_list=[ip_adapter_image, background_dict[prompt.replace("person ","")]]
                 ip_mask=[mask,inverted_mask]
             final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask

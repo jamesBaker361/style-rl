@@ -254,7 +254,7 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(1.0)
-            final_image_normal=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
+            final_image_normal=pipe(prompt,args.dim,args.dim,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
             torch.cuda.empty_cache()
             
             segmented_image,map_list=custom_sam(initial_image,detect_resolution=args.dim)

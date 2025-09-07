@@ -163,6 +163,7 @@ def main(args):
         score_seg_mask_list=[]
         score_raw_mask_list=[]
         score_normal_list=[]
+        score_all_steps_list=[]
 
         for k,row in enumerate(data):
             if k==args.limit:
@@ -248,14 +249,22 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(1.0)
-            final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
+            final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,
+                                      scale_step_dict=scale_step_dict).images[0]
             torch.cuda.empty_cache()
 
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(1.0)
-            final_image_normal=pipe(prompt,args.dim,args.dim,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
+            final_image_normal=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
             torch.cuda.empty_cache()
+
+            generator=torch.Generator()
+            generator.manual_seed(123)
+            pipe.set_ip_adapter_scale(1.0)
+            final_image_all_steps=final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
+                "ip_adapter_masks":ip_mask
+            }, mask_step_list=[x for x in range(args.final_steps)],scale_step_dict={i:1.0  for i in range(args.final_steps) }).images[0]
             
             segmented_image,map_list=custom_sam(initial_image,detect_resolution=args.dim)
             accelerator.log({
@@ -306,7 +315,7 @@ def main(args):
 
             
             concat=concat_images_horizontally([ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,
-                                               initial_image,final_image_raw_mask,final_image_seg_mask,final_image_unmasked,final_image_normal])
+                                               initial_image,final_image_raw_mask,final_image_seg_mask,final_image_unmasked,final_image_normal,final_image_all_steps])
             accelerator.log({
                 "image": wandb.Image(concat)
             })
@@ -316,19 +325,20 @@ def main(args):
             accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
 
             inputs = processor(
-                text=[prompt], images=[final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask], return_tensors="pt", padding=True
+                text=[prompt], images=[final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
             )
 
             outputs = clip_model(**inputs)
             logits_per_text = outputs.logits_per_text.numpy()[0]  # this is the image-text similarity score
             accelerator.print("logits per image", logits_per_text)
-            [score_normal,score_unmasked, score_seg_mask, score_raw_mask]=logits_per_text
+            [score_normal,score_unmasked, score_seg_mask, score_raw_mask,score_all_steps]=logits_per_text
 
             score_dict={
                 "score_unmasked":score_unmasked,
                 "score_seg_mask":score_seg_mask,
                 "score_raw_mask":score_raw_mask,
-                "score_normal":score_normal
+                "score_normal":score_normal,
+                "score_all_steps":score_all_steps
             }
             accelerator.print(score_dict)
             accelerator.log(score_dict)
@@ -337,14 +347,17 @@ def main(args):
             score_seg_mask_list.append(score_seg_mask)
             score_unmasked_list.append(score_unmasked)
             score_normal_list.append(score_normal)
+            score_all_steps_list.append(score_all_steps)
 
         avg_score_dict={
                 "score_unmasked":np.mean(score_unmasked_list),
                 "score_seg_mask":np.mean(score_seg_mask_list),
                 "score_raw_mask":np.mean(score_raw_mask_list),
-                "score_normal":np.mean(score_normal_list)
+                "score_normal":np.mean(score_normal_list),
+                "score_all_steps":np.mean(score_all_steps_list)
         }
 
+        accelerator.print("Average Scores:")
         accelerator.print(avg_score_dict)
         accelerator.log(avg_score_dict)
 

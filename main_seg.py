@@ -239,7 +239,7 @@ def main(args):
             ip_adapter_image_list=ip_adapter_image
             ip_mask=mask
             if args.background:
-                ip_adapter_image_list=[ip_adapter_image, background_dict[prompt.replace("person ","")]]
+                ip_adapter_image_list=[[ip_adapter_image, background_dict[prompt.replace("person ","")]]]
                 ip_mask=[mask,inverted_mask]
             final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask

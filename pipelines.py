@@ -292,7 +292,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     @torch.no_grad()
     def __call__(
         self,
-        prompt: Union[str, List[str]] = " ",
+        prompt: Union[str, List[str]] = None,
         height: Optional[int] = None,
         width: Optional[int] = None,
         num_inference_steps: int = 4,
@@ -398,7 +398,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
             device,
             num_images_per_prompt,
             do_classifier_free_guidance,
-            negative_prompt=[" " for _ in prompt],
+            negative_prompt=[" " ]*batch_size,
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=None,
             lora_scale=lora_scale,

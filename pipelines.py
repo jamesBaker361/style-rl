@@ -292,7 +292,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
     @torch.no_grad()
     def __call__(
         self,
-        prompt: Union[str, List[str]] = None,
+        prompt: Union[str, List[str]] = " ",
         height: Optional[int] = None,
         width: Optional[int] = None,
         num_inference_steps: int = 4,

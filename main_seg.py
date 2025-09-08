@@ -304,6 +304,10 @@ def main(args):
                     if merged.sum()>= args.overlap_frac * n_ones:
                         map_mask=torch.max(map_,map_mask)
                 
+            if len(map_list)==0:
+                accelerator.log({
+                    "unsegmentable":wandb.Image(initial_image)
+                })
             for _ in range(2):
                 if len(map_mask.size())>2:
                     map_mask=map_mask.squeeze(0)

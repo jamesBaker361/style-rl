@@ -159,11 +159,17 @@ def main(args):
             background_dict={row["prompt"]:row["image"] for row in background_data}
             accelerator.print("background dict", background_dict)
 
-        score_unmasked_list=[]
-        score_seg_mask_list=[]
-        score_raw_mask_list=[]
-        score_normal_list=[]
-        score_all_steps_list=[]
+        text_score_unmasked_list=[]
+        text_score_seg_mask_list=[]
+        text_score_raw_mask_list=[]
+        text_score_normal_list=[]
+        text_score_all_steps_list=[]
+
+        image_score_unmasked_list=[]
+        image_score_seg_mask_list=[]
+        image_score_raw_mask_list=[]
+        image_score_normal_list=[]
+        image_score_all_steps_list=[]
 
         for k,row in enumerate(data):
             if k==args.limit:
@@ -325,36 +331,54 @@ def main(args):
             accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
 
             inputs = processor(
-                text=[prompt], images=[final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
+                text=[prompt], images=[ip_adapter_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
             )
 
             outputs = clip_model(**inputs)
             logits_per_text = outputs.logits_per_text.numpy()[0]  # this is the image-text similarity score
+            image_embeds=outputs.image_embeds
+            image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
             accelerator.print("logits per image", logits_per_text)
-            [score_normal,score_unmasked, score_seg_mask, score_raw_mask,score_all_steps]=logits_per_text
+            [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
+            [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
 
             score_dict={
-                "score_unmasked":score_unmasked,
-                "score_seg_mask":score_seg_mask,
-                "score_raw_mask":score_raw_mask,
-                "score_normal":score_normal,
-                "score_all_steps":score_all_steps
+                "text_score_unmasked":text_score_unmasked,
+                "text_score_seg_mask":text_score_seg_mask,
+                "text_score_raw_mask":text_score_raw_mask,
+                "text_score_normal":text_score_normal,
+                "text_score_all_steps":text_score_all_steps,
+                "image_score_unmasked":image_score_unmasked,
+                "image_score_seg_mask":image_score_seg_mask,
+                "image_score_raw_mask":image_score_raw_mask,
+                "image_score_normal":image_score_normal,
+                "image_score_all_steps":image_score_all_steps
             }
             accelerator.print(score_dict)
             accelerator.log(score_dict)
 
-            score_raw_mask_list.append(score_raw_mask)
-            score_seg_mask_list.append(score_seg_mask)
-            score_unmasked_list.append(score_unmasked)
-            score_normal_list.append(score_normal)
-            score_all_steps_list.append(score_all_steps)
+            text_score_raw_mask_list.append(text_score_raw_mask)
+            text_score_seg_mask_list.append(text_score_seg_mask)
+            text_score_unmasked_list.append(text_score_unmasked)
+            text_score_normal_list.append(text_score_normal)
+            text_score_all_steps_list.append(text_score_all_steps)
+            image_score_raw_mask_list.append(image_score_raw_mask)
+            image_score_seg_mask_list.append(image_score_seg_mask)
+            image_score_unmasked_list.append(image_score_unmasked)
+            image_score_normal_list.append(image_score_normal)
+            image_score_all_steps_list.append(image_score_all_steps)
 
         avg_score_dict={
-                "score_unmasked":np.mean(score_unmasked_list),
-                "score_seg_mask":np.mean(score_seg_mask_list),
-                "score_raw_mask":np.mean(score_raw_mask_list),
-                "score_normal":np.mean(score_normal_list),
-                "score_all_steps":np.mean(score_all_steps_list)
+                "text_score_unmasked":np.mean(text_score_unmasked_list),
+                "text_score_seg_mask":np.mean(text_score_seg_mask_list),
+                "text_score_raw_mask":np.mean(text_score_raw_mask_list),
+                "text_score_normal":np.mean(text_score_normal_list),
+                "text_score_all_steps":np.mean(text_score_all_steps_list),
+                "image_score_unmasked":np.mean(image_score_unmasked_list),
+                "image_score_seg_mask":np.mean(image_score_seg_mask_list),
+                "image_score_raw_mask":np.mean(image_score_raw_mask_list),
+                "image_score_normal":np.mean(image_score_normal_list),
+                "image_score_all_steps":np.mean(image_score_all_steps_list)
         }
 
         accelerator.print("Average Scores:")

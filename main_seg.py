@@ -206,8 +206,8 @@ def main(args):
             #print(mask.size())
             mask_processor = IPAdapterMaskProcessor()
             #print(mask_processor.config)
-            mask = mask_processor.preprocess(mask)
-            inverted_mask=mask_processor.preprocess(inverted_mask)
+            '''mask = mask_processor.preprocess(mask)
+            inverted_mask=mask_processor.preprocess(inverted_mask)'''
             #print(mask.size())
             #print("mask size",mask.size())
 
@@ -244,10 +244,12 @@ def main(args):
             for k in args.final_adapter_steps_list:
                 scale_step_dict[k]=1.0
             ip_adapter_image_list=ip_adapter_image
-            ip_mask=mask
+            ip_mask=mask_processor.preprocess(mask)
             if args.background:
                 ip_adapter_image_list=[[ip_adapter_image, background_dict[prompt.replace("person ","")]]]
-                ip_mask=[mask,inverted_mask]
+                ip_mask=mask_processor.preprocess([mask,inverted_mask])
+                ip_mask=[ip_mask.reshape([ip_mask.shape[0],1,ip_mask.shape[2], ip_mask.shape[3]])]
+                accelerator.print('ip_mask.size()',ip_mask.size())
             final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
@@ -308,13 +310,15 @@ def main(args):
             
             inverted_map_mask=1.0-map_mask
             map_mask_pil=to_pil_image(1-map_mask).convert("RGB")
-            map_mask=mask_processor.preprocess(map_mask)
+            #map_mask=mask_processor.preprocess(map_mask)
 
             generator=torch.Generator()
             generator.manual_seed(123)
-            ip_map_mask=map_mask
+            ip_map_mask=mask_processor.preprocess(map_mask)
             if args.background:
-                ip_map_mask=[map_mask, inverted_map_mask]
+                ip_map_mask=mask_processor.preprocess([map_mask, inverted_map_mask])
+                ip_map_mask = [ip_map_mask.reshape(1, ip_map_mask.shape[0], ip_map_mask.shape[2], ip_map_mask.shape[3])]
+                accelerator.print('ip_map_mask.size()',ip_map_mask.size())
             final_image_seg_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_map_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]

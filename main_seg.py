@@ -248,8 +248,9 @@ def main(args):
             if args.background:
                 ip_adapter_image_list=[[ip_adapter_image, background_dict[prompt.replace("person ","")]]]
                 ip_mask=mask_processor.preprocess([mask,inverted_mask])
-                ip_mask=[ip_mask.reshape([ip_mask.shape[0],1,ip_mask.shape[2], ip_mask.shape[3]])]
                 accelerator.print('ip_mask.size()',ip_mask.size())
+                ip_mask=[ip_mask.reshape([ip_mask.shape[0],1,ip_mask.shape[2], ip_mask.shape[3]])]
+                
             final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]

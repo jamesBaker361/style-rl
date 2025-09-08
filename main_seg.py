@@ -389,7 +389,8 @@ def main(args):
 
         accelerator.print("Average Scores:")
         accelerator.print(len(avg_score_dict))
-        accelerator.print(avg_score_dict)
+        for k,v in avg_score_dict.items():
+            accelerator.print(k,float(v))
         accelerator.log(avg_score_dict)
 
 

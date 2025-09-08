@@ -318,8 +318,9 @@ def main(args):
             ip_map_mask=mask_processor.preprocess(map_mask)
             if args.background:
                 ip_map_mask=mask_processor.preprocess([map_mask, inverted_map_mask])
-                ip_map_mask = [ip_map_mask.reshape(1, ip_map_mask.shape[0], ip_map_mask.shape[2], ip_map_mask.shape[3])]
                 accelerator.print('ip_map_mask.size()',ip_map_mask.size())
+                ip_map_mask = [ip_map_mask.reshape(1, ip_map_mask.shape[0], ip_map_mask.shape[2], ip_map_mask.shape[3])]
+                
             final_image_seg_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_map_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]

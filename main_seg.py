@@ -178,6 +178,7 @@ def main(args):
             ip_adapter_image=row["image"]
             prompt="person "+random.choice(real_test_prompt_list)
             if args.background:
+                background_image=background_dict[prompt.replace("person ","")]
                 prompt=" "
             generator=torch.Generator()
             generator.manual_seed(123)
@@ -248,7 +249,7 @@ def main(args):
             ip_adapter_image_list=ip_adapter_image
             ip_mask=mask_processor.preprocess(mask)
             if args.background:
-                ip_adapter_image_list=[[ip_adapter_image, background_dict[prompt.replace("person ","")]]]
+                ip_adapter_image_list=[[ip_adapter_image, background_image]]
                 ip_mask=mask_processor.preprocess([mask,inverted_mask])
                 accelerator.print('ip_mask.size()',ip_mask.size())
                 ip_mask=[ip_mask.reshape([1,ip_mask.shape[0],ip_mask.shape[2], ip_mask.shape[3]])]

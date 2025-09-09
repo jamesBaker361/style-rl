@@ -85,11 +85,13 @@ def get_mask(layer_index:int,
 def main(args):
     with torch.no_grad():
         if args.initial_mask_step_list is None:
-            args.initial_mask_step_list=[1,2]
+            initial_quarter=args.initial_steps //4
+            args.initial_mask_step_list=[f for f in range(args.initial_steps)][initial_quarter:-initial_quarter]
         if args.final_mask_steps_list is None:
-            args.final_mask_steps_list=[3,4,5,6]
+            final_quarter=args.final_steps //4
+            args.final_mask_steps_list=[f for f in range(args.final_steps)][final_quarter:-final_quarter]
         if args.final_adapter_steps_list is None:
-            args.final_adapter_steps_list=[3,4,5,6]
+            args.final_adapter_steps_list=args.final_mask_steps_list
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)

@@ -28,7 +28,7 @@ from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
 import torch
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline,AutoPipelineForText2Image
 from datasets import load_dataset,Dataset
 
 parser=argparse.ArgumentParser()
@@ -45,10 +45,10 @@ def main(args):
         "image":[],
         "prompt":[]
     }
-    pipe = StableDiffusionPipeline.from_pretrained(
-            "SimianLuo/LCM_Dreamshaper_v7",
-            torch_dtype=torch.float16,
-        ).to(accelerator.device)
+    
+    pipe= AutoPipelineForText2Image.from_pretrained(
+        "stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, variant="fp16", use_safetensors=True
+    ).to(accelerator.device)
     for prompt in real_test_prompt_list:
         gen=torch.Generator()
         gen.manual_seed(10101)

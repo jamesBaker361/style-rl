@@ -84,18 +84,22 @@ def get_mask(layer_index:int,
 
 def main(args):
     with torch.no_grad():
-        if args.initial_mask_step_list is None:
-            initial_quarter=args.initial_steps //4
-            args.initial_mask_step_list=[f for f in range(args.initial_steps)][initial_quarter:-initial_quarter]
-        if args.final_mask_steps_list is None:
-            final_quarter=args.final_steps //4
-            args.final_mask_steps_list=[f for f in range(args.final_steps)][final_quarter:-final_quarter]
-        if args.final_adapter_steps_list is None:
-            args.final_adapter_steps_list=args.final_mask_steps_list
+        
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
         accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+
+        if args.initial_mask_step_list is None:
+            initial_quarter=args.initial_steps //4
+            args.initial_mask_step_list=[f for f in range(args.initial_steps)][initial_quarter:-initial_quarter]
+            accelerator.print("defaulting to initial_mask_step_list",args.initial_mask_step_list )
+        if args.final_mask_steps_list is None:
+            final_quarter=args.final_steps //4
+            args.final_mask_steps_list=[f for f in range(args.final_steps)][final_quarter:-final_quarter]
+            accelerator.print("defaulting final maske step lst",args.final_mask_steps_list )
+        if args.final_adapter_steps_list is None:
+            args.final_adapter_steps_list=args.final_mask_steps_list
 
         custom_sam= CustomSamDetector.from_pretrained("ybelkada/segment-anything", subfolder="checkpoints").to(accelerator.device)
 

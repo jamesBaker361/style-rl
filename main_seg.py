@@ -334,7 +334,12 @@ def main(args):
 
             
             concat_image_list=[ip_adapter_image.resize([args.dim,args.dim],0),mask_pil,map_mask_pil,masked_img, segmented_image,
-                                               initial_image,final_image_raw_mask,final_image_seg_mask,final_image_unmasked,final_image_normal,final_image_all_steps]
+                                               initial_image,
+                                               final_image_raw_mask,
+                                               final_image_seg_mask,
+                                               final_image_unmasked,
+                                               final_image_normal,
+                                               final_image_all_steps]
             if args.background:
                 concat_image_list=[background_image]+concat_image_list
             concat=concat_images_horizontally(concat_image_list)

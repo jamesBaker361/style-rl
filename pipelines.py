@@ -475,7 +475,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     self.set_ip_adapter_scale(1.0)
 
                 if len(scale_step_dict)==num_inference_steps:
-                    print(f"setting scale to {scale_step_dict[i]}")
+                    #print(f"setting scale to {scale_step_dict[i]}")
                     self.set_ip_adapter_scale(scale_step_dict[i])
 
                 temp_cross_attention_kwargs=self.cross_attention_kwargs

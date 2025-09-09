@@ -177,6 +177,8 @@ def main(args):
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
             prompt="person "+random.choice(real_test_prompt_list)
+            if args.background:
+                prompt=" "
             generator=torch.Generator()
             generator.manual_seed(123)
             pipe.set_ip_adapter_scale(0.5)

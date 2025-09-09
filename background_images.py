@@ -40,7 +40,7 @@ parser.add_argument("--mixed_precision",type=str,default="no")
 def main(args):
     accelerator=Accelerator()
     steps=32
-    size=512
+    size=1024
     data_dict={
         "image":[],
         "prompt":[]

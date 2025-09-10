@@ -437,13 +437,22 @@ def main(args):
                 for k,v in score_dict.items():
                     accelerator.print("background_"+k,v)
 
+                background_score_dict.update(score_dict)
+
         avg_score_dict=score_tracker.get_means()
 
         accelerator.print("Average Scores:")
         accelerator.print(len(avg_score_dict))
         for k,v in avg_score_dict.items():
             accelerator.print(k,float(v))
-        accelerator.log(avg_score_dict)
+        if args.background:
+            avg_score_dict=background_score_tracker.get_means()
+
+            accelerator.print("Background Average Scores:")
+            accelerator.print(len(avg_score_dict))
+            for k,v in avg_score_dict.items():
+                accelerator.print(k,float(v))
+
 
 
 

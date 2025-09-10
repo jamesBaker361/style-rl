@@ -355,10 +355,14 @@ def main(args):
             )
 
             outputs = clip_model(**inputs)
-            logits_per_text = outputs.logits_per_text.numpy()[0]  # this is the image-text similarity score
+            
+            #logits_per_text = outputs.logits_per_text.numpy()[0]  # this is the image-text similarity score
             image_embeds=outputs.image_embeds
+            text_embeds=outputs.text_embeds
+            logits_per_text=torch.matmul(text_embeds, image_embeds.t())[0]
+            accelerator.print("logits",logits_per_text.size())
+
             image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
-            accelerator.print("logits per image", logits_per_text)
             [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
             [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
 

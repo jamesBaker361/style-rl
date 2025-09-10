@@ -3,7 +3,7 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
-from ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey
+from ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
 import torch.nn.functional as F
 import math
 from diffusers import StableDiffusionPipeline
@@ -110,7 +110,7 @@ def main(args):
 
         # Load IP-Adapter
         pipe.load_ip_adapter("h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin")
-        pipe.set_ip_adapter_scale(args.initial_ip_adapter_scale)
+        set_ip_adapter_scale_monkey(pipe,args.initial_ip_adapter_scale)
 
         setattr(pipe,"safety_checker",None)
 
@@ -119,14 +119,7 @@ def main(args):
 
         
 
-        attn_list=get_modules_of_types(pipe.unet,Attention)
-
-        for [name,_] in attn_list:
-            print(name)
-
-        for name,module in attn_list:
-            if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==IPAdapterAttnProcessor2_0:
-                setattr(module,"processor",MonkeyIPAttnProcessor(module.processor,name))
+        insert_monkey(pipe)
 
 
 
@@ -188,7 +181,7 @@ def main(args):
                 prompt=" "
             generator=torch.Generator()
             generator.manual_seed(123)
-            pipe.set_ip_adapter_scale(0.5)
+            set_ip_adapter_scale_monkey(pipe,0.5)
             initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
             mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
@@ -266,20 +259,20 @@ def main(args):
 
             generator=torch.Generator()
             generator.manual_seed(123)
-            pipe.set_ip_adapter_scale(1.0)
+            set_ip_adapter_scale_monkey(pipe,1.0)
             final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,
                                       scale_step_dict=scale_step_dict).images[0]
             torch.cuda.empty_cache()
 
             generator=torch.Generator()
             generator.manual_seed(123)
-            pipe.set_ip_adapter_scale(1.0)
+            set_ip_adapter_scale_monkey(pipe,1.0)
             final_image_normal=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
             torch.cuda.empty_cache()
 
             generator=torch.Generator()
             generator.manual_seed(123)
-            pipe.set_ip_adapter_scale(1.0)
+            set_ip_adapter_scale_monkey(pipe,1.0)
             final_image_all_steps=final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=[x for x in range(args.final_steps)],scale_step_dict={i:1.0  for i in range(args.final_steps) }).images[0]

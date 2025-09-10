@@ -386,10 +386,7 @@ def main(args):
             [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
             [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
 
-            if args.background:
-                inputs = processor(
-                text=[prompt], images=[background_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
-                )
+            
 
             score_dict={
                 "text_score_unmasked":text_score_unmasked,
@@ -407,6 +404,38 @@ def main(args):
             accelerator.log(score_dict)
 
             score_tracker.update(score_dict)
+
+            if args.background:
+                inputs = processor(
+                text=[prompt], images=[background_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
+                )
+                outputs = clip_model(**inputs)
+
+                image_embeds=outputs.image_embeds
+                text_embeds=outputs.text_embeds
+                logits_per_text=torch.matmul(text_embeds, image_embeds.t())[0]
+
+                image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
+                [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
+                [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
+
+                
+
+                score_dict={
+                    "text_score_unmasked":text_score_unmasked,
+                    "text_score_seg_mask":text_score_seg_mask,
+                    "text_score_raw_mask":text_score_raw_mask,
+                    "text_score_normal":text_score_normal,
+                    "text_score_all_steps":text_score_all_steps,
+                    "image_score_unmasked":image_score_unmasked,
+                    "image_score_seg_mask":image_score_seg_mask,
+                    "image_score_raw_mask":image_score_raw_mask,
+                    "image_score_normal":image_score_normal,
+                    "image_score_all_steps":image_score_all_steps
+                }
+
+                for k,v in score_dict.items():
+                    accelerator.print("background_"+k,v)
 
         avg_score_dict=score_tracker.get_means()
 

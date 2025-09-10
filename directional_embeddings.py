@@ -53,7 +53,7 @@ def main(args):
         "embedding":[]
         }
         start=0
-    src_data=load_dataset(args.src_dataset,split="train")
+    src_data=load_dataset(args.src_dataset,split="train").cast_column("image",datasets.Image())
     accelerator.print("starting at ",start)
     for k,row in enumerate(src_data):
         if k==args.limit:

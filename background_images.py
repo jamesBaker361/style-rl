@@ -28,7 +28,7 @@ from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
 import torch
-from diffusers import StableDiffusionPipeline,AutoPipelineForText2Image
+from diffusers import StableDiffusionPipeline,StableDiffusionXLPipeline
 from datasets import load_dataset,Dataset
 
 parser=argparse.ArgumentParser()
@@ -46,14 +46,14 @@ def main(args):
         "prompt":[]
     }
     
-    pipe= AutoPipelineForText2Image.from_pretrained(
+    pipe= StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, variant="fp16", use_safetensors=True
     ).to(accelerator.device)
     for prompt in real_test_prompt_list:
         gen=torch.Generator()
         gen.manual_seed(10101)
         p=prompt.replace("with a"," ").replace("floating on top of", " ").replace("floating in", " ").replace("on top of"," ").replace("with the"," ").replace("in the background", " ")
-        image=pipe(p, size,size,steps,generator=gen).images[0]
+        image=pipe(p, height=size,width=size,generator=gen).images[0]
         data_dict['image'].append(image)
         data_dict['prompt'].append(prompt)
 

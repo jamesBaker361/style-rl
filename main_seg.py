@@ -82,6 +82,33 @@ def get_mask(layer_index:int,
 
     return avg
 
+class ScoreTracker:
+    def __init__(self):
+        self.score_list_dict={
+                "text_score_unmasked":[],
+                "text_score_seg_mask":[],
+                "text_score_raw_mask":[],
+                "text_score_normal":[],
+                "text_score_all_steps":[],
+                "image_score_unmasked":[],
+                "image_score_seg_mask":[],
+                "image_score_raw_mask":[],
+                "image_score_normal":[],
+                "image_score_all_steps":[]
+            }
+
+    def update(self,score_dict):
+        for k,v in score_dict.items():
+            self.score_list_dict[k].append(v)
+
+    def get_means(self)-> dict:
+        ret={}
+        for k,v in self.score_list_dict.items():
+            if len(v)>0:
+                ret[k]=np.mean(v)
+
+        return ret
+
 def main(args):
     with torch.no_grad():
         
@@ -158,17 +185,9 @@ def main(args):
             background_dict={row["prompt"]:row["image"] for row in background_data}
             accelerator.print("background dict", background_dict)
 
-        text_score_unmasked_list=[]
-        text_score_seg_mask_list=[]
-        text_score_raw_mask_list=[]
-        text_score_normal_list=[]
-        text_score_all_steps_list=[]
-
-        image_score_unmasked_list=[]
-        image_score_seg_mask_list=[]
-        image_score_raw_mask_list=[]
-        image_score_normal_list=[]
-        image_score_all_steps_list=[]
+        score_tracker=ScoreTracker()
+        if args.background:
+            background_score_tracker
 
         for k,row in enumerate(data):
             if k==args.limit:
@@ -350,6 +369,7 @@ def main(args):
 
             accelerator.log({"tiny_mask":wandb.Image(tiny_mask_pil)})
 
+
             inputs = processor(
                 text=[prompt], images=[ip_adapter_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
             )
@@ -366,6 +386,11 @@ def main(args):
             [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
             [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
 
+            if args.background:
+                inputs = processor(
+                text=[prompt], images=[background_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
+                )
+
             score_dict={
                 "text_score_unmasked":text_score_unmasked,
                 "text_score_seg_mask":text_score_seg_mask,
@@ -381,29 +406,9 @@ def main(args):
             accelerator.print(score_dict)
             accelerator.log(score_dict)
 
-            text_score_raw_mask_list.append(text_score_raw_mask)
-            text_score_seg_mask_list.append(text_score_seg_mask)
-            text_score_unmasked_list.append(text_score_unmasked)
-            text_score_normal_list.append(text_score_normal)
-            text_score_all_steps_list.append(text_score_all_steps)
-            image_score_raw_mask_list.append(image_score_raw_mask)
-            image_score_seg_mask_list.append(image_score_seg_mask)
-            image_score_unmasked_list.append(image_score_unmasked)
-            image_score_normal_list.append(image_score_normal)
-            image_score_all_steps_list.append(image_score_all_steps)
+            score_tracker.update(score_dict)
 
-        avg_score_dict={
-                "text_score_unmasked":np.mean(text_score_unmasked_list),
-                "text_score_seg_mask":np.mean(text_score_seg_mask_list),
-                "text_score_raw_mask":np.mean(text_score_raw_mask_list),
-                "text_score_normal":np.mean(text_score_normal_list),
-                "text_score_all_steps":np.mean(text_score_all_steps_list),
-                "image_score_unmasked":np.mean(image_score_unmasked_list),
-                "image_score_seg_mask":np.mean(image_score_seg_mask_list),
-                "image_score_raw_mask":np.mean(image_score_raw_mask_list),
-                "image_score_normal":np.mean(image_score_normal_list),
-                "image_score_all_steps":np.mean(image_score_all_steps_list)
-        }
+        avg_score_dict=score_tracker.get_means()
 
         accelerator.print("Average Scores:")
         accelerator.print(len(avg_score_dict))

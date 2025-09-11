@@ -9,6 +9,7 @@ import torch
 from diffusers import StableDiffusionPipeline
 from datasets import load_dataset, Dataset
 import datasets
+import random
 
 parser=argparse.ArgumentParser()
 
@@ -74,7 +75,7 @@ def main(args):
             try:
                 Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
             except:
-                time.sleep(10)
+                time.sleep(10+random.randint(1,90))
                 Dataset.from_dict(data_dict).push_to_hub(args.dest_dataset)
 
     time.sleep(10)

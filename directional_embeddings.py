@@ -8,6 +8,7 @@ from directional_data import noun_list, action_list, location_list, style_list
 import torch
 from diffusers import StableDiffusionPipeline
 from datasets import load_dataset, Dataset
+import datasets
 
 parser=argparse.ArgumentParser()
 

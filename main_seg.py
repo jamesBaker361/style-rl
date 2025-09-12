@@ -12,7 +12,7 @@ from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
 import torch
-from main_pers import concat_images_horizontally
+from image_utils import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
 import random

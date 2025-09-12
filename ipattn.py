@@ -70,7 +70,7 @@ from typing import Callable, List, Optional, Tuple, Union
 
 import torch
 import torch.nn.functional as F
-from main_pers import concat_images_horizontally,concat_images_vertically
+from image_utils import concat_images_horizontally,concat_images_vertically
 from PIL import Image, ImageDraw, ImageFont
 from diffusers.loaders.unet_loader_utils import _maybe_expand_lora_scales
 import os

@@ -46,7 +46,7 @@ gen_image.images[0]
 
 pipe.unet.mid_block.attentions[0].transformer_blocks[0].attn2.processor.scale'''
 
-from diffusers.models.attention_processor import  IPAdapterAttnProcessor2_0,Attention
+from diffusers.models.attention_processor import  IPAdapterAttnProcessor, IPAdapterAttnProcessor2_0, IPAdapterXFormersAttnProcessor,Attention
 from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor

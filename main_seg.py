@@ -141,14 +141,8 @@ def main(args):
 
         setattr(pipe,"safety_checker",None)
 
-        #if args.load_hf:
-            
-
-        
-
         insert_monkey(pipe)
-
-
+        attn_list=get_modules_of_types(pipe.unet,Attention)
 
         #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
         try:
@@ -187,7 +181,7 @@ def main(args):
 
         score_tracker=ScoreTracker()
         if args.background:
-            background_score_tracker
+            background_score_tracker=ScoreTracker()
 
         for k,row in enumerate(data):
             if k==args.limit:
@@ -437,7 +431,7 @@ def main(args):
                 for k,v in score_dict.items():
                     accelerator.print("background_"+k,v)
 
-                background_score_dict.update(score_dict)
+                background_score_tracker.update(score_dict)
 
         avg_score_dict=score_tracker.get_means()
 

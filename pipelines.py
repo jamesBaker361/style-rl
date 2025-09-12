@@ -16,6 +16,7 @@ import numpy as np
 from copy import deepcopy
 import random
 from diffusers.models.lora import adjust_lora_scale_text_encoder
+from ipattn import set_ip_adapter_scale_monkey
 import warnings
 from diffusers.utils import (
     USE_PEFT_BACKEND,
@@ -465,18 +466,17 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 #t = torch.cat([t]*2) if do_classifier_free_guidance else t
 
                 if decreasing_scale:
-                    self.set_ip_adapter_scale(1.0- (float(i)/len(timesteps)))
+                    set_ip_adapter_scale_monkey(self,1.0- (float(i)/len(timesteps)))
                 elif increasing_scale:
-                    self.set_ip_adapter_scale(float(i)/len(timesteps))
-
+                    set_ip_adapter_scale_monkey(self, float(i)/len(timesteps) )
                 if i < start*len(timesteps) or i > end *len(timesteps):
-                    self.set_ip_adapter_scale(0.0)
+                    set_ip_adapter_scale_monkey(self,0.0)
                 else:
-                    self.set_ip_adapter_scale(1.0)
+                    set_ip_adapter_scale_monkey(self,1.0)
 
                 if len(scale_step_dict)==num_inference_steps:
                     #print(f"setting scale to {scale_step_dict[i]}")
-                    self.set_ip_adapter_scale(scale_step_dict[i])
+                    set_ip_adapter_scale_monkey(self,scale_step_dict[i])
 
                 temp_cross_attention_kwargs=self.cross_attention_kwargs
 

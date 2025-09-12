@@ -26,6 +26,7 @@ parser.add_argument("--upload_interval",type=int,default=10)
 
 
 def main(args):
+    time.sleep(random.randint(1,120))
     accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
     accelerator.init_trackers(project_name=args.project_name,config=vars(args))
 

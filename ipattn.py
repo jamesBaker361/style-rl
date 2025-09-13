@@ -376,7 +376,6 @@ def set_ip_adapter_scale_monkey(self:IPAdapterMixin,scale):
         if isinstance(
             attn_processor, (IPAdapterAttnProcessor, IPAdapterAttnProcessor2_0, IPAdapterXFormersAttnProcessor,MonkeyIPAttnProcessor)
         ):
-            print("matched at ",attn_name, type(attn_processor))
             if len(scale_configs) != len(attn_processor.scale):
                 raise ValueError(
                     f"Cannot assign {len(scale_configs)} scale_configs to {len(attn_processor.scale)} IP-Adapter."

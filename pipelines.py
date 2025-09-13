@@ -18,6 +18,7 @@ import random
 from diffusers.models.lora import adjust_lora_scale_text_encoder
 from ipattn import set_ip_adapter_scale_monkey
 import warnings
+from copy import deepcopy
 from diffusers.utils import (
     USE_PEFT_BACKEND,
     deprecate,
@@ -478,11 +479,10 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                     #print(f"setting scale to {scale_step_dict[i]}")
                     set_ip_adapter_scale_monkey(self,scale_step_dict[i])
 
-                temp_cross_attention_kwargs=self.cross_attention_kwargs
+                temp_cross_attention_kwargs=deepcopy(self.cross_attention_kwargs)
 
                 if len(mask_step_list)!=0:
                     if i not in mask_step_list:
-                        temp_cross_attention_kwargs=temp_cross_attention_kwargs.copy()
                         temp_cross_attention_kwargs.pop( "ip_adapter_masks")
 
                 # model prediction (v-prediction, eps, x)

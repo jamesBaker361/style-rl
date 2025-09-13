@@ -484,6 +484,7 @@ class CompatibleLatentConsistencyModelPipeline(LatentConsistencyModelPipeline):
                 if len(mask_step_list)!=0:
                     if i not in mask_step_list:
                         temp_cross_attention_kwargs.pop( "ip_adapter_masks")
+                        print("popped",temp_cross_attention_kwargs)
 
                 # model prediction (v-prediction, eps, x)
                 model_pred = self.unet(

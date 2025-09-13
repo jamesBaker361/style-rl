@@ -256,8 +256,11 @@ def main(args):
             generator.manual_seed(123)
             mask_step_list=args.final_mask_steps_list        
             scale_step_dict={i:0  for i in range(args.final_steps) }
+            accelerator.print("mask step list",mask_step_list)
+            
             for k in args.final_adapter_steps_list:
                 scale_step_dict[k]=1.0
+            accelerator.print("scale step dict",scale_step_dict)
             ip_adapter_image_list=ip_adapter_image
             ip_mask=mask_processor.preprocess(mask)
             if args.background:
@@ -289,13 +292,12 @@ def main(args):
             final_image_all_steps=final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=[x for x in range(args.final_steps)],scale_step_dict={i:1.0  for i in range(args.final_steps) }).images[0]
-            
+            accelerator.print("all steps ",[x for x in range(args.final_steps)],{i:1.0  for i in range(args.final_steps) })
             segmented_image,map_list=custom_sam(initial_image,detect_resolution=args.dim)
             accelerator.log({
                 "segmented":wandb.Image(segmented_image)
             })
             mask=mask.cpu()
-            print("mask size",mask.size())
 
             if args.segmentation_attention_method=="exclusive":
                 map_mask=torch.ones((args.dim,args.dim))
@@ -374,7 +376,7 @@ def main(args):
             image_embeds=outputs.image_embeds
             text_embeds=outputs.text_embeds
             logits_per_text=torch.matmul(text_embeds, image_embeds.t())[0]
-            accelerator.print("logits",logits_per_text.size())
+            #accelerator.print("logits",logits_per_text.size())
 
             image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
             [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text

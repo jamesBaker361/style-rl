@@ -195,6 +195,7 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             set_ip_adapter_scale_monkey(pipe,0.5)
+            accelerator.print("inital image")
             initial_image=pipe(prompt,args.dim,args.dim,args.initial_steps,ip_adapter_image=ip_adapter_image,generator=generator).images[0]
 
             mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
@@ -269,6 +270,7 @@ def main(args):
                 accelerator.print('ip_mask.size()',ip_mask.size())
                 ip_mask=[ip_mask.reshape([1,ip_mask.shape[0],ip_mask.shape[2], ip_mask.shape[3]])]
                 
+            accelerator.print("final image raw mask")
             final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]
@@ -276,6 +278,7 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             set_ip_adapter_scale_monkey(pipe,1.0)
+            accelerator.print("final image unmasked")
             final_image_unmasked=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,
                                       scale_step_dict=scale_step_dict).images[0]
             torch.cuda.empty_cache()
@@ -283,12 +286,14 @@ def main(args):
             generator=torch.Generator()
             generator.manual_seed(123)
             set_ip_adapter_scale_monkey(pipe,1.0)
+            accelerator.print("final_image_normal")
             final_image_normal=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator).images[0]
             torch.cuda.empty_cache()
 
             generator=torch.Generator()
             generator.manual_seed(123)
             set_ip_adapter_scale_monkey(pipe,1.0)
+            accelerator.print("final_image_all_steps")
             final_image_all_steps=final_image_raw_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_mask
             }, mask_step_list=[x for x in range(args.final_steps)],scale_step_dict={i:1.0  for i in range(args.final_steps) }).images[0]
@@ -342,6 +347,7 @@ def main(args):
                 accelerator.print('ip_map_mask.size()',ip_map_mask.size())
                 ip_map_mask = [ip_map_mask.reshape(1, ip_map_mask.shape[0], ip_map_mask.shape[2], ip_map_mask.shape[3])]
                 
+            accelerator.print("final_image_seg_mask")
             final_image_seg_mask=pipe(prompt,args.dim,args.dim,args.final_steps,ip_adapter_image=ip_adapter_image_list,generator=generator,cross_attention_kwargs={
                 "ip_adapter_masks":ip_map_mask
             }, mask_step_list=mask_step_list,scale_step_dict=scale_step_dict).images[0]

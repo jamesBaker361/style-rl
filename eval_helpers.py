@@ -37,5 +37,5 @@ class DinoMetric:
 
         cosine_similarities=F.cosine_similarity(src_embedding,generated_embedding)
 
-        return cosine_similarities.numpy()
+        return cosine_similarities.detach().cpu().numpy()
     

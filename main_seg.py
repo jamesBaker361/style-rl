@@ -18,6 +18,9 @@ from torchvision.transforms.functional import to_pil_image
 import random
 from transformers import AutoProcessor, CLIPModel
 from pipelines import CompatibleLatentConsistencyModelPipeline
+import ImageReward as RM
+from eval_helpers import DinoMetric
+
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
@@ -85,6 +88,11 @@ def get_mask(layer_index:int,
 class ScoreTracker:
     def __init__(self):
         self.score_list_dict={
+                "dino_score_unmasked":[],
+                "dino_score_seg_mask":[],
+                "dino_score_raw_mask":[],
+                "dino_score_normal":[],
+                "dino_score_all_steps":[],
                 "text_score_unmasked":[],
                 "text_score_seg_mask":[],
                 "text_score_raw_mask":[],
@@ -94,7 +102,12 @@ class ScoreTracker:
                 "image_score_seg_mask":[],
                 "image_score_raw_mask":[],
                 "image_score_normal":[],
-                "image_score_all_steps":[]
+                "image_score_all_steps":[],
+                "ir_score_unmasked":[],
+                "ir_score_seg_mask":[],
+                "ir_score_raw_mask":[],
+                "ir_score_normal":[],
+                "ir_score_all_steps":[],
             }
 
     def update(self,score_dict):
@@ -111,11 +124,15 @@ class ScoreTracker:
 
 def main(args):
     with torch.no_grad():
+        ir_model=RM.load("ImageReward-v1.0")
+        
         
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
         accelerator=Accelerator(log_with="wandb",mixed_precision=args.mixed_precision)
         accelerator.init_trackers(project_name=args.project_name,config=vars(args))
+
+        dino_metric=DinoMetric(accelerator.device)
 
         if args.initial_mask_step_list is None:
             initial_quarter=args.initial_steps //4
@@ -387,10 +404,22 @@ def main(args):
             image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
             [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
             [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
+            [ir_score_normal,ir_score_unmasked, ir_score_seg_mask, ir_score_raw_mask,ir_score_all_steps]=ir_model.score(prompt,[final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps])
+            [dino_score_normal,dino_score_unmasked, dino_score_seg_mask, dino_score_raw_mask,dino_score_all_steps]=dino_metric.get_scores(ip_adapter_image, [final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps])
 
             
 
             score_dict={
+                "dino_score_unmasked":dino_score_unmasked,
+                "dino_score_seg_mask":dino_score_seg_mask,
+                "dino_score_raw_mask":dino_score_raw_mask,
+                "dino_score_normal":dino_score_normal,
+                "dino_score_all_steps":dino_score_all_steps,
+                "ir_score_unmasked":ir_score_unmasked,
+                "ir_score_seg_mask":ir_score_seg_mask,
+                "ir_score_raw_mask":ir_score_raw_mask,
+                "ir_score_normal":ir_score_normal,
+                "ir_score_all_steps":ir_score_all_steps,
                 "text_score_unmasked":text_score_unmasked,
                 "text_score_seg_mask":text_score_seg_mask,
                 "text_score_raw_mask":text_score_raw_mask,
@@ -420,10 +449,17 @@ def main(args):
                 image_similarities=torch.matmul(image_embeds,image_embeds.t()).numpy()[0]
                 [_,text_score_normal,text_score_unmasked, text_score_seg_mask, text_score_raw_mask,text_score_all_steps]=logits_per_text
                 [_,image_score_normal,image_score_unmasked, image_score_seg_mask, image_score_raw_mask,image_score_all_steps]=image_similarities
+                [ir_score_normal,ir_score_unmasked, ir_score_seg_mask, ir_score_raw_mask,ir_score_all_steps]=ir_model.score(prompt,[final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps])
+
 
                 
 
                 score_dict={
+                    "ir_score_unmasked":ir_score_unmasked,
+                    "ir_score_seg_mask":ir_score_seg_mask,
+                    "ir_score_raw_mask":ir_score_raw_mask,
+                    "ir_score_normal":ir_score_normal,
+                    "ir_score_all_steps":ir_score_all_steps,
                     "text_score_unmasked":text_score_unmasked,
                     "text_score_seg_mask":text_score_seg_mask,
                     "text_score_raw_mask":text_score_raw_mask,

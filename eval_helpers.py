@@ -25,7 +25,7 @@ class DinoMetric:
             )
 
     def embed_images(self, image_list:Union[Image.Image, List[Image.Image]])-> torch.Tensor:
-        if type(image_list)==Image.Image:
+        if type(image_list)!=list:
             image_list=[image_list]
         image_tensor_list=torch.stack([self.T(image.convert("RGB")).to(self.device) for image in image_list])
         return self.dino_model(image_tensor_list).last_hidden_state[:,0,:]

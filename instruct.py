@@ -22,6 +22,7 @@ parser.add_argument("--src_dataset",type=str, default="jlbaker361/mtg")
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)
+parser.add_argument("--instruct_clip",action="store_true")
 
 
 @torch.no_grad()
@@ -47,7 +48,9 @@ def main(args):
 
     model_id = "timbrooks/instruct-pix2pix"
     pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
-    pipe.load_lora_weights("SherryXTChen/InstructCLIP-InstructPix2Pix")
+
+    if args.instruct_clip:
+        pipe.load_lora_weights("SherryXTChen/InstructCLIP-InstructPix2Pix")
     pipe.to(device)
     pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 

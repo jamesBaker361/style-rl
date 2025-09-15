@@ -85,6 +85,28 @@ def get_mask(layer_index:int,
 
     return avg
 
+real_test_prompt_list=[
+           ' in the jungle',
+            ' in the snow',
+            ' on the beach',
+            ' on a cobblestone street',
+            ' on top of pink fabric',
+            ' on top of a wooden floor',
+            ' with a city in the background',
+            ' with a mountain in the background',
+            ' with a blue house in the background',
+            ' on top of a purple rug in a forest',
+            ' with a wheat field in the background',
+            ' with a tree and autumn leaves in the background',
+            ' with the Eiffel Tower in the background',
+            ' floating on top of water',
+            ' floating in an ocean of milk',
+            ' on top of green grass with sunflowers around it',
+            ' on top of a mirror',
+            ' on top of the sidewalk in a crowded street',
+            ' on top of a dirt road',
+            ' on top of a white rug',]
+
 class ScoreTracker:
     def __init__(self):
         self.score_list_dict={
@@ -168,28 +190,7 @@ def main(args):
             data=datasets.load_dataset(args.dataset,download_mode="force_redownload")
         data=data["train"]
 
-        real_test_prompt_list=[
-           ' in the jungle',
-            ' in the snow',
-            ' on the beach',
-            ' on a cobblestone street',
-            ' on top of pink fabric',
-            ' on top of a wooden floor',
-            ' with a city in the background',
-            ' with a mountain in the background',
-            ' with a blue house in the background',
-            ' on top of a purple rug in a forest',
-            ' with a wheat field in the background',
-            ' with a tree and autumn leaves in the background',
-            ' with the Eiffel Tower in the background',
-            ' floating on top of water',
-            ' floating in an ocean of milk',
-            ' on top of green grass with sunflowers around it',
-            ' on top of a mirror',
-            ' on top of the sidewalk in a crowded street',
-            ' on top of a dirt road',
-            ' on top of a white rug',
-        ]
+        
 
         if args.background:
             background_data=datasets.load_dataset("jlbaker361/real_test_prompt_list",split="train")
@@ -205,7 +206,7 @@ def main(args):
                 break
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
-            prompt="person "+random.choice(real_test_prompt_list)
+            prompt="person "+real_test_prompt_list[k % len(real_test_prompt_list)]
             if args.background:
                 background_image=background_dict[prompt.replace("person ","")]
                 prompt=" "

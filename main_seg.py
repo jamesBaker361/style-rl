@@ -455,16 +455,6 @@ def main(args):
                 
 
                 score_dict={
-                    "ir_score_unmasked":ir_score_unmasked,
-                    "ir_score_seg_mask":ir_score_seg_mask,
-                    "ir_score_raw_mask":ir_score_raw_mask,
-                    "ir_score_normal":ir_score_normal,
-                    "ir_score_all_steps":ir_score_all_steps,
-                    "text_score_unmasked":text_score_unmasked,
-                    "text_score_seg_mask":text_score_seg_mask,
-                    "text_score_raw_mask":text_score_raw_mask,
-                    "text_score_normal":text_score_normal,
-                    "text_score_all_steps":text_score_all_steps,
                     "image_score_unmasked":image_score_unmasked,
                     "image_score_seg_mask":image_score_seg_mask,
                     "image_score_raw_mask":image_score_raw_mask,

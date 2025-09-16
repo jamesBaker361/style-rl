@@ -100,10 +100,10 @@ def main(args):
         dino_score=dino_metric.get_scores(image, [augmented_image])
 
         text_score_list.append(text_score.detach().cpu().numpy())
-        image_score_list.append(image_score.detach().cpu().numpy())
-        image_score_background_list.append(image_score_background.detach().cpu().numpy())
-        ir_score_list.append(ir_score.detach().cpu().numpy())
-        dino_score_list.append(dino_score.detach().cpu().numpy())
+        image_score_list.append(image_score)
+        image_score_background_list.append(image_score_background)
+        ir_score_list.append(ir_score)
+        dino_score_list.append(dino_score)
 
     accelerator.log({
         "text_score_list":np.mean(text_score_list),

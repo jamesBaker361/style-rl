@@ -7,7 +7,8 @@ import torch
 import numpy as np
 from datasets import load_dataset
 import torch
-from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler,StableDiffusion3InstructPix2PixPipeline
+from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
+from pipeline_stable_diffusion_3_instruct_pix2pix import StableDiffusion3InstructPix2PixPipeline
 from main_seg import real_test_prompt_list
 from img_helpers import concat_images_horizontally
 import wandb

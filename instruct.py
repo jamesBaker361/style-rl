@@ -7,7 +7,7 @@ import torch
 import numpy as np
 from datasets import load_dataset
 import torch
-from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
+from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler,StableDiffusion3InstructPix2PixPipeline
 from main_seg import real_test_prompt_list
 from img_helpers import concat_images_horizontally
 import wandb
@@ -23,6 +23,7 @@ parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--instruct_clip",action="store_true")
+parser.add_argument("--ultra_edit",action="store_true")
 
 
 @torch.no_grad()
@@ -47,13 +48,18 @@ def main(args):
     device=accelerator.device
 
     model_id = "timbrooks/instruct-pix2pix"
+    
+
     pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
 
     if args.instruct_clip:
         pipe.load_lora_weights("SherryXTChen/InstructCLIP-InstructPix2Pix")
-    pipe.to(device)
+    
     pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
+    if args.ultra_edit:
+        pipe = StableDiffusion3InstructPix2PixPipeline.from_pretrained("BleachNick/SD3_UltraEdit_freeform", torch_dtype=torch_dtype)
+    pipe.to(device)
     data=load_dataset(args.src_dataset, split="train")
 
     background_data=load_dataset("jlbaker361/real_test_prompt_list",split="train")

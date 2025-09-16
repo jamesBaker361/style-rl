@@ -70,7 +70,7 @@ def main(args):
         if k==args.limit:
             break
         
-        prompt=real_test_prompt_list[k]
+        prompt=real_test_prompt_list[k%len(real_test_prompt_list)]
         background_image=background_dict[prompt]
         image=row["image"]
 

@@ -1106,6 +1106,8 @@ class StableDiffusion3InstructPix2PixPipeline(
             self.do_classifier_free_guidance,
         )
 
+        print('image_latents.size(), latents.size()',image_latents.size(), latents.size())
+
         # 6. Check that shapes of latents and image match the DiT (SD3) in_channels
         num_channels_image = image_latents.shape[1]
         if num_channels_latents + num_channels_image != self.transformer.config.in_channels:

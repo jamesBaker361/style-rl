@@ -80,7 +80,7 @@ def main(args):
         
         prompt=real_test_prompt_list[k%len(real_test_prompt_list)]
         background_image=background_dict[prompt]
-        image=row["image"]
+        image=row["image"].resize((args.size,args.size))
 
         augmented_image=pipe(prompt=prompt,height=args.size,width=args.size,image=image,num_inference_steps=args.num_inference_steps).images[0]
 

@@ -25,6 +25,7 @@ parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--instruct_clip",action="store_true")
 parser.add_argument("--ultra_edit",action="store_true")
+parser.add_argument("--size",type=int,default=256)
 
 
 @torch.no_grad()
@@ -81,7 +82,7 @@ def main(args):
         background_image=background_dict[prompt]
         image=row["image"]
 
-        augmented_image=pipe(prompt=prompt,image=image,num_inference_steps=args.num_inference_steps).images[0]
+        augmented_image=pipe(prompt=prompt,height=args.size,width=args.size,image=image,num_inference_steps=args.num_inference_steps).images[0]
 
         concat=concat_images_horizontally([image,augmented_image])
 

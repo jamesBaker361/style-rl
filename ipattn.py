@@ -3,7 +3,10 @@ from diffusers import StableDiffusionPipeline
 from PIL import Image
 import gc
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
-from .custom_sam_detector import CustomSamDetector
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+from custom_sam_detector import CustomSamDetector
 
 
 import torch
@@ -31,9 +34,7 @@ from diffusers.models.attention_processor import  IPAdapterAttnProcessor, IPAdap
 from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
-import os
-import sys
-sys.path.append(os.path.dirname(__file__))
+
 from adapter_helpers import get_modules_of_types
 import math
 from typing import Callable, List, Optional, Tuple, Union

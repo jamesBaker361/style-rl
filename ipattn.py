@@ -31,8 +31,10 @@ from diffusers.models.attention_processor import  IPAdapterAttnProcessor, IPAdap
 from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
-
-from .adapter_helpers import get_modules_of_types
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+from adapter_helpers import get_modules_of_types
 import math
 from typing import Callable, List, Optional, Tuple, Union
 
@@ -40,7 +42,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image, ImageDraw, ImageFont
 from diffusers.loaders.unet_loader_utils import _maybe_expand_lora_scales
-import os
+
 
 
 

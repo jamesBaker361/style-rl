@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
@@ -11,15 +12,16 @@ from diffusers.models.attention_processor import  IPAdapterAttnProcessor2_0,Atte
 from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
+sys.path.append(os.path.dirname(__file__))
 import torch
-from .image_utils import concat_images_horizontally
+from image_utils import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
 import random
 from transformers import AutoProcessor, CLIPModel
-from .pipelines import CompatibleLatentConsistencyModelPipeline
+from pipelines import CompatibleLatentConsistencyModelPipeline
 import ImageReward as RM
-from .eval_helpers import DinoMetric
+from eval_helpers import DinoMetric
 
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector

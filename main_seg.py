@@ -3,7 +3,7 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
-from ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
+from .ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
 import torch.nn.functional as F
 import math
 from diffusers import StableDiffusionPipeline
@@ -12,14 +12,14 @@ from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
 import torch
-from image_utils import concat_images_horizontally
+from .image_utils import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from torchvision.transforms.functional import to_pil_image
 import random
 from transformers import AutoProcessor, CLIPModel
-from pipelines import CompatibleLatentConsistencyModelPipeline
+from .pipelines import CompatibleLatentConsistencyModelPipeline
 import ImageReward as RM
-from eval_helpers import DinoMetric
+from .eval_helpers import DinoMetric
 
 
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector

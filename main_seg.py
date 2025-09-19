@@ -29,6 +29,7 @@ from custom_sam_detector import CustomSamDetector
 import datasets
 import wandb
 import numpy as np
+from prompt_list import real_test_prompt_list
 
 parser=argparse.ArgumentParser()
 
@@ -86,28 +87,6 @@ def get_mask(layer_index:int,
     #avg=F.interpolate(avg.unsqueeze(0).unsqueeze(0), size=(dim, dim), mode="nearest").squeeze(0).squeeze(0)
 
     return avg
-
-real_test_prompt_list=[
-           ' in the jungle',
-            ' in the snow',
-            ' on the beach',
-            ' on a cobblestone street',
-            ' on top of pink fabric',
-            ' on top of a wooden floor',
-            ' with a city in the background',
-            ' with a mountain in the background',
-            ' with a blue house in the background',
-            ' on top of a purple rug in a forest',
-            ' with a wheat field in the background',
-            ' with a tree and autumn leaves in the background',
-            ' with the Eiffel Tower in the background',
-            ' floating on top of water',
-            ' floating in an ocean of milk',
-            ' on top of green grass with sunflowers around it',
-            ' on top of a mirror',
-            ' on top of the sidewalk in a crowded street',
-            ' on top of a dirt road',
-            ' on top of a white rug',]
 
 class ScoreTracker:
     def __init__(self):

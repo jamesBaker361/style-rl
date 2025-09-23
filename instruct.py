@@ -32,6 +32,7 @@ parser.add_argument("--limit",type=int,default=-1)
 parser.add_argument("--model",default="pix2pix",help=f"one of {model_list}")
 parser.add_argument("--size",type=int,default=256)
 parser.add_argument("--background",action="store_true")
+parser.add_argument("--object",type=str,default="character")
 
 
 @torch.no_grad()
@@ -88,7 +89,11 @@ def main(args):
         background_image=background_dict[prompt]
         image=row["image"].resize((args.size,args.size))
 
-        augmented_image=pipe(prompt=prompt,height=args.size,width=args.size,image=image,num_inference_steps=args.num_inference_steps).images[0]
+        object=args.object
+        if "object" in row:
+            object=row["object"]
+
+        augmented_image=pipe(prompt=object+" "+prompt,height=args.size,width=args.size,image=image,num_inference_steps=args.num_inference_steps).images[0]
 
         concat=concat_images_horizontally([image,augmented_image])
 

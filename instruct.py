@@ -1,3 +1,5 @@
+# compare these to ip + background
+
 import os
 import argparse
 from experiment_helpers.gpu_details import print_details
@@ -18,14 +20,18 @@ import ImageReward as RM
 
 parser=argparse.ArgumentParser()
 
+model_list=[
+    "pix2pix","instruct_clip","ultra_edit",
+]
+
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 parser.add_argument("--src_dataset",type=str, default="jlbaker361/mtg")
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)
-parser.add_argument("--instruct_clip",action="store_true")
-parser.add_argument("--ultra_edit",action="store_true")
+parser.add_argument("--model",default="pix2pix",help=f"one of {model_list}")
 parser.add_argument("--size",type=int,default=256)
+parser.add_argument("--background",action="store_true")
 
 
 @torch.no_grad()
@@ -51,15 +57,15 @@ def main(args):
 
     model_id = "timbrooks/instruct-pix2pix"
     
-
-    pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
-
-    if args.instruct_clip:
+    if args.model=="pix2pix":
+        pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
+        pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
+    elif args.model=="instruct_clip":
         pipe.load_lora_weights("SherryXTChen/InstructCLIP-InstructPix2Pix")
     
-    pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
+        pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
-    if args.ultra_edit:
+    elif args.model=="ultra_edit":
         pipe = StableDiffusion3InstructPix2PixPipeline.from_pretrained("BleachNick/SD3_UltraEdit_freeform", torch_dtype=torch_dtype)
     pipe.to(device)
     data=load_dataset(args.src_dataset, split="train")

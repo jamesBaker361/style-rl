@@ -43,10 +43,19 @@ def run_job():
 
 
 
-
+'''
+sbatch -J auto runpygpu_chip.sh endless.py
+sbatch -J auto runpymain.sh endless.py
+'''
 
 count=0
 while True:
     run_job()
     time.sleep(10 * 60)  # Wait for 10 minutes
     count+=1
+    if count==288:
+        #propagate this after 10 * 6 * 48 minutes = 2 days
+        if os.getcwd().find("jlb638")!=-1:
+            subprocess.run("sbatch -J auto runpymain.sh endless.py".split(" "),check=True)
+        else:
+            subprocess.run("sbatch -J auto runpygpu_chip.sh endless.py".split(" "),check=True)

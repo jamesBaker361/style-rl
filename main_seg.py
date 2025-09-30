@@ -4,7 +4,7 @@ import argparse
 from experiment_helpers.gpu_details import print_details
 from accelerate import Accelerator
 import time
-from .ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
+
 import torch.nn.functional as F
 import math
 from diffusers import StableDiffusionPipeline
@@ -13,6 +13,7 @@ from diffusers.utils import deprecate, is_torch_xla_available, logging
 from typing import Optional,List
 from diffusers.image_processor import IPAdapterMaskProcessor
 sys.path.append(os.path.dirname(__file__))
+from ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
 import torch
 from image_utils import concat_images_horizontally
 from PIL import Image, ImageDraw, ImageFont, ImageOps

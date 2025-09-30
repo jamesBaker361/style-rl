@@ -27,6 +27,7 @@ from eval_helpers import DinoMetric
 from controlnet_aux import HEDdetector, MidasDetector, MLSDdetector, OpenposeDetector, PidiNetDetector, NormalBaeDetector, LineartDetector, LineartAnimeDetector, CannyDetector, ContentShuffleDetector, ZoeDetector, MediapipeFaceDetector, SamDetector, LeresDetector, DWposeDetector
 from custom_sam_detector import CustomSamDetector
 import datasets
+from datasets import Dataset
 import wandb
 import numpy as np
 from prompt_list import real_test_prompt_list
@@ -55,6 +56,8 @@ parser.add_argument("--segmentation_attention_method",type=str,help="overlap or 
 parser.add_argument("--kv_type",type=str,default="ip")
 parser.add_argument("--initial_ip_adapter_scale",type=float,default=0.75)
 parser.add_argument("--background",action="store_true")
+parser.add_argument("--dest_dataset",type=str, default="jlbaker361/monkey")
+parser.add_argument("--object",type=str,default="character")
 
 def get_mask(layer_index:int, 
              attn_list:list,step:int,
@@ -182,14 +185,26 @@ def main(args):
         if args.background:
             background_score_tracker=ScoreTracker()
 
+        output_dict={
+        "image":[],
+        "augmented_image":[],
+        "text_score":[],
+        "image_score":[],
+        "dino_score":[],
+        "prompt":[]
+        }
+
         for k,row in enumerate(data):
             if k==args.limit:
                 break
             reset_monkey(pipe)
             ip_adapter_image=row["image"]
-            prompt="person "+real_test_prompt_list[k % len(real_test_prompt_list)]
+            object=args.object
+            if "object" in row:
+                object=row["object"]
+            prompt=object+real_test_prompt_list[k % len(real_test_prompt_list)]
             if args.background:
-                background_image=background_dict[prompt.replace("person ","")]
+                background_image=background_dict[prompt.replace(object,"")]
                 prompt=" "
             generator=torch.Generator()
             generator.manual_seed(123)
@@ -418,6 +433,13 @@ def main(args):
 
             score_tracker.update(score_dict)
 
+            output_dict["augmented_image"].append(final_image_raw_mask)
+            output_dict["image"].append(ip_adapter_image)
+            output_dict["dino_score"].append(dino_score_raw_mask)
+            output_dict["image_score"].append(image_score_raw_mask)
+            output_dict["text_score"].append(text_score_raw_mask)
+            output_dict["prompt"].append(prompt)
+
             if args.background:
                 inputs = processor(
                 text=[prompt], images=[background_image,final_image_normal,final_image_unmasked,final_image_seg_mask,final_image_raw_mask,final_image_all_steps], return_tensors="pt", padding=True
@@ -451,6 +473,7 @@ def main(args):
 
         avg_score_dict=score_tracker.get_means()
 
+        Dataset.from_dict(output_dict).push_to_hub(args.dest_dataset)
         accelerator.print("Average Scores:")
         accelerator.print(len(avg_score_dict))
         for k,v in avg_score_dict.items():

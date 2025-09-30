@@ -14,6 +14,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="evaluation-creative")
 parser.add_argument("--dataset_list",nargs="*",type=str)
+parser.add_argument("--limit",type=int,default=-1)
 
 
 
@@ -31,7 +32,9 @@ def main(args):
     for d in args.dataset_list:
         dataset=load_dataset(d,split="train")
         accelerator.print(f"{d} & {np.mean(dataset["text_score"])} & {np.mean(dataset["dino_score"])} & {np.mean(dataset["image_score"])}  \\\\ ")
-    for rows in zip(*[load_dataset(d,split="train") for d in args.dataset_list ]):
+    for k,rows in enumerate(zip(*[load_dataset(d,split="train") for d in args.dataset_list ])):
+        if k==args.limit:
+            break
         image_list=[rows[0]["image"]]+[r["augmented_image"] for r in rows]
         concat=concat_images_horizontally(image_list)
         accelerator.log({

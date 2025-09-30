@@ -26,7 +26,7 @@ model_list=[
 
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 parser.add_argument("--src_dataset",type=str, default="jlbaker361/mtg")
-parser.add_argument("--sdest_dataset",type=str, default="jlbaker361/instruct")
+parser.add_argument("--dest_dataset",type=str, default="jlbaker361/instruct")
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)

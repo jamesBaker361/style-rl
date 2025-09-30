@@ -31,7 +31,10 @@ def main(args):
 
     for d in args.dataset_list:
         dataset=load_dataset(d,split="train")
-        accelerator.print(f"{d} & {np.mean(dataset["text_score"])} & {np.mean(dataset["dino_score"])} & {np.mean(dataset["image_score"])}  \\\\ ")
+        text_score=np.mean(dataset["text_score"])
+        dino_score=np.mean(dataset["dino_score"])
+        image_score=np.mean(dataset["image_score"])
+        accelerator.print(f"{d} & {text_score} & {dino_score} & {image_score}  \\\\ ")
     for k,rows in enumerate(zip(*[load_dataset(d,split="train") for d in args.dataset_list ])):
         if k==args.limit:
             break

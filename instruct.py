@@ -7,7 +7,7 @@ from accelerate import Accelerator
 import time
 import torch
 import numpy as np
-from datasets import load_dataset
+from datasets import load_dataset,Dataset
 import torch
 from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
 from pipeline_stable_diffusion_3_instruct_pix2pix import StableDiffusion3InstructPix2PixPipeline
@@ -26,6 +26,7 @@ model_list=[
 
 parser.add_argument("--mixed_precision",type=str,default="fp16")
 parser.add_argument("--src_dataset",type=str, default="jlbaker361/mtg")
+parser.add_argument("--sdest_dataset",type=str, default="jlbaker361/instruct")
 parser.add_argument("--num_inference_steps",type=int,default=20)
 parser.add_argument("--project_name",type=str,default="baseline")
 parser.add_argument("--limit",type=int,default=-1)
@@ -80,6 +81,15 @@ def main(args):
     ir_score_list=[]
     dino_score_list=[]
 
+    output_dict={
+        "image":[],
+        "augmented_image":[],
+        "text_score":[],
+        "image_score":[],
+        "dino_score":[],
+        "prompt":[]
+    }
+
 
     for k,row in enumerate(data):
         if k==args.limit:
@@ -124,6 +134,13 @@ def main(args):
         ir_score_list.append(ir_score)
         dino_score_list.append(dino_score)
 
+        output_dict["augmented_image"].append(augmented_image)
+        output_dict["image"].append(image)
+        output_dict["dino_score"].append(dino_score)
+        output_dict["image_score"].append(image_score)
+        output_dict["text_score"].append(text_score)
+        output_dict["prompt"].append(prompt)
+
     accelerator.log({
         "text_score_list":np.mean(text_score_list),
         "image_score_list":np.mean(image_score_list),
@@ -131,6 +148,8 @@ def main(args):
         "ir_score_list":np.mean(ir_score_list),
         "dino_score_list":np.mean(dino_score_list)
     })
+
+    Dataset.from_dict(output_dict).push_to_hub(args.dest_dataset)
 
 
 

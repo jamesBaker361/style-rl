@@ -64,6 +64,95 @@ from diffusers.loaders.unet_loader_utils import _maybe_expand_lora_scales
 import os
 import sys
 from ipattn import MonkeyIPAttnProcessor, reset_monkey, add_margin, add_padding_with_text
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
+from typing import Optional
+
+def add_caption_below_image_obj(
+    image: Image.Image,
+    text: str,
+    font_path: Optional[str] = None,
+    font_size: int = 20,
+    padding: int = 10,
+    line_spacing: int = 4,
+    rectangle_color=(255, 255, 255),
+    text_color=(0, 0, 0),
+    max_width_fraction: float = 0.95,
+)->Image.Image:
+    """
+    Takes a PIL Image object, appends a white rectangle with text,
+    and saves to output_path.
+    """
+    img = image
+    img_w, img_h = img.size
+
+    # Choose font
+    if font_path:
+        font = ImageFont.truetype(font_path, font_size)
+    else:
+        font = ImageFont.load_default()
+
+    # Create temporary draw to measure text
+    tmp = Image.new("RGB", (img_w, 2000), (255, 255, 255))
+    draw_tmp = ImageDraw.Draw(tmp)
+
+    # Estimate max chars per line using average character width
+    try:
+        avg_char_w = font.getbbox("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")[2] / 52
+    except Exception:
+        avg_char_w = font.getsize("A")[0]
+
+    max_text_width = int(img_w * max_width_fraction) - 2 * padding
+    if max_text_width <= 0:
+        max_chars = 40
+    else:
+        max_chars = max(20, int(max_text_width / max(avg_char_w, 1)))
+
+    wrapped_lines = textwrap.wrap(text, width=max_chars)
+    wrapped_text = "\n".join(wrapped_lines) if wrapped_lines else ""
+
+    bbox = draw_tmp.multiline_textbbox((0, 0), wrapped_text, font=font, spacing=line_spacing)
+    text_w = bbox[2] - bbox[0]
+    text_h = bbox[3] - bbox[1]
+    rect_h = text_h + 2 * padding
+
+    # Handle mode
+    if img.mode in ("RGBA", "LA") or ("transparency" in img.info):
+        new_mode = "RGBA"
+        background = (255, 255, 255, 0)
+    else:
+        new_mode = "RGB"
+        background = (255, 255, 255)
+
+    new_img = Image.new(new_mode, (img_w, img_h + rect_h), background)
+
+    if new_mode == "RGBA":
+        new_img.paste(img, (0, 0), img.convert("RGBA"))
+    else:
+        new_img.paste(img, (0, 0))
+
+    draw = ImageDraw.Draw(new_img)
+
+    rect_top = img_h
+    rect_bottom = img_h + rect_h
+    draw.rectangle([0, rect_top, img_w, rect_bottom], fill=rectangle_color)
+
+    text_x = (img_w - text_w) // 2
+    text_y = rect_top + padding
+
+    if text_w + 2 * padding > img_w:
+        max_chars = max(10, int(max_chars * 0.8))
+        wrapped_lines = textwrap.wrap(text, width=max_chars)
+        wrapped_text = "\n".join(wrapped_lines)
+        bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=font, spacing=line_spacing)
+        text_w = bbox[2] - bbox[0]
+        text_h = bbox[3] - bbox[1]
+        text_x = (img_w - text_w) // 2
+
+    draw.multiline_text((text_x, text_y), wrapped_text, font=font,
+                        fill=text_color, spacing=line_spacing, align="center")
+    
+    return new_img
 
 if __name__ =="__main__":
     folder="ip_images"
@@ -207,7 +296,10 @@ if __name__ =="__main__":
 
             segmented=sam(gen_image,dim,dim)
 
-            left=concat_images_vertically([ip_adapter_image,gen_image,segmented])
+            left=concat_images_vertically([add_caption_below_image_obj(ip_adapter_image, "source image"),
+                                           add_caption_below_image_obj(gen_image,"generated image"),
+                                           #segmented
+                                           ])
 
             from PIL import Image, ImageOps
 
@@ -227,7 +319,7 @@ if __name__ =="__main__":
                     vertical_image_list=[]
                     for token in range(n_tokens):
                         token_id=text_input_ids[token]
-                        decoded=pipe.tokenizer.decode(token_id)
+                        decoded=pipe.tokenizer.decode(token_id).replace("<|startoftext|>","<start>").replace("<|endoftext|>","<end>")
                         horiz_image_list=[]
                         for step in range(num_inference_steps):
                             size=processor_kv[step+count].size()
@@ -282,7 +374,8 @@ if __name__ =="__main__":
                     vertical_image=concat_images_vertically(vertical_image_list)
                     vertical_height=vertical_image.size[0]
                     left_height=left.size[0]
-                    new_left=add_margin(left,0,0,vertical_height-left_height,0,"white")
+                    new_left=add_margin(left,0,0,(vertical_height-left_height)//2,0,"white")
+                    new_left=add_margin(new_left,(vertical_height-left_height)//2,0,0,0,"white")
                     vertical_image=concat_images_horizontally([new_left,vertical_image])
                     vertical_image.save(f"{folder}/{m}_{n}_layer_{layer_index}.png")
             '''count+=n_tokens

@@ -40,7 +40,7 @@ parser.add_argument("--project_name",type=str,default="seg-ip")
 parser.add_argument("--load_hf",action="store_true",help="whether to load a special pretrained model")
 parser.add_argument("--embedding",type=str, help="ignore unless load from hf; its the embedding type for embedding helpers")
 parser.add_argument("--pretrained_model_path",type=str,default="")
-parser.add_argument("--dataset",type=str, default="jlbaker361/ssl-league_captioned_splash-1000-sana")
+parser.add_argument("--src_dataset",type=str, default="jlbaker361/ssl-league_captioned_splash-1000-sana")
 parser.add_argument("--use_test_split",action="store_true", help="only true for league dataset")
 parser.add_argument("--initial_steps",type=int,default=4,help="how many steps for the initial inference")
 parser.add_argument("--initial_mask_step_list",nargs="*",help="steps to generate mask from",type=int)
@@ -165,9 +165,9 @@ def main(args):
 
         #monkey_attn_list=get_modules_of_types(pipe.unet,MonkeyIPAttnProcessor)
         try:
-            data=datasets.load_dataset(args.dataset)
+            data=datasets.load_dataset(args.src_dataset)
         except:
-            data=datasets.load_dataset(args.dataset,download_mode="force_redownload")
+            data=datasets.load_dataset(args.src_dataset,download_mode="force_redownload")
         data=data["train"]
 
         

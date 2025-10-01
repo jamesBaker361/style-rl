@@ -110,11 +110,6 @@ class ScoreTracker:
                 "image_score_raw_mask":[],
                 "image_score_normal":[],
                 "image_score_all_steps":[],
-                "ir_score_unmasked":[],
-                "ir_score_seg_mask":[],
-                "ir_score_raw_mask":[],
-                "ir_score_normal":[],
-                "ir_score_all_steps":[],
             }
 
     def update(self,score_dict):

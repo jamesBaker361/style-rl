@@ -408,11 +408,6 @@ def main(args):
                 "dino_score_raw_mask":dino_score_raw_mask,
                 "dino_score_normal":dino_score_normal,
                 "dino_score_all_steps":dino_score_all_steps,
-                '''"ir_score_unmasked":ir_score_unmasked,
-                "ir_score_seg_mask":ir_score_seg_mask,
-                "ir_score_raw_mask":ir_score_raw_mask,
-                "ir_score_normal":ir_score_normal,
-                "ir_score_all_steps":ir_score_all_steps,'''
                 "text_score_unmasked":text_score_unmasked,
                 "text_score_seg_mask":text_score_seg_mask,
                 "text_score_raw_mask":text_score_raw_mask,

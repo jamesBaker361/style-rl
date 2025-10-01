@@ -296,8 +296,8 @@ if __name__ =="__main__":
 
             segmented=sam(gen_image,dim,dim)
 
-            left=concat_images_vertically([add_caption_below_image_obj(ip_adapter_image, "source image"),
-                                           add_caption_below_image_obj(gen_image,"generated image"),
+            left=concat_images_vertically([add_caption_below_image_obj(ip_adapter_image, "source image",padding=20),
+                                           add_caption_below_image_obj(gen_image,"generated image",font_size=40),
                                            #segmented
                                            ])
 

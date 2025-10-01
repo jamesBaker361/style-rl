@@ -144,13 +144,13 @@ def add_caption_below_image_obj(
         max_chars = max(10, int(max_chars * 0.8))
         wrapped_lines = textwrap.wrap(text, width=max_chars)
         wrapped_text = "\n".join(wrapped_lines)
-        bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=font, spacing=line_spacing)
+        bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=font, spacing=line_spacing,font_size=font_size)
         text_w = bbox[2] - bbox[0]
         text_h = bbox[3] - bbox[1]
         text_x = (img_w - text_w) // 2
 
     draw.multiline_text((text_x, text_y), wrapped_text, font=font,
-                        fill=text_color, spacing=line_spacing, align="center")
+                        fill=text_color, spacing=line_spacing, align="center",font_size=font_size)
     
     return new_img
 

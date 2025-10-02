@@ -250,13 +250,13 @@ if __name__ =="__main__":
     gen.manual_seed(123)
     num_inference_steps=4
     for n,ip_adapter_image in enumerate([
-        load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg"),
-        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_1.jpg"),
-        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Braum_2.jpg"),
-        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_2.jpg"),
+       # load_image("https://assets-us-01.kc-usercontent.com/5cb25086-82d2-4c89-94f0-8450813a0fd3/0c3fcefb-bc28-4af6-985e-0c3b499ae832/Elon_Musk_Royal_Society.jpg"),
+       # load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_1.jpg"),
+       # load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Braum_2.jpg"),
+       # load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_2.jpg"),
         load_image("https://draftsim.com/wp-content/uploads/2020/06/Oath-of-Teferi-MTG-card-art-by-Wesley-Burt-1024x752.jpg"),
-        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Hwei_1.jpg"),
-        load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Leblanc_1.jpg"),
+       # load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Hwei_1.jpg"),
+       # load_image("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Leblanc_1.jpg"),
         load_image("elf.jpg"),
         load_image("ghibli.jpg")
     ]):
@@ -312,7 +312,7 @@ if __name__ =="__main__":
                         )
             text_input_ids = text_inputs.input_ids[0]
 
-            for layer_index in [15]:
+            for layer_index in [15,13,17,31,30]:
                 [name,module]=attn_list[layer_index]
                 if getattr(module,"processor",None)!=None and type(getattr(module,"processor",None))==MonkeyIPAttnProcessor:
                     processor_kv=module.processor.kv

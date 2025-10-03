@@ -296,8 +296,7 @@ if __name__ =="__main__":
 
             segmented=sam(gen_image,dim,dim)
 
-            left=concat_images_vertically([add_caption_below_image_obj(ip_adapter_image, "source image",font_size=60,font_path="aileron_regular.otf"),
-                                           add_caption_below_image_obj(gen_image,"generated image",font_size=40,font_path="aileron_regular.otf"),
+            left=concat_images_vertically([ip_adapter_image, gen_image
                                            #segmented
                                            ])
 

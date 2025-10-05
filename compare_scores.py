@@ -5,7 +5,7 @@ from accelerate import Accelerator
 import time
 import torch
 import numpy as np
-from datasets import Dataset,load_dataset
+from datasets import Dataset,load_dataset,Image
 from image_utils import concat_images_horizontally
 import wandb
 
@@ -30,7 +30,7 @@ def main(args):
     device=accelerator.device
 
     for d in args.dataset_list:
-        dataset=load_dataset(d,split="train")
+        dataset=load_dataset(d,split="train").cast_column("image",Image).cast_column("augmented_image",Image)
         text_score=np.mean(dataset["text_score"])
         dino_score=np.mean(dataset["dino_score"])
         image_score=np.mean(dataset["image_score"])
@@ -38,7 +38,7 @@ def main(args):
     for k,rows in enumerate(zip(*[load_dataset(d,split="train") for d in args.dataset_list ])):
         if k==args.limit:
             break
-        image_list=[rows[0]["image"]]+[r["augmented_image"] for r in rows]
+        image_list=rows[0]["image"]+[r["augmented_image"] for r in rows]
         print(image_list)
         concat=concat_images_horizontally(image_list)
         accelerator.log({

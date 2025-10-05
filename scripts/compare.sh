@@ -1,0 +1,1 @@
+sbatch -J compare --err=slurm/compare/mtg.err --out=slurm/compare/mtg.out runpymain.sh compare_scores.py --dataset_list jlbaker361/tfi2i-mtg jlbaker361/rect-mtg jlbaker361/masa-mtg jlbaker361/free-mtg jlbaker361/attn-mtg 

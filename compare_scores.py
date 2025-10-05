@@ -39,6 +39,7 @@ def main(args):
         if k==args.limit:
             break
         image_list=[rows[0]["image"]]+[r["augmented_image"] for r in rows]
+        print(image_list)
         concat=concat_images_horizontally(image_list)
         accelerator.log({
             "concat":wandb.Image(concat)

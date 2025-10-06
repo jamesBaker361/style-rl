@@ -5,10 +5,13 @@ from accelerate import Accelerator
 import time
 import torch
 import numpy as np
-from datasets import Dataset,load_dataset,Image
+from datasets import Dataset,load_dataset
+import datasets
 from image_utils import concat_images_horizontally
 import wandb
 import matplotlib.pyplot as plt
+import PIL
+import io
 
 parser=argparse.ArgumentParser()
 
@@ -40,7 +43,18 @@ def main(args):
     labels=[]
 
     for d in args.dataset_list:
-        dataset=load_dataset(d,split="train").cast_column("image",Image).cast_column("augmented_image",Image)
+        print(d)
+        dataset=load_dataset(d,split="train")
+        try:
+            dataset=dataset.cast_column("image",datasets.Image())
+        except:
+            pass
+        try:
+            dataset=dataset.cast_column("augmented_image",datasets.Image())
+        except Exception as e:
+            print("error!!!")
+            print(e)
+            pass
         text_score=np.mean(dataset["text_score"])
         dino_score=np.mean(dataset["dino_score"])
         image_score=np.mean(dataset["image_score"])
@@ -58,7 +72,12 @@ def main(args):
         if k==args.limit:
             break
         image_list=rows[0]["image"]+[r["augmented_image"] for r in rows]
-        print(image_list)
+        for i in range(len(image_list)):
+            image=image_list[i]
+            if type(image)==dict:
+                image = PIL.Image.open(io.BytesIO(image["bytes"]))
+                image_list[i]=image
+        print([type(i) for i in image_list])
         concat=concat_images_horizontally(image_list)
         accelerator.log({
             "concat":wandb.Image(concat)

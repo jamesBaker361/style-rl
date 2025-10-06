@@ -35,7 +35,19 @@ def main(args):
     device=accelerator.device
 
     def get_name(dataset_name):
-        if dataset_name.find("attn"):
+        if dataset_name.find("masa")!=-1:
+            return "MASA"
+        elif dataset_name.find("tfi2i")!=-1:
+            return "TF-I2I"
+        elif dataset_name.find("free")!=-1:
+            return "FreeGraftor"
+        elif dataset_name.find("rect")!=-1:
+            return "RectifID"
+        elif dataset_name.find("ip_0.5")!=-1:
+            return "IP Scale 0.5"
+        elif dataset_name.find("ip_1.0")!=-1:
+            return "IP Scale 1.0"
+        elif dataset_name.find("attn")!=-1:
             return "Monkey"
         
     x=[]

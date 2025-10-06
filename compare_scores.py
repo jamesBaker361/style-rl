@@ -8,6 +8,7 @@ import numpy as np
 from datasets import Dataset,load_dataset,Image
 from image_utils import concat_images_horizontally
 import wandb
+import matplotlib.pyplot as plt
 
 parser=argparse.ArgumentParser()
 
@@ -15,6 +16,7 @@ parser.add_argument("--mixed_precision",type=str,default="no")
 parser.add_argument("--project_name",type=str,default="evaluation-creative")
 parser.add_argument("--dataset_list",nargs="*",type=str)
 parser.add_argument("--limit",type=int,default=-1)
+parser.add_argument("--figure_name",type=str,default="fig")
 
 
 
@@ -29,12 +31,29 @@ def main(args):
     }[args.mixed_precision]
     device=accelerator.device
 
+    def get_name(dataset_name):
+        if dataset_name.find("attn"):
+            return "Monkey"
+        
+    x=[]
+    y=[]
+    labels=[]
+
     for d in args.dataset_list:
         dataset=load_dataset(d,split="train").cast_column("image",Image).cast_column("augmented_image",Image)
         text_score=np.mean(dataset["text_score"])
         dino_score=np.mean(dataset["dino_score"])
         image_score=np.mean(dataset["image_score"])
-        accelerator.print(f"{d} & {text_score} & {dino_score} & {image_score}  \\\\ ")
+        x.append(image_score)
+        y.append(text_score)
+        labels.append(d)
+        accelerator.print(f"{d} & {round(text_score,3)} & {round(dino_score,3)} & {round(image_score,3)}  \\\\ ")
+
+    plt.scatter(x,y)
+    for xi, yi, label in zip(x, y, labels):
+        plt.text(xi, yi, label, fontsize=9, ha='right', va='bottom')
+
+    plt.savefig(f"{args.figure_name}.png")
     for k,rows in enumerate(zip(*[load_dataset(d,split="train") for d in args.dataset_list ])):
         if k==args.limit:
             break

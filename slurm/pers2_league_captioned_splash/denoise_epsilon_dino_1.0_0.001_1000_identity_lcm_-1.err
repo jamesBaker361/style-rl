@@ -1,176 +1,0 @@
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-The following values were not passed to `accelerate launch` and had defaults used instead:
-	`--num_machines` was set to a value of `1`
-	`--dynamo_backend` was set to a value of `'no'`
-To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
-  warnings.warn(
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
-  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
-  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
-  return register_model(fn_wrapper)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
-  return register_model(fn_wrapper)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
-  return register_model(fn_wrapper)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
-  return register_model(fn_wrapper)
-/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
-  return register_model(fn_wrapper)
-Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
-wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: Tracking run with wandb version 0.19.11
-wandb: Run data is saved locally in /scratch/jlb638/wandb/wandb/run-20251006_120141-qpn5d0i6
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run wise-gorge-1500
-wandb: ⭐️ View project at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta
-wandb: 🚀 View run at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta/runs/qpn5d0i6
-Using cache found in /scratch/jlb638/torch_home/hub/facebookresearch_dino_main
-Keyword arguments {'device': device(type='cuda')} are not expected by CompatibleLatentConsistencyModelPipeline and will be ignored.
-Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:02,  2.41it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:02,  1.78it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  3.16it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:02<00:00,  2.14it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:02<00:00,  2.51it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:02<00:00,  2.41it/s]
-`torch_dtype` is deprecated! Use `dtype` instead!
-/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:33: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  if isinstance(obj, torch.Tensor) and obj.is_cuda:
-/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:35: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  elif isinstance(obj, torch.nn.Module) and any(p.is_cuda for p in obj.parameters()):
-Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
-/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:63: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at /pytorch/build/aten/src/ATen/core/TensorBody.h:489.)
-  if obj.grad is not None:
-Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
-New Data Upload               : |          |  0.00B /  0.00B            [A
-
-  ...ity_lcm_-1/unet_model.bin:   2%|▏         | 5.29MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin:   2%|▏         | 5.29MB /  345MB            [A[AProcessing Files (0 / 1)      :   2%|▏         | 5.29MB /  345MB, 8.83MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:   8%|▊         | 28.6MB /  345MB            [A[AProcessing Files (0 / 1)      :   8%|▊         | 28.6MB /  345MB, 35.8MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  12%|█▏        | 40.9MB /  345MB            [A[AProcessing Files (0 / 1)      :  12%|█▏        | 40.9MB /  345MB, 40.9MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  16%|█▌        | 55.2MB /  345MB            [A[AProcessing Files (0 / 1)      :  16%|█▌        | 55.2MB /  345MB, 46.0MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  19%|█▉        | 67.2MB /  345MB            [A[AProcessing Files (0 / 1)      :  19%|█▉        | 67.2MB /  345MB, 48.0MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  25%|██▍       | 85.5MB /  345MB            [A[AProcessing Files (0 / 1)      :  25%|██▍       | 85.5MB /  345MB, 53.5MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  28%|██▊       | 97.8MB /  345MB            [A[AProcessing Files (0 / 1)      :  28%|██▊       | 97.8MB /  345MB, 54.4MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  32%|███▏      |  109MB /  345MB            [A[AProcessing Files (0 / 1)      :  32%|███▏      |  109MB /  345MB, 54.5MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  35%|███▌      |  121MB /  345MB            [A[AProcessing Files (0 / 1)      :  35%|███▌      |  121MB /  345MB, 55.1MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  41%|████      |  142MB /  345MB            [A[AProcessing Files (0 / 1)      :  41%|████      |  142MB /  345MB, 59.2MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  45%|████▍     |  154MB /  345MB            [A[AProcessing Files (0 / 1)      :  45%|████▍     |  154MB /  345MB, 59.3MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  48%|████▊     |  166MB /  345MB            [A[AProcessing Files (0 / 1)      :  48%|████▊     |  166MB /  345MB, 59.4MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  52%|█████▏    |  179MB /  345MB            [A[AProcessing Files (0 / 1)      :  52%|█████▏    |  179MB /  345MB, 59.5MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  52%|█████▏    |  179MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin:  60%|█████▉    |  207MB /  345MB            [A[AProcessing Files (0 / 1)      :  60%|█████▉    |  207MB /  345MB, 60.9MB/s  
-New Data Upload               :   6%|▌         | 3.87MB / 67.0MB, 1.14MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   |  240MB /  345MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   |  240MB /  345MB, 66.8MB/s  
-New Data Upload               :  34%|███▍      | 22.7MB / 67.0MB, 6.30MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  78%|███████▊  |  270MB /  345MB            [A[AProcessing Files (0 / 1)      :  78%|███████▊  |  270MB /  345MB, 71.2MB/s  
-New Data Upload               :  69%|██████▉   | 46.5MB / 67.0MB, 12.2MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  91%|█████████ |  314MB /  345MB            [A[AProcessing Files (0 / 1)      :  91%|█████████ |  314MB /  345MB, 78.5MB/s  
-New Data Upload               : 100%|█████████▉| 67.0MB / 67.0MB, 16.7MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  93%|█████████▎|  322MB /  345MB            [A[AProcessing Files (0 / 1)      :  93%|█████████▎|  322MB /  345MB, 76.8MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  94%|█████████▍|  324MB /  345MB            [A[AProcessing Files (0 / 1)      :  94%|█████████▍|  324MB /  345MB, 73.7MB/s  
-New Data Upload               :  77%|███████▋  | 68.6MB / 89.6MB, 15.6MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  99%|█████████▊|  341MB /  345MB            [A[AProcessing Files (0 / 1)      :  99%|█████████▊|  341MB /  345MB, 74.1MB/s  
-New Data Upload               :  95%|█████████▌| 85.2MB / 89.6MB, 18.5MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉|  345MB /  345MB, 71.8MB/s  
-New Data Upload               :  99%|█████████▉| 89.1MB / 89.6MB, 18.6MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[AProcessing Files (1 / 1)      : 100%|██████████|  345MB /  345MB, 61.6MB/s  
-New Data Upload               : 100%|██████████| 89.6MB / 89.6MB, 16.0MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[AProcessing Files (1 / 1)      : 100%|██████████|  345MB /  345MB, 59.5MB/s  
-New Data Upload               : 100%|██████████| 89.6MB / 89.6MB, 15.5MB/s  
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            
-Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
-New Data Upload               : |          |  0.00B /  0.00B            [A
-
-  ...ity_lcm_-1/unet_model.bin:   6%|▌         | 20.2MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin:   6%|▌         | 20.2MB /  345MB            [A[AProcessing Files (0 / 1)      :   6%|▌         | 20.2MB /  345MB,  101MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  12%|█▏        | 40.9MB /  345MB            [A[AProcessing Files (0 / 1)      :  12%|█▏        | 40.9MB /  345MB,  102MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  16%|█▌        | 55.0MB /  345MB            [A[AProcessing Files (0 / 1)      :  16%|█▌        | 55.0MB /  345MB, 91.7MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  19%|█▉        | 67.0MB /  345MB            [A[AProcessing Files (0 / 1)      :  19%|█▉        | 67.0MB /  345MB, 83.8MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  22%|██▏       | 76.8MB /  345MB            [A[AProcessing Files (0 / 1)      :  22%|██▏       | 76.8MB /  345MB, 76.9MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  26%|██▌       | 89.5MB /  345MB            [A[AProcessing Files (0 / 1)      :  26%|██▌       | 89.5MB /  345MB, 74.6MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  34%|███▎      |  116MB /  345MB            [A[AProcessing Files (0 / 1)      :  34%|███▎      |  116MB /  345MB, 82.7MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  39%|███▊      |  133MB /  345MB            [A[AProcessing Files (0 / 1)      :  39%|███▊      |  133MB /  345MB, 83.2MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  42%|████▏     |  145MB /  345MB            [A[AProcessing Files (0 / 1)      :  42%|████▏     |  145MB /  345MB, 80.8MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  48%|████▊     |  166MB /  345MB            [A[AProcessing Files (0 / 1)      :  48%|████▊     |  166MB /  345MB, 83.0MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  52%|█████▏    |  178MB /  345MB            [A[AProcessing Files (0 / 1)      :  52%|█████▏    |  178MB /  345MB, 81.0MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  52%|█████▏    |  178MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin:  59%|█████▉    |  205MB /  345MB            [A[AProcessing Files (0 / 1)      :  59%|█████▉    |  205MB /  345MB, 78.8MB/s  
-New Data Upload               :   3%|▎         | 2.21MB / 67.1MB,  851kB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   |  238MB /  345MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   |  238MB /  345MB, 84.9MB/s  
-New Data Upload               :  31%|███       | 20.5MB / 67.1MB, 7.31MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  79%|███████▉  |  273MB /  345MB            [A[AProcessing Files (0 / 1)      :  79%|███████▉  |  273MB /  345MB, 91.1MB/s  
-New Data Upload               :  67%|██████▋   | 44.8MB / 67.1MB, 14.9MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  91%|█████████ |  314MB /  345MB            [A[AProcessing Files (0 / 1)      :  91%|█████████ |  314MB /  345MB, 98.0MB/s  
-New Data Upload               : 100%|█████████▉| 67.0MB / 67.1MB, 20.9MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin:  93%|█████████▎|  322MB /  345MB            [A[AProcessing Files (0 / 1)      :  93%|█████████▎|  322MB /  345MB, 94.8MB/s  
-
-  ...ity_lcm_-1/unet_model.bin:  93%|█████████▎|  322MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin:  96%|█████████▌|  330MB /  345MB            [A[AProcessing Files (0 / 1)      :  96%|█████████▌|  330MB /  345MB, 86.8MB/s  
-New Data Upload               :  83%|████████▎ | 74.7MB / 90.0MB, 19.7MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉|  345MB /  345MB, 86.2MB/s  
-New Data Upload               : 100%|█████████▉| 89.7MB / 90.0MB, 22.4MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[AProcessing Files (1 / 1)      : 100%|██████████|  345MB /  345MB, 78.4MB/s  
-New Data Upload               : 100%|██████████| 90.0MB / 90.0MB, 20.5MB/s  [A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[A
-
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            [A[AProcessing Files (1 / 1)      : 100%|██████████|  345MB /  345MB, 71.9MB/s  
-New Data Upload               : 100%|██████████| 90.0MB / 90.0MB, 18.7MB/s  
-  ...ity_lcm_-1/unet_model.bin: 100%|██████████|  345MB /  345MB            

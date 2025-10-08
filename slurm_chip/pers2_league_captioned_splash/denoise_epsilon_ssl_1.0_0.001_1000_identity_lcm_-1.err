@@ -1,34 +1,0 @@
-Unable to determine the device handle for GPU0: 0000:41:00.0: Unknown Error
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
-  backends.update(_get_backends("networkx.backends"))
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
-  warnings.warn(
-wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: Tracking run with wandb version 0.21.0
-wandb: Run data is saved locally in /umbc/ada/donengel/common/wandb/wandb/run-20250919_074036-fw682sh3
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run worldly-spaceship-985
-wandb: ⭐️ View project at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta
-wandb: 🚀 View run at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta/runs/fw682sh3
-Keyword arguments {'device': device(type='cpu')} are not expected by CompatibleLatentConsistencyModelPipeline and will be ignored.
-Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:00, 19.03it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:00<00:00, 13.09it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:00<00:00,  7.44it/s]
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:33: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  if isinstance(obj, torch.Tensor) and obj.is_cuda:
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:35: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  elif isinstance(obj, torch.nn.Module) and any(p.is_cuda for p in obj.parameters()):
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/cuda/__init__.py:789: UserWarning: Can't initialize NVML
-  warnings.warn("Can't initialize NVML")
-Traceback (most recent call last):
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/main_pers.py", line 1002, in <module>
-    main(args)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/main_pers.py", line 487, in main
-    torch.cuda.synchronize()
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/cuda/__init__.py", line 1038, in synchronize
-    _lazy_init()
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/cuda/__init__.py", line 372, in _lazy_init
-    torch._C._cuda_init()
-RuntimeError: No CUDA GPUs are available
-srun: error: g20-12: task 0: Exited with exit code 1
-Unable to determine the device handle for GPU0: 0000:41:00.0: Unknown Error

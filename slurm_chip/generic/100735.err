@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/main_seg.py", line 7, in <module>
-    from .ipattn import MonkeyIPAttnProcessor, get_modules_of_types,reset_monkey,insert_monkey, set_ip_adapter_scale_monkey
-ImportError: attempted relative import with no known parent package
-srun: error: g20-09: task 0: Exited with exit code 1

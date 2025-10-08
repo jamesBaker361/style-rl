@@ -1,9 +1,0 @@
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
-  backends.update(_get_backends("networkx.backends"))
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-Traceback (most recent call last):
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 10, in <module>
-    from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler,StableDiffusion3InstructPix2PixPipeline
-ImportError: cannot import name 'StableDiffusion3InstructPix2PixPipeline' from 'diffusers' (/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/__init__.py)
-srun: error: g20-09: task 0: Exited with exit code 1

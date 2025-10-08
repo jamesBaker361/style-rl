@@ -1,45 +1,0 @@
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
-  backends.update(_get_backends("networkx.backends"))
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
-  warnings.warn(
-wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: Tracking run with wandb version 0.21.0
-wandb: Run data is saved locally in /umbc/ada/donengel/common/wandb/wandb/run-20250916_195106-qgj87mvt
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run vital-snowball-8
-wandb: ⭐️ View project at https://wandb.ai/jlbaker361/baseline
-wandb: 🚀 View run at https://wandb.ai/jlbaker361/baseline/runs/qgj87mvt
-Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:00,  7.19it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00,  7.80it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  3.62it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  3.36it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.15it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  4.83it/s]
-Fetching 28 files:   0%|          | 0/28 [00:00<?, ?it/s]Fetching 28 files:   7%|▋         | 2/28 [00:00<00:07,  3.43it/s]Fetching 28 files:  14%|█▍        | 4/28 [01:22<09:41, 24.21s/it]Fetching 28 files:  21%|██▏       | 6/28 [01:43<06:34, 17.91s/it]Fetching 28 files:  29%|██▊       | 8/28 [02:29<06:40, 20.00s/it]Fetching 28 files:  32%|███▏      | 9/28 [02:30<05:00, 15.80s/it]Fetching 28 files:  93%|█████████▎| 26/28 [02:46<00:06,  3.25s/it]Fetching 28 files: 100%|██████████| 28/28 [02:46<00:00,  5.93s/it]
-Loading pipeline components...:   0%|          | 0/9 [00:00<?, ?it/s]Loading pipeline components...:  11%|█         | 1/9 [00:00<00:04,  1.85it/s]Loading pipeline components...:  22%|██▏       | 2/9 [00:00<00:03,  2.17it/s]Loading pipeline components...:  44%|████▍     | 4/9 [00:10<00:15,  3.08s/it]Loading pipeline components...:  56%|█████▌    | 5/9 [00:13<00:12,  3.03s/it]
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s][A
-Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:11,  3.87s/it][A
-Loading checkpoint shards:  50%|█████     | 2/4 [00:07<00:07,  3.71s/it][A
-Loading checkpoint shards:  75%|███████▌  | 3/4 [00:11<00:03,  3.68s/it][A
-Loading checkpoint shards: 100%|██████████| 4/4 [00:14<00:00,  3.41s/it][ALoading checkpoint shards: 100%|██████████| 4/4 [00:14<00:00,  3.53s/it]
-Loading pipeline components...:  89%|████████▉ | 8/9 [00:27<00:04,  4.00s/it]Loading pipeline components...:  89%|████████▉ | 8/9 [00:27<00:03,  3.42s/it]
-Traceback (most recent call last):
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 130, in <module>
-    main(args)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
-    return func(*args, **kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 62, in main
-    pipe = StableDiffusion3InstructPix2PixPipeline.from_pretrained("BleachNick/SD3_UltraEdit_freeform", torch_dtype=torch_dtype)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/pipelines/pipeline_utils.py", line 1025, in from_pretrained
-    loaded_sub_model = load_sub_model(
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/pipelines/pipeline_loading_utils.py", line 849, in load_sub_model
-    loaded_sub_model = load_method(os.path.join(cached_folder, name), **loading_kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/tokenization_utils_base.py", line 2069, in from_pretrained
-    return cls._from_pretrained(
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/tokenization_utils_base.py", line 2315, in _from_pretrained
-    tokenizer = cls(*init_inputs, **init_kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/models/t5/tokenization_t5_fast.py", line 119, in __init__
-    super().__init__(
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/tokenization_utils_fast.py", line 108, in __init__
-    raise ValueError(
-ValueError: Cannot instantiate this tokenizer from a slow version. If it's based on sentencepiece, make sure you have sentencepiece installed.
-srun: error: g20-02: task 0: Exited with exit code 1

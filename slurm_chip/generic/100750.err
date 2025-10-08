@@ -1,5 +1,0 @@
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/compare_scores.py", line 34
-    accelerator.print(f"{d} & {np.mean(dataset["text_score"])} & {np.mean(dataset["dino_score"])} & {np.mean(dataset["image_score"])}  \\\\ ")
-                                                ^
-SyntaxError: f-string: unmatched '['
-srun: error: g20-02: task 0: Exited with exit code 1

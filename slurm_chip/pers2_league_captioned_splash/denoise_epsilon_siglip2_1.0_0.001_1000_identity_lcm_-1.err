@@ -1,22 +1,0 @@
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
-  backends.update(_get_backends("networkx.backends"))
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
-  warnings.warn(
-wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: Tracking run with wandb version 0.21.0
-wandb: Run data is saved locally in /umbc/ada/donengel/common/wandb/wandb/run-20250919_074036-6zi49d13
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run ancient-lion-984
-wandb: ⭐️ View project at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta
-wandb: 🚀 View run at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta/runs/6zi49d13
-Keyword arguments {'device': device(type='cuda')} are not expected by CompatibleLatentConsistencyModelPipeline and will be ignored.
-Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:00,  9.49it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  5.00it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  5.58it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  7.13it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.73it/s]
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:33: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  if isinstance(obj, torch.Tensor) and obj.is_cuda:
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:35: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
-  elif isinstance(obj, torch.nn.Module) and any(p.is_cuda for p in obj.parameters()):
-Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:63: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at /pytorch/build/aten/src/ATen/core/TensorBody.h:489.)
-  if obj.grad is not None:

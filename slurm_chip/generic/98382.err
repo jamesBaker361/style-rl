@@ -1,35 +1,0 @@
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
-  backends.update(_get_backends("networkx.backends"))
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
-  warnings.warn(
-wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: Tracking run with wandb version 0.21.0
-wandb: Run data is saved locally in /umbc/ada/donengel/common/wandb/wandb/run-20250917_113041-5246g01m
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run worldly-vortex-12
-wandb: ⭐️ View project at https://wandb.ai/jlbaker361/baseline
-wandb: 🚀 View run at https://wandb.ai/jlbaker361/baseline/runs/5246g01m
-Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:02<00:12,  2.09s/it]Loading pipeline components...:  29%|██▊       | 2/7 [00:02<00:05,  1.12s/it]Loading pipeline components...:  57%|█████▋    | 4/7 [00:13<00:12,  4.00s/it]Loading pipeline components...:  71%|███████▏  | 5/7 [00:14<00:05,  2.81s/it]Loading pipeline components...:  86%|████████▌ | 6/7 [00:15<00:02,  2.38s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:18<00:00,  2.45s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:18<00:00,  2.59s/it]
-Loading pipeline components...:   0%|          | 0/9 [00:00<?, ?it/s]Loading pipeline components...:  11%|█         | 1/9 [00:08<01:06,  8.37s/it]Loading pipeline components...:  22%|██▏       | 2/9 [00:08<00:25,  3.67s/it]Loading pipeline components...:  44%|████▍     | 4/9 [00:11<00:11,  2.23s/it]Loading pipeline components...:  56%|█████▌    | 5/9 [00:11<00:06,  1.62s/it]
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s][A
-Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:10,  3.58s/it][A
-Loading checkpoint shards:  50%|█████     | 2/4 [00:06<00:06,  3.42s/it][A
-Loading checkpoint shards:  75%|███████▌  | 3/4 [00:10<00:03,  3.38s/it][A
-Loading checkpoint shards: 100%|██████████| 4/4 [00:12<00:00,  3.13s/it][ALoading checkpoint shards: 100%|██████████| 4/4 [00:12<00:00,  3.24s/it]
-Loading pipeline components...:  78%|███████▊  | 7/9 [00:24<00:07,  3.93s/it]Loading pipeline components...: 100%|██████████| 9/9 [00:25<00:00,  2.47s/it]Loading pipeline components...: 100%|██████████| 9/9 [00:25<00:00,  2.82s/it]
-  0%|          | 0/20 [00:00<?, ?it/s]  0%|          | 0/20 [00:00<?, ?it/s]
-Traceback (most recent call last):
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 130, in <module>
-    main(args)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
-    return func(*args, **kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 84, in main
-    augmented_image=pipe(prompt=prompt,image=image,num_inference_steps=args.num_inference_steps).images[0]
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
-    return func(*args, **kwargs)
-  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/pipeline_stable_diffusion_3_instruct_pix2pix.py", line 1176, in __call__
-    scaled_latent_model_input = torch.cat([latent_model_input, image_latents], dim=1)
-RuntimeError: Sizes of tensors must match except in dimension 1. Expected size 128 but got size 49 for tensor number 1 in the list.
-srun: error: g20-09: task 0: Exited with exit code 1

@@ -351,9 +351,10 @@ if __name__ =="__main__":
                     for token in range(n_tokens_ip):
                         token_id=text_input_ids[token]
                         
-                        horiz_image_list=[]
+                        
                         
                         for i in range(image_count):
+                            horiz_image_list=[]
                             decoded=f"ip_{token}_{i}"
                             for step in range(num_inference_steps):
                                 index=step+image_count

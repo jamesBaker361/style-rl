@@ -312,7 +312,7 @@ if __name__ =="__main__":
                         )
             text_input_ids = text_inputs.input_ids[0]
 
-            image_count=1
+            image_count=2
 
             for layer_index in [15]:
                 [name,module]=attn_list[layer_index]

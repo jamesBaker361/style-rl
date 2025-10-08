@@ -279,6 +279,7 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
                         mask_downsample = mask_downsample.to(dtype=query.dtype, device=query.device)
                         hidden_states = hidden_states + scale[i] * (_current_ip_hidden_states * mask_downsample)
                 else:
+                    print("current_ip_hidden_states size",current_ip_hidden_states.size())
                     ip_key = to_k_ip(current_ip_hidden_states)
                     #print("\t ip key size",ip_key.size())
                     ip_value = to_v_ip(current_ip_hidden_states)

@@ -1,0 +1,7 @@
+"dino_score_unmasked":dino_score_unmasked,
+                "dino_score_seg_mask":dino_score_seg_mask,
+                "dino_score_raw_mask":dino_score_raw_mask,
+                "dino_score_normal":dino_score_normal,
+                "dino_score_all_steps":dino_score_all_steps,
+
+[dino_score_normal,dino_score_unmasked, dino_score_seg_mask, dino_score_raw_mask,dino_score_all_steps]

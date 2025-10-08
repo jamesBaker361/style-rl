@@ -1,0 +1,15 @@
+{"time":"2025-10-06T17:44:24.9461689-04:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"C:\\Users\\jlbak\\Downloads\\style-rl\\wandb\\run-20251006_174424-yhfc6ryv\\logs\\debug-core.log"}
+{"time":"2025-10-06T17:44:25.1711238-04:00","level":"INFO","msg":"created new stream","id":"yhfc6ryv"}
+{"time":"2025-10-06T17:44:25.1711238-04:00","level":"INFO","msg":"stream: started","id":"yhfc6ryv"}
+{"time":"2025-10-06T17:44:25.1711238-04:00","level":"INFO","msg":"writer: Do: started","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:44:25.1711238-04:00","level":"INFO","msg":"sender: started","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:44:25.1711238-04:00","level":"INFO","msg":"handler: started","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:44:25.3345011-04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-10-06T17:45:10.9345134-04:00","level":"INFO","msg":"stream: closing","id":"yhfc6ryv"}
+{"time":"2025-10-06T17:45:10.9345134-04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-10-06T17:45:10.9345134-04:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-10-06T17:45:11.2796044-04:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-10-06T17:45:11.3763628-04:00","level":"INFO","msg":"handler: closed","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:45:11.3763628-04:00","level":"INFO","msg":"writer: Close: closed","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:45:11.3763628-04:00","level":"INFO","msg":"sender: closed","stream_id":"yhfc6ryv"}
+{"time":"2025-10-06T17:45:11.3763628-04:00","level":"INFO","msg":"stream: closed","id":"yhfc6ryv"}

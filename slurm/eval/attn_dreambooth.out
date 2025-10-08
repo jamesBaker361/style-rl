@@ -1,0 +1,2889 @@
+gcc (GCC) 10.3.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SLURMD_NODENAME gpu026
+SBATCH_CLUSTERS doesnt exist
+SBATCH_PARTITION doesnt exist
+SLURM_JOB_PARTITION gpu
+SLURM_NODEID 0
+SLURM_MEM_PER_GPU doesnt exist
+SLURM_MEM_PER_CPU doesnt exist
+SLURM_MEM_PER_NODE 128000
+SLURM_JOB_ID 47231081
+torch.cuda.get_device_name() NVIDIA A100-PCIE-40GB
+torch.cuda.get_device_capability() (8, 0)
+GPU Name: NVIDIA A100-PCIE-40GB
+GPU Memory Total: 40339.3125 MB
+GPU Memory Free: 2509.58056640625 MB
+GPU Memory Used: 5130.0 MB
+Namespace(mixed_precision='no', project_name='seg-ip', load_hf=False, embedding=None, pretrained_model_path='', src_dataset='jlbaker361/dreambooth', use_test_split=False, initial_steps=4, initial_mask_step_list=None, final_steps=8, final_mask_steps_list=None, final_adapter_steps_list=None, threshold=0.5, limit=-1, layer_index=15, dim=256, token=1, overlap_frac=0.8, segmentation_attention_method='overlap', kv_type='ip', initial_ip_adapter_scale=0.75, background=False, dest_dataset='jlbaker361/attn-dreambooth', object='character')
+defaulting to initial_mask_step_list [1, 2]
+defaulting final maske step lst [2, 3, 4, 5]
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4722182), 'dino_score_seg_mask': np.float32(0.124697156), 'dino_score_raw_mask': np.float32(0.40528625), 'dino_score_normal': np.float32(0.5632789), 'dino_score_all_steps': np.float32(0.40528625), 'text_score_unmasked': tensor(0.3251), 'text_score_seg_mask': tensor(0.3870), 'text_score_raw_mask': tensor(0.3483), 'text_score_normal': tensor(0.3112), 'text_score_all_steps': tensor(0.3483), 'image_score_unmasked': np.float32(0.68879354), 'image_score_seg_mask': np.float32(0.5492004), 'image_score_raw_mask': np.float32(0.8054896), 'image_score_normal': np.float32(0.8540093), 'image_score_all_steps': np.float32(0.8054896)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.45284158), 'dino_score_seg_mask': np.float32(0.21824671), 'dino_score_raw_mask': np.float32(0.31151217), 'dino_score_normal': np.float32(0.54779196), 'dino_score_all_steps': np.float32(0.31151217), 'text_score_unmasked': tensor(0.3047), 'text_score_seg_mask': tensor(0.3120), 'text_score_raw_mask': tensor(0.3260), 'text_score_normal': tensor(0.2416), 'text_score_all_steps': tensor(0.3260), 'image_score_unmasked': np.float32(0.7793176), 'image_score_seg_mask': np.float32(0.8331641), 'image_score_raw_mask': np.float32(0.81273586), 'image_score_normal': np.float32(0.79432505), 'image_score_all_steps': np.float32(0.81273586)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.563333), 'dino_score_seg_mask': np.float32(0.35383695), 'dino_score_raw_mask': np.float32(0.47065416), 'dino_score_normal': np.float32(0.7075602), 'dino_score_all_steps': np.float32(0.47065416), 'text_score_unmasked': tensor(0.3232), 'text_score_seg_mask': tensor(0.3296), 'text_score_raw_mask': tensor(0.3039), 'text_score_normal': tensor(0.2938), 'text_score_all_steps': tensor(0.3039), 'image_score_unmasked': np.float32(0.8788636), 'image_score_seg_mask': np.float32(0.7437612), 'image_score_raw_mask': np.float32(0.7821504), 'image_score_normal': np.float32(0.88550395), 'image_score_all_steps': np.float32(0.7821504)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.45949268), 'dino_score_seg_mask': np.float32(0.04120124), 'dino_score_raw_mask': np.float32(0.4308074), 'dino_score_normal': np.float32(0.4579088), 'dino_score_all_steps': np.float32(0.4308074), 'text_score_unmasked': tensor(0.3193), 'text_score_seg_mask': tensor(0.2860), 'text_score_raw_mask': tensor(0.3589), 'text_score_normal': tensor(0.2984), 'text_score_all_steps': tensor(0.3589), 'image_score_unmasked': np.float32(0.80556494), 'image_score_seg_mask': np.float32(0.5614811), 'image_score_raw_mask': np.float32(0.7632734), 'image_score_normal': np.float32(0.88202584), 'image_score_all_steps': np.float32(0.7632734)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.38618457), 'dino_score_seg_mask': np.float32(0.27199098), 'dino_score_raw_mask': np.float32(0.32436422), 'dino_score_normal': np.float32(0.50611806), 'dino_score_all_steps': np.float32(0.32436422), 'text_score_unmasked': tensor(0.3166), 'text_score_seg_mask': tensor(0.3183), 'text_score_raw_mask': tensor(0.3240), 'text_score_normal': tensor(0.2762), 'text_score_all_steps': tensor(0.3240), 'image_score_unmasked': np.float32(0.70936525), 'image_score_seg_mask': np.float32(0.66192436), 'image_score_raw_mask': np.float32(0.7761893), 'image_score_normal': np.float32(0.8038696), 'image_score_all_steps': np.float32(0.7761893)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3705209), 'dino_score_seg_mask': np.float32(0.1989542), 'dino_score_raw_mask': np.float32(0.4273402), 'dino_score_normal': np.float32(0.5964525), 'dino_score_all_steps': np.float32(0.4273402), 'text_score_unmasked': tensor(0.2909), 'text_score_seg_mask': tensor(0.3472), 'text_score_raw_mask': tensor(0.3052), 'text_score_normal': tensor(0.2834), 'text_score_all_steps': tensor(0.3052), 'image_score_unmasked': np.float32(0.8455725), 'image_score_seg_mask': np.float32(0.6866141), 'image_score_raw_mask': np.float32(0.82418346), 'image_score_normal': np.float32(0.9024788), 'image_score_all_steps': np.float32(0.82418346)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.39867526), 'dino_score_seg_mask': np.float32(0.2401014), 'dino_score_raw_mask': np.float32(0.28545424), 'dino_score_normal': np.float32(0.4087064), 'dino_score_all_steps': np.float32(0.28545424), 'text_score_unmasked': tensor(0.3580), 'text_score_seg_mask': tensor(0.3255), 'text_score_raw_mask': tensor(0.2932), 'text_score_normal': tensor(0.3405), 'text_score_all_steps': tensor(0.2932), 'image_score_unmasked': np.float32(0.73013914), 'image_score_seg_mask': np.float32(0.6130215), 'image_score_raw_mask': np.float32(0.6094206), 'image_score_normal': np.float32(0.7542921), 'image_score_all_steps': np.float32(0.6094206)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.392686), 'dino_score_seg_mask': np.float32(0.25715056), 'dino_score_raw_mask': np.float32(0.28197205), 'dino_score_normal': np.float32(0.51043355), 'dino_score_all_steps': np.float32(0.28197205), 'text_score_unmasked': tensor(0.2953), 'text_score_seg_mask': tensor(0.3138), 'text_score_raw_mask': tensor(0.3501), 'text_score_normal': tensor(0.3059), 'text_score_all_steps': tensor(0.3501), 'image_score_unmasked': np.float32(0.725324), 'image_score_seg_mask': np.float32(0.6089462), 'image_score_raw_mask': np.float32(0.60891956), 'image_score_normal': np.float32(0.6940347), 'image_score_all_steps': np.float32(0.60891956)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.27109444), 'dino_score_seg_mask': np.float32(0.13802415), 'dino_score_raw_mask': np.float32(0.3286637), 'dino_score_normal': np.float32(0.48196465), 'dino_score_all_steps': np.float32(0.3286637), 'text_score_unmasked': tensor(0.3413), 'text_score_seg_mask': tensor(0.2979), 'text_score_raw_mask': tensor(0.3325), 'text_score_normal': tensor(0.2789), 'text_score_all_steps': tensor(0.3325), 'image_score_unmasked': np.float32(0.6539006), 'image_score_seg_mask': np.float32(0.6452989), 'image_score_raw_mask': np.float32(0.6300606), 'image_score_normal': np.float32(0.6222369), 'image_score_all_steps': np.float32(0.6300606)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.2585373), 'dino_score_seg_mask': np.float32(0.16347757), 'dino_score_raw_mask': np.float32(0.37753716), 'dino_score_normal': np.float32(0.34759617), 'dino_score_all_steps': np.float32(0.37753716), 'text_score_unmasked': tensor(0.3110), 'text_score_seg_mask': tensor(0.3526), 'text_score_raw_mask': tensor(0.3108), 'text_score_normal': tensor(0.3134), 'text_score_all_steps': tensor(0.3108), 'image_score_unmasked': np.float32(0.64468205), 'image_score_seg_mask': np.float32(0.63110346), 'image_score_raw_mask': np.float32(0.70312643), 'image_score_normal': np.float32(0.71322125), 'image_score_all_steps': np.float32(0.70312643)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.32931453), 'dino_score_seg_mask': np.float32(0.13799354), 'dino_score_raw_mask': np.float32(0.32992506), 'dino_score_normal': np.float32(0.4280358), 'dino_score_all_steps': np.float32(0.32992506), 'text_score_unmasked': tensor(0.3329), 'text_score_seg_mask': tensor(0.3309), 'text_score_raw_mask': tensor(0.3250), 'text_score_normal': tensor(0.3462), 'text_score_all_steps': tensor(0.3250), 'image_score_unmasked': np.float32(0.6709287), 'image_score_seg_mask': np.float32(0.5930853), 'image_score_raw_mask': np.float32(0.60914654), 'image_score_normal': np.float32(0.6387047), 'image_score_all_steps': np.float32(0.60914654)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5386075), 'dino_score_seg_mask': np.float32(0.5020133), 'dino_score_raw_mask': np.float32(0.5271202), 'dino_score_normal': np.float32(0.6251949), 'dino_score_all_steps': np.float32(0.5271202), 'text_score_unmasked': tensor(0.3416), 'text_score_seg_mask': tensor(0.3446), 'text_score_raw_mask': tensor(0.3665), 'text_score_normal': tensor(0.3527), 'text_score_all_steps': tensor(0.3665), 'image_score_unmasked': np.float32(0.78088045), 'image_score_seg_mask': np.float32(0.66037995), 'image_score_raw_mask': np.float32(0.68227774), 'image_score_normal': np.float32(0.7929971), 'image_score_all_steps': np.float32(0.68227774)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.71875226), 'dino_score_seg_mask': np.float32(0.46764728), 'dino_score_raw_mask': np.float32(0.59398377), 'dino_score_normal': np.float32(0.7191777), 'dino_score_all_steps': np.float32(0.59398377), 'text_score_unmasked': tensor(0.3804), 'text_score_seg_mask': tensor(0.3715), 'text_score_raw_mask': tensor(0.3275), 'text_score_normal': tensor(0.3700), 'text_score_all_steps': tensor(0.3275), 'image_score_unmasked': np.float32(0.7830602), 'image_score_seg_mask': np.float32(0.61889136), 'image_score_raw_mask': np.float32(0.67220944), 'image_score_normal': np.float32(0.7590357), 'image_score_all_steps': np.float32(0.67220944)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.565925), 'dino_score_seg_mask': np.float32(0.4316114), 'dino_score_raw_mask': np.float32(0.45278853), 'dino_score_normal': np.float32(0.67638725), 'dino_score_all_steps': np.float32(0.45278853), 'text_score_unmasked': tensor(0.3454), 'text_score_seg_mask': tensor(0.3755), 'text_score_raw_mask': tensor(0.3430), 'text_score_normal': tensor(0.2827), 'text_score_all_steps': tensor(0.3430), 'image_score_unmasked': np.float32(0.66681695), 'image_score_seg_mask': np.float32(0.56739104), 'image_score_raw_mask': np.float32(0.59230846), 'image_score_normal': np.float32(0.73199797), 'image_score_all_steps': np.float32(0.59230846)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5160736), 'dino_score_seg_mask': np.float32(0.47341865), 'dino_score_raw_mask': np.float32(0.46232197), 'dino_score_normal': np.float32(0.55616295), 'dino_score_all_steps': np.float32(0.46232197), 'text_score_unmasked': tensor(0.2680), 'text_score_seg_mask': tensor(0.3087), 'text_score_raw_mask': tensor(0.3200), 'text_score_normal': tensor(0.2657), 'text_score_all_steps': tensor(0.3200), 'image_score_unmasked': np.float32(0.79278857), 'image_score_seg_mask': np.float32(0.7382153), 'image_score_raw_mask': np.float32(0.7952734), 'image_score_normal': np.float32(0.8308532), 'image_score_all_steps': np.float32(0.7952734)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.64737654), 'dino_score_seg_mask': np.float32(0.5080577), 'dino_score_raw_mask': np.float32(0.63242054), 'dino_score_normal': np.float32(0.6814661), 'dino_score_all_steps': np.float32(0.63242054), 'text_score_unmasked': tensor(0.3304), 'text_score_seg_mask': tensor(0.3431), 'text_score_raw_mask': tensor(0.3398), 'text_score_normal': tensor(0.3018), 'text_score_all_steps': tensor(0.3398), 'image_score_unmasked': np.float32(0.7322559), 'image_score_seg_mask': np.float32(0.6426586), 'image_score_raw_mask': np.float32(0.6834888), 'image_score_normal': np.float32(0.73736775), 'image_score_all_steps': np.float32(0.6834888)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6876479), 'dino_score_seg_mask': np.float32(0.438256), 'dino_score_raw_mask': np.float32(0.6311991), 'dino_score_normal': np.float32(0.6575005), 'dino_score_all_steps': np.float32(0.6311991), 'text_score_unmasked': tensor(0.3271), 'text_score_seg_mask': tensor(0.2981), 'text_score_raw_mask': tensor(0.3031), 'text_score_normal': tensor(0.2958), 'text_score_all_steps': tensor(0.3031), 'image_score_unmasked': np.float32(0.8482786), 'image_score_seg_mask': np.float32(0.8402864), 'image_score_raw_mask': np.float32(0.8451062), 'image_score_normal': np.float32(0.85575664), 'image_score_all_steps': np.float32(0.8451062)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5559933), 'dino_score_seg_mask': np.float32(0.5403646), 'dino_score_raw_mask': np.float32(0.5935314), 'dino_score_normal': np.float32(0.6072037), 'dino_score_all_steps': np.float32(0.5935314), 'text_score_unmasked': tensor(0.2545), 'text_score_seg_mask': tensor(0.3371), 'text_score_raw_mask': tensor(0.2914), 'text_score_normal': tensor(0.2697), 'text_score_all_steps': tensor(0.2914), 'image_score_unmasked': np.float32(0.76134443), 'image_score_seg_mask': np.float32(0.8180825), 'image_score_raw_mask': np.float32(0.8078836), 'image_score_normal': np.float32(0.81567174), 'image_score_all_steps': np.float32(0.8078836)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.70285), 'dino_score_seg_mask': np.float32(0.6217686), 'dino_score_raw_mask': np.float32(0.7602994), 'dino_score_normal': np.float32(0.6827468), 'dino_score_all_steps': np.float32(0.7602994), 'text_score_unmasked': tensor(0.2878), 'text_score_seg_mask': tensor(0.2929), 'text_score_raw_mask': tensor(0.2611), 'text_score_normal': tensor(0.2623), 'text_score_all_steps': tensor(0.2611), 'image_score_unmasked': np.float32(0.878847), 'image_score_seg_mask': np.float32(0.8329017), 'image_score_raw_mask': np.float32(0.85737747), 'image_score_normal': np.float32(0.8218724), 'image_score_all_steps': np.float32(0.85737747)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.53537154), 'dino_score_seg_mask': np.float32(0.59828746), 'dino_score_raw_mask': np.float32(0.64633477), 'dino_score_normal': np.float32(0.6162965), 'dino_score_all_steps': np.float32(0.64633477), 'text_score_unmasked': tensor(0.2924), 'text_score_seg_mask': tensor(0.3338), 'text_score_raw_mask': tensor(0.3459), 'text_score_normal': tensor(0.2763), 'text_score_all_steps': tensor(0.3459), 'image_score_unmasked': np.float32(0.8135952), 'image_score_seg_mask': np.float32(0.7872851), 'image_score_raw_mask': np.float32(0.7671934), 'image_score_normal': np.float32(0.79772186), 'image_score_all_steps': np.float32(0.7671934)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.61092997), 'dino_score_seg_mask': np.float32(0.54300654), 'dino_score_raw_mask': np.float32(0.6557239), 'dino_score_normal': np.float32(0.63637626), 'dino_score_all_steps': np.float32(0.6557239), 'text_score_unmasked': tensor(0.2925), 'text_score_seg_mask': tensor(0.3017), 'text_score_raw_mask': tensor(0.2736), 'text_score_normal': tensor(0.2789), 'text_score_all_steps': tensor(0.2736), 'image_score_unmasked': np.float32(0.7795541), 'image_score_seg_mask': np.float32(0.66691834), 'image_score_raw_mask': np.float32(0.75890255), 'image_score_normal': np.float32(0.7738315), 'image_score_all_steps': np.float32(0.75890255)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6550497), 'dino_score_seg_mask': np.float32(0.55783576), 'dino_score_raw_mask': np.float32(0.6711509), 'dino_score_normal': np.float32(0.69676167), 'dino_score_all_steps': np.float32(0.6711509), 'text_score_unmasked': tensor(0.3027), 'text_score_seg_mask': tensor(0.2894), 'text_score_raw_mask': tensor(0.2880), 'text_score_normal': tensor(0.2742), 'text_score_all_steps': tensor(0.2880), 'image_score_unmasked': np.float32(0.83244157), 'image_score_seg_mask': np.float32(0.8130958), 'image_score_raw_mask': np.float32(0.8521089), 'image_score_normal': np.float32(0.80547786), 'image_score_all_steps': np.float32(0.8521089)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6305622), 'dino_score_seg_mask': np.float32(0.5125071), 'dino_score_raw_mask': np.float32(0.5798348), 'dino_score_normal': np.float32(0.7244638), 'dino_score_all_steps': np.float32(0.5798348), 'text_score_unmasked': tensor(0.3046), 'text_score_seg_mask': tensor(0.2923), 'text_score_raw_mask': tensor(0.2999), 'text_score_normal': tensor(0.3137), 'text_score_all_steps': tensor(0.2999), 'image_score_unmasked': np.float32(0.6971262), 'image_score_seg_mask': np.float32(0.63183343), 'image_score_raw_mask': np.float32(0.64695466), 'image_score_normal': np.float32(0.7370146), 'image_score_all_steps': np.float32(0.64695466)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.51558447), 'dino_score_seg_mask': np.float32(0.10512695), 'dino_score_raw_mask': np.float32(0.35577783), 'dino_score_normal': np.float32(0.61914945), 'dino_score_all_steps': np.float32(0.35577783), 'text_score_unmasked': tensor(0.2951), 'text_score_seg_mask': tensor(0.2962), 'text_score_raw_mask': tensor(0.3462), 'text_score_normal': tensor(0.2752), 'text_score_all_steps': tensor(0.3462), 'image_score_unmasked': np.float32(0.49143374), 'image_score_seg_mask': np.float32(0.2847681), 'image_score_raw_mask': np.float32(0.48176807), 'image_score_normal': np.float32(0.73599195), 'image_score_all_steps': np.float32(0.48176807)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.60137), 'dino_score_seg_mask': np.float32(0.4909618), 'dino_score_raw_mask': np.float32(0.5516745), 'dino_score_normal': np.float32(0.7187886), 'dino_score_all_steps': np.float32(0.5516745), 'text_score_unmasked': tensor(0.2984), 'text_score_seg_mask': tensor(0.2895), 'text_score_raw_mask': tensor(0.3107), 'text_score_normal': tensor(0.2875), 'text_score_all_steps': tensor(0.3107), 'image_score_unmasked': np.float32(0.68771505), 'image_score_seg_mask': np.float32(0.514962), 'image_score_raw_mask': np.float32(0.671267), 'image_score_normal': np.float32(0.7790816), 'image_score_all_steps': np.float32(0.671267)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.61610085), 'dino_score_seg_mask': np.float32(0.43721026), 'dino_score_raw_mask': np.float32(0.5687998), 'dino_score_normal': np.float32(0.58502734), 'dino_score_all_steps': np.float32(0.5687998), 'text_score_unmasked': tensor(0.3132), 'text_score_seg_mask': tensor(0.3187), 'text_score_raw_mask': tensor(0.3344), 'text_score_normal': tensor(0.2923), 'text_score_all_steps': tensor(0.3344), 'image_score_unmasked': np.float32(0.80459225), 'image_score_seg_mask': np.float32(0.7419541), 'image_score_raw_mask': np.float32(0.75536424), 'image_score_normal': np.float32(0.81768703), 'image_score_all_steps': np.float32(0.75536424)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.65236706), 'dino_score_seg_mask': np.float32(0.11081064), 'dino_score_raw_mask': np.float32(0.5637225), 'dino_score_normal': np.float32(0.63345945), 'dino_score_all_steps': np.float32(0.5637225), 'text_score_unmasked': tensor(0.3004), 'text_score_seg_mask': tensor(0.2420), 'text_score_raw_mask': tensor(0.3147), 'text_score_normal': tensor(0.2759), 'text_score_all_steps': tensor(0.3147), 'image_score_unmasked': np.float32(0.7236587), 'image_score_seg_mask': np.float32(0.40356767), 'image_score_raw_mask': np.float32(0.6824318), 'image_score_normal': np.float32(0.6435262), 'image_score_all_steps': np.float32(0.6824318)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.58348614), 'dino_score_seg_mask': np.float32(0.3271968), 'dino_score_raw_mask': np.float32(0.36888078), 'dino_score_normal': np.float32(0.5059111), 'dino_score_all_steps': np.float32(0.36888078), 'text_score_unmasked': tensor(0.3170), 'text_score_seg_mask': tensor(0.3263), 'text_score_raw_mask': tensor(0.3210), 'text_score_normal': tensor(0.2969), 'text_score_all_steps': tensor(0.3210), 'image_score_unmasked': np.float32(0.7612338), 'image_score_seg_mask': np.float32(0.47667655), 'image_score_raw_mask': np.float32(0.5167715), 'image_score_normal': np.float32(0.6432128), 'image_score_all_steps': np.float32(0.5167715)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.47913766), 'dino_score_seg_mask': np.float32(0.39986235), 'dino_score_raw_mask': np.float32(0.3890429), 'dino_score_normal': np.float32(0.36406124), 'dino_score_all_steps': np.float32(0.3890429), 'text_score_unmasked': tensor(0.2864), 'text_score_seg_mask': tensor(0.3016), 'text_score_raw_mask': tensor(0.2794), 'text_score_normal': tensor(0.3035), 'text_score_all_steps': tensor(0.2794), 'image_score_unmasked': np.float32(0.7012959), 'image_score_seg_mask': np.float32(0.6509631), 'image_score_raw_mask': np.float32(0.68058044), 'image_score_normal': np.float32(0.7217449), 'image_score_all_steps': np.float32(0.68058044)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.49988273), 'dino_score_seg_mask': np.float32(0.3686729), 'dino_score_raw_mask': np.float32(0.46898568), 'dino_score_normal': np.float32(0.4991715), 'dino_score_all_steps': np.float32(0.46898568), 'text_score_unmasked': tensor(0.3045), 'text_score_seg_mask': tensor(0.3421), 'text_score_raw_mask': tensor(0.3609), 'text_score_normal': tensor(0.2812), 'text_score_all_steps': tensor(0.3609), 'image_score_unmasked': np.float32(0.7004765), 'image_score_seg_mask': np.float32(0.6174173), 'image_score_raw_mask': np.float32(0.67481935), 'image_score_normal': np.float32(0.7212834), 'image_score_all_steps': np.float32(0.67481935)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.39222986), 'dino_score_seg_mask': np.float32(0.2270141), 'dino_score_raw_mask': np.float32(0.32083467), 'dino_score_normal': np.float32(0.32628548), 'dino_score_all_steps': np.float32(0.32083467), 'text_score_unmasked': tensor(0.3803), 'text_score_seg_mask': tensor(0.3851), 'text_score_raw_mask': tensor(0.3870), 'text_score_normal': tensor(0.3421), 'text_score_all_steps': tensor(0.3870), 'image_score_unmasked': np.float32(0.7534035), 'image_score_seg_mask': np.float32(0.63617694), 'image_score_raw_mask': np.float32(0.63902235), 'image_score_normal': np.float32(0.7042743), 'image_score_all_steps': np.float32(0.63902235)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.41286194), 'dino_score_seg_mask': np.float32(0.4107212), 'dino_score_raw_mask': np.float32(0.3401271), 'dino_score_normal': np.float32(0.4482517), 'dino_score_all_steps': np.float32(0.3401271), 'text_score_unmasked': tensor(0.3669), 'text_score_seg_mask': tensor(0.3682), 'text_score_raw_mask': tensor(0.3548), 'text_score_normal': tensor(0.3928), 'text_score_all_steps': tensor(0.3548), 'image_score_unmasked': np.float32(0.6472411), 'image_score_seg_mask': np.float32(0.58449155), 'image_score_raw_mask': np.float32(0.63360715), 'image_score_normal': np.float32(0.75265944), 'image_score_all_steps': np.float32(0.63360715)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.40013933), 'dino_score_seg_mask': np.float32(0.190144), 'dino_score_raw_mask': np.float32(0.3950176), 'dino_score_normal': np.float32(0.42620268), 'dino_score_all_steps': np.float32(0.3950176), 'text_score_unmasked': tensor(0.3185), 'text_score_seg_mask': tensor(0.3081), 'text_score_raw_mask': tensor(0.3217), 'text_score_normal': tensor(0.2819), 'text_score_all_steps': tensor(0.3217), 'image_score_unmasked': np.float32(0.5480748), 'image_score_seg_mask': np.float32(0.48121047), 'image_score_raw_mask': np.float32(0.60710067), 'image_score_normal': np.float32(0.65462214), 'image_score_all_steps': np.float32(0.60710067)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7161304), 'dino_score_seg_mask': np.float32(0.5581679), 'dino_score_raw_mask': np.float32(0.70337486), 'dino_score_normal': np.float32(0.8226757), 'dino_score_all_steps': np.float32(0.70337486), 'text_score_unmasked': tensor(0.2864), 'text_score_seg_mask': tensor(0.3506), 'text_score_raw_mask': tensor(0.3361), 'text_score_normal': tensor(0.2676), 'text_score_all_steps': tensor(0.3361), 'image_score_unmasked': np.float32(0.7622111), 'image_score_seg_mask': np.float32(0.7611229), 'image_score_raw_mask': np.float32(0.81638145), 'image_score_normal': np.float32(0.87806803), 'image_score_all_steps': np.float32(0.81638145)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6651515), 'dino_score_seg_mask': np.float32(0.25604796), 'dino_score_raw_mask': np.float32(0.4238725), 'dino_score_normal': np.float32(0.74881303), 'dino_score_all_steps': np.float32(0.4238725), 'text_score_unmasked': tensor(0.2573), 'text_score_seg_mask': tensor(0.3428), 'text_score_raw_mask': tensor(0.3306), 'text_score_normal': tensor(0.2305), 'text_score_all_steps': tensor(0.3306), 'image_score_unmasked': np.float32(0.8124353), 'image_score_seg_mask': np.float32(0.7274366), 'image_score_raw_mask': np.float32(0.7050013), 'image_score_normal': np.float32(0.8863095), 'image_score_all_steps': np.float32(0.7050013)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.75005126), 'dino_score_seg_mask': np.float32(0.4991543), 'dino_score_raw_mask': np.float32(0.6505837), 'dino_score_normal': np.float32(0.74301815), 'dino_score_all_steps': np.float32(0.6505837), 'text_score_unmasked': tensor(0.3004), 'text_score_seg_mask': tensor(0.3435), 'text_score_raw_mask': tensor(0.3495), 'text_score_normal': tensor(0.3192), 'text_score_all_steps': tensor(0.3495), 'image_score_unmasked': np.float32(0.7712692), 'image_score_seg_mask': np.float32(0.75932795), 'image_score_raw_mask': np.float32(0.7647213), 'image_score_normal': np.float32(0.84952635), 'image_score_all_steps': np.float32(0.7647213)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6682146), 'dino_score_seg_mask': np.float32(0.496999), 'dino_score_raw_mask': np.float32(0.6849524), 'dino_score_normal': np.float32(0.7758809), 'dino_score_all_steps': np.float32(0.6849524), 'text_score_unmasked': tensor(0.2464), 'text_score_seg_mask': tensor(0.3088), 'text_score_raw_mask': tensor(0.2827), 'text_score_normal': tensor(0.2211), 'text_score_all_steps': tensor(0.2827), 'image_score_unmasked': np.float32(0.80096173), 'image_score_seg_mask': np.float32(0.7680787), 'image_score_raw_mask': np.float32(0.8234544), 'image_score_normal': np.float32(0.84587085), 'image_score_all_steps': np.float32(0.8234544)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.74717516), 'dino_score_seg_mask': np.float32(0.5064256), 'dino_score_raw_mask': np.float32(0.6914255), 'dino_score_normal': np.float32(0.8115655), 'dino_score_all_steps': np.float32(0.6914255), 'text_score_unmasked': tensor(0.2999), 'text_score_seg_mask': tensor(0.3024), 'text_score_raw_mask': tensor(0.3032), 'text_score_normal': tensor(0.2598), 'text_score_all_steps': tensor(0.3032), 'image_score_unmasked': np.float32(0.8256885), 'image_score_seg_mask': np.float32(0.71807134), 'image_score_raw_mask': np.float32(0.84540546), 'image_score_normal': np.float32(0.8465195), 'image_score_all_steps': np.float32(0.84540546)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.64549583), 'dino_score_seg_mask': np.float32(0.423827), 'dino_score_raw_mask': np.float32(0.6821097), 'dino_score_normal': np.float32(0.7594621), 'dino_score_all_steps': np.float32(0.6821097), 'text_score_unmasked': tensor(0.2696), 'text_score_seg_mask': tensor(0.3397), 'text_score_raw_mask': tensor(0.3391), 'text_score_normal': tensor(0.2395), 'text_score_all_steps': tensor(0.3391), 'image_score_unmasked': np.float32(0.7763007), 'image_score_seg_mask': np.float32(0.6424828), 'image_score_raw_mask': np.float32(0.75475127), 'image_score_normal': np.float32(0.8636528), 'image_score_all_steps': np.float32(0.75475127)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5303636), 'dino_score_seg_mask': np.float32(0.58634716), 'dino_score_raw_mask': np.float32(0.67575705), 'dino_score_normal': np.float32(0.62383807), 'dino_score_all_steps': np.float32(0.67575705), 'text_score_unmasked': tensor(0.3215), 'text_score_seg_mask': tensor(0.2833), 'text_score_raw_mask': tensor(0.2889), 'text_score_normal': tensor(0.2852), 'text_score_all_steps': tensor(0.2889), 'image_score_unmasked': np.float32(0.791368), 'image_score_seg_mask': np.float32(0.7844342), 'image_score_raw_mask': np.float32(0.7924189), 'image_score_normal': np.float32(0.7993793), 'image_score_all_steps': np.float32(0.7924189)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.79098105), 'dino_score_seg_mask': np.float32(0.68016034), 'dino_score_raw_mask': np.float32(0.3925402), 'dino_score_normal': np.float32(0.8142638), 'dino_score_all_steps': np.float32(0.3925402), 'text_score_unmasked': tensor(0.2522), 'text_score_seg_mask': tensor(0.3358), 'text_score_raw_mask': tensor(0.2819), 'text_score_normal': tensor(0.2403), 'text_score_all_steps': tensor(0.2819), 'image_score_unmasked': np.float32(0.89430135), 'image_score_seg_mask': np.float32(0.77379805), 'image_score_raw_mask': np.float32(0.7199205), 'image_score_normal': np.float32(0.9036283), 'image_score_all_steps': np.float32(0.7199205)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.63204336), 'dino_score_seg_mask': np.float32(0.57171094), 'dino_score_raw_mask': np.float32(0.65475464), 'dino_score_normal': np.float32(0.693472), 'dino_score_all_steps': np.float32(0.65475464), 'text_score_unmasked': tensor(0.3199), 'text_score_seg_mask': tensor(0.3218), 'text_score_raw_mask': tensor(0.3227), 'text_score_normal': tensor(0.2898), 'text_score_all_steps': tensor(0.3227), 'image_score_unmasked': np.float32(0.8242507), 'image_score_seg_mask': np.float32(0.68867207), 'image_score_raw_mask': np.float32(0.7398952), 'image_score_normal': np.float32(0.8414674), 'image_score_all_steps': np.float32(0.7398952)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.66437435), 'dino_score_seg_mask': np.float32(0.55152595), 'dino_score_raw_mask': np.float32(0.5381237), 'dino_score_normal': np.float32(0.7320921), 'dino_score_all_steps': np.float32(0.5381237), 'text_score_unmasked': tensor(0.3129), 'text_score_seg_mask': tensor(0.3430), 'text_score_raw_mask': tensor(0.3438), 'text_score_normal': tensor(0.3044), 'text_score_all_steps': tensor(0.3438), 'image_score_unmasked': np.float32(0.8417618), 'image_score_seg_mask': np.float32(0.7963791), 'image_score_raw_mask': np.float32(0.7703841), 'image_score_normal': np.float32(0.89021766), 'image_score_all_steps': np.float32(0.7703841)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.49624836), 'dino_score_seg_mask': np.float32(0.05186667), 'dino_score_raw_mask': np.float32(0.17497003), 'dino_score_normal': np.float32(0.46476874), 'dino_score_all_steps': np.float32(0.17497003), 'text_score_unmasked': tensor(0.2188), 'text_score_seg_mask': tensor(0.2953), 'text_score_raw_mask': tensor(0.2940), 'text_score_normal': tensor(0.2009), 'text_score_all_steps': tensor(0.2940), 'image_score_unmasked': np.float32(0.7665155), 'image_score_seg_mask': np.float32(0.61451685), 'image_score_raw_mask': np.float32(0.7078867), 'image_score_normal': np.float32(0.7798585), 'image_score_all_steps': np.float32(0.7078867)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3008348), 'dino_score_seg_mask': np.float32(0.09499541), 'dino_score_raw_mask': np.float32(0.28365153), 'dino_score_normal': np.float32(0.3697039), 'dino_score_all_steps': np.float32(0.28365153), 'text_score_unmasked': tensor(0.3330), 'text_score_seg_mask': tensor(0.3200), 'text_score_raw_mask': tensor(0.3286), 'text_score_normal': tensor(0.2656), 'text_score_all_steps': tensor(0.3286), 'image_score_unmasked': np.float32(0.5999294), 'image_score_seg_mask': np.float32(0.6823345), 'image_score_raw_mask': np.float32(0.7046205), 'image_score_normal': np.float32(0.76691544), 'image_score_all_steps': np.float32(0.7046205)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5260061), 'dino_score_seg_mask': np.float32(0.2806753), 'dino_score_raw_mask': np.float32(0.50930417), 'dino_score_normal': np.float32(0.57983446), 'dino_score_all_steps': np.float32(0.50930417), 'text_score_unmasked': tensor(0.2603), 'text_score_seg_mask': tensor(0.2966), 'text_score_raw_mask': tensor(0.2922), 'text_score_normal': tensor(0.2559), 'text_score_all_steps': tensor(0.2922), 'image_score_unmasked': np.float32(0.80719435), 'image_score_seg_mask': np.float32(0.62279284), 'image_score_raw_mask': np.float32(0.79570293), 'image_score_normal': np.float32(0.85803413), 'image_score_all_steps': np.float32(0.79570293)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.68004906), 'dino_score_seg_mask': np.float32(0.054996785), 'dino_score_raw_mask': np.float32(0.5605555), 'dino_score_normal': np.float32(0.70475936), 'dino_score_all_steps': np.float32(0.5605555), 'text_score_unmasked': tensor(0.2670), 'text_score_seg_mask': tensor(0.3261), 'text_score_raw_mask': tensor(0.3258), 'text_score_normal': tensor(0.2631), 'text_score_all_steps': tensor(0.3258), 'image_score_unmasked': np.float32(0.7292904), 'image_score_seg_mask': np.float32(0.649204), 'image_score_raw_mask': np.float32(0.7063234), 'image_score_normal': np.float32(0.8791832), 'image_score_all_steps': np.float32(0.7063234)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.59137535), 'dino_score_seg_mask': np.float32(0.02931666), 'dino_score_raw_mask': np.float32(0.15759596), 'dino_score_normal': np.float32(0.6316608), 'dino_score_all_steps': np.float32(0.15759596), 'text_score_unmasked': tensor(0.2713), 'text_score_seg_mask': tensor(0.2893), 'text_score_raw_mask': tensor(0.3404), 'text_score_normal': tensor(0.2444), 'text_score_all_steps': tensor(0.3404), 'image_score_unmasked': np.float32(0.83937114), 'image_score_seg_mask': np.float32(0.47202653), 'image_score_raw_mask': np.float32(0.6169167), 'image_score_normal': np.float32(0.8911023), 'image_score_all_steps': np.float32(0.6169167)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5718485), 'dino_score_seg_mask': np.float32(0.08546286), 'dino_score_raw_mask': np.float32(0.25793394), 'dino_score_normal': np.float32(0.5905439), 'dino_score_all_steps': np.float32(0.25793394), 'text_score_unmasked': tensor(0.2910), 'text_score_seg_mask': tensor(0.2729), 'text_score_raw_mask': tensor(0.2718), 'text_score_normal': tensor(0.2522), 'text_score_all_steps': tensor(0.2718), 'image_score_unmasked': np.float32(0.8307042), 'image_score_seg_mask': np.float32(0.54108274), 'image_score_raw_mask': np.float32(0.4812669), 'image_score_normal': np.float32(0.84289414), 'image_score_all_steps': np.float32(0.4812669)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.65577245), 'dino_score_seg_mask': np.float32(0.51560223), 'dino_score_raw_mask': np.float32(0.62979305), 'dino_score_normal': np.float32(0.7095341), 'dino_score_all_steps': np.float32(0.62979305), 'text_score_unmasked': tensor(0.3411), 'text_score_seg_mask': tensor(0.3277), 'text_score_raw_mask': tensor(0.3313), 'text_score_normal': tensor(0.3034), 'text_score_all_steps': tensor(0.3313), 'image_score_unmasked': np.float32(0.6764239), 'image_score_seg_mask': np.float32(0.6420835), 'image_score_raw_mask': np.float32(0.65347874), 'image_score_normal': np.float32(0.7158284), 'image_score_all_steps': np.float32(0.65347874)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7995304), 'dino_score_seg_mask': np.float32(0.069983885), 'dino_score_raw_mask': np.float32(0.63406086), 'dino_score_normal': np.float32(0.8683931), 'dino_score_all_steps': np.float32(0.63406086), 'text_score_unmasked': tensor(0.3158), 'text_score_seg_mask': tensor(0.2724), 'text_score_raw_mask': tensor(0.3866), 'text_score_normal': tensor(0.2949), 'text_score_all_steps': tensor(0.3866), 'image_score_unmasked': np.float32(0.79993314), 'image_score_seg_mask': np.float32(0.4075831), 'image_score_raw_mask': np.float32(0.72678363), 'image_score_normal': np.float32(0.89503217), 'image_score_all_steps': np.float32(0.72678363)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6600636), 'dino_score_seg_mask': np.float32(0.26540324), 'dino_score_raw_mask': np.float32(0.56114244), 'dino_score_normal': np.float32(0.7372691), 'dino_score_all_steps': np.float32(0.56114244), 'text_score_unmasked': tensor(0.3477), 'text_score_seg_mask': tensor(0.3417), 'text_score_raw_mask': tensor(0.3956), 'text_score_normal': tensor(0.3330), 'text_score_all_steps': tensor(0.3956), 'image_score_unmasked': np.float32(0.82049817), 'image_score_seg_mask': np.float32(0.736936), 'image_score_raw_mask': np.float32(0.8032942), 'image_score_normal': np.float32(0.83787787), 'image_score_all_steps': np.float32(0.8032942)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.60380113), 'dino_score_seg_mask': np.float32(0.017557519), 'dino_score_raw_mask': np.float32(0.42443934), 'dino_score_normal': np.float32(0.6119006), 'dino_score_all_steps': np.float32(0.42443934), 'text_score_unmasked': tensor(0.2757), 'text_score_seg_mask': tensor(0.2574), 'text_score_raw_mask': tensor(0.3807), 'text_score_normal': tensor(0.2773), 'text_score_all_steps': tensor(0.3807), 'image_score_unmasked': np.float32(0.69445884), 'image_score_seg_mask': np.float32(0.5603628), 'image_score_raw_mask': np.float32(0.61586547), 'image_score_normal': np.float32(0.736349), 'image_score_all_steps': np.float32(0.61586547)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.77500737), 'dino_score_seg_mask': np.float32(0.6423614), 'dino_score_raw_mask': np.float32(0.77373946), 'dino_score_normal': np.float32(0.74441624), 'dino_score_all_steps': np.float32(0.77373946), 'text_score_unmasked': tensor(0.2982), 'text_score_seg_mask': tensor(0.3285), 'text_score_raw_mask': tensor(0.3417), 'text_score_normal': tensor(0.2994), 'text_score_all_steps': tensor(0.3417), 'image_score_unmasked': np.float32(0.8280349), 'image_score_seg_mask': np.float32(0.7751873), 'image_score_raw_mask': np.float32(0.817186), 'image_score_normal': np.float32(0.8194344), 'image_score_all_steps': np.float32(0.817186)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.77073574), 'dino_score_seg_mask': np.float32(0.5374769), 'dino_score_raw_mask': np.float32(0.7906321), 'dino_score_normal': np.float32(0.8155702), 'dino_score_all_steps': np.float32(0.7906321), 'text_score_unmasked': tensor(0.2907), 'text_score_seg_mask': tensor(0.3230), 'text_score_raw_mask': tensor(0.3005), 'text_score_normal': tensor(0.2950), 'text_score_all_steps': tensor(0.3005), 'image_score_unmasked': np.float32(0.86942166), 'image_score_seg_mask': np.float32(0.76452684), 'image_score_raw_mask': np.float32(0.83630383), 'image_score_normal': np.float32(0.8764862), 'image_score_all_steps': np.float32(0.83630383)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.70440453), 'dino_score_seg_mask': np.float32(0.55014086), 'dino_score_raw_mask': np.float32(0.8044154), 'dino_score_normal': np.float32(0.812679), 'dino_score_all_steps': np.float32(0.8044154), 'text_score_unmasked': tensor(0.3136), 'text_score_seg_mask': tensor(0.3489), 'text_score_raw_mask': tensor(0.3212), 'text_score_normal': tensor(0.2877), 'text_score_all_steps': tensor(0.3212), 'image_score_unmasked': np.float32(0.81032515), 'image_score_seg_mask': np.float32(0.7875273), 'image_score_raw_mask': np.float32(0.83450216), 'image_score_normal': np.float32(0.85009336), 'image_score_all_steps': np.float32(0.83450216)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.793706), 'dino_score_seg_mask': np.float32(0.19219777), 'dino_score_raw_mask': np.float32(0.7984119), 'dino_score_normal': np.float32(0.8342911), 'dino_score_all_steps': np.float32(0.7984119), 'text_score_unmasked': tensor(0.2415), 'text_score_seg_mask': tensor(0.2989), 'text_score_raw_mask': tensor(0.3102), 'text_score_normal': tensor(0.2634), 'text_score_all_steps': tensor(0.3102), 'image_score_unmasked': np.float32(0.8500541), 'image_score_seg_mask': np.float32(0.7245703), 'image_score_raw_mask': np.float32(0.85039276), 'image_score_normal': np.float32(0.8412584), 'image_score_all_steps': np.float32(0.85039276)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7512145), 'dino_score_seg_mask': np.float32(0.24559575), 'dino_score_raw_mask': np.float32(0.69532084), 'dino_score_normal': np.float32(0.7011106), 'dino_score_all_steps': np.float32(0.69532084), 'text_score_unmasked': tensor(0.2667), 'text_score_seg_mask': tensor(0.2885), 'text_score_raw_mask': tensor(0.2775), 'text_score_normal': tensor(0.2618), 'text_score_all_steps': tensor(0.2775), 'image_score_unmasked': np.float32(0.81977934), 'image_score_seg_mask': np.float32(0.6432855), 'image_score_raw_mask': np.float32(0.8108991), 'image_score_normal': np.float32(0.85769945), 'image_score_all_steps': np.float32(0.8108991)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7642809), 'dino_score_seg_mask': np.float32(0.50336), 'dino_score_raw_mask': np.float32(0.78515875), 'dino_score_normal': np.float32(0.79366803), 'dino_score_all_steps': np.float32(0.78515875), 'text_score_unmasked': tensor(0.2807), 'text_score_seg_mask': tensor(0.3029), 'text_score_raw_mask': tensor(0.2542), 'text_score_normal': tensor(0.2548), 'text_score_all_steps': tensor(0.2542), 'image_score_unmasked': np.float32(0.9271249), 'image_score_seg_mask': np.float32(0.80913734), 'image_score_raw_mask': np.float32(0.89156806), 'image_score_normal': np.float32(0.930163), 'image_score_all_steps': np.float32(0.89156806)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.62784344), 'dino_score_seg_mask': np.float32(0.30205742), 'dino_score_raw_mask': np.float32(0.64004743), 'dino_score_normal': np.float32(0.7838981), 'dino_score_all_steps': np.float32(0.64004743), 'text_score_unmasked': tensor(0.2372), 'text_score_seg_mask': tensor(0.2630), 'text_score_raw_mask': tensor(0.2694), 'text_score_normal': tensor(0.2158), 'text_score_all_steps': tensor(0.2694), 'image_score_unmasked': np.float32(0.8095329), 'image_score_seg_mask': np.float32(0.7512765), 'image_score_raw_mask': np.float32(0.7789318), 'image_score_normal': np.float32(0.90831345), 'image_score_all_steps': np.float32(0.7789318)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.50708723), 'dino_score_seg_mask': np.float32(0.5724063), 'dino_score_raw_mask': np.float32(0.6450956), 'dino_score_normal': np.float32(0.75819635), 'dino_score_all_steps': np.float32(0.6450956), 'text_score_unmasked': tensor(0.2856), 'text_score_seg_mask': tensor(0.3247), 'text_score_raw_mask': tensor(0.3073), 'text_score_normal': tensor(0.2797), 'text_score_all_steps': tensor(0.3073), 'image_score_unmasked': np.float32(0.8018787), 'image_score_seg_mask': np.float32(0.79276645), 'image_score_raw_mask': np.float32(0.83682853), 'image_score_normal': np.float32(0.8362086), 'image_score_all_steps': np.float32(0.83682853)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.64905), 'dino_score_seg_mask': np.float32(0.3340952), 'dino_score_raw_mask': np.float32(0.7102098), 'dino_score_normal': np.float32(0.7372327), 'dino_score_all_steps': np.float32(0.7102098), 'text_score_unmasked': tensor(0.2941), 'text_score_seg_mask': tensor(0.3019), 'text_score_raw_mask': tensor(0.2966), 'text_score_normal': tensor(0.2709), 'text_score_all_steps': tensor(0.2966), 'image_score_unmasked': np.float32(0.82540065), 'image_score_seg_mask': np.float32(0.79546005), 'image_score_raw_mask': np.float32(0.84735143), 'image_score_normal': np.float32(0.87263745), 'image_score_all_steps': np.float32(0.84735143)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.51309615), 'dino_score_seg_mask': np.float32(0.14648111), 'dino_score_raw_mask': np.float32(0.5522312), 'dino_score_normal': np.float32(0.7489885), 'dino_score_all_steps': np.float32(0.5522312), 'text_score_unmasked': tensor(0.2763), 'text_score_seg_mask': tensor(0.2880), 'text_score_raw_mask': tensor(0.3016), 'text_score_normal': tensor(0.2462), 'text_score_all_steps': tensor(0.3016), 'image_score_unmasked': np.float32(0.7838164), 'image_score_seg_mask': np.float32(0.7352146), 'image_score_raw_mask': np.float32(0.7747218), 'image_score_normal': np.float32(0.7459511), 'image_score_all_steps': np.float32(0.7747218)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6593939), 'dino_score_seg_mask': np.float32(0.16899088), 'dino_score_raw_mask': np.float32(0.58832884), 'dino_score_normal': np.float32(0.6057203), 'dino_score_all_steps': np.float32(0.58832884), 'text_score_unmasked': tensor(0.3161), 'text_score_seg_mask': tensor(0.3563), 'text_score_raw_mask': tensor(0.3269), 'text_score_normal': tensor(0.3121), 'text_score_all_steps': tensor(0.3269), 'image_score_unmasked': np.float32(0.85751855), 'image_score_seg_mask': np.float32(0.7149095), 'image_score_raw_mask': np.float32(0.8122387), 'image_score_normal': np.float32(0.8308725), 'image_score_all_steps': np.float32(0.8122387)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.57352984), 'dino_score_seg_mask': np.float32(0.32371292), 'dino_score_raw_mask': np.float32(0.6144281), 'dino_score_normal': np.float32(0.7131245), 'dino_score_all_steps': np.float32(0.6144281), 'text_score_unmasked': tensor(0.2389), 'text_score_seg_mask': tensor(0.3106), 'text_score_raw_mask': tensor(0.3025), 'text_score_normal': tensor(0.2260), 'text_score_all_steps': tensor(0.3025), 'image_score_unmasked': np.float32(0.83725464), 'image_score_seg_mask': np.float32(0.74738204), 'image_score_raw_mask': np.float32(0.8095596), 'image_score_normal': np.float32(0.88570803), 'image_score_all_steps': np.float32(0.8095596)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4973933), 'dino_score_seg_mask': np.float32(0.108742416), 'dino_score_raw_mask': np.float32(0.5991056), 'dino_score_normal': np.float32(0.66674685), 'dino_score_all_steps': np.float32(0.5991056), 'text_score_unmasked': tensor(0.2592), 'text_score_seg_mask': tensor(0.3043), 'text_score_raw_mask': tensor(0.2764), 'text_score_normal': tensor(0.2342), 'text_score_all_steps': tensor(0.2764), 'image_score_unmasked': np.float32(0.7834238), 'image_score_seg_mask': np.float32(0.7703513), 'image_score_raw_mask': np.float32(0.800235), 'image_score_normal': np.float32(0.8649924), 'image_score_all_steps': np.float32(0.800235)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.31954154), 'dino_score_seg_mask': np.float32(0.22316153), 'dino_score_raw_mask': np.float32(0.48622328), 'dino_score_normal': np.float32(0.56165135), 'dino_score_all_steps': np.float32(0.48622328), 'text_score_unmasked': tensor(0.3122), 'text_score_seg_mask': tensor(0.3019), 'text_score_raw_mask': tensor(0.2981), 'text_score_normal': tensor(0.3180), 'text_score_all_steps': tensor(0.2981), 'image_score_unmasked': np.float32(0.74939644), 'image_score_seg_mask': np.float32(0.6005181), 'image_score_raw_mask': np.float32(0.63779914), 'image_score_normal': np.float32(0.7510361), 'image_score_all_steps': np.float32(0.63779914)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.45829237), 'dino_score_seg_mask': np.float32(0.15140045), 'dino_score_raw_mask': np.float32(0.66906047), 'dino_score_normal': np.float32(0.64020723), 'dino_score_all_steps': np.float32(0.66906047), 'text_score_unmasked': tensor(0.3156), 'text_score_seg_mask': tensor(0.3134), 'text_score_raw_mask': tensor(0.3003), 'text_score_normal': tensor(0.2730), 'text_score_all_steps': tensor(0.3003), 'image_score_unmasked': np.float32(0.78302264), 'image_score_seg_mask': np.float32(0.64441335), 'image_score_raw_mask': np.float32(0.64680505), 'image_score_normal': np.float32(0.8271644), 'image_score_all_steps': np.float32(0.64680505)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.58151543), 'dino_score_seg_mask': np.float32(0.077853896), 'dino_score_raw_mask': np.float32(0.35404718), 'dino_score_normal': np.float32(0.661489), 'dino_score_all_steps': np.float32(0.35404718), 'text_score_unmasked': tensor(0.2611), 'text_score_seg_mask': tensor(0.2630), 'text_score_raw_mask': tensor(0.2882), 'text_score_normal': tensor(0.2464), 'text_score_all_steps': tensor(0.2882), 'image_score_unmasked': np.float32(0.73698914), 'image_score_seg_mask': np.float32(0.45768058), 'image_score_raw_mask': np.float32(0.68545276), 'image_score_normal': np.float32(0.7924715), 'image_score_all_steps': np.float32(0.68545276)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5094426), 'dino_score_seg_mask': np.float32(0.16503203), 'dino_score_raw_mask': np.float32(0.38754362), 'dino_score_normal': np.float32(0.540134), 'dino_score_all_steps': np.float32(0.38754362), 'text_score_unmasked': tensor(0.2732), 'text_score_seg_mask': tensor(0.3769), 'text_score_raw_mask': tensor(0.3550), 'text_score_normal': tensor(0.2695), 'text_score_all_steps': tensor(0.3550), 'image_score_unmasked': np.float32(0.6303597), 'image_score_seg_mask': np.float32(0.5945644), 'image_score_raw_mask': np.float32(0.5813035), 'image_score_normal': np.float32(0.76639676), 'image_score_all_steps': np.float32(0.5813035)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5378249), 'dino_score_seg_mask': np.float32(0.23791619), 'dino_score_raw_mask': np.float32(0.5581292), 'dino_score_normal': np.float32(0.73658866), 'dino_score_all_steps': np.float32(0.5581292), 'text_score_unmasked': tensor(0.2307), 'text_score_seg_mask': tensor(0.3453), 'text_score_raw_mask': tensor(0.3008), 'text_score_normal': tensor(0.1917), 'text_score_all_steps': tensor(0.3008), 'image_score_unmasked': np.float32(0.6862571), 'image_score_seg_mask': np.float32(0.6854557), 'image_score_raw_mask': np.float32(0.7135127), 'image_score_normal': np.float32(0.8551779), 'image_score_all_steps': np.float32(0.7135127)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5117396), 'dino_score_seg_mask': np.float32(0.48131537), 'dino_score_raw_mask': np.float32(0.46957654), 'dino_score_normal': np.float32(0.62643933), 'dino_score_all_steps': np.float32(0.46957654), 'text_score_unmasked': tensor(0.2495), 'text_score_seg_mask': tensor(0.3358), 'text_score_raw_mask': tensor(0.3328), 'text_score_normal': tensor(0.2269), 'text_score_all_steps': tensor(0.3328), 'image_score_unmasked': np.float32(0.6440631), 'image_score_seg_mask': np.float32(0.72104406), 'image_score_raw_mask': np.float32(0.7020101), 'image_score_normal': np.float32(0.78533095), 'image_score_all_steps': np.float32(0.7020101)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5724838), 'dino_score_seg_mask': np.float32(0.3810775), 'dino_score_raw_mask': np.float32(0.49390653), 'dino_score_normal': np.float32(0.64968264), 'dino_score_all_steps': np.float32(0.49390653), 'text_score_unmasked': tensor(0.3269), 'text_score_seg_mask': tensor(0.3309), 'text_score_raw_mask': tensor(0.3500), 'text_score_normal': tensor(0.3365), 'text_score_all_steps': tensor(0.3500), 'image_score_unmasked': np.float32(0.7102317), 'image_score_seg_mask': np.float32(0.6396343), 'image_score_raw_mask': np.float32(0.6815911), 'image_score_normal': np.float32(0.78963256), 'image_score_all_steps': np.float32(0.6815911)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5891341), 'dino_score_seg_mask': np.float32(0.34449062), 'dino_score_raw_mask': np.float32(0.33720836), 'dino_score_normal': np.float32(0.6586017), 'dino_score_all_steps': np.float32(0.33720836), 'text_score_unmasked': tensor(0.2494), 'text_score_seg_mask': tensor(0.3218), 'text_score_raw_mask': tensor(0.3315), 'text_score_normal': tensor(0.2317), 'text_score_all_steps': tensor(0.3315), 'image_score_unmasked': np.float32(0.68505615), 'image_score_seg_mask': np.float32(0.64287114), 'image_score_raw_mask': np.float32(0.5962812), 'image_score_normal': np.float32(0.81693375), 'image_score_all_steps': np.float32(0.5962812)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.46559098), 'dino_score_seg_mask': np.float32(0.16953586), 'dino_score_raw_mask': np.float32(0.46721447), 'dino_score_normal': np.float32(0.57729566), 'dino_score_all_steps': np.float32(0.46721447), 'text_score_unmasked': tensor(0.3207), 'text_score_seg_mask': tensor(0.3332), 'text_score_raw_mask': tensor(0.3247), 'text_score_normal': tensor(0.2423), 'text_score_all_steps': tensor(0.3247), 'image_score_unmasked': np.float32(0.70877546), 'image_score_seg_mask': np.float32(0.53101987), 'image_score_raw_mask': np.float32(0.67972803), 'image_score_normal': np.float32(0.82608896), 'image_score_all_steps': np.float32(0.67972803)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5772697), 'dino_score_seg_mask': np.float32(0.3078562), 'dino_score_raw_mask': np.float32(0.584403), 'dino_score_normal': np.float32(0.72566605), 'dino_score_all_steps': np.float32(0.584403), 'text_score_unmasked': tensor(0.2427), 'text_score_seg_mask': tensor(0.3615), 'text_score_raw_mask': tensor(0.3503), 'text_score_normal': tensor(0.2081), 'text_score_all_steps': tensor(0.3503), 'image_score_unmasked': np.float32(0.6931317), 'image_score_seg_mask': np.float32(0.62197137), 'image_score_raw_mask': np.float32(0.627211), 'image_score_normal': np.float32(0.8608392), 'image_score_all_steps': np.float32(0.627211)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.41890603), 'dino_score_seg_mask': np.float32(0.6230198), 'dino_score_raw_mask': np.float32(0.6349272), 'dino_score_normal': np.float32(0.8090979), 'dino_score_all_steps': np.float32(0.6349272), 'text_score_unmasked': tensor(0.2838), 'text_score_seg_mask': tensor(0.2871), 'text_score_raw_mask': tensor(0.2658), 'text_score_normal': tensor(0.2751), 'text_score_all_steps': tensor(0.2658), 'image_score_unmasked': np.float32(0.78696907), 'image_score_seg_mask': np.float32(0.7719527), 'image_score_raw_mask': np.float32(0.7927076), 'image_score_normal': np.float32(0.8228641), 'image_score_all_steps': np.float32(0.7927076)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.64985), 'dino_score_seg_mask': np.float32(0.17080559), 'dino_score_raw_mask': np.float32(0.6151588), 'dino_score_normal': np.float32(0.7341977), 'dino_score_all_steps': np.float32(0.6151588), 'text_score_unmasked': tensor(0.2533), 'text_score_seg_mask': tensor(0.2887), 'text_score_raw_mask': tensor(0.2736), 'text_score_normal': tensor(0.2239), 'text_score_all_steps': tensor(0.2736), 'image_score_unmasked': np.float32(0.80217683), 'image_score_seg_mask': np.float32(0.6408617), 'image_score_raw_mask': np.float32(0.8581558), 'image_score_normal': np.float32(0.85663694), 'image_score_all_steps': np.float32(0.8581558)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.76081735), 'dino_score_seg_mask': np.float32(0.61095554), 'dino_score_raw_mask': np.float32(0.76136464), 'dino_score_normal': np.float32(0.8527688), 'dino_score_all_steps': np.float32(0.76136464), 'text_score_unmasked': tensor(0.2581), 'text_score_seg_mask': tensor(0.2963), 'text_score_raw_mask': tensor(0.2735), 'text_score_normal': tensor(0.2222), 'text_score_all_steps': tensor(0.2735), 'image_score_unmasked': np.float32(0.79560715), 'image_score_seg_mask': np.float32(0.8236146), 'image_score_raw_mask': np.float32(0.8469491), 'image_score_normal': np.float32(0.92093134), 'image_score_all_steps': np.float32(0.8469491)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7766582), 'dino_score_seg_mask': np.float32(0.4077254), 'dino_score_raw_mask': np.float32(0.75500786), 'dino_score_normal': np.float32(0.7753534), 'dino_score_all_steps': np.float32(0.75500786), 'text_score_unmasked': tensor(0.2691), 'text_score_seg_mask': tensor(0.2964), 'text_score_raw_mask': tensor(0.2491), 'text_score_normal': tensor(0.2720), 'text_score_all_steps': tensor(0.2491), 'image_score_unmasked': np.float32(0.8062073), 'image_score_seg_mask': np.float32(0.789438), 'image_score_raw_mask': np.float32(0.8858861), 'image_score_normal': np.float32(0.79218584), 'image_score_all_steps': np.float32(0.8858861)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.68305385), 'dino_score_seg_mask': np.float32(0.5544126), 'dino_score_raw_mask': np.float32(0.66931784), 'dino_score_normal': np.float32(0.6726936), 'dino_score_all_steps': np.float32(0.66931784), 'text_score_unmasked': tensor(0.2772), 'text_score_seg_mask': tensor(0.3117), 'text_score_raw_mask': tensor(0.2731), 'text_score_normal': tensor(0.2484), 'text_score_all_steps': tensor(0.2731), 'image_score_unmasked': np.float32(0.85704005), 'image_score_seg_mask': np.float32(0.8201953), 'image_score_raw_mask': np.float32(0.8894033), 'image_score_normal': np.float32(0.8511439), 'image_score_all_steps': np.float32(0.8894033)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6939235), 'dino_score_seg_mask': np.float32(0.21283504), 'dino_score_raw_mask': np.float32(0.6319059), 'dino_score_normal': np.float32(0.7599981), 'dino_score_all_steps': np.float32(0.6319059), 'text_score_unmasked': tensor(0.2834), 'text_score_seg_mask': tensor(0.2959), 'text_score_raw_mask': tensor(0.2814), 'text_score_normal': tensor(0.2800), 'text_score_all_steps': tensor(0.2814), 'image_score_unmasked': np.float32(0.8361646), 'image_score_seg_mask': np.float32(0.78239715), 'image_score_raw_mask': np.float32(0.8255588), 'image_score_normal': np.float32(0.8751402), 'image_score_all_steps': np.float32(0.8255588)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7217603), 'dino_score_seg_mask': np.float32(0.38815248), 'dino_score_raw_mask': np.float32(0.71168077), 'dino_score_normal': np.float32(0.70493954), 'dino_score_all_steps': np.float32(0.71168077), 'text_score_unmasked': tensor(0.3027), 'text_score_seg_mask': tensor(0.2891), 'text_score_raw_mask': tensor(0.2942), 'text_score_normal': tensor(0.2900), 'text_score_all_steps': tensor(0.2942), 'image_score_unmasked': np.float32(0.93522686), 'image_score_seg_mask': np.float32(0.8158236), 'image_score_raw_mask': np.float32(0.9021987), 'image_score_normal': np.float32(0.8997337), 'image_score_all_steps': np.float32(0.9021987)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5243274), 'dino_score_seg_mask': np.float32(0.22249946), 'dino_score_raw_mask': np.float32(0.4981553), 'dino_score_normal': np.float32(0.59378), 'dino_score_all_steps': np.float32(0.4981553), 'text_score_unmasked': tensor(0.3152), 'text_score_seg_mask': tensor(0.3689), 'text_score_raw_mask': tensor(0.3246), 'text_score_normal': tensor(0.3174), 'text_score_all_steps': tensor(0.3246), 'image_score_unmasked': np.float32(0.671106), 'image_score_seg_mask': np.float32(0.6953749), 'image_score_raw_mask': np.float32(0.73812103), 'image_score_normal': np.float32(0.86694974), 'image_score_all_steps': np.float32(0.73812103)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.65578544), 'dino_score_seg_mask': np.float32(0.3188228), 'dino_score_raw_mask': np.float32(0.54612124), 'dino_score_normal': np.float32(0.710467), 'dino_score_all_steps': np.float32(0.54612124), 'text_score_unmasked': tensor(0.2473), 'text_score_seg_mask': tensor(0.2839), 'text_score_raw_mask': tensor(0.3073), 'text_score_normal': tensor(0.1992), 'text_score_all_steps': tensor(0.3073), 'image_score_unmasked': np.float32(0.80282277), 'image_score_seg_mask': np.float32(0.6410818), 'image_score_raw_mask': np.float32(0.7335071), 'image_score_normal': np.float32(0.9027412), 'image_score_all_steps': np.float32(0.7335071)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5919452), 'dino_score_seg_mask': np.float32(0.56765044), 'dino_score_raw_mask': np.float32(0.5670989), 'dino_score_normal': np.float32(0.6024915), 'dino_score_all_steps': np.float32(0.5670989), 'text_score_unmasked': tensor(0.2250), 'text_score_seg_mask': tensor(0.2915), 'text_score_raw_mask': tensor(0.2861), 'text_score_normal': tensor(0.2279), 'text_score_all_steps': tensor(0.2861), 'image_score_unmasked': np.float32(0.66901445), 'image_score_seg_mask': np.float32(0.76627505), 'image_score_raw_mask': np.float32(0.74849045), 'image_score_normal': np.float32(0.78587365), 'image_score_all_steps': np.float32(0.74849045)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.54303885), 'dino_score_seg_mask': np.float32(0.09984005), 'dino_score_raw_mask': np.float32(0.43794382), 'dino_score_normal': np.float32(0.6327607), 'dino_score_all_steps': np.float32(0.43794382), 'text_score_unmasked': tensor(0.3028), 'text_score_seg_mask': tensor(0.2949), 'text_score_raw_mask': tensor(0.3064), 'text_score_normal': tensor(0.2173), 'text_score_all_steps': tensor(0.3064), 'image_score_unmasked': np.float32(0.6791458), 'image_score_seg_mask': np.float32(0.6004504), 'image_score_raw_mask': np.float32(0.68833643), 'image_score_normal': np.float32(0.9173714), 'image_score_all_steps': np.float32(0.68833643)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5763998), 'dino_score_seg_mask': np.float32(0.26344648), 'dino_score_raw_mask': np.float32(0.5671551), 'dino_score_normal': np.float32(0.6611699), 'dino_score_all_steps': np.float32(0.5671551), 'text_score_unmasked': tensor(0.2834), 'text_score_seg_mask': tensor(0.2905), 'text_score_raw_mask': tensor(0.3220), 'text_score_normal': tensor(0.2763), 'text_score_all_steps': tensor(0.3220), 'image_score_unmasked': np.float32(0.7465869), 'image_score_seg_mask': np.float32(0.6319447), 'image_score_raw_mask': np.float32(0.7901826), 'image_score_normal': np.float32(0.8672799), 'image_score_all_steps': np.float32(0.7901826)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.65566266), 'dino_score_seg_mask': np.float32(0.112898774), 'dino_score_raw_mask': np.float32(0.68424344), 'dino_score_normal': np.float32(0.7083077), 'dino_score_all_steps': np.float32(0.68424344), 'text_score_unmasked': tensor(0.2672), 'text_score_seg_mask': tensor(0.3017), 'text_score_raw_mask': tensor(0.2780), 'text_score_normal': tensor(0.2559), 'text_score_all_steps': tensor(0.2780), 'image_score_unmasked': np.float32(0.8054843), 'image_score_seg_mask': np.float32(0.54804003), 'image_score_raw_mask': np.float32(0.76352894), 'image_score_normal': np.float32(0.8563486), 'image_score_all_steps': np.float32(0.76352894)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.55062616), 'dino_score_seg_mask': np.float32(0.3273245), 'dino_score_raw_mask': np.float32(0.5550195), 'dino_score_normal': np.float32(0.6738492), 'dino_score_all_steps': np.float32(0.5550195), 'text_score_unmasked': tensor(0.2979), 'text_score_seg_mask': tensor(0.3681), 'text_score_raw_mask': tensor(0.2947), 'text_score_normal': tensor(0.2827), 'text_score_all_steps': tensor(0.2947), 'image_score_unmasked': np.float32(0.8053583), 'image_score_seg_mask': np.float32(0.72638726), 'image_score_raw_mask': np.float32(0.79273725), 'image_score_normal': np.float32(0.863508), 'image_score_all_steps': np.float32(0.79273725)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5044144), 'dino_score_seg_mask': np.float32(0.31905425), 'dino_score_raw_mask': np.float32(0.57966745), 'dino_score_normal': np.float32(0.67052054), 'dino_score_all_steps': np.float32(0.57966745), 'text_score_unmasked': tensor(0.2782), 'text_score_seg_mask': tensor(0.3575), 'text_score_raw_mask': tensor(0.3312), 'text_score_normal': tensor(0.2181), 'text_score_all_steps': tensor(0.3312), 'image_score_unmasked': np.float32(0.751282), 'image_score_seg_mask': np.float32(0.7648816), 'image_score_raw_mask': np.float32(0.7595578), 'image_score_normal': np.float32(0.81145597), 'image_score_all_steps': np.float32(0.7595578)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.75751996), 'dino_score_seg_mask': np.float32(0.44508678), 'dino_score_raw_mask': np.float32(0.6969875), 'dino_score_normal': np.float32(0.77445376), 'dino_score_all_steps': np.float32(0.6969875), 'text_score_unmasked': tensor(0.2913), 'text_score_seg_mask': tensor(0.3361), 'text_score_raw_mask': tensor(0.3479), 'text_score_normal': tensor(0.3227), 'text_score_all_steps': tensor(0.3479), 'image_score_unmasked': np.float32(0.91848934), 'image_score_seg_mask': np.float32(0.7819843), 'image_score_raw_mask': np.float32(0.8232586), 'image_score_normal': np.float32(0.90357167), 'image_score_all_steps': np.float32(0.8232586)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7550328), 'dino_score_seg_mask': np.float32(0.24116054), 'dino_score_raw_mask': np.float32(0.58448625), 'dino_score_normal': np.float32(0.7264929), 'dino_score_all_steps': np.float32(0.58448625), 'text_score_unmasked': tensor(0.2957), 'text_score_seg_mask': tensor(0.3362), 'text_score_raw_mask': tensor(0.3437), 'text_score_normal': tensor(0.2827), 'text_score_all_steps': tensor(0.3437), 'image_score_unmasked': np.float32(0.8947135), 'image_score_seg_mask': np.float32(0.73303473), 'image_score_raw_mask': np.float32(0.78640103), 'image_score_normal': np.float32(0.9306338), 'image_score_all_steps': np.float32(0.78640103)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7463659), 'dino_score_seg_mask': np.float32(0.5191879), 'dino_score_raw_mask': np.float32(0.53676873), 'dino_score_normal': np.float32(0.7717726), 'dino_score_all_steps': np.float32(0.53676873), 'text_score_unmasked': tensor(0.3130), 'text_score_seg_mask': tensor(0.3182), 'text_score_raw_mask': tensor(0.3295), 'text_score_normal': tensor(0.3173), 'text_score_all_steps': tensor(0.3295), 'image_score_unmasked': np.float32(0.93663955), 'image_score_seg_mask': np.float32(0.829275), 'image_score_raw_mask': np.float32(0.8413782), 'image_score_normal': np.float32(0.9179474), 'image_score_all_steps': np.float32(0.8413782)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6837615), 'dino_score_seg_mask': np.float32(0.48518154), 'dino_score_raw_mask': np.float32(0.49487382), 'dino_score_normal': np.float32(0.6961863), 'dino_score_all_steps': np.float32(0.49487382), 'text_score_unmasked': tensor(0.2729), 'text_score_seg_mask': tensor(0.2996), 'text_score_raw_mask': tensor(0.2788), 'text_score_normal': tensor(0.2905), 'text_score_all_steps': tensor(0.2788), 'image_score_unmasked': np.float32(0.77876544), 'image_score_seg_mask': np.float32(0.7402147), 'image_score_raw_mask': np.float32(0.76867855), 'image_score_normal': np.float32(0.80263275), 'image_score_all_steps': np.float32(0.76867855)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4067272), 'dino_score_seg_mask': np.float32(0.116057076), 'dino_score_raw_mask': np.float32(0.31621698), 'dino_score_normal': np.float32(0.48799875), 'dino_score_all_steps': np.float32(0.31621698), 'text_score_unmasked': tensor(0.2611), 'text_score_seg_mask': tensor(0.3109), 'text_score_raw_mask': tensor(0.3446), 'text_score_normal': tensor(0.2633), 'text_score_all_steps': tensor(0.3446), 'image_score_unmasked': np.float32(0.74179596), 'image_score_seg_mask': np.float32(0.5539367), 'image_score_raw_mask': np.float32(0.6964023), 'image_score_normal': np.float32(0.8082806), 'image_score_all_steps': np.float32(0.6964023)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3560922), 'dino_score_seg_mask': np.float32(0.32911205), 'dino_score_raw_mask': np.float32(0.4457953), 'dino_score_normal': np.float32(0.44939184), 'dino_score_all_steps': np.float32(0.4457953), 'text_score_unmasked': tensor(0.3138), 'text_score_seg_mask': tensor(0.3030), 'text_score_raw_mask': tensor(0.3127), 'text_score_normal': tensor(0.2814), 'text_score_all_steps': tensor(0.3127), 'image_score_unmasked': np.float32(0.6854495), 'image_score_seg_mask': np.float32(0.7368559), 'image_score_raw_mask': np.float32(0.7548442), 'image_score_normal': np.float32(0.7615589), 'image_score_all_steps': np.float32(0.7548442)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5306972), 'dino_score_seg_mask': np.float32(0.32997158), 'dino_score_raw_mask': np.float32(0.5408364), 'dino_score_normal': np.float32(0.5605545), 'dino_score_all_steps': np.float32(0.5408364), 'text_score_unmasked': tensor(0.3146), 'text_score_seg_mask': tensor(0.3078), 'text_score_raw_mask': tensor(0.3116), 'text_score_normal': tensor(0.3127), 'text_score_all_steps': tensor(0.3116), 'image_score_unmasked': np.float32(0.7968468), 'image_score_seg_mask': np.float32(0.72169244), 'image_score_raw_mask': np.float32(0.80118823), 'image_score_normal': np.float32(0.82405615), 'image_score_all_steps': np.float32(0.80118823)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4063841), 'dino_score_seg_mask': np.float32(0.4555199), 'dino_score_raw_mask': np.float32(0.4657107), 'dino_score_normal': np.float32(0.4839782), 'dino_score_all_steps': np.float32(0.4657107), 'text_score_unmasked': tensor(0.2770), 'text_score_seg_mask': tensor(0.3133), 'text_score_raw_mask': tensor(0.3007), 'text_score_normal': tensor(0.2989), 'text_score_all_steps': tensor(0.3007), 'image_score_unmasked': np.float32(0.82008576), 'image_score_seg_mask': np.float32(0.83147514), 'image_score_raw_mask': np.float32(0.81881464), 'image_score_normal': np.float32(0.8397006), 'image_score_all_steps': np.float32(0.81881464)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.43578663), 'dino_score_seg_mask': np.float32(0.34674984), 'dino_score_raw_mask': np.float32(0.36865708), 'dino_score_normal': np.float32(0.47518408), 'dino_score_all_steps': np.float32(0.36865708), 'text_score_unmasked': tensor(0.3374), 'text_score_seg_mask': tensor(0.2985), 'text_score_raw_mask': tensor(0.3058), 'text_score_normal': tensor(0.2985), 'text_score_all_steps': tensor(0.3058), 'image_score_unmasked': np.float32(0.75576967), 'image_score_seg_mask': np.float32(0.76113665), 'image_score_raw_mask': np.float32(0.68420124), 'image_score_normal': np.float32(0.7808674), 'image_score_all_steps': np.float32(0.68420124)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.24922574), 'dino_score_seg_mask': np.float32(0.3701706), 'dino_score_raw_mask': np.float32(0.4170239), 'dino_score_normal': np.float32(0.4996523), 'dino_score_all_steps': np.float32(0.4170239), 'text_score_unmasked': tensor(0.3027), 'text_score_seg_mask': tensor(0.3405), 'text_score_raw_mask': tensor(0.3213), 'text_score_normal': tensor(0.2788), 'text_score_all_steps': tensor(0.3213), 'image_score_unmasked': np.float32(0.7079142), 'image_score_seg_mask': np.float32(0.679417), 'image_score_raw_mask': np.float32(0.78125966), 'image_score_normal': np.float32(0.7678999), 'image_score_all_steps': np.float32(0.78125966)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.55290633), 'dino_score_seg_mask': np.float32(0.39029574), 'dino_score_raw_mask': np.float32(0.5479992), 'dino_score_normal': np.float32(0.5693793), 'dino_score_all_steps': np.float32(0.5479992), 'text_score_unmasked': tensor(0.3676), 'text_score_seg_mask': tensor(0.3395), 'text_score_raw_mask': tensor(0.3706), 'text_score_normal': tensor(0.3477), 'text_score_all_steps': tensor(0.3706), 'image_score_unmasked': np.float32(0.72967964), 'image_score_seg_mask': np.float32(0.68234885), 'image_score_raw_mask': np.float32(0.756905), 'image_score_normal': np.float32(0.73494256), 'image_score_all_steps': np.float32(0.756905)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7000593), 'dino_score_seg_mask': np.float32(0.65919256), 'dino_score_raw_mask': np.float32(0.6423048), 'dino_score_normal': np.float32(0.7224645), 'dino_score_all_steps': np.float32(0.6423048), 'text_score_unmasked': tensor(0.3807), 'text_score_seg_mask': tensor(0.3726), 'text_score_raw_mask': tensor(0.3993), 'text_score_normal': tensor(0.3700), 'text_score_all_steps': tensor(0.3993), 'image_score_unmasked': np.float32(0.70834315), 'image_score_seg_mask': np.float32(0.63900596), 'image_score_raw_mask': np.float32(0.6827293), 'image_score_normal': np.float32(0.790627), 'image_score_all_steps': np.float32(0.6827293)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3948261), 'dino_score_seg_mask': np.float32(0.44668347), 'dino_score_raw_mask': np.float32(0.51491684), 'dino_score_normal': np.float32(0.49596697), 'dino_score_all_steps': np.float32(0.51491684), 'text_score_unmasked': tensor(0.3115), 'text_score_seg_mask': tensor(0.3899), 'text_score_raw_mask': tensor(0.3559), 'text_score_normal': tensor(0.3374), 'text_score_all_steps': tensor(0.3559), 'image_score_unmasked': np.float32(0.69724476), 'image_score_seg_mask': np.float32(0.7574306), 'image_score_raw_mask': np.float32(0.73359376), 'image_score_normal': np.float32(0.73621976), 'image_score_all_steps': np.float32(0.73359376)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5298782), 'dino_score_seg_mask': np.float32(0.37000352), 'dino_score_raw_mask': np.float32(0.61090994), 'dino_score_normal': np.float32(0.57827485), 'dino_score_all_steps': np.float32(0.61090994), 'text_score_unmasked': tensor(0.3531), 'text_score_seg_mask': tensor(0.3261), 'text_score_raw_mask': tensor(0.3310), 'text_score_normal': tensor(0.3234), 'text_score_all_steps': tensor(0.3310), 'image_score_unmasked': np.float32(0.7093131), 'image_score_seg_mask': np.float32(0.5829327), 'image_score_raw_mask': np.float32(0.73113346), 'image_score_normal': np.float32(0.7431736), 'image_score_all_steps': np.float32(0.73113346)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5546974), 'dino_score_seg_mask': np.float32(0.45862004), 'dino_score_raw_mask': np.float32(0.5395478), 'dino_score_normal': np.float32(0.50408816), 'dino_score_all_steps': np.float32(0.5395478), 'text_score_unmasked': tensor(0.3326), 'text_score_seg_mask': tensor(0.3700), 'text_score_raw_mask': tensor(0.3651), 'text_score_normal': tensor(0.3486), 'text_score_all_steps': tensor(0.3651), 'image_score_unmasked': np.float32(0.6921382), 'image_score_seg_mask': np.float32(0.6716136), 'image_score_raw_mask': np.float32(0.66932964), 'image_score_normal': np.float32(0.6837876), 'image_score_all_steps': np.float32(0.66932964)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6242405), 'dino_score_seg_mask': np.float32(0.49740404), 'dino_score_raw_mask': np.float32(0.6239155), 'dino_score_normal': np.float32(0.64667696), 'dino_score_all_steps': np.float32(0.6239155), 'text_score_unmasked': tensor(0.3027), 'text_score_seg_mask': tensor(0.3257), 'text_score_raw_mask': tensor(0.2992), 'text_score_normal': tensor(0.3133), 'text_score_all_steps': tensor(0.2992), 'image_score_unmasked': np.float32(0.79720914), 'image_score_seg_mask': np.float32(0.7117098), 'image_score_raw_mask': np.float32(0.7309867), 'image_score_normal': np.float32(0.76852286), 'image_score_all_steps': np.float32(0.7309867)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4891882), 'dino_score_seg_mask': np.float32(0.22866884), 'dino_score_raw_mask': np.float32(0.5203424), 'dino_score_normal': np.float32(0.59508777), 'dino_score_all_steps': np.float32(0.5203424), 'text_score_unmasked': tensor(0.2970), 'text_score_seg_mask': tensor(0.2922), 'text_score_raw_mask': tensor(0.2964), 'text_score_normal': tensor(0.3153), 'text_score_all_steps': tensor(0.2964), 'image_score_unmasked': np.float32(0.68481433), 'image_score_seg_mask': np.float32(0.56055146), 'image_score_raw_mask': np.float32(0.64391804), 'image_score_normal': np.float32(0.65302867), 'image_score_all_steps': np.float32(0.64391804)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.58931065), 'dino_score_seg_mask': np.float32(0.24926782), 'dino_score_raw_mask': np.float32(0.4474935), 'dino_score_normal': np.float32(0.58221364), 'dino_score_all_steps': np.float32(0.4474935), 'text_score_unmasked': tensor(0.2837), 'text_score_seg_mask': tensor(0.2823), 'text_score_raw_mask': tensor(0.2427), 'text_score_normal': tensor(0.2527), 'text_score_all_steps': tensor(0.2427), 'image_score_unmasked': np.float32(0.72663563), 'image_score_seg_mask': np.float32(0.57555974), 'image_score_raw_mask': np.float32(0.72279143), 'image_score_normal': np.float32(0.8086513), 'image_score_all_steps': np.float32(0.72279143)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3897282), 'dino_score_seg_mask': np.float32(0.46755248), 'dino_score_raw_mask': np.float32(0.3673598), 'dino_score_normal': np.float32(0.474666), 'dino_score_all_steps': np.float32(0.3673598), 'text_score_unmasked': tensor(0.2815), 'text_score_seg_mask': tensor(0.3353), 'text_score_raw_mask': tensor(0.3122), 'text_score_normal': tensor(0.2619), 'text_score_all_steps': tensor(0.3122), 'image_score_unmasked': np.float32(0.7427892), 'image_score_seg_mask': np.float32(0.65463126), 'image_score_raw_mask': np.float32(0.6552366), 'image_score_normal': np.float32(0.76966995), 'image_score_all_steps': np.float32(0.6552366)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5490761), 'dino_score_seg_mask': np.float32(0.43632188), 'dino_score_raw_mask': np.float32(0.5162546), 'dino_score_normal': np.float32(0.5729978), 'dino_score_all_steps': np.float32(0.5162546), 'text_score_unmasked': tensor(0.3045), 'text_score_seg_mask': tensor(0.2987), 'text_score_raw_mask': tensor(0.3065), 'text_score_normal': tensor(0.2859), 'text_score_all_steps': tensor(0.3065), 'image_score_unmasked': np.float32(0.7642288), 'image_score_seg_mask': np.float32(0.7030797), 'image_score_raw_mask': np.float32(0.7380558), 'image_score_normal': np.float32(0.7563951), 'image_score_all_steps': np.float32(0.7380558)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.33567291), 'dino_score_seg_mask': np.float32(0.13129476), 'dino_score_raw_mask': np.float32(0.43924278), 'dino_score_normal': np.float32(0.53328705), 'dino_score_all_steps': np.float32(0.43924278), 'text_score_unmasked': tensor(0.2779), 'text_score_seg_mask': tensor(0.2745), 'text_score_raw_mask': tensor(0.3387), 'text_score_normal': tensor(0.2667), 'text_score_all_steps': tensor(0.3387), 'image_score_unmasked': np.float32(0.651394), 'image_score_seg_mask': np.float32(0.6721383), 'image_score_raw_mask': np.float32(0.8257803), 'image_score_normal': np.float32(0.6336842), 'image_score_all_steps': np.float32(0.8257803)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7292169), 'dino_score_seg_mask': np.float32(0.15163766), 'dino_score_raw_mask': np.float32(0.0898042), 'dino_score_normal': np.float32(0.68284076), 'dino_score_all_steps': np.float32(0.0898042), 'text_score_unmasked': tensor(0.2957), 'text_score_seg_mask': tensor(0.3317), 'text_score_raw_mask': tensor(0.2799), 'text_score_normal': tensor(0.2961), 'text_score_all_steps': tensor(0.2799), 'image_score_unmasked': np.float32(0.8497365), 'image_score_seg_mask': np.float32(0.6294142), 'image_score_raw_mask': np.float32(0.5842525), 'image_score_normal': np.float32(0.846112), 'image_score_all_steps': np.float32(0.5842525)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.37216246), 'dino_score_seg_mask': np.float32(0.3538066), 'dino_score_raw_mask': np.float32(0.6037557), 'dino_score_normal': np.float32(0.42938593), 'dino_score_all_steps': np.float32(0.6037557), 'text_score_unmasked': tensor(0.2665), 'text_score_seg_mask': tensor(0.3175), 'text_score_raw_mask': tensor(0.3274), 'text_score_normal': tensor(0.2628), 'text_score_all_steps': tensor(0.3274), 'image_score_unmasked': np.float32(0.6997441), 'image_score_seg_mask': np.float32(0.76673263), 'image_score_raw_mask': np.float32(0.89055955), 'image_score_normal': np.float32(0.7270526), 'image_score_all_steps': np.float32(0.89055955)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.33060357), 'dino_score_seg_mask': np.float32(0.5119195), 'dino_score_raw_mask': np.float32(0.36019325), 'dino_score_normal': np.float32(0.38957572), 'dino_score_all_steps': np.float32(0.36019325), 'text_score_unmasked': tensor(0.3057), 'text_score_seg_mask': tensor(0.3081), 'text_score_raw_mask': tensor(0.3032), 'text_score_normal': tensor(0.2947), 'text_score_all_steps': tensor(0.3032), 'image_score_unmasked': np.float32(0.73628616), 'image_score_seg_mask': np.float32(0.79851186), 'image_score_raw_mask': np.float32(0.76551753), 'image_score_normal': np.float32(0.70074), 'image_score_all_steps': np.float32(0.76551753)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5157021), 'dino_score_seg_mask': np.float32(0.42062414), 'dino_score_raw_mask': np.float32(0.26467836), 'dino_score_normal': np.float32(0.34217542), 'dino_score_all_steps': np.float32(0.26467836), 'text_score_unmasked': tensor(0.3134), 'text_score_seg_mask': tensor(0.3462), 'text_score_raw_mask': tensor(0.3368), 'text_score_normal': tensor(0.2460), 'text_score_all_steps': tensor(0.3368), 'image_score_unmasked': np.float32(0.6328522), 'image_score_seg_mask': np.float32(0.75612223), 'image_score_raw_mask': np.float32(0.73143554), 'image_score_normal': np.float32(0.561005), 'image_score_all_steps': np.float32(0.73143554)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4117398), 'dino_score_seg_mask': np.float32(0.4398457), 'dino_score_raw_mask': np.float32(0.34139073), 'dino_score_normal': np.float32(0.51497984), 'dino_score_all_steps': np.float32(0.34139073), 'text_score_unmasked': tensor(0.2836), 'text_score_seg_mask': tensor(0.3146), 'text_score_raw_mask': tensor(0.2948), 'text_score_normal': tensor(0.2826), 'text_score_all_steps': tensor(0.2948), 'image_score_unmasked': np.float32(0.7226949), 'image_score_seg_mask': np.float32(0.7524119), 'image_score_raw_mask': np.float32(0.7781224), 'image_score_normal': np.float32(0.790828), 'image_score_all_steps': np.float32(0.7781224)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.58843315), 'dino_score_seg_mask': np.float32(0.6745082), 'dino_score_raw_mask': np.float32(0.70004326), 'dino_score_normal': np.float32(0.5548494), 'dino_score_all_steps': np.float32(0.70004326), 'text_score_unmasked': tensor(0.3313), 'text_score_seg_mask': tensor(0.3562), 'text_score_raw_mask': tensor(0.3551), 'text_score_normal': tensor(0.3228), 'text_score_all_steps': tensor(0.3551), 'image_score_unmasked': np.float32(0.76496863), 'image_score_seg_mask': np.float32(0.8006649), 'image_score_raw_mask': np.float32(0.8037504), 'image_score_normal': np.float32(0.7785914), 'image_score_all_steps': np.float32(0.8037504)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5248117), 'dino_score_seg_mask': np.float32(0.4341232), 'dino_score_raw_mask': np.float32(0.48858172), 'dino_score_normal': np.float32(0.5270703), 'dino_score_all_steps': np.float32(0.48858172), 'text_score_unmasked': tensor(0.3037), 'text_score_seg_mask': tensor(0.3084), 'text_score_raw_mask': tensor(0.3405), 'text_score_normal': tensor(0.3154), 'text_score_all_steps': tensor(0.3405), 'image_score_unmasked': np.float32(0.7610189), 'image_score_seg_mask': np.float32(0.69192076), 'image_score_raw_mask': np.float32(0.7433464), 'image_score_normal': np.float32(0.79036474), 'image_score_all_steps': np.float32(0.7433464)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5002267), 'dino_score_seg_mask': np.float32(0.4867537), 'dino_score_raw_mask': np.float32(0.50846136), 'dino_score_normal': np.float32(0.6329452), 'dino_score_all_steps': np.float32(0.50846136), 'text_score_unmasked': tensor(0.2458), 'text_score_seg_mask': tensor(0.2683), 'text_score_raw_mask': tensor(0.2984), 'text_score_normal': tensor(0.2659), 'text_score_all_steps': tensor(0.2984), 'image_score_unmasked': np.float32(0.65227085), 'image_score_seg_mask': np.float32(0.5412203), 'image_score_raw_mask': np.float32(0.54618007), 'image_score_normal': np.float32(0.7852042), 'image_score_all_steps': np.float32(0.54618007)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3887955), 'dino_score_seg_mask': np.float32(0.19840133), 'dino_score_raw_mask': np.float32(0.40313518), 'dino_score_normal': np.float32(0.37822893), 'dino_score_all_steps': np.float32(0.40313518), 'text_score_unmasked': tensor(0.3030), 'text_score_seg_mask': tensor(0.3358), 'text_score_raw_mask': tensor(0.3052), 'text_score_normal': tensor(0.3088), 'text_score_all_steps': tensor(0.3052), 'image_score_unmasked': np.float32(0.7693774), 'image_score_seg_mask': np.float32(0.6193906), 'image_score_raw_mask': np.float32(0.7259369), 'image_score_normal': np.float32(0.78542066), 'image_score_all_steps': np.float32(0.7259369)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3162466), 'dino_score_seg_mask': np.float32(0.36307272), 'dino_score_raw_mask': np.float32(0.3815629), 'dino_score_normal': np.float32(0.42588794), 'dino_score_all_steps': np.float32(0.3815629), 'text_score_unmasked': tensor(0.3015), 'text_score_seg_mask': tensor(0.3049), 'text_score_raw_mask': tensor(0.3480), 'text_score_normal': tensor(0.2782), 'text_score_all_steps': tensor(0.3480), 'image_score_unmasked': np.float32(0.70683175), 'image_score_seg_mask': np.float32(0.61599195), 'image_score_raw_mask': np.float32(0.7380202), 'image_score_normal': np.float32(0.74066806), 'image_score_all_steps': np.float32(0.7380202)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6155883), 'dino_score_seg_mask': np.float32(0.5545149), 'dino_score_raw_mask': np.float32(0.5742438), 'dino_score_normal': np.float32(0.6207473), 'dino_score_all_steps': np.float32(0.5742438), 'text_score_unmasked': tensor(0.3199), 'text_score_seg_mask': tensor(0.2984), 'text_score_raw_mask': tensor(0.3208), 'text_score_normal': tensor(0.2938), 'text_score_all_steps': tensor(0.3208), 'image_score_unmasked': np.float32(0.74781805), 'image_score_seg_mask': np.float32(0.6672428), 'image_score_raw_mask': np.float32(0.7154521), 'image_score_normal': np.float32(0.7448201), 'image_score_all_steps': np.float32(0.7154521)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.60268444), 'dino_score_seg_mask': np.float32(0.60275865), 'dino_score_raw_mask': np.float32(0.6209547), 'dino_score_normal': np.float32(0.6544518), 'dino_score_all_steps': np.float32(0.6209547), 'text_score_unmasked': tensor(0.2748), 'text_score_seg_mask': tensor(0.2774), 'text_score_raw_mask': tensor(0.2943), 'text_score_normal': tensor(0.2585), 'text_score_all_steps': tensor(0.2943), 'image_score_unmasked': np.float32(0.79020524), 'image_score_seg_mask': np.float32(0.6929692), 'image_score_raw_mask': np.float32(0.7494678), 'image_score_normal': np.float32(0.75356245), 'image_score_all_steps': np.float32(0.7494678)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4251371), 'dino_score_seg_mask': np.float32(0.4098424), 'dino_score_raw_mask': np.float32(0.50059986), 'dino_score_normal': np.float32(0.5470598), 'dino_score_all_steps': np.float32(0.50059986), 'text_score_unmasked': tensor(0.2989), 'text_score_seg_mask': tensor(0.3382), 'text_score_raw_mask': tensor(0.2652), 'text_score_normal': tensor(0.1994), 'text_score_all_steps': tensor(0.2652), 'image_score_unmasked': np.float32(0.64803183), 'image_score_seg_mask': np.float32(0.64337885), 'image_score_raw_mask': np.float32(0.6857089), 'image_score_normal': np.float32(0.6308058), 'image_score_all_steps': np.float32(0.6857089)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5060587), 'dino_score_seg_mask': np.float32(0.46316165), 'dino_score_raw_mask': np.float32(0.5810441), 'dino_score_normal': np.float32(0.6139343), 'dino_score_all_steps': np.float32(0.5810441), 'text_score_unmasked': tensor(0.2810), 'text_score_seg_mask': tensor(0.2693), 'text_score_raw_mask': tensor(0.2794), 'text_score_normal': tensor(0.2605), 'text_score_all_steps': tensor(0.2794), 'image_score_unmasked': np.float32(0.71948946), 'image_score_seg_mask': np.float32(0.67101663), 'image_score_raw_mask': np.float32(0.74215835), 'image_score_normal': np.float32(0.7520661), 'image_score_all_steps': np.float32(0.74215835)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.32934093), 'dino_score_seg_mask': np.float32(0.23054494), 'dino_score_raw_mask': np.float32(0.5147407), 'dino_score_normal': np.float32(0.5418333), 'dino_score_all_steps': np.float32(0.5147407), 'text_score_unmasked': tensor(0.2730), 'text_score_seg_mask': tensor(0.2441), 'text_score_raw_mask': tensor(0.2633), 'text_score_normal': tensor(0.2440), 'text_score_all_steps': tensor(0.2633), 'image_score_unmasked': np.float32(0.73793066), 'image_score_seg_mask': np.float32(0.64639425), 'image_score_raw_mask': np.float32(0.76214206), 'image_score_normal': np.float32(0.8553658), 'image_score_all_steps': np.float32(0.76214206)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7212088), 'dino_score_seg_mask': np.float32(0.42987353), 'dino_score_raw_mask': np.float32(0.6890838), 'dino_score_normal': np.float32(0.67186475), 'dino_score_all_steps': np.float32(0.6890838), 'text_score_unmasked': tensor(0.3050), 'text_score_seg_mask': tensor(0.3513), 'text_score_raw_mask': tensor(0.3129), 'text_score_normal': tensor(0.3003), 'text_score_all_steps': tensor(0.3129), 'image_score_unmasked': np.float32(0.84203), 'image_score_seg_mask': np.float32(0.7457388), 'image_score_raw_mask': np.float32(0.87587726), 'image_score_normal': np.float32(0.88415354), 'image_score_all_steps': np.float32(0.87587726)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5457009), 'dino_score_seg_mask': np.float32(0.49842343), 'dino_score_raw_mask': np.float32(0.5494226), 'dino_score_normal': np.float32(0.67296696), 'dino_score_all_steps': np.float32(0.5494226), 'text_score_unmasked': tensor(0.3222), 'text_score_seg_mask': tensor(0.3137), 'text_score_raw_mask': tensor(0.3010), 'text_score_normal': tensor(0.2646), 'text_score_all_steps': tensor(0.3010), 'image_score_unmasked': np.float32(0.8067075), 'image_score_seg_mask': np.float32(0.78469706), 'image_score_raw_mask': np.float32(0.8116082), 'image_score_normal': np.float32(0.88359475), 'image_score_all_steps': np.float32(0.8116082)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4795502), 'dino_score_seg_mask': np.float32(0.38394699), 'dino_score_raw_mask': np.float32(0.47698402), 'dino_score_normal': np.float32(0.6628759), 'dino_score_all_steps': np.float32(0.47698402), 'text_score_unmasked': tensor(0.2958), 'text_score_seg_mask': tensor(0.2975), 'text_score_raw_mask': tensor(0.2768), 'text_score_normal': tensor(0.2792), 'text_score_all_steps': tensor(0.2768), 'image_score_unmasked': np.float32(0.7736862), 'image_score_seg_mask': np.float32(0.7389691), 'image_score_raw_mask': np.float32(0.79816115), 'image_score_normal': np.float32(0.8380456), 'image_score_all_steps': np.float32(0.79816115)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5508391), 'dino_score_seg_mask': np.float32(0.41308805), 'dino_score_raw_mask': np.float32(0.5247411), 'dino_score_normal': np.float32(0.74318284), 'dino_score_all_steps': np.float32(0.5247411), 'text_score_unmasked': tensor(0.3139), 'text_score_seg_mask': tensor(0.3490), 'text_score_raw_mask': tensor(0.3147), 'text_score_normal': tensor(0.2617), 'text_score_all_steps': tensor(0.3147), 'image_score_unmasked': np.float32(0.77918303), 'image_score_seg_mask': np.float32(0.7253649), 'image_score_raw_mask': np.float32(0.78477263), 'image_score_normal': np.float32(0.86322665), 'image_score_all_steps': np.float32(0.78477263)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.60708565), 'dino_score_seg_mask': np.float32(0.39304414), 'dino_score_raw_mask': np.float32(0.5807502), 'dino_score_normal': np.float32(0.64798415), 'dino_score_all_steps': np.float32(0.5807502), 'text_score_unmasked': tensor(0.3166), 'text_score_seg_mask': tensor(0.3528), 'text_score_raw_mask': tensor(0.3472), 'text_score_normal': tensor(0.2823), 'text_score_all_steps': tensor(0.3472), 'image_score_unmasked': np.float32(0.84571624), 'image_score_seg_mask': np.float32(0.73304725), 'image_score_raw_mask': np.float32(0.6914279), 'image_score_normal': np.float32(0.891542), 'image_score_all_steps': np.float32(0.6914279)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.47844428), 'dino_score_seg_mask': np.float32(-0.039270557), 'dino_score_raw_mask': np.float32(0.35717332), 'dino_score_normal': np.float32(0.4984929), 'dino_score_all_steps': np.float32(0.35717332), 'text_score_unmasked': tensor(0.3034), 'text_score_seg_mask': tensor(0.2863), 'text_score_raw_mask': tensor(0.3437), 'text_score_normal': tensor(0.2687), 'text_score_all_steps': tensor(0.3437), 'image_score_unmasked': np.float32(0.79025126), 'image_score_seg_mask': np.float32(0.54913926), 'image_score_raw_mask': np.float32(0.6531937), 'image_score_normal': np.float32(0.8270951), 'image_score_all_steps': np.float32(0.6531937)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5733366), 'dino_score_seg_mask': np.float32(0.6049147), 'dino_score_raw_mask': np.float32(0.5612136), 'dino_score_normal': np.float32(0.59446), 'dino_score_all_steps': np.float32(0.5612136), 'text_score_unmasked': tensor(0.3045), 'text_score_seg_mask': tensor(0.3301), 'text_score_raw_mask': tensor(0.3225), 'text_score_normal': tensor(0.2829), 'text_score_all_steps': tensor(0.3225), 'image_score_unmasked': np.float32(0.75108004), 'image_score_seg_mask': np.float32(0.7634591), 'image_score_raw_mask': np.float32(0.78855115), 'image_score_normal': np.float32(0.73482573), 'image_score_all_steps': np.float32(0.78855115)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.57550323), 'dino_score_seg_mask': np.float32(0.4370717), 'dino_score_raw_mask': np.float32(0.53324753), 'dino_score_normal': np.float32(0.6016907), 'dino_score_all_steps': np.float32(0.53324753), 'text_score_unmasked': tensor(0.2868), 'text_score_seg_mask': tensor(0.3062), 'text_score_raw_mask': tensor(0.2944), 'text_score_normal': tensor(0.2541), 'text_score_all_steps': tensor(0.2944), 'image_score_unmasked': np.float32(0.7241485), 'image_score_seg_mask': np.float32(0.70125985), 'image_score_raw_mask': np.float32(0.72692865), 'image_score_normal': np.float32(0.80094147), 'image_score_all_steps': np.float32(0.72692865)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.51341325), 'dino_score_seg_mask': np.float32(0.49753538), 'dino_score_raw_mask': np.float32(0.5740471), 'dino_score_normal': np.float32(0.72083366), 'dino_score_all_steps': np.float32(0.5740471), 'text_score_unmasked': tensor(0.3296), 'text_score_seg_mask': tensor(0.3422), 'text_score_raw_mask': tensor(0.3729), 'text_score_normal': tensor(0.2865), 'text_score_all_steps': tensor(0.3729), 'image_score_unmasked': np.float32(0.6549967), 'image_score_seg_mask': np.float32(0.643741), 'image_score_raw_mask': np.float32(0.7190838), 'image_score_normal': np.float32(0.7909045), 'image_score_all_steps': np.float32(0.7190838)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5958266), 'dino_score_seg_mask': np.float32(0.46570307), 'dino_score_raw_mask': np.float32(0.5801039), 'dino_score_normal': np.float32(0.6471103), 'dino_score_all_steps': np.float32(0.5801039), 'text_score_unmasked': tensor(0.2510), 'text_score_seg_mask': tensor(0.2996), 'text_score_raw_mask': tensor(0.2601), 'text_score_normal': tensor(0.2566), 'text_score_all_steps': tensor(0.2601), 'image_score_unmasked': np.float32(0.724635), 'image_score_seg_mask': np.float32(0.64658827), 'image_score_raw_mask': np.float32(0.7376427), 'image_score_normal': np.float32(0.7714092), 'image_score_all_steps': np.float32(0.7376427)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.78588843), 'dino_score_seg_mask': np.float32(0.8049164), 'dino_score_raw_mask': np.float32(0.7983111), 'dino_score_normal': np.float32(0.78840274), 'dino_score_all_steps': np.float32(0.7983111), 'text_score_unmasked': tensor(0.2866), 'text_score_seg_mask': tensor(0.2477), 'text_score_raw_mask': tensor(0.2582), 'text_score_normal': tensor(0.2768), 'text_score_all_steps': tensor(0.2582), 'image_score_unmasked': np.float32(0.7915146), 'image_score_seg_mask': np.float32(0.7824124), 'image_score_raw_mask': np.float32(0.76999784), 'image_score_normal': np.float32(0.76582444), 'image_score_all_steps': np.float32(0.76999784)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.74904144), 'dino_score_seg_mask': np.float32(0.83587694), 'dino_score_raw_mask': np.float32(0.7625035), 'dino_score_normal': np.float32(0.7789779), 'dino_score_all_steps': np.float32(0.7625035), 'text_score_unmasked': tensor(0.2706), 'text_score_seg_mask': tensor(0.2673), 'text_score_raw_mask': tensor(0.3043), 'text_score_normal': tensor(0.2616), 'text_score_all_steps': tensor(0.3043), 'image_score_unmasked': np.float32(0.83408093), 'image_score_seg_mask': np.float32(0.8605794), 'image_score_raw_mask': np.float32(0.8597485), 'image_score_normal': np.float32(0.8602925), 'image_score_all_steps': np.float32(0.8597485)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7551513), 'dino_score_seg_mask': np.float32(0.45177695), 'dino_score_raw_mask': np.float32(0.72878927), 'dino_score_normal': np.float32(0.7600622), 'dino_score_all_steps': np.float32(0.72878927), 'text_score_unmasked': tensor(0.2435), 'text_score_seg_mask': tensor(0.3006), 'text_score_raw_mask': tensor(0.2540), 'text_score_normal': tensor(0.2639), 'text_score_all_steps': tensor(0.2540), 'image_score_unmasked': np.float32(0.79058784), 'image_score_seg_mask': np.float32(0.72981143), 'image_score_raw_mask': np.float32(0.83504134), 'image_score_normal': np.float32(0.7848056), 'image_score_all_steps': np.float32(0.83504134)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.50273585), 'dino_score_seg_mask': np.float32(0.6006385), 'dino_score_raw_mask': np.float32(0.5785731), 'dino_score_normal': np.float32(0.57621217), 'dino_score_all_steps': np.float32(0.5785731), 'text_score_unmasked': tensor(0.2911), 'text_score_seg_mask': tensor(0.2957), 'text_score_raw_mask': tensor(0.2895), 'text_score_normal': tensor(0.2764), 'text_score_all_steps': tensor(0.2895), 'image_score_unmasked': np.float32(0.673901), 'image_score_seg_mask': np.float32(0.68628407), 'image_score_raw_mask': np.float32(0.6705777), 'image_score_normal': np.float32(0.68106604), 'image_score_all_steps': np.float32(0.6705777)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.7046329), 'dino_score_seg_mask': np.float32(0.5597849), 'dino_score_raw_mask': np.float32(0.66129184), 'dino_score_normal': np.float32(0.72939265), 'dino_score_all_steps': np.float32(0.66129184), 'text_score_unmasked': tensor(0.2987), 'text_score_seg_mask': tensor(0.3193), 'text_score_raw_mask': tensor(0.3076), 'text_score_normal': tensor(0.2827), 'text_score_all_steps': tensor(0.3076), 'image_score_unmasked': np.float32(0.85923946), 'image_score_seg_mask': np.float32(0.7651193), 'image_score_raw_mask': np.float32(0.79883456), 'image_score_normal': np.float32(0.85589826), 'image_score_all_steps': np.float32(0.79883456)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6350851), 'dino_score_seg_mask': np.float32(0.5152213), 'dino_score_raw_mask': np.float32(0.6064397), 'dino_score_normal': np.float32(0.68653643), 'dino_score_all_steps': np.float32(0.6064397), 'text_score_unmasked': tensor(0.3232), 'text_score_seg_mask': tensor(0.3561), 'text_score_raw_mask': tensor(0.3679), 'text_score_normal': tensor(0.2798), 'text_score_all_steps': tensor(0.3679), 'image_score_unmasked': np.float32(0.81674373), 'image_score_seg_mask': np.float32(0.7824483), 'image_score_raw_mask': np.float32(0.8147841), 'image_score_normal': np.float32(0.90832984), 'image_score_all_steps': np.float32(0.8147841)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5889448), 'dino_score_seg_mask': np.float32(0.5261915), 'dino_score_raw_mask': np.float32(0.58888584), 'dino_score_normal': np.float32(0.5650894), 'dino_score_all_steps': np.float32(0.58888584), 'text_score_unmasked': tensor(0.2806), 'text_score_seg_mask': tensor(0.3775), 'text_score_raw_mask': tensor(0.3864), 'text_score_normal': tensor(0.2730), 'text_score_all_steps': tensor(0.3864), 'image_score_unmasked': np.float32(0.8562263), 'image_score_seg_mask': np.float32(0.7232315), 'image_score_raw_mask': np.float32(0.7185286), 'image_score_normal': np.float32(0.85137624), 'image_score_all_steps': np.float32(0.7185286)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.43035817), 'dino_score_seg_mask': np.float32(0.28013122), 'dino_score_raw_mask': np.float32(0.48660463), 'dino_score_normal': np.float32(0.49420658), 'dino_score_all_steps': np.float32(0.48660463), 'text_score_unmasked': tensor(0.3382), 'text_score_seg_mask': tensor(0.3354), 'text_score_raw_mask': tensor(0.3635), 'text_score_normal': tensor(0.3000), 'text_score_all_steps': tensor(0.3635), 'image_score_unmasked': np.float32(0.8139591), 'image_score_seg_mask': np.float32(0.772272), 'image_score_raw_mask': np.float32(0.80402994), 'image_score_normal': np.float32(0.79672515), 'image_score_all_steps': np.float32(0.80402994)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.26093975), 'dino_score_seg_mask': np.float32(0.21888354), 'dino_score_raw_mask': np.float32(0.2774769), 'dino_score_normal': np.float32(0.3789567), 'dino_score_all_steps': np.float32(0.2774769), 'text_score_unmasked': tensor(0.3524), 'text_score_seg_mask': tensor(0.3737), 'text_score_raw_mask': tensor(0.3664), 'text_score_normal': tensor(0.3524), 'text_score_all_steps': tensor(0.3664), 'image_score_unmasked': np.float32(0.812395), 'image_score_seg_mask': np.float32(0.8345989), 'image_score_raw_mask': np.float32(0.8195655), 'image_score_normal': np.float32(0.893114), 'image_score_all_steps': np.float32(0.8195655)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.67699826), 'dino_score_seg_mask': np.float32(0.7263782), 'dino_score_raw_mask': np.float32(0.74612296), 'dino_score_normal': np.float32(0.71522105), 'dino_score_all_steps': np.float32(0.74612296), 'text_score_unmasked': tensor(0.3694), 'text_score_seg_mask': tensor(0.3709), 'text_score_raw_mask': tensor(0.3682), 'text_score_normal': tensor(0.3653), 'text_score_all_steps': tensor(0.3682), 'image_score_unmasked': np.float32(0.8248076), 'image_score_seg_mask': np.float32(0.81755733), 'image_score_raw_mask': np.float32(0.8241602), 'image_score_normal': np.float32(0.8483235), 'image_score_all_steps': np.float32(0.8241602)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.55152464), 'dino_score_seg_mask': np.float32(0.447057), 'dino_score_raw_mask': np.float32(0.5253781), 'dino_score_normal': np.float32(0.54507494), 'dino_score_all_steps': np.float32(0.5253781), 'text_score_unmasked': tensor(0.3108), 'text_score_seg_mask': tensor(0.3689), 'text_score_raw_mask': tensor(0.3607), 'text_score_normal': tensor(0.3281), 'text_score_all_steps': tensor(0.3607), 'image_score_unmasked': np.float32(0.85836434), 'image_score_seg_mask': np.float32(0.7442527), 'image_score_raw_mask': np.float32(0.83738375), 'image_score_normal': np.float32(0.7877418), 'image_score_all_steps': np.float32(0.83738375)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5341644), 'dino_score_seg_mask': np.float32(0.31406367), 'dino_score_raw_mask': np.float32(0.5740217), 'dino_score_normal': np.float32(0.54434115), 'dino_score_all_steps': np.float32(0.5740217), 'text_score_unmasked': tensor(0.3168), 'text_score_seg_mask': tensor(0.3100), 'text_score_raw_mask': tensor(0.2788), 'text_score_normal': tensor(0.2762), 'text_score_all_steps': tensor(0.2788), 'image_score_unmasked': np.float32(0.7884703), 'image_score_seg_mask': np.float32(0.6670582), 'image_score_raw_mask': np.float32(0.8064443), 'image_score_normal': np.float32(0.79775536), 'image_score_all_steps': np.float32(0.8064443)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.6776516), 'dino_score_seg_mask': np.float32(0.46719185), 'dino_score_raw_mask': np.float32(0.59555644), 'dino_score_normal': np.float32(0.6541062), 'dino_score_all_steps': np.float32(0.59555644), 'text_score_unmasked': tensor(0.2904), 'text_score_seg_mask': tensor(0.3768), 'text_score_raw_mask': tensor(0.3568), 'text_score_normal': tensor(0.2704), 'text_score_all_steps': tensor(0.3568), 'image_score_unmasked': np.float32(0.8746842), 'image_score_seg_mask': np.float32(0.7211901), 'image_score_raw_mask': np.float32(0.78351223), 'image_score_normal': np.float32(0.8766911), 'image_score_all_steps': np.float32(0.78351223)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.3909523), 'dino_score_seg_mask': np.float32(0.27592146), 'dino_score_raw_mask': np.float32(0.3363824), 'dino_score_normal': np.float32(0.5045142), 'dino_score_all_steps': np.float32(0.3363824), 'text_score_unmasked': tensor(0.3083), 'text_score_seg_mask': tensor(0.3499), 'text_score_raw_mask': tensor(0.3659), 'text_score_normal': tensor(0.3254), 'text_score_all_steps': tensor(0.3659), 'image_score_unmasked': np.float32(0.87368685), 'image_score_seg_mask': np.float32(0.71803993), 'image_score_raw_mask': np.float32(0.708524), 'image_score_normal': np.float32(0.8583886), 'image_score_all_steps': np.float32(0.708524)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.54254687), 'dino_score_seg_mask': np.float32(0.44369394), 'dino_score_raw_mask': np.float32(0.61339355), 'dino_score_normal': np.float32(0.54324716), 'dino_score_all_steps': np.float32(0.61339355), 'text_score_unmasked': tensor(0.3268), 'text_score_seg_mask': tensor(0.3672), 'text_score_raw_mask': tensor(0.3247), 'text_score_normal': tensor(0.2923), 'text_score_all_steps': tensor(0.3247), 'image_score_unmasked': np.float32(0.7603672), 'image_score_seg_mask': np.float32(0.6934364), 'image_score_raw_mask': np.float32(0.8378155), 'image_score_normal': np.float32(0.853352), 'image_score_all_steps': np.float32(0.8378155)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.5130881), 'dino_score_seg_mask': np.float32(0.3248903), 'dino_score_raw_mask': np.float32(0.4823984), 'dino_score_normal': np.float32(0.49447078), 'dino_score_all_steps': np.float32(0.4823984), 'text_score_unmasked': tensor(0.2743), 'text_score_seg_mask': tensor(0.3543), 'text_score_raw_mask': tensor(0.3121), 'text_score_normal': tensor(0.2601), 'text_score_all_steps': tensor(0.3121), 'image_score_unmasked': np.float32(0.87593764), 'image_score_seg_mask': np.float32(0.6717826), 'image_score_raw_mask': np.float32(0.7732905), 'image_score_normal': np.float32(0.9021982), 'image_score_all_steps': np.float32(0.7732905)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.42714667), 'dino_score_seg_mask': np.float32(0.2952571), 'dino_score_raw_mask': np.float32(0.40351495), 'dino_score_normal': np.float32(0.62822926), 'dino_score_all_steps': np.float32(0.40351495), 'text_score_unmasked': tensor(0.3341), 'text_score_seg_mask': tensor(0.3281), 'text_score_raw_mask': tensor(0.3655), 'text_score_normal': tensor(0.3111), 'text_score_all_steps': tensor(0.3655), 'image_score_unmasked': np.float32(0.66790307), 'image_score_seg_mask': np.float32(0.53672886), 'image_score_raw_mask': np.float32(0.5904475), 'image_score_normal': np.float32(0.7303027), 'image_score_all_steps': np.float32(0.5904475)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.45959586), 'dino_score_seg_mask': np.float32(0.3877079), 'dino_score_raw_mask': np.float32(0.42570603), 'dino_score_normal': np.float32(0.5924685), 'dino_score_all_steps': np.float32(0.42570603), 'text_score_unmasked': tensor(0.3218), 'text_score_seg_mask': tensor(0.3326), 'text_score_raw_mask': tensor(0.3487), 'text_score_normal': tensor(0.3081), 'text_score_all_steps': tensor(0.3487), 'image_score_unmasked': np.float32(0.7348325), 'image_score_seg_mask': np.float32(0.718753), 'image_score_raw_mask': np.float32(0.7583939), 'image_score_normal': np.float32(0.848896), 'image_score_all_steps': np.float32(0.7583939)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.47755796), 'dino_score_seg_mask': np.float32(0.36381066), 'dino_score_raw_mask': np.float32(0.5475495), 'dino_score_normal': np.float32(0.5693882), 'dino_score_all_steps': np.float32(0.5475495), 'text_score_unmasked': tensor(0.3774), 'text_score_seg_mask': tensor(0.3716), 'text_score_raw_mask': tensor(0.3988), 'text_score_normal': tensor(0.4025), 'text_score_all_steps': tensor(0.3988), 'image_score_unmasked': np.float32(0.7135846), 'image_score_seg_mask': np.float32(0.6485024), 'image_score_raw_mask': np.float32(0.70550096), 'image_score_normal': np.float32(0.7964878), 'image_score_all_steps': np.float32(0.70550096)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.4692505), 'dino_score_seg_mask': np.float32(0.18588033), 'dino_score_raw_mask': np.float32(0.5243721), 'dino_score_normal': np.float32(0.5973613), 'dino_score_all_steps': np.float32(0.5243721), 'text_score_unmasked': tensor(0.2867), 'text_score_seg_mask': tensor(0.3408), 'text_score_raw_mask': tensor(0.3328), 'text_score_normal': tensor(0.2982), 'text_score_all_steps': tensor(0.3328), 'image_score_unmasked': np.float32(0.7320311), 'image_score_seg_mask': np.float32(0.66414535), 'image_score_raw_mask': np.float32(0.78747654), 'image_score_normal': np.float32(0.85080063), 'image_score_all_steps': np.float32(0.78747654)}
+inital image
+mask step list [2, 3, 4, 5]
+scale step dict {0: 0, 1: 0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0, 7: 0}
+final image raw mask
+popped {}
+popped {}
+popped {}
+popped {}
+final image unmasked
+final_image_normal
+final_image_all_steps
+all steps  [0, 1, 2, 3, 4, 5, 6, 7] {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0}
+final_image_seg_mask
+popped {}
+popped {}
+popped {}
+popped {}
+{'dino_score_unmasked': np.float32(0.45297006), 'dino_score_seg_mask': np.float32(0.35636094), 'dino_score_raw_mask': np.float32(0.5468813), 'dino_score_normal': np.float32(0.517529), 'dino_score_all_steps': np.float32(0.5468813), 'text_score_unmasked': tensor(0.3168), 'text_score_seg_mask': tensor(0.3454), 'text_score_raw_mask': tensor(0.3480), 'text_score_normal': tensor(0.3764), 'text_score_all_steps': tensor(0.3480), 'image_score_unmasked': np.float32(0.71729845), 'image_score_seg_mask': np.float32(0.67406285), 'image_score_raw_mask': np.float32(0.7246225), 'image_score_normal': np.float32(0.7724633), 'image_score_all_steps': np.float32(0.7246225)}
+Average Scores:
+15
+dino_score_unmasked 0.5570032596588135
+dino_score_seg_mask 0.3677600026130676
+dino_score_raw_mask 0.5292467474937439
+dino_score_normal 0.6214754581451416
+dino_score_all_steps 0.5292467474937439
+text_score_unmasked 0.2984637916088104
+text_score_seg_mask 0.3202049732208252
+text_score_raw_mask 0.3183836042881012
+text_score_normal 0.28243622183799744
+text_score_all_steps 0.3183836042881012
+image_score_unmasked 0.7646015882492065
+image_score_seg_mask 0.6859090328216553
+image_score_raw_mask 0.7434530854225159
+image_score_normal 0.8058999180793762
+image_score_all_steps 0.7434530854225159
+successful generating:) time elapsed: 1544.4235725402832 seconds = 0.4290065479278564 hours
+all done!
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mearthy-fire-98[0m at: [34mhttps://wandb.ai/jlbaker361/seg-ip/runs/pj9x6vos[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../scratch/jlb638/wandb/wandb/run-20251002_085418-pj9x6vos/logs[0m

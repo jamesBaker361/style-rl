@@ -1,0 +1,79 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:04,  1.30it/s]`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  29%|██▊       | 2/7 [00:01<00:04,  1.06it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:02<00:02,  1.45it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:10<00:00,  1.70s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:10<00:00,  1.47s/it]
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:00<00:01,  1.63it/s] 50%|█████     | 2/4 [00:00<00:00,  3.18it/s] 75%|███████▌  | 3/4 [00:00<00:00,  4.57it/s]100%|██████████| 4/4 [00:00<00:00,  5.64it/s]100%|██████████| 4/4 [00:00<00:00,  4.27it/s]
+Traceback (most recent call last):
+  File "/cache/home/jlb638/Desktop/style-rl/ipattn_maps.py", line 297, in <module>
+    segmented=sam(gen_image,dim,dim)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/__init__.py", line 77, in __call__
+    masks = self.mask_generator.generate(input_image)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/automatic_mask_generator.py", line 163, in generate
+    mask_data = self._generate_masks(image)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/automatic_mask_generator.py", line 206, in _generate_masks
+    crop_data = self._process_crop(image, crop_box, layer_idx, orig_size)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/automatic_mask_generator.py", line 236, in _process_crop
+    self.predictor.set_image(cropped_im)
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/predictor.py", line 60, in set_image
+    self.set_torch_image(input_image_torch, image.shape[:2])
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/predictor.py", line 89, in set_torch_image
+    self.features = self.model.image_encoder(input_image)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/image_encoder.py", line 112, in forward
+    x = blk(x)
+        ^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/image_encoder.py", line 174, in forward
+    x = self.attn(x)
+        ^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/image_encoder.py", line 234, in forward
+    attn = add_decomposed_rel_pos(attn, q, self.rel_pos_h, self.rel_pos_w, (H, W), (H, W))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/image_encoder.py", line 358, in add_decomposed_rel_pos
+    attn.view(B, q_h, q_w, k_h, k_w) + rel_h[:, :, :, :, None] + rel_w[:, :, :, None, :]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1024.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 871.62 MiB is free. Including non-PyTorch memory, this process has 9.90 GiB memory in use. Of the allocated memory 9.42 GiB is allocated by PyTorch, and 298.46 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: gpu014: task 0: Exited with exit code 1

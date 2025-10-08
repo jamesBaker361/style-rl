@@ -1,0 +1,32 @@
+README.md: 100%|███████████| 476/476 [00:00<00:00, 161kB/s]
+C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\huggingface_hub\file_download.py:143: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\jlbak\.cache\huggingface\hub\datasets--jlbaker361--tfi2i-dreambooth. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00000-of-00001.parquet: 100%|█| 305M/305M [00:47<00:0
+Generating train split: 100%|█| 158/158 [00:01<00:00, 143.8
+Traceback (most recent call last):
+  File "C:\Users\jlbak\Downloads\style-rl\compare_scores.py", line 74, in <module>
+    main(args)
+  File "C:\Users\jlbak\Downloads\style-rl\compare_scores.py", line 43, in main
+    dataset=load_dataset(d,split="train").cast_column("image",Image).cast_column("augmented_image",Image)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\datasets\fingerprint.py", line 442, in wrapper
+    out = func(dataset, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\datasets\arrow_dataset.py", line 2111, in cast_column
+    dataset._data = dataset._data.cast(dataset.features.arrow_schema)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\datasets\features\features.py", line 1826, in arrow_schema
+    return pa.schema(self.type).with_metadata({"huggingface": json.dumps(hf_metadata)})
+                     ^^^^^^^^^
+  File "C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\datasets\features\features.py", line 1815, in type
+    return get_nested_type(self)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\datasets\features\features.py", line 1252, in get_nested_type
+    return pa.struct(
+           ^^^^^^^^^^
+  File "pyarrow\\types.pxi", line 5406, in pyarrow.lib.struct
+  File "pyarrow\\types.pxi", line 3890, in pyarrow.lib.field
+  File "pyarrow\\types.pxi", line 5918, in pyarrow.lib.ensure_type
+TypeError: DataType expected, got <class 'datasets.features.image.Image'>

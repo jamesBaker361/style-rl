@@ -1,0 +1,49 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /scratch/jlb638/wandb/wandb/run-20250930_232405-stsote9s
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run desert-resonance-94
+wandb: ⭐️ View project at https://wandb.ai/jlbaker361/seg-ip
+wandb: 🚀 View run at https://wandb.ai/jlbaker361/seg-ip/runs/stsote9s
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:01,  2.86it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:02<00:02,  1.25it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:10<00:06,  3.01s/it]Loading pipeline components...:  86%|████████▌ | 6/7 [00:11<00:02,  2.36s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:11<00:00,  1.65s/it]
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:02<00:06,  2.07s/it] 75%|███████▌  | 3/4 [00:02<00:00,  1.68it/s]100%|██████████| 4/4 [00:02<00:00,  1.74it/s]
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torchvision/transforms/functional.py:282: RuntimeWarning: overflow encountered in multiply
+  npimg = (npimg * 255).astype(np.uint8)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/torchvision/transforms/functional.py:282: RuntimeWarning: invalid value encountered in cast
+  npimg = (npimg * 255).astype(np.uint8)
+  0%|          | 0/8 [00:00<?, ?it/s] 25%|██▌       | 2/8 [00:00<00:00, 12.97it/s] 50%|█████     | 4/8 [00:00<00:00,  8.76it/s] 75%|███████▌  | 6/8 [00:00<00:00, 10.00it/s]100%|██████████| 8/8 [00:00<00:00, 11.05it/s]100%|██████████| 8/8 [00:00<00:00, 10.62it/s]
+  0%|          | 0/8 [00:00<?, ?it/s] 25%|██▌       | 2/8 [00:00<00:00, 13.50it/s] 50%|█████     | 4/8 [00:00<00:00, 12.84it/s] 75%|███████▌  | 6/8 [00:00<00:00, 12.65it/s]100%|██████████| 8/8 [00:00<00:00, 12.94it/s]100%|██████████| 8/8 [00:00<00:00, 12.91it/s]
+  0%|          | 0/8 [00:00<?, ?it/s] 25%|██▌       | 2/8 [00:00<00:00, 13.37it/s] 50%|█████     | 4/8 [00:00<00:00, 13.40it/s] 75%|███████▌  | 6/8 [00:00<00:00, 13.41it/s]100%|██████████| 8/8 [00:00<00:00, 13.38it/s]100%|██████████| 8/8 [00:00<00:00, 13.37it/s]
+  0%|          | 0/8 [00:00<?, ?it/s] 25%|██▌       | 2/8 [00:00<00:00, 12.07it/s] 50%|█████     | 4/8 [00:00<00:00, 12.10it/s] 75%|███████▌  | 6/8 [00:00<00:00, 12.12it/s]100%|██████████| 8/8 [00:00<00:00, 12.11it/s]100%|██████████| 8/8 [00:00<00:00, 12.09it/s]
+  0%|          | 0/8 [00:00<?, ?it/s] 25%|██▌       | 2/8 [00:00<00:00, 15.02it/s] 50%|█████     | 4/8 [00:00<00:00, 13.99it/s] 75%|███████▌  | 6/8 [00:00<00:00, 13.71it/s]100%|██████████| 8/8 [00:00<00:00, 14.20it/s]100%|██████████| 8/8 [00:00<00:00, 14.13it/s]
+Traceback (most recent call last):
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 501, in <module>
+    main(args)
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 430, in main
+    score_tracker.update(score_dict)
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 117, in update
+    self.score_list_dict[k].append(v)
+    ~~~~~~~~~~~~~~~~~~~~^^^
+KeyError: '"ir_score_unmasked":ir_score_unmasked,\n                "ir_score_seg_mask":ir_score_seg_mask,\n                "ir_score_raw_mask":ir_score_raw_mask,\n                "ir_score_normal":ir_score_normal,\n                "ir_score_all_steps":ir_score_all_steps,text_score_unmasked'
+srun: error: gpu021: task 0: Exited with exit code 1

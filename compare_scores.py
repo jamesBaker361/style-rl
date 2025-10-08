@@ -94,7 +94,8 @@ def main(args):
         concat=concat_images_horizontally(image_list)
         prompt=rows[0]["prompt"].replace(" ","_")
         accelerator.log({
-            "concat":wandb.Image(concat)
+            "concat":wandb.Image(concat),
+            prompt:wandb.Image(concat)
         })
 
 

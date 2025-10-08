@@ -1,0 +1,22 @@
+TF-I2I & 0.247 & 0.413 & 0.723  \\
+README.md: 100%|█████████████████████████████████████████████████████████████| 477/477 [00:00<?, ?B/s]
+C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\huggingface_hub\file_download.py:143: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\jlbak\.cache\huggingface\hub\datasets--jlbaker361--rect-dreambooth. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00000-of-00001.parquet: 100%|████████████████████████████████| 346M/346M [00:30<00:00, 11.4MB/s]
+Generating train split: 100%|███████████████████████████████| 158/158 [00:00<00:00, 182.69 examples/s]
+RectifID & 0.273 & 0.14 & 0.543  \\
+README.md: 100%|█████████████████████████████████████████████████████| 614/614 [00:00<00:00, 1.18MB/s]
+C:\Users\jlbak\miniconda3\envs\hands0\Lib\site-packages\huggingface_hub\file_download.py:143: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\jlbak\.cache\huggingface\hub\datasets--jlbaker361--masa-dreambooth. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00000-of-00001.parquet: 100%|██████████████████████████████| 33.0M/33.0M [00:18<00:00, 1.80MB/s]
+Generating train split: 100%|██████████████████████████████| 158/158 [00:00<00:00, 3074.77 examples/s]
+MASA & 0.186 & 0.511 & 0.775  \\
+FreeGraftor & 0.253 & 0.471 & 0.679  \\
+IP Base & 0.282 & 0.621 & 0.806  \\
+Monkey & 0.318 & 0.529 & 0.743  \\
+successful generating:) time elapsed: 149.16086792945862 seconds = 0.041433574424849615 hours
+all done!

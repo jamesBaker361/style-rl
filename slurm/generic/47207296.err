@@ -1,0 +1,56 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:08<00:52,  8.80s/it]Loading pipeline components...:  29%|██▊       | 2/7 [00:09<00:18,  3.75s/it]`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  43%|████▎     | 3/7 [00:10<00:10,  2.63s/it]Loading pipeline components...:  57%|█████▋    | 4/7 [00:11<00:06,  2.26s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:13<00:00,  1.09s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:13<00:00,  1.88s/it]
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:02<00:07,  2.36s/it] 75%|███████▌  | 3/4 [00:02<00:00,  1.48it/s]100%|██████████| 4/4 [00:02<00:00,  1.53it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.70it/s]100%|██████████| 4/4 [00:00<00:00, 11.89it/s]100%|██████████| 4/4 [00:00<00:00, 11.86it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.55it/s]100%|██████████| 4/4 [00:00<00:00, 11.66it/s]100%|██████████| 4/4 [00:00<00:00, 11.64it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.72it/s]100%|██████████| 4/4 [00:00<00:00, 12.02it/s]100%|██████████| 4/4 [00:00<00:00, 11.97it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.75it/s]100%|██████████| 4/4 [00:00<00:00, 12.02it/s]100%|██████████| 4/4 [00:00<00:00, 11.97it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.83it/s]100%|██████████| 4/4 [00:00<00:00, 12.01it/s]100%|██████████| 4/4 [00:00<00:00, 11.98it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.69it/s]100%|██████████| 4/4 [00:00<00:00, 11.92it/s]100%|██████████| 4/4 [00:00<00:00, 11.88it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.78it/s]100%|██████████| 4/4 [00:00<00:00, 11.98it/s]100%|██████████| 4/4 [00:00<00:00, 11.94it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.44it/s]100%|██████████| 4/4 [00:00<00:00, 11.67it/s]100%|██████████| 4/4 [00:00<00:00, 11.63it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.76it/s]100%|██████████| 4/4 [00:00<00:00, 12.09it/s]100%|██████████| 4/4 [00:00<00:00, 12.03it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.79it/s]100%|██████████| 4/4 [00:00<00:00, 11.96it/s]100%|██████████| 4/4 [00:00<00:00, 11.93it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.81it/s]100%|██████████| 4/4 [00:00<00:00, 11.98it/s]100%|██████████| 4/4 [00:00<00:00, 11.95it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.48it/s]100%|██████████| 4/4 [00:00<00:00, 11.77it/s]100%|██████████| 4/4 [00:00<00:00, 11.72it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.77it/s]100%|██████████| 4/4 [00:00<00:00, 11.99it/s]100%|██████████| 4/4 [00:00<00:00, 11.95it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.54it/s]100%|██████████| 4/4 [00:00<00:00, 11.73it/s]100%|██████████| 4/4 [00:00<00:00, 11.70it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.42it/s]100%|██████████| 4/4 [00:00<00:00, 11.62it/s]100%|██████████| 4/4 [00:00<00:00, 11.59it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.82it/s]100%|██████████| 4/4 [00:00<00:00, 11.99it/s]100%|██████████| 4/4 [00:00<00:00, 11.96it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.76it/s]100%|██████████| 4/4 [00:00<00:00, 12.03it/s]100%|██████████| 4/4 [00:00<00:00, 11.99it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.79it/s]100%|██████████| 4/4 [00:00<00:00, 12.07it/s]100%|██████████| 4/4 [00:00<00:00, 12.02it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.79it/s]100%|██████████| 4/4 [00:00<00:00, 12.00it/s]100%|██████████| 4/4 [00:00<00:00, 11.97it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.69it/s]100%|██████████| 4/4 [00:00<00:00, 11.99it/s]100%|██████████| 4/4 [00:00<00:00, 11.94it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.46it/s]100%|██████████| 4/4 [00:00<00:00, 11.67it/s]100%|██████████| 4/4 [00:00<00:00, 11.63it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.52it/s]100%|██████████| 4/4 [00:00<00:00, 11.71it/s]100%|██████████| 4/4 [00:00<00:00, 11.67it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.75it/s]100%|██████████| 4/4 [00:00<00:00, 11.97it/s]100%|██████████| 4/4 [00:00<00:00, 11.93it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.77it/s]100%|██████████| 4/4 [00:00<00:00, 11.97it/s]100%|██████████| 4/4 [00:00<00:00, 11.93it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.57it/s]100%|██████████| 4/4 [00:00<00:00, 11.75it/s]100%|██████████| 4/4 [00:00<00:00, 11.71it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.73it/s]100%|██████████| 4/4 [00:00<00:00, 12.00it/s]100%|██████████| 4/4 [00:00<00:00, 11.95it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.69it/s]100%|██████████| 4/4 [00:00<00:00, 11.96it/s]100%|██████████| 4/4 [00:00<00:00, 11.91it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.66it/s]100%|██████████| 4/4 [00:00<00:00, 11.90it/s]100%|██████████| 4/4 [00:00<00:00, 11.85it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.42it/s]100%|██████████| 4/4 [00:00<00:00, 11.59it/s]100%|██████████| 4/4 [00:00<00:00, 11.56it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.69it/s]100%|██████████| 4/4 [00:00<00:00, 11.95it/s]100%|██████████| 4/4 [00:00<00:00, 11.90it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.36it/s]100%|██████████| 4/4 [00:00<00:00, 11.59it/s]100%|██████████| 4/4 [00:00<00:00, 11.55it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.77it/s]100%|██████████| 4/4 [00:00<00:00, 11.87it/s]100%|██████████| 4/4 [00:00<00:00, 11.85it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.73it/s]100%|██████████| 4/4 [00:00<00:00, 11.89it/s]100%|██████████| 4/4 [00:00<00:00, 11.86it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.73it/s]100%|██████████| 4/4 [00:00<00:00, 11.94it/s]100%|██████████| 4/4 [00:00<00:00, 11.91it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 11.77it/s]100%|██████████| 4/4 [00:00<00:00, 12.10it/s]100%|██████████| 4/4 [00:00<00:00, 12.04it/s]

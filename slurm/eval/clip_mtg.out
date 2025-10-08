@@ -1,0 +1,24 @@
+gcc (GCC) 10.3.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SLURMD_NODENAME gpu026
+SBATCH_CLUSTERS doesnt exist
+SBATCH_PARTITION doesnt exist
+SLURM_JOB_PARTITION gpu
+SLURM_NODEID 0
+SLURM_MEM_PER_GPU doesnt exist
+SLURM_MEM_PER_CPU doesnt exist
+SLURM_MEM_PER_NODE 128000
+SLURM_JOB_ID 47231076
+torch.cuda.get_device_name() NVIDIA A100-PCIE-40GB
+torch.cuda.get_device_capability() (8, 0)
+GPU Name: NVIDIA A100-PCIE-40GB
+GPU Memory Total: 40339.3125 MB
+GPU Memory Free: 2509.58056640625 MB
+GPU Memory Used: 5130.0 MB
+Namespace(mixed_precision='fp16', src_dataset='jlbaker361/mtg', dest_dataset='jlbaker361/instruct_clip-mtg', num_inference_steps=20, project_name='baseline', limit=-1, model='instruct_clip', size=256, background=False, object='character')
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mgallant-eon-91[0m at: [34mhttps://wandb.ai/jlbaker361/baseline/runs/xrk7zubu[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../scratch/jlb638/wandb/wandb/run-20251002_084009-xrk7zubu/logs[0m

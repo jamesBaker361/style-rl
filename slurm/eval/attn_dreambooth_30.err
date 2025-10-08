@@ -1,0 +1,44 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /scratch/jlb638/wandb/wandb/run-20251002_142304-0xpe9mpz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run dutiful-frog-107
+wandb: ⭐️ View project at https://wandb.ai/jlbaker361/seg-ip
+wandb: 🚀 View run at https://wandb.ai/jlbaker361/seg-ip/runs/0xpe9mpz
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.06it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:04<00:07,  1.99s/it]Loading pipeline components...:  71%|███████▏  | 5/7 [00:05<00:02,  1.03s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.12it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:06<00:00,  1.02it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:00<00:01,  2.06it/s] 75%|███████▌  | 3/4 [00:00<00:00,  5.54it/s]100%|██████████| 4/4 [00:00<00:00,  5.66it/s]
+Traceback (most recent call last):
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 496, in <module>
+    main(args)
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 211, in main
+    mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 211, in <listcomp>
+    mask=sum([get_mask(args.layer_index,attn_list,step,args.token,args.dim,args.threshold) for step in args.initial_mask_step_list])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cache/home/jlb638/Desktop/style-rl/main_seg.py", line 73, in get_mask
+    processor_kv=module.processor.kv_ip
+                 ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AttnProcessor2_0' object has no attribute 'kv_ip'
+srun: error: gpu016: task 0: Exited with exit code 1

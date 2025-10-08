@@ -1,0 +1,42 @@
+{
+  "os": "Windows-11-10.0.26100-SP0",
+  "python": "CPython 3.12.9",
+  "startedAt": "2025-10-08T02:34:01.286757Z",
+  "args": [
+    "--figure_name",
+    "mtg",
+    "--dataset_list",
+    "jlbaker361/tfi2i-mtg",
+    "jlbaker361/rect-mtg",
+    "jlbaker361/masa-mtg",
+    "jlbaker361/free-mtg",
+    "jlbaker361/ip_1.0_mtg",
+    "jlbaker361/attn-mtg"
+  ],
+  "program": "C:\\Users\\jlbak\\Downloads\\style-rl\\compare_scores.py",
+  "codePath": "compare_scores.py",
+  "git": {
+    "remote": "https://github.com/jamesBaker361/style-rl.git",
+    "commit": "acdc95e73b7697de40a4287843d351a76d3eff9a"
+  },
+  "email": "jlbaker361@gmail.com",
+  "root": "C:\\Users\\jlbak\\Downloads\\style-rl",
+  "host": "james_laptop",
+  "executable": "C:\\Users\\jlbak\\miniconda3\\envs\\hands0\\python.exe",
+  "codePathLocal": "compare_scores.py",
+  "cpu_count": 12,
+  "cpu_count_logical": 14,
+  "disk": {
+    "/": {
+      "total": "2047173718016",
+      "used": "1008994107392"
+    }
+  },
+  "memory": {
+    "total": "33767481344"
+  },
+  "cpu": {
+    "count": 12,
+    "countLogical": 14
+  }
+}

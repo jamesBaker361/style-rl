@@ -1,0 +1,235 @@
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/networkx/utils/backends.py:135: RuntimeWarning: networkx backend defined more than once: nx-loopback
+  backends.update(_get_backends("networkx.backends"))
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.21.0
+wandb: Run data is saved locally in /umbc/ada/donengel/common/wandb/wandb/run-20250919_074036-7e8e1mhm
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run skilled-dew-982
+wandb: ⭐️ View project at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta
+wandb: 🚀 View run at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta/runs/7e8e1mhm
+Keyword arguments {'device': device(type='cuda')} are not expected by CompatibleLatentConsistencyModelPipeline and will be ignored.
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00, 17.92it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00, 18.04it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:00<00:00, 15.61it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:00<00:00, 14.54it/s]
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:33: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(obj, torch.Tensor) and obj.is_cuda:
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:35: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  elif isinstance(obj, torch.nn.Module) and any(p.is_cuda for p in obj.parameters()):
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/gpu_helpers.py:63: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at /pytorch/build/aten/src/ATen/core/TensorBody.h:489.)
+  if obj.grad is not None:
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  30%|██▉       | 22.9MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.4MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|██████▉   | 53.4MB / 76.7MB,  153MB/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  76%|███████▌  | 58.4MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  76%|███████▌  | 58.4MB / 76.7MB, 88.7MB/s  
+New Data Upload                         :  21%|██▏       | 4.99MB / 23.4MB, 12.5MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.7MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.7MB / 76.7MB, 89.6MB/s  
+New Data Upload                         : 100%|█████████▉| 23.3MB / 23.4MB, 38.8MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 53.8MB/s  
+New Data Upload                         : 100%|██████████| 23.4MB / 23.4MB, 23.4MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 38.4MB/s  
+New Data Upload                         : 100%|██████████| 23.4MB / 23.4MB, 16.7MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.3MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.3MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  46%|████▌     | 35.3MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  71%|███████   | 54.1MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  71%|███████   | 54.1MB / 76.7MB, 94.0MB/s  
+New Data Upload                         :   2%|▏         |  554kB / 23.2MB, 2.77MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  85%|████████▍ | 65.2MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  85%|████████▍ | 65.2MB / 76.7MB, 74.7MB/s  
+New Data Upload                         :  50%|█████     | 11.6MB / 23.2MB, 29.1MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  99%|█████████▉| 76.3MB / 76.7MB, 68.3MB/s  
+New Data Upload                         :  98%|█████████▊| 22.7MB / 23.2MB, 37.9MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 41.4MB/s  
+New Data Upload                         : 100%|██████████| 23.2MB / 23.2MB, 23.2MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 34.5MB/s  
+New Data Upload                         : 100%|██████████| 23.2MB / 23.2MB, 19.3MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.2MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.2MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  46%|████▌     | 35.2MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|███████   | 53.8MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|███████   | 53.8MB / 76.7MB, 93.0MB/s  
+New Data Upload                         :   2%|▏         |  555kB / 23.5MB, 2.77MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.5MB / 76.7MB,  103MB/s  
+New Data Upload                         :  99%|█████████▉| 23.3MB / 23.5MB, 58.2MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 52.0MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 29.4MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 34.6MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 19.6MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  30%|██▉       | 22.9MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.4MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|██████▉   | 53.4MB / 76.7MB,  153MB/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  73%|███████▎  | 56.1MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  73%|███████▎  | 56.1MB / 76.7MB, 83.2MB/s  
+New Data Upload                         :  12%|█▏        | 2.78MB / 23.4MB, 6.95MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  80%|███████▉  | 61.1MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  80%|███████▉  | 61.1MB / 76.7MB, 63.8MB/s  
+New Data Upload                         :  33%|███▎      | 7.77MB / 23.4MB, 13.0MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  88%|████████▊ | 67.2MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  88%|████████▊ | 67.2MB / 76.7MB, 55.4MB/s  
+New Data Upload                         :  59%|█████▉    | 13.9MB / 23.4MB, 17.3MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  97%|█████████▋| 74.4MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  97%|█████████▋| 74.4MB / 76.7MB, 51.5MB/s  
+New Data Upload                         :  90%|█████████ | 21.1MB / 23.4MB, 21.1MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.7MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.7MB / 76.7MB, 44.8MB/s  
+New Data Upload                         : 100%|█████████▉| 23.3MB / 23.4MB, 19.4MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 33.6MB/s  
+New Data Upload                         : 100%|██████████| 23.4MB / 23.4MB, 14.6MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 29.9MB/s  
+New Data Upload                         : 100%|██████████| 23.4MB / 23.4MB, 13.0MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.2MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.2MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  46%|████▌     | 35.2MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.7MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|██████▉   | 53.7MB / 76.7MB, 92.7MB/s  
+New Data Upload                         :   2%|▏         |  555kB / 23.6MB, 2.78MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.4MB / 76.7MB,  103MB/s  
+New Data Upload                         :  99%|█████████▊| 23.3MB / 23.6MB, 58.2MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 52.0MB/s  
+New Data Upload                         : 100%|██████████| 23.6MB / 23.6MB, 29.5MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 34.6MB/s  
+New Data Upload                         : 100%|██████████| 23.6MB / 23.6MB, 19.7MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.1MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.1MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  46%|████▌     | 35.1MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|███████   | 53.8MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|███████   | 53.8MB / 76.7MB, 93.8MB/s  
+New Data Upload                         :   2%|▏         |  555kB / 23.5MB, 2.77MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  85%|████████▍ | 64.9MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  85%|████████▍ | 64.9MB / 76.7MB, 74.7MB/s  
+New Data Upload                         :  50%|████▉     | 11.6MB / 23.5MB, 29.1MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.5MB / 76.7MB, 69.2MB/s  
+New Data Upload                         :  99%|█████████▉| 23.3MB / 23.5MB, 38.8MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 41.7MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 23.5MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 34.7MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 19.6MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.3MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  46%|████▌     | 35.3MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  46%|████▌     | 35.3MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  70%|███████   | 54.0MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  70%|███████   | 54.0MB / 76.7MB, 93.2MB/s  
+New Data Upload                         :   2%|▏         |  555kB / 23.3MB, 2.77MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  99%|█████████▉| 76.2MB / 76.7MB,  102MB/s  
+New Data Upload                         :  98%|█████████▊| 22.8MB / 23.3MB, 56.9MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 51.7MB/s  
+New Data Upload                         : 100%|██████████| 23.3MB / 23.3MB, 29.1MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 41.4MB/s  
+New Data Upload                         : 100%|██████████| 23.3MB / 23.3MB, 23.3MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)                : |          |  0.00B /  0.00B            
+New Data Upload                         : |          |  0.00B /  0.00B            [A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  22%|██▏       | 16.8MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin:  22%|██▏       | 16.8MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  22%|██▏       | 16.8MB / 76.7MB,   ???B/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  68%|██████▊   | 52.1MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  68%|██████▊   | 52.1MB / 76.7MB,  177MB/s  
+
+  ...1000_identity_lcm_-1/unet_model.bin:  74%|███████▎  | 56.5MB / 76.7MB            [A[AProcessing Files (0 / 1)                :  74%|███████▎  | 56.5MB / 76.7MB, 99.2MB/s  
+New Data Upload                         :  14%|█▍        | 3.33MB / 23.5MB, 8.32MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[AProcessing Files (0 / 1)                : 100%|█████████▉| 76.5MB / 76.7MB, 99.5MB/s  
+New Data Upload                         :  99%|█████████▉| 23.3MB / 23.5MB, 38.9MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 59.9MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 23.5MB/s  [A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)                : 100%|██████████| 76.7MB / 76.7MB, 42.8MB/s  
+New Data Upload                         : 100%|██████████| 23.5MB / 23.5MB, 16.8MB/s  
+  ...1000_identity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            

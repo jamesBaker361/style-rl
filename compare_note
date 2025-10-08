@@ -1,0 +1,2 @@
+python compare_scores.py --figure_name mtg --dataset_list  jlbaker361/tfi2i-mtg jlbaker361/rect-mtg jlbaker361/masa-mtg jlbaker361/free-mtg  jlbaker361/ip_1.0_mtg jlbaker361/attn-mtg
+python compare_scores.py --figure_name dream --dataset_list  jlbaker361/tfi2i-dreambooth jlbaker361/rect-dreambooth jlbaker361/masa-dreambooth jlbaker361/free-dreambooth  jlbaker361/ip_1.0_dreambooth jlbaker361/attn-dreambooth

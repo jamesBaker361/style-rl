@@ -1,0 +1,381 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+The following values were not passed to `accelerate launch` and had defaults used instead:
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: jlbaker361 to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /scratch/jlb638/wandb/wandb/run-20251006_155842-tcwr3oir
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run hardy-violet-1502
+wandb: ⭐️ View project at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta
+wandb: 🚀 View run at https://wandb.ai/jlbaker361/league_captioned_splash-1000-beta/runs/tcwr3oir
+Keyword arguments {'device': device(type='cuda')} are not expected by CompatibleLatentConsistencyModelPipeline and will be ignored.
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:04<00:26,  4.48s/it]Loading pipeline components...:  43%|████▎     | 3/7 [00:05<00:05,  1.42s/it]Loading pipeline components...:  57%|█████▋    | 4/7 [00:05<00:02,  1.00it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:06<00:01,  1.11it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:10<00:00,  1.48s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:10<00:00,  1.46s/it]
+`torch_dtype` is deprecated! Use `dtype` instead!
+/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:33: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(obj, torch.Tensor) and obj.is_cuda:
+/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:35: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  elif isinstance(obj, torch.nn.Module) and any(p.is_cuda for p in obj.parameters()):
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+/cache/home/jlb638/Desktop/style-rl/gpu_helpers.py:63: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at /pytorch/build/aten/src/ATen/core/TensorBody.h:489.)
+  if obj.grad is not None:
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.5MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  15%|█▍        | 11.5MB / 76.7MB, 11.5MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  38%|███▊      | 29.1MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  38%|███▊      | 29.1MB / 76.7MB, 24.2MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  54%|█████▍    | 41.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  54%|█████▍    | 41.3MB / 76.7MB, 29.5MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 53.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 53.0MB / 76.7MB, 33.2MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  71%|███████   | 54.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  71%|███████   | 54.3MB / 76.7MB, 30.2MB/s  
+New Data Upload               :   2%|▏         |  554kB / 23.0MB,  308kB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  89%|████████▉ | 68.2MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  89%|████████▉ | 68.2MB / 76.7MB, 34.1MB/s  
+New Data Upload               :  63%|██████▎   | 14.4MB / 23.0MB, 7.20MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉| 76.5MB / 76.7MB, 34.8MB/s  
+New Data Upload               :  99%|█████████▉| 22.7MB / 23.0MB, 10.3MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.5MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 10.4MB/s  
+New Data Upload               : 100%|██████████| 23.0MB / 23.0MB, 3.10MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 9.84MB/s  
+New Data Upload               : 100%|██████████| 23.0MB / 23.0MB, 2.94MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  30%|██▉       | 22.9MB / 76.7MB,  114MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  46%|████▌     | 35.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  46%|████▌     | 35.0MB / 76.7MB, 87.6MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▊   | 52.7MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▊   | 52.7MB / 76.7MB, 87.9MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   | 53.4MB / 76.7MB, 66.8MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  77%|███████▋  | 59.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  77%|███████▋  | 59.0MB / 76.7MB, 59.0MB/s  
+New Data Upload               :  24%|██▍       | 5.55MB / 23.3MB, 5.55MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  99%|█████████▉| 76.2MB / 76.7MB, 63.5MB/s  
+New Data Upload               :  98%|█████████▊| 22.7MB / 23.3MB, 18.9MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.2MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 18.3MB/s  
+New Data Upload               : 100%|██████████| 23.3MB / 23.3MB, 5.54MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 16.7MB/s  
+New Data Upload               : 100%|██████████| 23.3MB / 23.3MB, 5.06MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:06,  2.78it/s] 10%|█         | 2/20 [00:00<00:03,  4.54it/s] 15%|█▌        | 3/20 [00:00<00:02,  5.78it/s] 20%|██        | 4/20 [00:00<00:02,  6.64it/s] 25%|██▌       | 5/20 [00:00<00:02,  7.25it/s] 30%|███       | 6/20 [00:00<00:01,  7.65it/s] 35%|███▌      | 7/20 [00:01<00:01,  7.96it/s] 40%|████      | 8/20 [00:01<00:01,  8.18it/s] 45%|████▌     | 9/20 [00:01<00:01,  8.51it/s] 55%|█████▌    | 11/20 [00:01<00:00,  9.65it/s] 65%|██████▌   | 13/20 [00:01<00:00, 10.30it/s] 75%|███████▌  | 15/20 [00:01<00:00, 10.71it/s] 85%|████████▌ | 17/20 [00:01<00:00, 10.96it/s] 95%|█████████▌| 19/20 [00:02<00:00, 11.14it/s]100%|██████████| 20/20 [00:02<00:00,  8.91it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.46it/s] 10%|█         | 2/20 [00:00<00:02,  8.59it/s] 15%|█▌        | 3/20 [00:00<00:01,  8.66it/s] 20%|██        | 4/20 [00:00<00:01,  9.02it/s] 30%|███       | 6/20 [00:00<00:01, 10.19it/s] 40%|████      | 8/20 [00:00<00:01, 10.73it/s] 50%|█████     | 10/20 [00:00<00:00, 11.02it/s] 60%|██████    | 12/20 [00:01<00:00, 11.17it/s] 70%|███████   | 14/20 [00:01<00:00, 11.28it/s] 80%|████████  | 16/20 [00:01<00:00, 11.35it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.41it/s]100%|██████████| 20/20 [00:01<00:00, 11.42it/s]100%|██████████| 20/20 [00:01<00:00, 10.85it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.66it/s] 10%|█         | 2/20 [00:00<00:02,  8.76it/s] 15%|█▌        | 3/20 [00:00<00:01,  8.82it/s] 20%|██        | 4/20 [00:00<00:01,  8.88it/s] 30%|███       | 6/20 [00:00<00:01,  9.94it/s] 40%|████      | 8/20 [00:00<00:01, 10.62it/s] 50%|█████     | 10/20 [00:00<00:00, 11.00it/s] 60%|██████    | 12/20 [00:01<00:00, 11.23it/s] 70%|███████   | 14/20 [00:01<00:00, 11.34it/s] 80%|████████  | 16/20 [00:01<00:00, 11.45it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.52it/s]100%|██████████| 20/20 [00:01<00:00, 11.51it/s]100%|██████████| 20/20 [00:01<00:00, 10.89it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.97it/s] 10%|█         | 2/20 [00:00<00:01,  9.07it/s] 15%|█▌        | 3/20 [00:00<00:01,  9.26it/s] 20%|██        | 4/20 [00:00<00:01,  9.51it/s] 30%|███       | 6/20 [00:00<00:01, 10.50it/s] 40%|████      | 8/20 [00:00<00:01, 11.16it/s] 50%|█████     | 10/20 [00:00<00:00, 11.48it/s] 60%|██████    | 12/20 [00:01<00:00, 11.71it/s] 70%|███████   | 14/20 [00:01<00:00, 11.84it/s] 80%|████████  | 16/20 [00:01<00:00, 11.93it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.95it/s]100%|██████████| 20/20 [00:01<00:00, 11.88it/s]100%|██████████| 20/20 [00:01<00:00, 11.35it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.54it/s] 10%|█         | 2/20 [00:00<00:02,  8.64it/s] 15%|█▌        | 3/20 [00:00<00:01,  8.61it/s] 20%|██        | 4/20 [00:00<00:01,  8.70it/s] 30%|███       | 6/20 [00:00<00:01,  9.83it/s] 40%|████      | 8/20 [00:00<00:01, 10.50it/s] 50%|█████     | 10/20 [00:00<00:00, 10.88it/s] 60%|██████    | 12/20 [00:01<00:00, 11.12it/s] 70%|███████   | 14/20 [00:01<00:00, 11.25it/s] 80%|████████  | 16/20 [00:01<00:00, 11.33it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.40it/s]100%|██████████| 20/20 [00:01<00:00, 11.46it/s]100%|██████████| 20/20 [00:01<00:00, 10.79it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.84it/s] 10%|█         | 2/20 [00:00<00:02,  8.93it/s] 15%|█▌        | 3/20 [00:00<00:01,  8.96it/s] 20%|██        | 4/20 [00:00<00:01,  9.11it/s] 30%|███       | 6/20 [00:00<00:01, 10.13it/s] 40%|████      | 8/20 [00:00<00:01, 10.86it/s] 50%|█████     | 10/20 [00:00<00:00, 11.29it/s] 60%|██████    | 12/20 [00:01<00:00, 11.52it/s] 70%|███████   | 14/20 [00:01<00:00, 11.68it/s] 80%|████████  | 16/20 [00:01<00:00, 11.77it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.79it/s]100%|██████████| 20/20 [00:01<00:00, 11.70it/s]100%|██████████| 20/20 [00:01<00:00, 11.13it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  9.36it/s] 10%|█         | 2/20 [00:00<00:01,  9.43it/s] 15%|█▌        | 3/20 [00:00<00:01,  9.30it/s] 20%|██        | 4/20 [00:00<00:01,  9.26it/s] 30%|███       | 6/20 [00:00<00:01, 10.06it/s] 40%|████      | 8/20 [00:00<00:01, 10.82it/s] 50%|█████     | 10/20 [00:00<00:00, 11.21it/s] 60%|██████    | 12/20 [00:01<00:00, 11.50it/s] 70%|███████   | 14/20 [00:01<00:00, 11.64it/s] 80%|████████  | 16/20 [00:01<00:00, 11.81it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.86it/s]100%|██████████| 20/20 [00:01<00:00, 11.84it/s]100%|██████████| 20/20 [00:01<00:00, 11.22it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:02,  8.74it/s] 10%|█         | 2/20 [00:00<00:02,  8.83it/s] 15%|█▌        | 3/20 [00:00<00:01,  8.89it/s] 20%|██        | 4/20 [00:00<00:01,  8.92it/s] 30%|███       | 6/20 [00:00<00:01, 10.03it/s] 40%|████      | 8/20 [00:00<00:01, 10.71it/s] 50%|█████     | 10/20 [00:00<00:00, 11.10it/s] 60%|██████    | 12/20 [00:01<00:00, 11.28it/s] 70%|███████   | 14/20 [00:01<00:00, 11.36it/s] 80%|████████  | 16/20 [00:01<00:00, 11.43it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.43it/s]100%|██████████| 20/20 [00:01<00:00, 11.42it/s]100%|██████████| 20/20 [00:01<00:00, 10.89it/s]
+  0%|          | 0/20 [00:00<?, ?it/s] 10%|█         | 2/20 [00:00<00:01, 11.63it/s] 20%|██        | 4/20 [00:00<00:01, 11.71it/s] 30%|███       | 6/20 [00:00<00:01, 11.76it/s] 40%|████      | 8/20 [00:00<00:01, 11.69it/s] 50%|█████     | 10/20 [00:00<00:00, 11.65it/s] 60%|██████    | 12/20 [00:01<00:00, 11.63it/s] 70%|███████   | 14/20 [00:01<00:00, 11.61it/s] 80%|████████  | 16/20 [00:01<00:00, 11.61it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.61it/s]100%|██████████| 20/20 [00:01<00:00, 11.58it/s]100%|██████████| 20/20 [00:01<00:00, 11.63it/s]
+  0%|          | 0/20 [00:00<?, ?it/s] 10%|█         | 2/20 [00:00<00:01, 11.54it/s] 20%|██        | 4/20 [00:00<00:01, 11.62it/s] 30%|███       | 6/20 [00:00<00:01, 11.68it/s] 40%|████      | 8/20 [00:00<00:01, 11.74it/s] 50%|█████     | 10/20 [00:00<00:00, 11.77it/s] 60%|██████    | 12/20 [00:01<00:00, 11.80it/s] 70%|███████   | 14/20 [00:01<00:00, 11.82it/s] 80%|████████  | 16/20 [00:01<00:00, 11.82it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.83it/s]100%|██████████| 20/20 [00:01<00:00, 11.76it/s]100%|██████████| 20/20 [00:01<00:00, 11.76it/s]
+  0%|          | 0/20 [00:00<?, ?it/s] 10%|█         | 2/20 [00:00<00:01, 11.59it/s] 20%|██        | 4/20 [00:00<00:01, 11.71it/s] 30%|███       | 6/20 [00:00<00:01, 11.65it/s] 40%|████      | 8/20 [00:00<00:01, 11.67it/s] 50%|█████     | 10/20 [00:00<00:00, 11.64it/s] 60%|██████    | 12/20 [00:01<00:00, 11.61it/s] 70%|███████   | 14/20 [00:01<00:00, 11.64it/s] 80%|████████  | 16/20 [00:01<00:00, 11.72it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.74it/s]100%|██████████| 20/20 [00:01<00:00, 11.69it/s]100%|██████████| 20/20 [00:01<00:00, 11.67it/s]
+  0%|          | 0/20 [00:00<?, ?it/s] 10%|█         | 2/20 [00:00<00:01, 11.56it/s] 20%|██        | 4/20 [00:00<00:01, 11.71it/s] 30%|███       | 6/20 [00:00<00:01, 11.65it/s] 40%|████      | 8/20 [00:00<00:01, 11.62it/s] 50%|█████     | 10/20 [00:00<00:00, 11.60it/s] 60%|██████    | 12/20 [00:01<00:00, 11.59it/s] 70%|███████   | 14/20 [00:01<00:00, 11.62it/s] 80%|████████  | 16/20 [00:01<00:00, 11.65it/s] 90%|█████████ | 18/20 [00:01<00:00, 11.68it/s]100%|██████████| 20/20 [00:01<00:00, 11.65it/s]100%|██████████| 20/20 [00:01<00:00, 11.64it/s]
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:06,  3.15it/s] 15%|█▌        | 3/20 [00:00<00:02,  6.91it/s] 25%|██▌       | 5/20 [00:00<00:01,  8.91it/s] 35%|███▌      | 7/20 [00:00<00:01, 10.05it/s] 45%|████▌     | 9/20 [00:00<00:01, 10.75it/s] 55%|█████▌    | 11/20 [00:01<00:00, 11.24it/s] 65%|██████▌   | 13/20 [00:01<00:00, 11.57it/s] 75%|███████▌  | 15/20 [00:01<00:00, 11.82it/s] 85%|████████▌ | 17/20 [00:01<00:00, 11.94it/s] 95%|█████████▌| 19/20 [00:01<00:00, 11.95it/s]100%|██████████| 20/20 [00:01<00:00, 10.64it/s]
+[W1006 17:16:35.547798435 PyInterpreter.cpp:259] Warning: Deallocating Tensor that still has live PyObject references.  This probably happened because you took out a weak reference to Tensor and didn't call _fix_weakref() after dereferencing it.  Subsequent accesses to this tensor via the PyObject will now fail. (function decref)
+[W1006 17:16:35.547838626 PyInterpreter.cpp:259] Warning: Deallocating Tensor that still has live PyObject references.  This probably happened because you took out a weak reference to Tensor and didn't call _fix_weakref() after dereferencing it.  Subsequent accesses to this tensor via the PyObject will now fail. (function decref)
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  30%|██▉       | 22.9MB / 76.7MB,  114MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  46%|████▌     | 35.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  46%|████▌     | 35.0MB / 76.7MB, 87.5MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 53.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 53.0MB / 76.7MB, 88.4MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.5MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   | 53.5MB / 76.7MB, 66.9MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  78%|███████▊  | 60.2MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  78%|███████▊  | 60.2MB / 76.7MB, 60.2MB/s  
+New Data Upload               :  29%|██▊       | 6.66MB / 23.2MB, 6.65MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  99%|█████████▉| 76.3MB / 76.7MB, 63.6MB/s  
+New Data Upload               :  98%|█████████▊| 22.7MB / 23.2MB, 18.9MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 48.0MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 14.5MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 42.6MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 12.9MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  15%|█▍        | 11.4MB / 76.7MB,   ???B/s  
+
+  ...ity_lcm_-1/unet_model.bin:  38%|███▊      | 28.8MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  38%|███▊      | 28.8MB / 76.7MB, 87.3MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  53%|█████▎    | 41.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  53%|█████▎    | 41.0MB / 76.7MB, 74.1MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.5MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   | 53.5MB / 76.7MB, 70.3MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|███████   | 54.1MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|███████   | 54.1MB / 76.7MB, 53.4MB/s  
+New Data Upload               :   2%|▏         |  554kB / 23.2MB,  694kB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  84%|████████▍ | 64.6MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  84%|████████▍ | 64.6MB / 76.7MB, 53.3MB/s  
+New Data Upload               :  48%|████▊     | 11.1MB / 23.2MB, 11.1MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  99%|█████████▉| 76.3MB / 76.7MB, 54.1MB/s  
+New Data Upload               :  98%|█████████▊| 22.7MB / 23.2MB, 19.0MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 40.9MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 14.5MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 36.3MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 12.9MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  15%|█▍        | 11.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  15%|█▍        | 11.4MB / 76.7MB,   ???B/s  
+
+  ...ity_lcm_-1/unet_model.bin:  38%|███▊      | 28.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  38%|███▊      | 28.9MB / 76.7MB, 87.8MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  54%|█████▎    | 41.1MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  54%|█████▎    | 41.1MB / 76.7MB, 74.3MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 52.8MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 52.8MB / 76.7MB, 69.0MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  71%|███████   | 54.1MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  71%|███████   | 54.1MB / 76.7MB, 53.4MB/s  
+New Data Upload               :   2%|▏         |  555kB / 23.2MB,  693kB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  86%|████████▋ | 66.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  86%|████████▋ | 66.3MB / 76.7MB, 54.9MB/s  
+New Data Upload               :  55%|█████▌    | 12.8MB / 23.2MB, 12.8MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  99%|█████████▉| 76.3MB / 76.7MB, 54.1MB/s  
+New Data Upload               :  98%|█████████▊| 22.7MB / 23.2MB, 18.9MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  99%|█████████▉| 76.3MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 36.3MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 12.9MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 32.7MB/s  
+New Data Upload               : 100%|██████████| 23.2MB / 23.2MB, 11.6MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  30%|██▉       | 22.9MB / 76.7MB,  114MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  54%|█████▍    | 41.2MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  54%|█████▍    | 41.2MB / 76.7MB,  103MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 52.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 52.9MB / 76.7MB, 88.1MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  71%|███████   | 54.2MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  71%|███████   | 54.2MB / 76.7MB, 67.7MB/s  
+New Data Upload               :   2%|▏         |  555kB / 23.1MB,  694kB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin:  80%|███████▉  | 61.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  80%|███████▉  | 61.4MB / 76.7MB, 61.4MB/s  
+New Data Upload               :  34%|███▎      | 7.77MB / 23.1MB, 7.77MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉| 76.4MB / 76.7MB, 63.6MB/s  
+New Data Upload               :  98%|█████████▊| 22.8MB / 23.1MB, 19.0MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 48.0MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 14.5MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 42.6MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 12.8MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  22%|██▏       | 17.0MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  22%|██▏       | 17.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  22%|██▏       | 17.0MB / 76.7MB, 84.7MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  54%|█████▍    | 41.3MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  54%|█████▍    | 41.3MB / 76.7MB,  103MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 53.0MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 53.0MB / 76.7MB, 88.3MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.7MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   | 53.7MB / 76.7MB, 67.1MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  78%|███████▊  | 59.8MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  78%|███████▊  | 59.8MB / 76.7MB, 59.8MB/s  
+New Data Upload               :  26%|██▋       | 6.11MB / 23.1MB, 6.11MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉| 76.4MB / 76.7MB, 63.7MB/s  
+New Data Upload               :  99%|█████████▊| 22.8MB / 23.1MB, 19.0MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 42.6MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 12.8MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 38.4MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 11.5MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            
+Processing Files (0 / 0)      : |          |  0.00B /  0.00B            
+New Data Upload               : |          |  0.00B /  0.00B            [A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.8MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin:  30%|██▉       | 22.8MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  30%|██▉       | 22.8MB / 76.7MB,  114MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  45%|████▌     | 34.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  45%|████▌     | 34.9MB / 76.7MB, 87.3MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  69%|██████▉   | 52.9MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  69%|██████▉   | 52.9MB / 76.7MB, 88.2MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  70%|██████▉   | 53.6MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  70%|██████▉   | 53.6MB / 76.7MB, 67.0MB/s  
+
+  ...ity_lcm_-1/unet_model.bin:  76%|███████▋  | 58.6MB / 76.7MB            [A[AProcessing Files (0 / 1)      :  76%|███████▋  | 58.6MB / 76.7MB, 58.6MB/s  
+New Data Upload               :  22%|██▏       | 5.00MB / 23.1MB, 5.00MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[AProcessing Files (0 / 1)      : 100%|█████████▉| 76.4MB / 76.7MB, 63.7MB/s  
+New Data Upload               :  99%|█████████▊| 22.8MB / 23.1MB, 19.0MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|█████████▉| 76.4MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 48.0MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 14.4MB/s  [A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[A
+
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            [A[AProcessing Files (1 / 1)      : 100%|██████████| 76.7MB / 76.7MB, 42.6MB/s  
+New Data Upload               : 100%|██████████| 23.1MB / 23.1MB, 12.8MB/s  
+  ...ity_lcm_-1/unet_model.bin: 100%|██████████| 76.7MB / 76.7MB            

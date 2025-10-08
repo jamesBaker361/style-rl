@@ -1,0 +1,14 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Device set to use cuda:0
+The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:10000 for open-end generation.
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+Traceback (most recent call last):
+  File "/cache/home/jlb638/Desktop/style-rl/bark.py", line 8, in <module>
+    scipy.io.wavfile.write("bark_out.wav", rate=speech["sampling_rate"], data=speech["audio"])
+  File "/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/scipy/io/wavfile.py", line 824, in write
+    fmt_chunk_data = struct.pack('<HHIIHH', format_tag, channels, fs,
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+struct.error: ushort format requires 0 <= number <= 65535
+srun: error: gpu014: task 0: Exited with exit code 1

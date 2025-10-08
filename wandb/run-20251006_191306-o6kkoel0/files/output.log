@@ -1,0 +1,9 @@
+TF-I2I & 0.247 & 0.413 & 0.723  \\
+RectifID & 0.275 & 0.141 & 0.506  \\
+MASA & 0.186 & 0.511 & 0.769  \\
+FreeGraftor & 0.253 & 0.471 & 0.679  \\
+IP Base & 0.282 & 0.621 & 0.806  \\
+IP Scale 0.5 & 0.282 & 0.621 & 0.806  \\
+Monkey & 0.318 & 0.529 & 0.743  \\
+successful generating:) time elapsed: 50.32641386985779 seconds = 0.01397955940829383 hours
+all done!

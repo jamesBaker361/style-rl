@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/cache/home/jlb638/Desktop/style-rl/pdf.py", line 1, in <module>
+    from gtts import gTTS
+ModuleNotFoundError: No module named 'gtts'
+srun: error: hal0075: task 0: Exited with exit code 1

@@ -1,0 +1,13 @@
+SLURMD_NODENAME hal0141
+SBATCH_CLUSTERS doesnt exist
+SBATCH_PARTITION doesnt exist
+SLURM_JOB_PARTITION main
+SLURM_NODEID 0
+SLURM_MEM_PER_GPU doesnt exist
+SLURM_MEM_PER_CPU doesnt exist
+SLURM_MEM_PER_NODE 128000
+SLURM_JOB_ID 47223040
+couldnt print cuda details
+[2025-10-01 13:39:25.092050] Running job...
+penidnign jobs:  0
+Number of jobs: 4

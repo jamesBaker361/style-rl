@@ -1,0 +1,17 @@
+jlbaker361/tfi2i-dreambooth
+jlbaker361/tfi2i-dreambooth & 0.247 & 0.413 & 0.723  \\
+jlbaker361/rect-dreambooth
+jlbaker361/rect-dreambooth & 0.275 & 0.141 & 0.506  \\
+jlbaker361/masa-dreambooth
+jlbaker361/masa-dreambooth & 0.186 & 0.511 & 0.769  \\
+[<class 'PIL.JpegImagePlugin.JpegImageFile'>, <class 'PIL.PngImagePlugin.PngImageFile'>, <class 'PIL.PngImagePlugin.PngImageFile'>, <class 'dict'>]
+Traceback (most recent call last):
+  File "C:\Users\jlbak\Downloads\style-rl\compare_scores.py", line 92, in <module>
+    main(args)
+  File "C:\Users\jlbak\Downloads\style-rl\compare_scores.py", line 80, in main
+    concat=concat_images_horizontally(image_list)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jlbak\Downloads\style-rl\image_utils.py", line 15, in concat_images_horizontally
+    heights = [img.height for img in images]
+               ^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'height'

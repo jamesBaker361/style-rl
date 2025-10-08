@@ -1,0 +1,3 @@
+/umbc/rs/pi_donengel/users/jbaker15/style-rl
+sbatch -J auto runpygpu_chip.sh endless.py
+sbatch -J auto runpymain.sh endless.py

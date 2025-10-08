@@ -1,0 +1,335 @@
+Submitted batch job 47206150
+Submitted batch job 47206151
+Submitted batch job 47209520
+Submitted batch job 47213576
+Submitted batch job 47214641
+Submitted batch job 47217666
+Submitted batch job 47219928
+Submitted batch job 47220405
+Submitted batch job 47220413
+Submitted batch job 47220423
+Submitted batch job 47220522
+Submitted batch job 47220537
+SLURMD_NODENAME hal0108
+SBATCH_CLUSTERS doesnt exist
+SBATCH_PARTITION doesnt exist
+SLURM_JOB_PARTITION main
+SLURM_NODEID 0
+SLURM_MEM_PER_GPU doesnt exist
+SLURM_MEM_PER_CPU doesnt exist
+SLURM_MEM_PER_NODE 128000
+SLURM_JOB_ID 47065575
+couldnt print cuda details
+[2025-09-30 23:08:56.234401] Running job...
+penidnign jobs:  0
+Number of jobs: 4
+[2025-09-30 23:08:56.530032] Job completed.
+[2025-09-30 23:18:56.530238] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-09-30 23:18:56.633423] Job completed.
+[2025-09-30 23:28:56.633569] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-09-30 23:28:56.753324] Job completed.
+[2025-09-30 23:38:56.753546] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-09-30 23:38:56.916197] Job completed.
+[2025-09-30 23:48:56.916414] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-09-30 23:48:57.021159] Job completed.
+[2025-09-30 23:58:57.021354] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-09-30 23:58:57.124796] Job completed.
+[2025-10-01 00:08:57.124921] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 00:08:57.262444] Job completed.
+[2025-10-01 00:18:57.262591] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 00:18:57.370229] Job completed.
+[2025-10-01 00:28:57.370879] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 00:28:57.510998] Job completed.
+[2025-10-01 00:38:57.511207] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 00:38:57.648427] Job completed.
+[2025-10-01 00:48:57.648790] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 00:48:57.772259] Job completed.
+[2025-10-01 00:58:57.772454] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 00:58:57.898782] Job completed.
+[2025-10-01 01:08:57.898983] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 01:08:58.022884] Job completed.
+[2025-10-01 01:18:58.023034] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 01:18:58.336114] Job completed.
+[2025-10-01 01:28:58.336527] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 01:28:58.440169] Job completed.
+[2025-10-01 01:38:58.440619] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 01:38:58.583638] Job completed.
+[2025-10-01 01:48:58.583839] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 01:48:58.744958] Job completed.
+[2025-10-01 01:58:58.745118] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 01:58:58.831874] Job completed.
+[2025-10-01 02:08:58.832017] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 02:08:58.996924] Job completed.
+[2025-10-01 02:18:58.997280] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 02:18:59.115697] Job completed.
+[2025-10-01 02:28:59.115959] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 02:28:59.215169] Job completed.
+[2025-10-01 02:38:59.215291] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 02:38:59.299355] Job completed.
+[2025-10-01 02:48:59.299593] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 02:48:59.429027] Job completed.
+[2025-10-01 02:58:59.429334] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 02:58:59.511007] Job completed.
+[2025-10-01 03:08:59.511233] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 03:08:59.641475] Job completed.
+[2025-10-01 03:18:59.641686] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 03:18:59.742416] Job completed.
+[2025-10-01 03:28:59.742634] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 03:28:59.830088] Job completed.
+[2025-10-01 03:38:59.830324] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 03:38:59.919300] Job completed.
+[2025-10-01 03:48:59.919554] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 03:49:00.040057] Job completed.
+[2025-10-01 03:59:00.040293] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 03:59:00.125153] Job completed.
+[2025-10-01 04:09:00.125361] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 04:09:00.214312] Job completed.
+[2025-10-01 04:19:00.214721] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 04:19:00.321762] Job completed.
+[2025-10-01 04:29:00.321880] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 04:29:00.431257] Job completed.
+[2025-10-01 04:39:00.431484] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 04:39:00.525007] Job completed.
+[2025-10-01 04:49:00.525127] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 04:49:00.615064] Job completed.
+[2025-10-01 04:59:00.615282] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 04:59:00.716946] Job completed.
+[2025-10-01 05:09:00.717193] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 05:09:01.139410] Job completed.
+[2025-10-01 05:19:01.139664] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 05:19:01.222768] Job completed.
+[2025-10-01 05:29:01.222994] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 05:29:01.311512] Job completed.
+[2025-10-01 05:39:01.311817] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 05:39:01.392820] Job completed.
+[2025-10-01 05:49:01.393073] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 05:49:01.506440] Job completed.
+[2025-10-01 05:59:01.506722] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 05:59:01.589724] Job completed.
+[2025-10-01 06:09:01.590054] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:09:01.834060] Job completed.
+[2025-10-01 06:19:01.834186] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:19:01.917371] Job completed.
+[2025-10-01 06:29:01.917490] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:29:02.006362] Job completed.
+[2025-10-01 06:39:02.006481] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:39:02.093644] Job completed.
+[2025-10-01 06:49:02.093893] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:49:02.188891] Job completed.
+[2025-10-01 06:59:02.189220] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 06:59:02.287396] Job completed.
+[2025-10-01 07:09:02.287515] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 07:09:02.392467] Job completed.
+[2025-10-01 07:19:02.392679] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 07:19:02.496915] Job completed.
+[2025-10-01 07:29:02.497293] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 07:29:02.578771] Job completed.
+[2025-10-01 07:39:02.578891] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 07:39:02.664231] Job completed.
+[2025-10-01 07:49:02.664472] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 07:49:02.764842] Job completed.
+[2025-10-01 07:59:02.765059] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 07:59:02.854931] Job completed.
+[2025-10-01 08:09:02.855175] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 08:09:02.995097] Job completed.
+[2025-10-01 08:19:02.995226] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 08:19:03.102867] Job completed.
+[2025-10-01 08:29:03.103057] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 08:29:03.215662] Job completed.
+[2025-10-01 08:39:03.215784] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 08:39:03.300109] Job completed.
+[2025-10-01 08:49:03.300324] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 08:49:03.381206] Job completed.
+[2025-10-01 08:59:03.381479] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 08:59:03.461681] Job completed.
+[2025-10-01 09:09:03.461901] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 09:09:03.548322] Job completed.
+[2025-10-01 09:19:03.548557] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 09:19:03.898424] Job completed.
+[2025-10-01 09:29:03.898683] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 09:29:03.984448] Job completed.
+[2025-10-01 09:39:03.984747] Running job...
+penidnign jobs: Submitted batch job 47220759
+Submitted batch job 47221025
+ 0
+Number of jobs: 0
+[2025-10-01 09:39:04.076148] Job completed.
+[2025-10-01 09:49:04.076443] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 09:49:04.233562] Job completed.
+[2025-10-01 09:59:04.233776] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 09:59:04.314347] Job completed.
+[2025-10-01 10:09:04.314629] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:09:04.398139] Job completed.
+[2025-10-01 10:19:04.398285] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:19:04.529219] Job completed.
+[2025-10-01 10:29:04.529439] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:29:04.650881] Job completed.
+[2025-10-01 10:39:04.651009] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:39:04.746426] Job completed.
+[2025-10-01 10:49:04.746656] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:49:04.849702] Job completed.
+[2025-10-01 10:59:04.849966] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 10:59:04.972768] Job completed.
+[2025-10-01 11:09:04.972979] Running job...
+penidnign jobs:  0
+Number of jobs: 2
+[2025-10-01 11:09:05.104221] Job completed.
+[2025-10-01 11:19:05.104643] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 11:19:05.236690] Job completed.
+[2025-10-01 11:29:05.237150] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 11:29:05.372398] Job completed.
+[2025-10-01 11:39:05.372707] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 11:39:05.506183] Job completed.
+[2025-10-01 11:49:05.506547] Running job...
+penidnign jobs:  0
+Number of jobs: 0
+[2025-10-01 11:49:05.639813] Job completed.
+[2025-10-01 11:59:05.640004] Running job...
+penidnign jobs:  0
+Number of jobs: 2

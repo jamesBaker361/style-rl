@@ -1,0 +1,15 @@
+{"time":"2025-09-13T22:04:35.7713397-04:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"C:\\Users\\jlbak\\Downloads\\style-rl\\wandb\\run-20250913_220435-4iq02jib\\logs\\debug-core.log"}
+{"time":"2025-09-13T22:04:36.4721472-04:00","level":"INFO","msg":"created new stream","id":"4iq02jib"}
+{"time":"2025-09-13T22:04:36.4721472-04:00","level":"INFO","msg":"stream: started","id":"4iq02jib"}
+{"time":"2025-09-13T22:04:36.4721472-04:00","level":"INFO","msg":"handler: started","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:04:36.4721472-04:00","level":"INFO","msg":"sender: started","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:04:36.4721472-04:00","level":"INFO","msg":"writer: Do: started","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:04:36.6393774-04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-09-13T22:05:24.0004693-04:00","level":"INFO","msg":"stream: closing","id":"4iq02jib"}
+{"time":"2025-09-13T22:05:24.0004693-04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-09-13T22:05:24.0004693-04:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-09-13T22:05:24.4308498-04:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-09-13T22:05:24.5506921-04:00","level":"INFO","msg":"handler: closed","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:05:24.5506921-04:00","level":"INFO","msg":"writer: Close: closed","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:05:24.5506921-04:00","level":"INFO","msg":"sender: closed","stream_id":"4iq02jib"}
+{"time":"2025-09-13T22:05:24.5518902-04:00","level":"INFO","msg":"stream: closed","id":"4iq02jib"}

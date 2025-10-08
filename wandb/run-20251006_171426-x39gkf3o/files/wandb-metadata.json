@@ -1,0 +1,37 @@
+{
+  "os": "Windows-11-10.0.26100-SP0",
+  "python": "CPython 3.12.9",
+  "startedAt": "2025-10-06T21:14:26.712520Z",
+  "args": [
+    "--dataset_list",
+    "jlbaker361/tfi2i-dreambooth",
+    "jlbaker361/rect-dreambooth",
+    "jlbaker361/masa-dreambooth"
+  ],
+  "program": "C:\\Users\\jlbak\\Downloads\\style-rl\\compare_scores.py",
+  "codePath": "compare_scores.py",
+  "git": {
+    "remote": "https://github.com/jamesBaker361/style-rl.git",
+    "commit": "8d3b3641a189b0f6fab51826d1230aa2f0b67765"
+  },
+  "email": "jlbaker361@gmail.com",
+  "root": "C:\\Users\\jlbak\\Downloads\\style-rl",
+  "host": "james_laptop",
+  "executable": "C:\\Users\\jlbak\\miniconda3\\envs\\hands0\\python.exe",
+  "codePathLocal": "compare_scores.py",
+  "cpu_count": 12,
+  "cpu_count_logical": 14,
+  "disk": {
+    "/": {
+      "total": "2047173718016",
+      "used": "1000322621440"
+    }
+  },
+  "memory": {
+    "total": "33767481344"
+  },
+  "cpu": {
+    "count": 12,
+    "countLogical": 14
+  }
+}

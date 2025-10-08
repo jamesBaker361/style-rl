@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/instruct.py", line 10, in <module>
+    from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/__init__.py", line 5, in <module>
+    from .utils import (
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/utils/__init__.py", line 21, in <module>
+    from .constants import (
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/utils/constants.py", line 63, in <module>
+    dep_version_check("peft")
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/dependency_versions_check.py", line 34, in dep_version_check
+    require_version(deps[pkg], hint)
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/utils/versions.py", line 111, in require_version
+    _compare_versions(op, got_ver, want_ver, requirement, pkg, hint)
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/diffusers/utils/versions.py", line 44, in _compare_versions
+    raise ImportError(
+ImportError: peft>=0.17.0 is required for a normal functioning of this module, but found peft==0.16.0.
+srun: error: g20-09: task 0: Exited with exit code 1

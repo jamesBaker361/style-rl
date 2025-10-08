@@ -1,0 +1,32 @@
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_5m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_5m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_11m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_11m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_224 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_224. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_384 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_384. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+/scratch/jlb638/conda_envs/deephands/lib/python3.11/site-packages/controlnet_aux/segment_anything/modeling/tiny_vit_sam.py:654: UserWarning: Overwriting tiny_vit_21m_512 in registry with controlnet_aux.segment_anything.modeling.tiny_vit_sam.tiny_vit_21m_512. This is because the name being registered conflicts with an existing name. Please check if this is not expected.
+  return register_model(fn_wrapper)
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]`torch_dtype` is deprecated! Use `dtype` instead!
+Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:04,  1.26it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:02<00:02,  1.33it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:02<00:00,  2.52it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:03<00:00,  1.79it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:11<00:00,  2.68s/it]Loading pipeline components...: 100%|██████████| 7/7 [00:11<00:00,  1.66s/it]
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:02<00:06,  2.01s/it] 75%|███████▌  | 3/4 [00:02<00:00,  1.72it/s]100%|██████████| 4/4 [00:02<00:00,  1.77it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.71it/s]100%|██████████| 4/4 [00:00<00:00, 13.98it/s]100%|██████████| 4/4 [00:00<00:00, 13.93it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.73it/s]100%|██████████| 4/4 [00:00<00:00, 14.27it/s]100%|██████████| 4/4 [00:00<00:00, 14.18it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.71it/s]100%|██████████| 4/4 [00:00<00:00, 13.92it/s]100%|██████████| 4/4 [00:00<00:00, 13.88it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.70it/s]100%|██████████| 4/4 [00:00<00:00, 13.91it/s]100%|██████████| 4/4 [00:00<00:00, 13.87it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.68it/s]100%|██████████| 4/4 [00:00<00:00, 14.32it/s]100%|██████████| 4/4 [00:00<00:00, 14.22it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.66it/s]100%|██████████| 4/4 [00:00<00:00, 13.86it/s]100%|██████████| 4/4 [00:00<00:00, 13.83it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.65it/s]100%|██████████| 4/4 [00:00<00:00, 14.16it/s]100%|██████████| 4/4 [00:00<00:00, 14.07it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.58it/s]100%|██████████| 4/4 [00:00<00:00, 14.10it/s]100%|██████████| 4/4 [00:00<00:00, 14.01it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.62it/s]100%|██████████| 4/4 [00:00<00:00, 13.96it/s]100%|██████████| 4/4 [00:00<00:00, 13.90it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.61it/s]100%|██████████| 4/4 [00:00<00:00, 13.76it/s]100%|██████████| 4/4 [00:00<00:00, 13.73it/s]
+  0%|          | 0/4 [00:00<?, ?it/s] 50%|█████     | 2/4 [00:00<00:00, 13.59it/s]100%|██████████| 4/4 [00:00<00:00, 14.10it/s]100%|██████████| 4/4 [00:00<00:00, 14.01it/s]

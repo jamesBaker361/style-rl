@@ -1,0 +1,35 @@
+{
+  "os": "Windows-11-10.0.26100-SP0",
+  "python": "CPython 3.12.9",
+  "startedAt": "2025-09-05T21:18:36.231117Z",
+  "args": [
+    "--limit",
+    "2"
+  ],
+  "program": "C:\\Users\\jlbak\\Downloads\\style-rl\\directional_embeddings.py",
+  "codePath": "directional_embeddings.py",
+  "git": {
+    "remote": "https://github.com/jamesBaker361/style-rl.git",
+    "commit": "8528362fe1a1a63e1bb592ffcd96620398f9ab7c"
+  },
+  "email": "jlbaker361@gmail.com",
+  "root": "C:\\Users\\jlbak\\Downloads\\style-rl",
+  "host": "james_laptop",
+  "executable": "C:\\Users\\jlbak\\miniconda3\\envs\\hands0\\python.exe",
+  "codePathLocal": "directional_embeddings.py",
+  "cpu_count": 12,
+  "cpu_count_logical": 14,
+  "disk": {
+    "/": {
+      "total": "2047271235584",
+      "used": "839970455552"
+    }
+  },
+  "memory": {
+    "total": "33767481344"
+  },
+  "cpu": {
+    "count": 12,
+    "countLogical": 14
+  }
+}

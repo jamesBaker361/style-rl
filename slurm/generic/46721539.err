@@ -1,0 +1,2 @@
+slurmstepd: error: *** JOB 46721539 ON hal0096 CANCELLED AT 2025-09-22T10:35:44 ***
+slurmstepd: error: *** STEP 46721539.0 ON hal0096 CANCELLED AT 2025-09-22T10:35:44 ***

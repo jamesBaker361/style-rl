@@ -1,0 +1,38 @@
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/controlnet_aux/mediapipe_face/mediapipe_face_common.py:7: UserWarning: The module 'mediapipe' is not installed. The package will have limited functionality. Please install it using the command: pip install 'mediapipe'
+  warnings.warn(
+Traceback (most recent call last):
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/import_utils.py", line 144, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/usr/lib64/python3.9/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1030, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1007, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/trainer/ddpo_trainer.py", line 32, in <module>
+    from .utils import PerPromptStatTracker, generate_model_card, get_comet_experiment_url
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/trainer/utils.py", line 43, in <module>
+    from transformers.utils import (
+ImportError: cannot import name 'is_rich_available' from 'transformers.utils' (/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/__init__.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/main_seg.py", line 23, in <module>
+    from pipelines import CompatibleLatentConsistencyModelPipeline
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/pipelines.py", line 1, in <module>
+    from trl import DDPOConfig, DDPOTrainer, DefaultDDPOStableDiffusionPipeline,DDPOPipelineOutput,DDPOStableDiffusionPipeline
+  File "<frozen importlib._bootstrap>", line 1055, in _handle_fromlist
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/import_utils.py", line 135, in __getattr__
+    value = getattr(module, name)
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/import_utils.py", line 134, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/trl/import_utils.py", line 146, in _get_module
+    raise RuntimeError(
+RuntimeError: Failed to import trl.trainer.ddpo_trainer because of the following error (look up to see its traceback):
+cannot import name 'is_rich_available' from 'transformers.utils' (/umbc/rs/pi_donengel/users/jbaker15/style-rl/myenv/lib64/python3.9/site-packages/transformers/utils/__init__.py)
+srun: error: g20-09: task 0: Exited with exit code 1

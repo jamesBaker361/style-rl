@@ -296,6 +296,11 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
                         _current_ip_hidden_states = _current_ip_hidden_states.transpose(1, 2).reshape(
                             batch_size, -1, attn.heads * head_dim
                         )
+
+                        attn_weight = query @ ip_key.transpose(-2, -1)
+                        attn_weight = torch.softmax(attn_weight, dim=-1)
+
+                        self.kv_ip.append(attn_weight)
                         _current_ip_hidden_states = _current_ip_hidden_states.to(query.dtype)
 
                         

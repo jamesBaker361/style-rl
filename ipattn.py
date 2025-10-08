@@ -299,7 +299,7 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
                         _current_ip_hidden_states = _current_ip_hidden_states.to(query.dtype)
 
                         
-                        hidden_states = hidden_states + scale[i] * (_current_ip_hidden_states)
+                        hidden_states = hidden_states + scale * (_current_ip_hidden_states)
 
         # linear proj
         hidden_states = attn.to_out[0](hidden_states)

@@ -279,37 +279,27 @@ class MonkeyIPAttnProcessor(torch.nn.Module):
                         mask_downsample = mask_downsample.to(dtype=query.dtype, device=query.device)
                         hidden_states = hidden_states + scale[i] * (_current_ip_hidden_states * mask_downsample)
                 else:
-                    print("current_ip_hidden_states size",current_ip_hidden_states.size())
-                    ip_key = to_k_ip(current_ip_hidden_states)
-                    #print("\t ip key size",ip_key.size())
-                    ip_value = to_v_ip(current_ip_hidden_states)
+                    current_num_images=current_ip_hidden_states.size()[1]
+                    for i in range(current_num_images):
+                        ip_key = to_k_ip(current_ip_hidden_states[:, i, :, :])
+                        ip_value = to_v_ip(current_ip_hidden_states[:, i, :, :])
 
-                    ip_key = ip_key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-                    #print("\t ip key after view size",ip_key.size())
-                    ip_value = ip_value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+                        ip_key = ip_key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+                        ip_value = ip_value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
 
-                    # the output of sdp = (batch, num_heads, seq_len, head_dim)
-                    # TODO: add support for attn.scale when we move to Torch 2.1
-                    current_ip_hidden_states = F.scaled_dot_product_attention(
-                        query, ip_key, ip_value, attn_mask=None, dropout_p=0.0, is_causal=False
-                    )
+                        # the output of sdp = (batch, num_heads, seq_len, head_dim)
+                        # TODO: add support for attn.scale when we move to Torch 2.1
+                        _current_ip_hidden_states = F.scaled_dot_product_attention(
+                            query, ip_key, ip_value, attn_mask=None, dropout_p=0.0, is_causal=False
+                        )
 
-                    attn_weight = query @ ip_key.transpose(-2, -1)
-                    attn_weight = torch.softmax(attn_weight, dim=-1)
+                        _current_ip_hidden_states = _current_ip_hidden_states.transpose(1, 2).reshape(
+                            batch_size, -1, attn.heads * head_dim
+                        )
+                        _current_ip_hidden_states = _current_ip_hidden_states.to(query.dtype)
 
-                    self.kv_ip.append(attn_weight)
-
-                    #print("\t attn_weight shape",attn_weight.size())
-                    if self.dict_name not in big_global_ip_dict:
-                        big_global_ip_dict[self.dict_name]=[]
-                    big_global_ip_dict[self.dict_name].append(attn_weight)
-
-                    current_ip_hidden_states = current_ip_hidden_states.transpose(1, 2).reshape(
-                        batch_size, -1, attn.heads * head_dim
-                    )
-                    current_ip_hidden_states = current_ip_hidden_states.to(query.dtype)
-
-                    hidden_states = hidden_states + scale * current_ip_hidden_states
+                        
+                        hidden_states = hidden_states + scale[i] * (_current_ip_hidden_states)
 
         # linear proj
         hidden_states = attn.to_out[0](hidden_states)

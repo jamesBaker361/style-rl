@@ -46,7 +46,7 @@ def main(args):
         elif dataset_name.find("ip_0.5")!=-1:
             return "IP Scale 0.5"
         elif dataset_name.find("ip_1.0")!=-1:
-            return "IP Scale 1.0"
+            return "IP Base"
         elif dataset_name.find("attn")!=-1:
             return "Monkey"
         
@@ -55,7 +55,6 @@ def main(args):
     labels=[]
 
     for d in args.dataset_list:
-        print(d)
         dataset=load_dataset(d,split="train")
         try:
             dataset=dataset.cast_column("image",datasets.Image())
@@ -72,10 +71,12 @@ def main(args):
         image_score=np.mean(dataset["image_score"])
         x.append(image_score)
         y.append(text_score)
-        labels.append(d)
-        accelerator.print(f"{d} & {round(text_score,3)} & {round(dino_score,3)} & {round(image_score,3)}  \\\\ ")
+        labels.append(get_name(d))
+        accelerator.print(f"{get_name(d)} & {round(text_score,3)} & {round(dino_score,3)} & {round(image_score,3)}  \\\\ ")
 
     plt.scatter(x,y)
+    plt.xlabel("CLIP-I")
+    plt.ylabel("CLIP-T")
     for xi, yi, label in zip(x, y, labels):
         plt.text(xi, yi, label, fontsize=9, ha='right', va='bottom')
 
@@ -89,8 +90,9 @@ def main(args):
             if type(image)==dict:
                 image = PIL.Image.open(io.BytesIO(image["bytes"]))
                 image_list[i]=image
-        print([type(i) for i in image_list])
+        #([type(i) for i in image_list])
         concat=concat_images_horizontally(image_list)
+        prompt=rows[0]["prompt"].replace(" ","_")
         accelerator.log({
             "concat":wandb.Image(concat)
         })

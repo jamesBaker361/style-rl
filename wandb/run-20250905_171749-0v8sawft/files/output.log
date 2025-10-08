@@ -1,8 +1,0 @@
-Loading pipeline components...: 100%|█| 7/7 [00:00<00:00
-Traceback (most recent call last):
-  File "C:\Users\jlbak\Downloads\style-rl\directional_embeddings.py", line 88, in <module>
-    main(args)
-  File "C:\Users\jlbak\Downloads\style-rl\directional_embeddings.py", line 71, in main
-    if k%args.upload_interval==0:
-       ~^~~~~~~~~~~~~~~~~~~~~
-TypeError: not all arguments converted during string formatting
